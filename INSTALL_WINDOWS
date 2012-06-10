@@ -1,0 +1,22 @@
+dépendances :
+R 2.10.1
+http://cran.cict.fr/bin/windows/
+
+python 2.6
+http://www.python.org/
+
+Numpy
+http://surfnet.dl.sourceforge.net/sourceforge/numpy/
+
+wxpython
+http://surfnet.dl.sourceforge.net/sourceforge/wxpython/
+
+xlrd
+
+package de R :
+rgl
+ca
+gee
+ape
+igraph
+proxy
