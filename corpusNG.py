@@ -21,23 +21,6 @@ import datetime
 
 log = logging.getLogger('iramuteq.corpus')
 
-#expressions = ReadDicoAsDico('dictionnaires/expression_fr.txt')
-#lexique = ReadDicoAsDico('dictionnaires/lexique_fr.txt')
-#infile = '/home/pierre/workspace/iramuteq/corpus/lru2.txt'
-#infile = '/home/pierre/workspace/iramuteq/corpus/corpussab_cor.txt'
-#encoding = 'utf8'
-#infile = '/home/pierre/fac/identite/identite_sans_doublons_ok.txt'
-#encoding = 'cp1252'
-#infile = '/home/pierre/workspace/iramuteq/corpus/Natacha.txt'
-#infile = '/home/pierre/fac/cablegate/allcables-all.txt'
-#infile = '/home/pierre/fac/cablegate/allcables-08290338.txt'
-#tar_in = '/home/pierre/fac/identite/uce.tar.gz
-#tar_in = '/home/pierre/fac/cablegate/uce-cable-test.tar.gz'
-#tar_infouce = '/home/pierre/fac/identite/info_uce.tar.gz'
-#tar_infouce = '/home/pierre/fac/cablegate/info_uce.tar.gz'
-#tar_formes = '/home/pierre/fac/identite/tar_formes.tar.gz'
-#tar_formes = '/home/pierre/fac/cablegate/tar_formes.tar.gz'
-
 
 def copycorpus(corpus) :
     log.info('copy corpus')
