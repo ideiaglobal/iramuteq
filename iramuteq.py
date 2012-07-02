@@ -433,7 +433,7 @@ Le chemin de l'executable de R n'a pas été trouvé.
 Si R n'est pas installé, vous devez l'installer (http://www.r-project.org/).
 Si R n'est pas installé dans le répertoire par défaut
 (C:\Program Files\R\R-2.x.x\R.exe sous windows ou /usr/bin/R sous linux ou Mac Os X)
-vous devez signaler le chemin de l'éxecutable de R dans les préférences.""" % self.ConfigPath['path']
+vous devez signaler le chemin de l'éxecutable de R dans les préférences.""" 
             dlg = wx.MessageDialog(self, msg, u"Problème de configuration", wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
             dlg.CenterOnParent()
             if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
