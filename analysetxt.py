@@ -78,8 +78,8 @@ class AnalyseText :
             minutes, seconds = divmod(self.time, 60)
             hours, minutes = divmod(minutes, 60)            
             self.parametres['time'] = '%.0fh %.0fm %.0fs' % (hours, minutes, seconds)
-            self.parametres['ira'] = self.pathout['ira']
-            DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['ira'])
+            self.parametres['ira'] = self.pathout['Analyse.ira']
+            DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
             self.ira.history.add(self.parametres)
             if dlg :
                 dlg.Destroy()

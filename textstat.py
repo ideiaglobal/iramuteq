@@ -1,7 +1,7 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2009 Pierre Ratinaud
+#Copyright (c) 2008-2012 Pierre Ratinaud
 #Lisense: GNU/GPL
 
 #from chemins import ConstructPathOut, StatTxtPathOut, ffr
@@ -66,6 +66,8 @@ class Stat(AnalyseText) :
         act = [[i, val] for i, val in enumerate(act)]
         supp = [[forme, formes[forme].freq, formes[forme].gram] for forme in formes if formes[forme].act == 2]        
         supp = sortedby(supp, 2, 1)
+
+        #print self.corpus.gethapaxbyuci()
 
         supp = [[i, val] for i, val in enumerate(supp)]
         #self.corpus.pathout = self.dictpathout

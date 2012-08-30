@@ -54,6 +54,7 @@ class Corpus :
         self.idformesuces = {}
         self.iduces = None
         self.idformes = None
+        self.uceuci = None
         if read :
             self.pathout = PathOut(dirout = parametres['pathout'])
             self.read_corpus()
@@ -220,6 +221,10 @@ class Corpus :
 #                    self.lems[self.formes[forme].lem][self.formes[forme].ident] = 0
 #            else :
 #                    self.lems[self.formes[forme].lem] = {self.formes[forme].ident : 0}
+
+    def getetbyuceid(self, uceid) :
+        if self.uceuci is None : self.uceuci = dict([[uce.ident,uci.ident] for uci in self.ucis for uce in uci.uces])
+        return self.ucis[self.uceuci[uceid]].etoiles
 
     def make_lems(self, lem = True) :
         log.info('make lems')
@@ -527,6 +532,64 @@ class Corpus :
         self.lc0 = self.lc.pop(0)
         #return ucecl
 
+    def gethapaxbyet(self, etoiles) :
+        hapaxuces = [self.getlemuces(forme)[0] for forme in self.lems if self.lems[forme].freq == 1]
+        hucesdict = {}
+        for uce in hapaxuces :
+            if uce in hucesdict :
+                hucesdict[uce] += 1
+            else :
+                hucesdict[uce] = 1
+        etuces = [[] for et in etoiles]
+        for uci in self.ucis :
+            get = list(set(uci.etoiles).intersection(etoiles))
+            if len(get) > 1 :
+                return '2 variables sur la meme ligne'
+            elif get != [] :
+                etuces[etoiles.index(get[0])] += [uce.ident for uce in uci.uces]
+        etuces = [set(val) for val in etuces]
+        return [sum([hucesdict[uce] for uce in list(etuce.intersection(hapaxuces))]) for etuce in etuces]
+
+    def gethapaxuces(self) :
+        hapaxuces = [self.getlemuces(forme)[0] for forme in self.lems if self.lems[forme].freq == 1]
+        hapax = [forme for forme in self.lems if self.lems[forme].freq == 1]
+        hucesdict = {}
+        for i,uce in enumerate(hapaxuces) :
+            if uce in hucesdict :
+                hucesdict[uce][0] += 1
+                hucesdict[uce][1].append(hapax[i])
+            else :
+                hucesdict[uce] = [1,[hapax[i]]]
+        huces = {}
+        for uce in hucesdict :
+            if hucesdict[uce][0] in huces :
+                huces[hucesdict[uce][0]].append(uce)
+            else :
+                huces[hucesdict[uce][0]] = [uce]
+        huces = zip(huces, huces.values())
+        huces.sort(reverse=True)
+        txt = """
+        <html><body>
+        """
+        for nb in huces[0:4] :
+            txt += "<p><h2>%i hapax par uce</h2><p>\n" % nb[0]
+            for uce in nb[1] :
+                res = self.getconcorde([uce])
+                for row in res :
+                    ucetxt = ' ' + row[1] + ' '
+                    uceid = row[0]
+                for hap in hucesdict[uce][1] :
+                    laforme = self.getforme([forme for forme in self.lems[hap].formes][0]).forme
+                    ucetxt = ucetxt.replace(' '+laforme+' ', ' <font color=red>'+laforme+'</font> ')
+                txt += '<p><b>' + ' '.join(self.getetbyuceid(uceid)) + '</b></p>'
+                txt += '<p>'+ucetxt+'</p>\n'
+        txt += """
+        </body></html>
+        """
+        with open('/tmp/testhapxuce.html','w') as f :
+            f.write(txt)
+
+
 class Uci :
     def __init__(self, iduci, line, paraset = None) :
         self.ident = iduci
@@ -630,7 +693,7 @@ def prep_txtcharact(txt) :
 
 class BuildCorpus :
     """
-    Class for building a corpora
+    Class for building a corpus
     """
     def __init__(self, infile, parametres_corpus, lexique = None, expressions = None, dlg = None) :
         log.info('begin building corpus...')

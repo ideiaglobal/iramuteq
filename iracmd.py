@@ -100,7 +100,10 @@ class CmdLine :
 
 
             corpus.conn_all()
+            corpus.make_lems()
             corpus.parse_active(gramact, gramsup)
+            log.warning('ATTENTION gethapaxuces')
+            corpus.gethapaxuces()
                 #    self.content = f.read()
                 #self.content = self.content.replace('\r','')
             if options.type_analyse == 'alceste' :

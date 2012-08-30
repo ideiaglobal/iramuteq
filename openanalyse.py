@@ -60,7 +60,18 @@ class OpenAnalyse():
         elif self.conf['type'] == 'alceste' :
             self.parent.ShowMenu(_("Text analysis"))
             OpenCHDS(self.parent,  corpus, self.conf, Alceste = True)
-        elif self.conf['type'] == 'simi' :
+        elif self.conf['type'] == 'simitxt' :
+            self.tableau = Tableau(self.parent, self.conf['ira'])
+            self.DictPathOut=construct_simipath(self.conf['pathout'])
+            self.tableau.dictpathout = self.DictPathOut
+            self.tableau.read_tableau(self.tableau.dictpathout['db'])
+            if self.tableau.parametre.get('corpus', False) :
+                self.corpus=corpus
+                #self.corpus.read_corpus_from_shelves(self.DictPathOut['corpus'])
+                self.corpus.parametres['openpath'] = self.conf['pathout']
+                self.parent.ShowMenu(_("Text analysis"))
+            DoSimi(self.parent, self.conf, isopen = True, filename = self.conf['ira'], gparent = self, openfromprof=False) 
+            
             print 'simi'
 #        try :
 #            #if self.conf['type'] in ['analyse','lexico','stat','wordcloud'] :

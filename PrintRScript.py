@@ -17,6 +17,7 @@ class PrintRScript :
         log.info('Rscript')
         self.pathout = analyse.pathout
         self.analyse = analyse
+        self.parametres = analyse.parametres
         self.scriptout = self.pathout['temp']
         self.script =  u"#Script genere par IRaMuTeQ - %s" % datetime.now().ctime()
     

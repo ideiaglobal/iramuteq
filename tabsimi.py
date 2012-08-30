@@ -16,6 +16,8 @@ import tempfile
 import datetime
 from ConfigParser import RawConfigParser
 from time import sleep
+from uuid import uuid4
+
 
 class DoSimi():
     def __init__(self, parent, param = None, isopen = False, fromprof = False, pathout = False, filename ='', gparent = False, wordgraph = False, listactives = False, actives = False, cmd = False, openfromprof=False):
@@ -226,6 +228,9 @@ class DoSimi():
         if not 'simi' in conf.sections() :
             conf.add_section('simi')
         date = datetime.datetime.now().ctime()
+        if self.fromprof :
+            conf.set('simi', 'corpus', self.Source.corpus.parametres['uuid'])
+        conf.set('simi', 'uuid', str(uuid4()))
         conf.set('simi', 'date', str(date))
         conf.set('simi', 'indice', self.paramsimi['coeff'])
         conf.set('simi','layout', self.paramsimi['layout'])

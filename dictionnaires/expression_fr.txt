@@ -3,7 +3,6 @@ a cappella	a_cappella	ADV			0.04	0.07	0.04	0.07
 a contrario	a_contrario	ADV			0	0.27	0	0.27	
 a fortiori	a_fortiori	ADV			0.04	0.88	0.04	0.88	
 a giorno	a_giorno	ADV			0	0.27	0	0.27	
-a jeun	à_jeun	ADV			1.45	3.85	0.18	0	
 a l'instar	a_l_instar	PRE			0.26	0	0.26	0	
 a posteriori	a_posteriori	ADV			0.05	0.2	0.01	0.14	
 ab absurdo	ab_absurdo	ADV			0	0.07	0	0.07	

@@ -50,10 +50,6 @@ class LeftTree(CT.CustomTreeCtrl):
         self.count = 0
         self.log = log
 
-        # NOTE:  For some reason tree items have to have a data object in
-        #        order to be sorted.  Since our compare just uses the labels
-        #        we don't need any real data, so we'll just use None below for
-        #        the item data.
         self.history = parent.history
         self.h = self.history.history
         self.root = self.AddRoot("Iramuteq")
@@ -319,15 +315,17 @@ class LeftTree(CT.CustomTreeCtrl):
             alceste = classification.Append(wx.ID_ANY, u"Méthode ALCESTE")
             pam = classification.Append(wx.ID_ANY, u"Par matrice des distances")
             menu.AppendMenu(-1, u"Classification", classification)
+            simi = menu.Append(wx.ID_ANY, u"Analyse de similitude")
             menu.AppendSeparator()
             self.Bind(wx.EVT_MENU, self.OnAlceste, alceste)
             self.Bind(wx.EVT_MENU, self.OnPam, pam)
             self.Bind(wx.EVT_MENU, self.OnStat, stat)
             self.Bind(wx.EVT_MENU, self.OnSpec, spec)
+            self.Bind(wx.EVT_MENU, self.OnSimiTxt, simi)
 
-        item10 = menu.Append(wx.ID_ANY, "Supprimer de l'historique")
+        itemdelete = menu.Append(wx.ID_ANY, "Supprimer de l'historique")
         if item == self.GetRootItem():
-            item10.Enable(False)
+            itemdelete.Enable(False)
         #item11 = menu.Append(wx.ID_ANY, "Prepend An Item")
         #item12 = menu.Append(wx.ID_ANY, "Append An Item")
 
@@ -340,7 +338,7 @@ class LeftTree(CT.CustomTreeCtrl):
         #self.Bind(wx.EVT_MENU, self.OnDisableItem, item7)
         #self.Bind(wx.EVT_MENU, self.OnItemIcons, item8)
         self.Bind(wx.EVT_MENU, self.OnItemInfo, info)
-        #self.Bind(wx.EVT_MENU, self.OnItemDelete, item10)
+        self.Bind(wx.EVT_MENU, self.OnItemDelete, itemdelete)
         #self.Bind(wx.EVT_MENU, self.OnItemPrepend, item11)
         #self.Bind(wx.EVT_MENU, self.OnItemAppend, item12)
         
@@ -364,6 +362,9 @@ class LeftTree(CT.CustomTreeCtrl):
 
     def OnPam(self, evt) :
         print 'rien'
+
+    def OnSimiTxt(self, evt) :
+        self.parent.OnSimiTxt(evt, self.getcorpus(self.itemdict))
 
     def OnItemBackground(self, event):
 
@@ -495,7 +496,12 @@ class LeftTree(CT.CustomTreeCtrl):
             return
 
         dlg.Destroy()
-
+        
+        pydata = self.itemdict['pydata']
+        if 'corpus_name' in pydata :
+            self.history.delete(pydata['uuid'], True)
+        else :
+            self.history.delete(pydata['uuid'])
         self.DeleteChildren(self.current)
         self.Delete(self.current)
         self.current = None
@@ -647,13 +653,14 @@ class LeftTree(CT.CustomTreeCtrl):
     def OnSelChanged(self, event):
         item = event.GetItem()
         pydata = self.GetPyData(item)
-        if pydata['uuid'] in self.parent.history.opened :
-            for i in range(self.parent.nb.GetPageCount()) :
-                page = self.parent.nb.GetPage(i)
-                if 'parametres' in dir(page) :
-                    if page.parametres['uuid'] == pydata['uuid'] :
-                        self.parent.nb.SetSelection(i)
-                        break
+        if pydata is not None :
+            if pydata['uuid'] in self.parent.history.opened :
+                for i in range(self.parent.nb.GetPageCount()) :
+                    page = self.parent.nb.GetPage(i)
+                    if 'parametres' in dir(page) :
+                        if page.parametres['uuid'] == pydata['uuid'] :
+                            self.parent.nb.SetSelection(i)
+                            break
 
         #self.item = event.GetItem()
         #if self.item:

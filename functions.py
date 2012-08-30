@@ -71,6 +71,7 @@ class History :
         sections = self.corpora.keys() + self.analyses.keys()
         parametres = [self.corpora[key] for key in self.corpora.keys()] + [self.analyses[key] for key in self.analyses.keys()]
         self.conf.makeoptions(sections, parametres)
+        log.info('write history')
 
     def add(self, analyse) :
         if 'corpus' in analyse :
@@ -85,6 +86,19 @@ class History :
         elif 'corpus_name' in analyse :
             self.history[analyse['uuid']] = analyse
             self.corpora[analyse['uuid']] = analyse
+        self.write()
+
+    def delete(self, uuid, corpus = False) :
+        if corpus :
+            del self.corpora[uuid]
+            self.conf.conf.remove_section(uuid)
+            for analyse in self.history[uuid].get('analyses', [False]) :
+                if analyse :
+                    del self.analyses[analyse['uuid']]
+                    self.conf.conf.remove_section(analyse['uuid'])
+        else :
+            del self.analyses[uuid]
+            self.conf.conf.remove_section(uuid)
         self.write()
 
     def addtab(self, analyse) :
@@ -133,6 +147,7 @@ class DoConf :
                     self.conf.set(section, option, parametres[i][option].encode('utf8'))
         if outfile is None :
             outfile = self.configfile
+        print outfile
         with codecs.open(outfile, 'w', 'utf8') as f :
             self.conf.write(f)
 

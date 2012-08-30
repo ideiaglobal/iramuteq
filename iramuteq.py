@@ -844,14 +844,15 @@ Voulez-vous fermer quand même ?"""
         except:
             BugReport(self)
 
-    def OnSimiTxt(self, evt) :
-        #    print 'PLUS DE BUG SUR SIMITXT'
-        try :
-            self.Text = SimiTxt(self)
+    def OnSimiTxt(self, evt, corpus = None) :
+            print 'PLUS DE BUG SUR SIMITXT'
+        #try :
+            #self.Text = SimiTxt(self)
+            self.Text = SimiTxt(self, corpus, parametres = {'type': 'simitxt'}, dlg = progressbar(self, 3))
             if self.Text.val == wx.ID_OK :
                 PlaySound(self)
-        except :
-            BugReport(self)
+        #except :
+        #    BugReport(self)
     
     def OnWordCloud(self, evt) :
         #    print 'PLUS DE BUG SUR WORDCLOUD'
