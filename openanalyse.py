@@ -63,6 +63,9 @@ class OpenAnalyse():
         elif self.conf['type'] == 'simitxt' :
             self.parent.ShowMenu(_("Text analysis"))
             SimiLayout(self.parent, corpus, self.conf)
+        elif self.conf['type'] == 'wordcloud' :
+            self.parent.ShowMenu(_("Text analysis"))
+            WordCloudLayout(self.parent, corpus, self.conf)
             #self.tableau = Tableau(self.parent, self.conf['ira'])
             #self.DictPathOut=construct_simipath(self.conf['pathout'])
             #self.tableau.dictpathout = self.DictPathOut

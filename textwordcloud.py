@@ -4,8 +4,6 @@
 #Copyright (c) 2008-2009 Pierre Ratinaud
 #Lisense: GNU/GPL
 
-from chemins import ConstructPathOut, StatTxtPathOut, ffr, FFF
-#from corpus import Corpus
 from analysetxt import AnalyseText
 from guifunct import getPage, getCorpus, SelectColumn
 from ConfigParser import RawConfigParser

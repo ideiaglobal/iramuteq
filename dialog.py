@@ -2494,18 +2494,18 @@ class PrefWordCloud ( wx.Dialog ):
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Sélectionner les formes", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_staticText1.Wrap( -1 )
-        fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
+        #self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Sélectionner les formes", wx.DefaultPosition, wx.DefaultSize, 0 )
+        #self.m_staticText1.Wrap( -1 )
+        #fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
-        self.but_selectcol = wx.Button( self, wx.ID_ANY, u"Sélectionner", wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizer1.Add( self.but_selectcol, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        #self.but_selectcol = wx.Button( self, wx.ID_ANY, u"Sélectionner", wx.DefaultPosition, wx.DefaultSize, 0 )
+        #fgSizer1.Add( self.but_selectcol, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_staticline1 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-        fgSizer1.Add( self.m_staticline1, 0, wx.EXPAND |wx.ALL, 5 )
+        #self.m_staticline1 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        #fgSizer1.Add( self.m_staticline1, 0, wx.EXPAND |wx.ALL, 5 )
         
-        self.m_staticline2 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-        fgSizer1.Add( self.m_staticline2, 0, wx.EXPAND |wx.ALL, 5 )
+        #self.m_staticline2 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        #fgSizer1.Add( self.m_staticline2, 0, wx.EXPAND |wx.ALL, 5 )
         
         bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
         
@@ -2535,18 +2535,18 @@ class PrefWordCloud ( wx.Dialog ):
         self.m_staticline4 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline4, 0, wx.EXPAND |wx.ALL, 5 )
         
-        self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, u"Nombre maximum de formes", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_staticText5.Wrap( -1 )
-        fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
+        #self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, u"Nombre maximum de formes", wx.DefaultPosition, wx.DefaultSize, 0 )
+        #self.m_staticText5.Wrap( -1 )
+        #fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
-        self.spin_maxword = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10000, 600 )
-        fgSizer1.Add( self.spin_maxword, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        #self.spin_maxword = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10000, 600 )
+        #fgSizer1.Add( self.spin_maxword, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_staticline5 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-        fgSizer1.Add( self.m_staticline5, 0, wx.EXPAND |wx.ALL, 5 )
+        #self.m_staticline5 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        #fgSizer1.Add( self.m_staticline5, 0, wx.EXPAND |wx.ALL, 5 )
         
-        self.m_staticline6 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-        fgSizer1.Add( self.m_staticline6, 0, wx.EXPAND |wx.ALL, 5 )
+        #self.m_staticline6 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        #fgSizer1.Add( self.m_staticline6, 0, wx.EXPAND |wx.ALL, 5 )
         
         self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, u"Taille du texte", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText6.Wrap( -1 )

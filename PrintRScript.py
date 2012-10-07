@@ -919,7 +919,8 @@ class WordCloudRScript(PrintRScript) :
         txt = """
         act <- read.csv2("%s", header = FALSE, row.names=1, sep='\t')
         selected.col <- read.table("%s")
-        toprint <- act[selected.col[,1] + 1,]
+        toprint <- as.matrix(act[selected.col[,1] + 1,])
+        rownames(toprint) <- rownames(act)[selected.col[,1] + 1]
         open_file_graph("%s", width = %i, height = %i)
         par(bg=rgb%s)
         wordcloud(row.names(toprint), toprint[,1], scale=c(%f,%f), random.order=FALSE, colors=rgb%s)

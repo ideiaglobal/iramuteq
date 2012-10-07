@@ -758,21 +758,7 @@ class GraphPanelDendro(wx.Panel):
             self.make_param(dial)
             self.make_dendro()
 
-class WordCloudLayout:
-    def __init__(self, ira, parent, filename):
-        self.dictpathout = parent.corpus.dictpathout
-        self.pathout = os.path.dirname(filename)
-        self.corpus = parent.corpus
-    #    self.read_result()
-        self.Tab = aui.AuiNotebook(ira.nb, -1, wx.DefaultPosition)
-        list_graph = [['nuage_1.png', 'Nuage']]
-        self.TabStatTot = GraphPanel(ira.nb, self.dictpathout, list_graph)
-        #self.TabStatTot.write(self.result['glob'])
-        self.Tab.AddPage(self.TabStatTot, 'Nuage')
-        self.Tab.corpus = parent.corpus
-        ira.nb.AddPage(self.Tab, 'WordCloud %s' % parent.conf.get('wordcloud','corpus_name'))
-        ira.nb.SetSelection(ira.nb.GetPageCount() - 1)
-        ira.ShowAPane("Tab_content")
+
 
 class OpenCorpus :
     def __init__(self, ira, parametres) :
@@ -910,6 +896,28 @@ class DefaultTextLayout :
     
     def dolayout(self) :
         log.info('no layout yet')
+
+class WordCloudLayout(DefaultTextLayout):
+    def dolayout(self):
+        #self.dictpathout = parent.corpus.dictpathout
+        #self.pathout = os.path.dirname(filename)
+        #self.corpus = parent.corpus
+    #    self.read_result()
+        self.pathout.basefiles(simipath)
+        self.Tab = aui.AuiNotebook(self.ira.nb, -1, wx.DefaultPosition)
+#        if os.path.exists(self.pathout['liste_graph']) :
+#            list_graph = read_list_file(self.pathout['liste_graph'])
+#        else : 
+#            list_graph = [['','']]
+        list_graph = [['nuage_1.png', 'Nuage']]
+        self.TabStatTot = GraphPanel(self.ira.nb, self.pathout, list_graph)
+        #self.TabStatTot.write(self.result['glob'])
+        self.Tab.AddPage(self.TabStatTot, 'Nuage')
+        self.Tab.corpus = self.corpus
+        self.Tab.parametres = self.parametres
+        self.ira.nb.AddPage(self.Tab, 'WordCloud %s' % self.parametres.get('corpus_name','corpus_name'))
+        self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
+        self.ira.ShowAPane("Tab_content")
 
 class SimiLayout(DefaultTextLayout) :
     def dolayout(self) :
