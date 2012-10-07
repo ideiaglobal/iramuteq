@@ -11,6 +11,7 @@ from guifunct import getPage, getCorpus, SelectColumn
 from ConfigParser import RawConfigParser
 from functions import sortedby, progressbar, CreateIraFile, exec_rcode, check_Rresult, MessageImage
 from dialog import StatDialog, PrefWordCloud
+from PrintRScript import WordCloudRScript
 #from openanalyse import OpenAnalyse
 #from ttparser import * 
 import tempfile
@@ -41,24 +42,24 @@ class WordCloud(AnalyseText):
         dial.CenterOnParent()
         res = dial.ShowModal()
         if res == wx.ID_OK :
-            self.parametres['width'] = pref.spin_L.GetValue()
-            self.parametres['height'] = pref.spin_H.GetValue()
-            #maxword = pref.spin_maxword.GetValue()
-            self.parametres['mincex'] = float(pref.spin_mincex.GetValue())/float(10)
-            self.parametres['maxcex'] = float(pref.spin_maxcex.GetValue())/float(10)
-            self.parametres['col_text'] = pref.color_text.GetColour()
-            self.parametres['col_bg'] = pref.color_bg.GetColour()
+            self.parametres['width'] = dial.spin_L.GetValue()
+            self.parametres['height'] = dial.spin_H.GetValue()
+            #maxword = dial.spin_maxword.GetValue()
+            self.parametres['mincex'] = float(dial.spin_mincex.GetValue())/float(10)
+            self.parametres['maxcex'] = float(dial.spin_maxcex.GetValue())/float(10)
+            self.parametres['col_text'] = dial.color_text.GetColour()
+            self.parametres['col_bg'] = dial.color_bg.GetColour()
             outgraph = os.path.join(os.path.dirname(self.pathout['zipf.png']), 'nuage_')
             nb = 1
             while os.path.exists(outgraph + str(nb) + '.png') :
                 nb += 1
-            self.parametres['outgraph'] = outgraph + str(nb) + '.png'
+            self.parametres['graphout'] = outgraph + str(nb) + '.png'
 
 
     def make_wordcloud(self) :
-        act = [[act, self.corpus.getlemeff(act)] for act in self.actives]
+        act = ['\t'.join([act, `self.corpus.getlemeff(act)`]) for act in self.actives]
         with open(self.pathout['actives_eff.csv'], 'w') as f :
-            f.write('\n'.join('\t'.join([[val[0], `val[1]`] for val in act])))
+            f.write('\n'.join(act).encode(self.ira.syscoding))
        ####################################################################        
 #        self.conf = None
 #        self.parent = parent
