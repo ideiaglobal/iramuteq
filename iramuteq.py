@@ -854,10 +854,10 @@ Voulez-vous fermer quand même ?"""
         #except :
         #    BugReport(self)
     
-    def OnWordCloud(self, evt) :
+    def OnWordCloud(self, evt, corpus = None) :
         #    print 'PLUS DE BUG SUR WORDCLOUD'
         try :
-            self.Text = WordCloud(self)
+            self.Text = WordCloud(self, corpus, parametres = {'type' : 'wordcloud'}, dlg = progressbar(self, 3))
             if self.Text.val == wx.ID_OK :
                 PlaySound(self)
         except :

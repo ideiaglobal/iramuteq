@@ -316,12 +316,14 @@ class LeftTree(CT.CustomTreeCtrl):
             pam = classification.Append(wx.ID_ANY, u"Par matrice des distances")
             menu.AppendMenu(-1, u"Classification", classification)
             simi = menu.Append(wx.ID_ANY, u"Analyse de similitude")
+            wdc = menu.Append(wx.ID_ANY, u"Nuage de mots")
             menu.AppendSeparator()
             self.Bind(wx.EVT_MENU, self.OnAlceste, alceste)
             self.Bind(wx.EVT_MENU, self.OnPam, pam)
             self.Bind(wx.EVT_MENU, self.OnStat, stat)
             self.Bind(wx.EVT_MENU, self.OnSpec, spec)
             self.Bind(wx.EVT_MENU, self.OnSimiTxt, simi)
+            self.Bind(wx.EVT_MENU, self.OnWordCloud, wdc)
 
         itemdelete = menu.Append(wx.ID_ANY, "Supprimer de l'historique")
         if item == self.GetRootItem():
@@ -365,6 +367,9 @@ class LeftTree(CT.CustomTreeCtrl):
 
     def OnSimiTxt(self, evt) :
         self.parent.OnSimiTxt(evt, self.getcorpus(self.itemdict))
+
+    def OnWordCloud(self, evt) :
+        self.parent.OnWordCloud(evt, self.getcorpus(self.itemdict))
 
     def OnItemBackground(self, event):
 

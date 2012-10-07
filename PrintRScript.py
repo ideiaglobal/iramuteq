@@ -51,6 +51,8 @@ class PrintRScript :
 class chdtxt(PrintRScript) :
     pass
 
+def Rcolor(color) :
+    return str(color).replace(')', ', max=255)')
 
 class Alceste2(PrintRScript) :
     def doscript(self) :
@@ -908,3 +910,20 @@ class PrintSimiScript(PrintRScript) :
         self.add(txt)
         self.write()
 
+WordCloudRScript(PrintRScript) :
+    def make_script(self) :
+        self.Source([self.analyse.parent.RscriptsPath['Rgraph']])
+        self.packages(['wordcloud'])
+        bg_col = Rcolor(self.parametres['col_bg'])
+        txt_col = Rcolor(self.parametres['col_text'])
+        txt = """
+        act <- read.csv2("%s", header = FALSE, row.names=1, sep='\t')
+        selected.col <- read.table("%s")
+        toprint <- act[selected.col + 1,]
+        open_file_graph("%s", width = %i, height = %i)
+        par(bg=rgb%s)
+        wordcloud(row.names(toprint), toprint[,1], scale=c(%f,%f), random.order=FALSE, colors=rgb%s)
+        dev.off()
+        """ % (self.parametres['actives_eff.csv'], self.parametres['selected.csv'], self.parametres['graphout'], self.parametres['width'], self.parametres['height'], bg_col, self.parametres['maxcex'], self.parametres['mincex'], txt_col)
+        self.add(txt)
+        self.write()

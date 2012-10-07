@@ -4,7 +4,7 @@
 #Lisense: GNU/GPL
 
 from chemins import ffr, simipath
-from corpus import Corpus
+#from corpus import Corpus
 import os
 from analysetxt import AnalyseText
 from ConfigParser import RawConfigParser
