@@ -69,6 +69,7 @@ class AnalyseText :
             self.parametres['uuid'] = str(uuid4())
             self.parametres['name'] = os.path.split(self.parametres['pathout'])[1]
             self.parametres['type'] = parametres['type']
+            self.parametres['encoding'] = self.ira.syscoding
             self.t1 = time()
             #if self.corpus.lems is None :
             self.corpus.make_lems(lem = self.parametres['lem'])
@@ -96,8 +97,8 @@ class AnalyseText :
 
     def make_config(self, config) :
         if config is not None :
-            if isinstance(config, basestring) : 
-                return self.readconfig(config)
+            if not self.dlg : 
+                return config
             else :
                 return self.preferences()
 
@@ -106,9 +107,6 @@ class AnalyseText :
 
     def preferences(self) :
         return {}
-
-    def doR(self):
-        pass
 
     def printRscript(self) :
         pass

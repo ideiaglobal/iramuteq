@@ -8,18 +8,19 @@ import os
 import wx
 #import wx.lib.agw.aui as aui
 import agw.aui as aui
-from chemins import ConstructPathOut, ChdTxtPathOut, FFF, ffr, PathOut, StatTxtPathOut
+from chemins import ConstructPathOut, ChdTxtPathOut, FFF, ffr, PathOut, StatTxtPathOut, simipath
 from ConfigParser import ConfigParser
-from functions import ReadProfileAsDico, GetTxtProfile, read_list_file, ReadList, exec_rcode, print_liste, BugReport, DoConf
+from functions import ReadProfileAsDico, GetTxtProfile, read_list_file, ReadList, exec_rcode, print_liste, BugReport, DoConf, indices_simi
 from ProfList import *
 from guiparam3d import param3d, simi3d
-from PrintRScript import write_afc_graph, print_simi3d
+from PrintRScript import write_afc_graph, print_simi3d, PrintSimiScript
 from profile_segment import *
 from functions import ReadList
 from listlex import *
 from Liste import *
 from search_tools import SearchFrame
 from dialog import PrefGraph, PrefExport, PrefSimpleFile, PrefDendro
+from guifunct import SelectColumn, PrepSimi
 from corpusNG import Corpus
 import datetime
 import sys
@@ -27,6 +28,10 @@ import tempfile
 import shutil
 import webbrowser
 import codecs
+import logging
+
+log = logging.getLogger('iramuteq.layout')
+
 
 class GraphPanelAfc(wx.Panel):
     def __init__(self, parent, dico, list_graph, clnb, itempath = 'liste_graph_afc', coding = sys.getdefaultencoding()):
@@ -849,6 +854,119 @@ class CopusPanel(wx.Panel) :
             text.Wrap( -1 )
             self.fgSizer5.Add( text, 0, wx.ALL, 5 )
 
+class GraphPanelSimi(wx.Panel):
+    def __init__(self, parent, dico, list_graph):
+        wx.Panel.__init__(self,parent)
+        self.afcnb = 1
+        self.Dict = dico
+        self.dirout = os.path.dirname(self.Dict['ira'])
+        self.parent = self.GetParent()#parent
+        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "courier"))
+        self.labels = []
+        self.listimg = []
+        self.tabsimi = self.parent.GetParent()
+        self.ira = self.tabsimi.GetParent()
+        self.panel_1 = wx.ScrolledWindow(self, -1, style=wx.TAB_TRAVERSAL)
+        afc_img = wx.Image(os.path.join(self.ira.images_path,'button_simi.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.butafc = wx.BitmapButton(self, -1, afc_img)
+        export_img = wx.Image(os.path.join(self.ira.images_path,'button_export.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.butexport = wx.BitmapButton(self, -1, export_img)
+        
+        for i in range(0,len(list_graph)):
+            if os.path.exists(os.path.join(self.dirout,list_graph[i][0])) and list_graph[i][0] != '' :
+                self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
+                self.labels.append(wx.StaticText(self.panel_1, -1, list_graph[i][1]))
+                
+        self.__set_properties()
+        self.__do_layout()
+
+    def __set_properties(self):
+        self.panel_1.EnableScrolling(True,True)
+        #self.panel_1.SetSize((1000,1000))
+        self.panel_1.SetScrollRate(20, 20)
+
+    def __do_layout(self):    
+        self.sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
+        self.sizer_2 = wx.BoxSizer(wx.VERTICAL)
+        self.sizer_3 = wx.BoxSizer(wx.VERTICAL)
+        self.sizer_2.Add(self.butafc, 0, 0, 0)
+        self.sizer_2.Add(self.butexport, 0, 0, 0)
+        for i in range(0, len(self.listimg)):
+            self.sizer_3.Add(self.listimg[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+            self.sizer_3.Add(self.labels[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+        self.panel_1.SetSizer(self.sizer_3)
+        self.sizer_1.Add(self.sizer_2, 0, wx.EXPAND, 0)
+        self.sizer_1.Add(self.panel_1, 1, wx.EXPAND, 0)
+        self.SetSizer(self.sizer_1)
+
+class DefaultTextLayout :
+    def __init__(self, ira, corpus, parametres) :
+        self.pathout = PathOut(dirout = parametres['pathout'])
+        self.ira = ira
+        self.parent = ira
+        self.parametres = parametres
+        self.corpus = corpus
+        self.dolayout()
+    
+    def dolayout(self) :
+        log.info('no layout yet')
+
+class SimiLayout(DefaultTextLayout) :
+    def dolayout(self) :
+        self.pathout.basefiles(simipath)
+        self.actives = None
+        self.indices = indices_simi
+        if os.path.exists(self.pathout['liste_graph']) :
+            list_graph = read_list_file(self.pathout['liste_graph'])
+        else : 
+            list_graph = [['','']]
+        notebook_flags =  aui.AUI_NB_DEFAULT_STYLE | aui.AUI_NB_TAB_EXTERNAL_MOVE | aui.AUI_NB_TAB_MOVE | aui.AUI_NB_TAB_FLOAT
+        self.tabsimi = aui.AuiNotebook(self.ira.nb, -1, wx.DefaultPosition)
+        self.tabsimi.SetAGWWindowStyleFlag(notebook_flags)
+        self.tabsimi.SetArtProvider(aui.ChromeTabArt())
+        self.tabsimi.corpus = self.corpus
+        self.tabsimi.parametres = self.parametres
+        self.graphpan = GraphPanelSimi(self.tabsimi, self.pathout, list_graph)
+        self.graphpan.Bind(wx.EVT_BUTTON, self.redosimi, self.graphpan.butafc)
+        self.graphpan.Bind(wx.EVT_BUTTON, self.export, self.graphpan.butexport)
+        self.tabsimi.AddPage(self.graphpan, 'Graph')
+        self.ira.nb.AddPage(self.tabsimi, 'Analyse de graph')
+        self.ira.ShowTab(True)
+        self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
+        
+    def redosimi(self, evt) :
+        with open(self.pathout['selected.csv'],'r') as f :
+            selected = f.read()
+        selected = [int(val) for val in selected.splitlines()]
+        if self.actives is None :
+            with codecs.open(self.pathout['actives.csv'], 'r', self.parametres['encoding']) as f :
+                self.actives = f.read()
+            self.actives = [act for act in self.actives.splitlines()]
+        dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
+        SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], selected = selected) 
+        prep = PrepSimi(self.ira, self.parametres, indices_simi)
+        self.parametres = prep.parametres
+        script = PrintSimiScript(self)
+        script.make_script()
+        pid = exec_rcode(self.ira.RPath, script.scriptout, wait = True)
+        check_Rresult(self.ira, pid)
+        if self.parametres['type_graph'] == 1:
+            if os.path.exists(self.pathout['liste_graph']):
+                graph_simi = read_list_file(self.pathout['liste_graph'])
+                graph_simi.append([os.path.basename(script.filename), script.txtgraph])
+            else :
+                graph_simi = [[os.path.basename(script.filename), script.txtgraph]]
+            print_liste(self.pathout['liste_graph'], graph_simi)
+        DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
+        if self.parametres['type_graph'] == 1:
+            self.graphpan.sizer_3.Add(wx.StaticBitmap(self.graphpan.panel_1, -1, wx.Bitmap(script.filename, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+            self.graphpan.sizer_3.Add(wx.StaticText(self.graphpan.panel_1,-1, script.txtgraph), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+            self.graphpan.sizer_3.Fit(self.graphpan.panel_1)
+            self.graphpan.Layout()
+            self.graphpan.panel_1.Scroll(0,self.graphpan.panel_1.GetScrollRange(wx.VERTICAL))
+
+    def export(self, evt) :
+        pass
    # def read_result(self) :
    #     #self.corpus.read_corpus_from_shelves(self.corpus.dictpathout['db'])
    #     #self.corpus.make_et_table()

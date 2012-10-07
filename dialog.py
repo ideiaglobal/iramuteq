@@ -10,6 +10,7 @@ import wx.lib.filebrowsebutton as filebrowse
 import locale
 import os
 import sys
+#from listlex import *
 from KeyFrame import AlcOptFrame
 #---------------------------------------------------------------------------
 provider = wx.SimpleHelpProvider()
@@ -191,8 +192,8 @@ class EncodeDialog(wx.Dialog):
         kwds["title"] = u'Encodage'
         wx.Dialog.__init__(self, *args, **kwds)
         self.label_dict = wx.StaticText(self, -1, u"Langue")
-        langues_n = [u'français', u'english', u'german (expérimentale)', u'italian (expérimentale)']
-        self.langues = [u'french', u'english', u'german', 'italian']
+        langues_n = [u'français', u'english', u'german (expérimentale)', u'italian (expérimentale)', u'swedish (exp.)', u'portuguese (exp.)']
+        self.langues = [u'french', u'english', u'german', 'italian', 'swedish', 'portuguese']
         self.choice_dict = wx.Choice(self, -1, choices = langues_n)
         self.encodages = encodages
         self.text = wx.StaticText(self, -1, u"Encodage du corpus : ")
@@ -1360,7 +1361,7 @@ class PrefSimi ( wx.Dialog ):
     def __set_properties(self):
         self.choice1.SetSelection(self.paramsimi['coeff'])
         self.choice2.SetSelection(self.paramsimi['layout'])
-        self.choice3.SetSelection(self.paramsimi['type'])
+        self.choice3.SetSelection(self.paramsimi['type_graph'])
         if self.paramsimi['type'] != 2 :
             self.film.Enable(False)
             self.slider_sphere.Enable(False)
@@ -2764,11 +2765,11 @@ class CorpusPref ( wx.Dialog ):
     def __init__( self, parent, parametres ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Préférences", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         self.parent = parent 
-        langues_n = [u'français', u'english', u'german (expérimentale)', u'italian (expérimentale)']
-        self.langues = [u'french', u'english', u'german', 'italian']
+        langues_n = [u'français', u'english', u'german (expérimentale)', u'italian (expérimentale)', u'swedish (exp.)', u'portuguese (exp.)']
+        self.langues = [u'french', u'english', u'german', 'italian', 'swedish', u'portuguese']
         self.encodages = encodages
         ucimark = [u'****', u'0000']
-        ucemethod = [u'charactères', u'occurrences']
+        ucemethod = [u'charactères', u'occurrences', u'paragraphe']
 
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
@@ -3008,4 +3009,3 @@ class CorpusPref ( wx.Dialog ):
                 else :
                     parametres[val] = 0
         return parametres
-

@@ -118,6 +118,7 @@ def ConstructConfigPath(AppliPath, user=True):
         'preferences' : os.path.join(ConfigPath, 'iramuteq.cfg'),
         'pam' : os.path.join(ConfigPath, 'pam.cfg'),
         'history' : os.path.join(ConfigPath, 'history.db'),
+        'corpus' : os.path.join(ConfigPath, 'corpus.cfg'),
     }
     return DictConfigPath
 
@@ -139,6 +140,10 @@ def ConstructDicoPath(AppliPath):
         'german_exp' : os.path.join(BasePath, 'expression_de.txt'),
         'italian' : os.path.join(BasePath, 'lexique_it.txt'),
         'italian_exp' : os.path.join(BasePath, 'expression_it.txt'),
+        'swedish' :  os.path.join(BasePath, 'lexique_sw.txt'),
+        'swedish_exp' :  os.path.join(BasePath, 'expression_sw.txt'),
+        'portuguese' : os.path.join(BasePath, 'lexique_pt.txt'),
+        'portuguese_exp': os.path.join(BasePath, 'expression_pt.txt'),
     }
     return DictPath
 
@@ -276,3 +281,15 @@ def construct_simipath(pathout):
           'corpus' : os.path.join(pathout, 'corpus.db'),
         }
     return d
+
+simipath = {'mat01' :  'mat01.csv',
+          'matsimi' : 'matsimi.csv',
+          'eff' : 'eff.csv',
+          'RData' : 'RData.RData',
+          'liste_graph' :'liste_graph.txt',
+          'ira' : 'Analyse.ira',
+          'film' : '',
+          'db' : 'analyse.db',
+          'corpus' : 'corpus.db',
+        }
+

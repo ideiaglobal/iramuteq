@@ -433,6 +433,16 @@ class Corpus :
                 for line in f :
                     ffin.write(line)
         os.remove(outfile + '~')
+    
+    def make_table_with_classe(self, uces, list_act) :
+        table_uce = [[0 for val in list_act] for line in range(0,len(uces))]
+        uces = dict([[uce, i] for i, uce in enumerate(uces)])
+        for i, lem in enumerate(list_act) :
+            lemuces = list(set(self.getlemuces(lem)).intersection(uces))
+            for uce in lemuces :
+                table_uce[uces[uce]][i] = 1
+        table_uce.insert(0, list_act)
+        return table_uce      
 
     def parse_active(self, gramact, gramsup = None) :
         log.info('parse actives')
@@ -450,7 +460,7 @@ class Corpus :
     def make_actives_limit(self, limit) :
         if self.idformes is None :
             self.make_idformes()
-        return [lem for lem in self.lems if self.getlemeff(lem) >= limit]
+        return [lem for lem in self.lems if self.getlemeff(lem) >= limit and self.lems[lem].act == 1]
     
     def make_actives_nb(self, nbmax, key) :
         log.info('make_actives_nb : %i - %i' % (nbmax,key))
@@ -490,6 +500,27 @@ class Corpus :
         for uci in self.ucis :
             etoiles.update(uci.etoiles[1:] + uci.paras)
         return list(etoiles)
+
+    def make_etoiles_dict(self) :
+        etoiles = [et for uci in self.ucis for et in uci.etoiles[1:]]
+        det = {}
+        for etoile in etoiles :
+            et = etoile.split('_')
+            if et[0] in det :
+                try :
+                    if et[1] in det[et[0]] :
+                        det[et[0]][et[1]] += 1
+                    else :
+                        det[et[0]][et[1]] = 1
+                except IndexError :
+                    det[et[0]] += 1
+            else :
+                try :
+                    det[et[0]] = {et[1] :1}
+                except IndexError :
+                    det[et[0]] = 1
+        print det
+            
 
     def make_and_write_profile_et(self, ucecl, fileout) :
         log.info('etoiles/classes')
@@ -590,6 +621,14 @@ class Corpus :
             f.write(txt)
 
 
+class MakeUciStat :
+    def __init__(self, corpus) :
+        ucinb = corpus.getucinb()
+        ucisize = corpus.getucisize()
+        ucimean = float(sum(ucisize))/float(ucinb)
+        detoile = corpus.make_etoiles_dict()
+        
+
 class Uci :
     def __init__(self, iduci, line, paraset = None) :
         self.ident = iduci
@@ -648,7 +687,7 @@ def decouperlist(chaine, longueur, longueurOptimale) :
     try :
         indice = chaineTravail.index(u'$')
         trouve = True
-        iDecoupe = indice
+        iDecoupe = indice - 1
     except ValueError :
         pass
     if not trouve:
@@ -665,7 +704,7 @@ def decouperlist(chaine, longueur, longueurOptimale) :
                     iDecoupe = nbCar
             else :
                 if (float(dsep[' ']) / distance) > (float(meilleur[1]) / meilleureDistance) :
-                    meilleur[0] = caractere
+                    meilleur[0] = ' '
                     meilleur[1] = dsep[' ']
                     meilleur[2] = nbCar
                     trouve = True
@@ -673,8 +712,12 @@ def decouperlist(chaine, longueur, longueurOptimale) :
             nbCar = nbCar - 1
     # si on a trouvé
     if trouve:
+        #if meilleur[0] != ' ' :
+        #    fin = chaine[iDecoupe + 1:]
+        #    retour = chaineTravail[:iDecoupe]
+        #else :
         fin = chaine[iDecoupe + 1:]
-        retour = chaineTravail[:iDecoupe]
+        retour = chaineTravail[:iDecoupe + 1]
         return len(retour) > 0, retour, fin
     # si on a rien trouvé
     return False, chaine, ''
@@ -911,13 +954,15 @@ class BuildFromAlceste(BuildCorpus) :
         self.backup_uce()
 
     def treattxt(self, txt, iduce, idpara, iduci) :
-        txt = ' '.join(txt)
-        #log.debug('ATTENTION CHINOIS -> charactères')
-        #clean_chinois = [self.firstclean, self.dolower, self.make_expression, self.doapos, self.dotiret]
-        #log.debug('ATTENTION CHINOIS -> list(text)')
-        #txt = ' '.join(list(txt))
-        txt = self.make_cleans(txt)#, clean_chinois)
-        ucetxt = self.make_uces(txt, self.corpus.parametres['douce'])
+        if self.corpus.parametres.get('ucemethod', 0) == 2 and self.corpus.parametres['douce']:
+            txt = 'laphrasepoursplitter'.join(txt)
+            txt = self.make_cleans(txt)
+            txt = ' '.join([val for val in txt.split() if val not in self.ponctuation_espace])
+            ucetxt = txt.split('laphrasepoursplitter')
+        else :
+            txt = ' '.join(txt)
+            txt = self.make_cleans(txt)
+            ucetxt = self.make_uces(txt, self.corpus.parametres['douce'])
         if self.corpus.ucis[-1].paras == [] :
             idpara += 1
         for uce in ucetxt :

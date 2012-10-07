@@ -35,6 +35,10 @@ class PrintRScript :
         for source in lsources :
             self.add('source("%s")' % source)
 
+    def packages(self, lpks) :
+        for pk in lpks :
+            self.add('library(%s)' % pk)
+
     def load(self, l) :
         for val in l :
             self.add('load("%s")' % val)
@@ -620,4 +624,287 @@ def barplot(table, rownames, colnames, rgraph, tmpgraph, intxt = False) :
 #    f = open(DictAfcUciOut['Rafcuci'], 'w')
 #    f.write(txt)
 #    f.close()
+
+class PrintSimiScript(PrintRScript) :
+    def make_script(self) :
+        self.txtgraph = ''
+        self.packages(['igraph', 'proxy', 'Matrix'])
+        self.sources([self.analyse.parent.RscriptsPath['simi'], self.analyse.parent.RscriptsPath['Rgraph']])
+        txt = """
+        dm.path <- "%s"
+        cn.path <- "%s"
+        selected.col <- "%s"
+        """ % (self.pathout['mat01.csv'], self.pathout['actives.csv'], self.pathout['selected.csv'])
+        txt += """
+        dm <-readMM(dm.path)
+        cn <- read.table(cn.path, sep=';', quote='"')
+        colnames(dm) <- cn[,1]
+        sel.col <- read.csv2(selected.col)
+        dm <- dm[, sel.col[,1] + 1]
+        """
+
+        if self.parametres['coeff'] == 0 :
+            method = 'cooc'
+            txt += """
+            method <- 'cooc'
+            mat <- make.a(dm)
+            """
+        else :
+            txt += """
+            dm <- as.matrix(dm)
+            """
+        if self.parametres['coeff'] == 1 :
+            method = 'prcooc'
+            txt += """
+            method <- 'Russel'
+            mat <- simil(dm, method = 'Russel', diag = TRUE, upper = TRUE, by_rows = FALSE)
+            """
+        elif self.analyse.indices[self.parametres['coeff']] == 'binomial' :
+            method = 'binomial'
+            txt += """
+            method <- 'binomial'
+            mat <- binom.sim(dm)
+            """
+        elif self.parametres['coeff'] != 0 :
+            method = self.analyse.indices[self.parametres['coeff']]
+            txt += """
+            method <-"%s"
+            mat <- simil(dm, method = method, diag = TRUE, upper = TRUE, by_rows = FALSE)
+            """ % self.analyse.indices[self.parametres['coeff']]
+        txt += """
+        mat <- as.matrix(stats::as.dist(mat,diag=TRUE,upper=TRUE))
+        mat[is.na(mat)] <- 0
+        mat[is.infinite(mat)] <- 0
+        """
+        if self.parametres['layout'] == 0 : layout = 'random'
+        if self.parametres['layout'] == 1 : layout = 'circle'
+        if self.parametres['layout'] == 2 : layout = 'frutch'
+        if self.parametres['layout'] == 3 : layout = 'kawa'
+        if self.parametres['layout'] == 4 : layout = 'graphopt'
+
+        self.filename=''
+        if self.parametres['type_graph'] == 0 : type = 'tkplot'
+        if self.parametres['type_graph'] == 1 : 
+            graphnb = 1
+            type = 'nplot'
+            dirout = os.path.dirname(self.pathout['mat01'])
+            while os.path.exists(os.path.join(dirout,'graph_simi_'+str(graphnb)+'.png')):
+                graphnb +=1
+            self.filename = ffr(os.path.join(dirout,'graph_simi_'+str(graphnb)+'.png'))
+        if self.parametres['type_graph'] == 2 : type = 'rgl'
+
+        if self.parametres['arbremax'] : 
+            arbremax = 'TRUE'
+            self.txtgraph += ' - arbre maximum'
+        else : arbremax = 'FALSE'
+        
+        if self.parametres['coeff_tv'] : 
+            coeff_tv = self.parametres['coeff_tv_nb']
+            tvminmax = 'c(NULL,NULL)'
+        elif not self.parametres['coeff_tv'] or self.parametres.get('sformchi', False) :
+            coeff_tv = 'NULL'
+            tvminmax = 'c(%i, %i)' %(self.parametres['tvmin'], self.parametres['tvmax'])
+        if self.parametres['coeff_te'] : coeff_te = 'c(%i,%i)' % (self.parametres['coeff_temin'], self.parametres['coeff_temax'])
+        else : coeff_te = 'NULL'
+        
+        if self.parametres['vcex'] or self.parametres.get('cexfromchi', False) :
+            vcexminmax = 'c(%i/10,%i/10)' % (self.parametres['vcexmin'],self.parametres['vcexmax'])
+        else :
+            vcexminmax = 'c(NULL,NULL)'
+        if not self.parametres['label_v'] : label_v = 'FALSE'
+        else : label_v = 'TRUE'
+
+        if not self.parametres['label_e'] : label_e = 'FALSE'
+        else : label_e = 'TRUE'
+        
+        if self.parametres['seuil_ok'] : seuil = str(self.parametres['seuil'])
+        else : seuil = 'NULL'
+            
+        cols = str(self.parametres['cols']).replace(')',', max=255)')
+        cola = str(self.parametres['cola']).replace(')',',max=255)')
+
+        txt += """
+        minmaxeff <- %s
+        """ % tvminmax
+        txt += """
+        vcexminmax <- %s
+        """ % vcexminmax
+        txt += """
+        cex = %i/10
+        """ % self.parametres['cex']
+
+        if self.parametres['film'] : 
+            txt += """
+            film <- "%s"
+            """ % self.pathout['film']
+        else : 
+            txt += """
+            film <- NULL
+            """
+        txt += """
+        seuil <- %s
+        """ % seuil
+        
+        txt += """
+        label.v <- %s
+        label.e <- %s
+        """ % (label_v, label_e)
+        txt += """
+        cols <- rgb%s
+        cola <- rgb%s
+        """ % (cols, cola)
+        txt += """
+        width <- %i
+        height <- %i
+        """ % (self.parametres['width'], self.parametres['height'])
+        if self.parametres['keep_coord'] :
+            txt += """
+            coords <- try(coords, TRUE)
+            if (!is.matrix(coords)) {
+                coords<-NULL
+            }
+            """
+        else :
+            txt += """
+            coords <- NULL
+            """
+        txt += """
+        alpha <- %i/100
+        """ % self.parametres['alpha']
+        txt += """
+        alpha <- %i/100
+        """ % self.parametres['alpha']
+#############################################
+        if  self.parametres.get('bystar',False) :
+            txt += """
+            et <- list()
+            """
+            for i,et in enumerate(self.tableau.etline) :
+                txt+= """
+                et[[%i]] <- c(%s)
+                """ % (i+1, ','.join(et[1:]))
+            txt+= """
+            unetoile <- c('%s')
+            """ % ("','".join([val[0] for val in self.tableau.etline]))
+            txt += """
+            fsum <- NULL
+            rs <- rowSums(dm)
+            for (i in 1:length(unetoile)) {
+                print(unetoile[i])
+                tosum <- et[[i]]
+                if (length(tosum) > 1) {
+                    fsum <- cbind(fsum, colSums(dm[tosum,]))
+                } else {
+                    fsum <- cbind(fsum, dm[tosum,])
+                }
+            }
+            source("%s")
+            lex <- AsLexico2(fsum, chip=TRUE)
+            dcol <- apply(lex[[4]],1,which.max)
+            toblack <- apply(lex[[4]],1,max)
+            gcol <- rainbow(length(unetoile))
+            #gcol[2] <- 'orange'
+            vertex.label.color <- gcol[dcol]
+            vertex.label.color[which(toblack <= 3.84)] <- 'black'
+            leg <- list(unetoile=unetoile, gcol=gcol)  
+            cols <- vertex.label.color
+            chivertex.size <- norm.vec(toblack, vcexminmax[1],  vcexminmax[2])
+            
+            """ % (self.parent.RscriptsPath['chdfunct'])
+        else :
+            txt += """
+            vertex.label.color <- 'black' 
+            chivertex.size <- 1
+            leg<-NULL
+            """
+#############################################        
+
+#        txt += """
+#        eff <- colSums(dm)
+#        g.ori <- graph.adjacency(mat, mode='lower', weighted = TRUE)
+#        w.ori <- E(g.ori)$weight
+#        if (max.tree) {
+#            if (method == 'cooc') {
+#                E(g.ori)$weight <- 1 / w.ori
+#            } else {
+#                E(g.ori)$weigth <- 1 - w.ori
+#            }
+#            g.max <- minimum.spanning.tree(g.ori)
+#            if (method == 'cooc') {
+#                E(g.max)$weight <- 1 / E(g.max)$weight
+#            } else {
+#                E(g.max)$weight <- 1 - E(g.max)$weight
+#            }
+#            g.toplot <- g.max
+#        } else {
+#            g.toplot <- g.ori
+#        }
+#        """
+        txt += """
+        eff <- colSums(dm)
+        x <- list(mat = mat, eff = eff)
+        graph.simi <- do.simi(x, method='%s', seuil = seuil, p.type = '%s', layout.type = '%s', max.tree = %s, coeff.vertex=%s, coeff.edge = %s, minmaxeff = minmaxeff, vcexminmax = vcexminmax, cex = cex, coords = coords)
+        """ % (method, type, layout, arbremax, coeff_tv, coeff_te)
+            
+        if self.parametres.get('bystar',False) :
+            if self.parametres.get('cexfromchi', False) :
+                txt+="""
+                    label.cex<-chivertex.size
+                    """
+            else :
+                txt+="""
+                label.cex <- NULL
+                """
+            if self.parametres.get('sfromchi', False) :
+                txt += """
+                vertex.size <- norm.vec(toblack, minmaxeff[1], minmaxeff[2])
+                """
+            else :
+                txt += """
+                vertex.size <- NULL
+                """
+        else :
+            #FIXME
+            tmpchi = False
+            if tmpchi :
+                txt += """
+                lchi <- read.table("%s")
+                lchi <- lchi[,1]
+                """ % ffr(tmpchi)
+                if 'selected_col' in dir(self.tableau) :
+                    txt += """
+                    lchi <- lchi[c%s+1]
+                    """ % datas
+            if tmpchi and self.parametres.get('cexfromchi', False) :
+                txt += """ 
+                label.cex <- norm.vec(lchi, vcexminmax[1], vcexminmax[2])
+                """
+            else :
+                txt += """
+            if (is.null(vcexminmax[1])) {
+                label.cex <- NULL
+            } else {
+                label.cex <- graph.simi$label.cex
+            }
+            """
+            if tmpchi and self.parametres.get('sfromchi', False) :
+                txt += """ 
+                vertex.size <- norm.vec(lchi, minmaxeff[1], minmaxeff[2])
+                """
+            else :
+                txt += """
+            if (is.null(minmaxeff[1])) {
+                vertex.size <- NULL
+            } else {
+                vertex.size <- graph.simi$eff
+            }
+            """
+        txt += """ vertex.size <- NULL """
+        txt += """
+        coords <- plot.simi(graph.simi, p.type='%s',filename="%s", vertex.label = label.v, edge.label = label.e, vertex.col = cols, vertex.label.color = vertex.label.color, vertex.label.cex=label.cex, vertex.size = vertex.size, edge.col = cola, leg=leg, width = width, height = height, alpha = alpha, movie = film)
+        save.image(file="%s")
+        """ % (type, self.filename, self.pathout['RData'])
+        
+        self.add(txt)
+        self.write()
 

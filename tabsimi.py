@@ -33,7 +33,7 @@ class DoSimi():
         else :
             self.paramsimi = {'coeff' : 0,
                           'layout' : 2,
-                          'type' : 1,
+                          'type_graph' : 1,
                           'arbremax' : 1,
                           'coeff_tv' : 0,
                           'coeff_tv_nb' : 10,
@@ -183,7 +183,7 @@ class DoSimi():
 
         paramsimi = {'coeff' : self.dial.choice1.GetSelection(),
                           'layout' : self.dial.choice2.GetSelection(),
-                          'type' : self.dial.choice3.GetSelection(),
+                          'type_graph' : self.dial.choice3.GetSelection(),
                           'arbremax' : self.dial.check1.GetValue(),
                           'coeff_tv' : self.dial.check_s_size.GetValue(),
                           'coeff_tv_nb' : self.dial.spin_tv.GetValue(),
@@ -407,15 +407,15 @@ class DoSimi():
         if self.paramsimi['layout'] == 4 : layout = 'graphopt'
         
         self.filename=''
-        if self.paramsimi['type'] == 0 : type = 'tkplot'
-        if self.paramsimi['type'] == 1 : 
+        if self.paramsimi['type_graph'] == 0 : type = 'tkplot'
+        if self.paramsimi['type_graph'] == 1 : 
             graphnb = 1
             type = 'nplot'
             dirout = os.path.dirname(self.DictPathOut['mat01'])
             while os.path.exists(os.path.join(dirout,'graph_simi_'+str(graphnb)+'.png')):
                 graphnb +=1
             self.filename = ffr(os.path.join(dirout,'graph_simi_'+str(graphnb)+'.png'))
-        if self.paramsimi['type'] == 2 : type = 'rgl'
+        if self.paramsimi['type_graph'] == 2 : type = 'rgl'
      
         if self.paramsimi['arbremax'] : 
             arbremax = 'TRUE'

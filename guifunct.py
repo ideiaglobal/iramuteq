@@ -8,6 +8,8 @@ import os
 import sys
 from copy import copy
 import dialog
+from listlex import *
+
 
 def OnOpen(self, type):
         if type == "Data":
@@ -111,3 +113,90 @@ def getCorpus(page) :
     else :
         return None
             
+class SelectColumn :
+    def __init__(self, parent, dictcol, actives, pathout, selected = None) :
+        self.ira = parent
+        dial = dialog.SelectColDial(self.ira)
+        listcol = ListForSpec(dial, self, dictcol, ['forme', 'eff'])
+        dial.bSizer2.Add( listcol, 2, wx.ALL|wx.EXPAND, 5 )
+        dial.m_sdbSizer2.AddButton( dial.m_sdbSizer2OK )
+        dial.m_sdbSizer2.Realize()
+        dial.bSizer2.Add( dial.m_sdbSizer2, 0, wx.EXPAND, 5 )
+        dial.Layout()
+        if selected is None :
+            for row in xrange(listcol.list.GetItemCount()):
+                listcol.list.Select(row)
+        else :
+            orderlex = dict([[listcol.getColumnText(i,0),i] for i in range(0,listcol.list.GetItemCount())])
+            for row in selected :
+                listcol.list.Select(orderlex[actives[row]])
+        dial.CenterOnParent()
+        val = dial.ShowModal()        
+        last = listcol.list.GetFirstSelected()
+        lastl = [listcol.list.GetFirstSelected()]
+        indexes = [listcol.getColumnText(listcol.list.GetFirstSelected(),0)]
+        while listcol.list.GetNextSelected(last) != -1:
+            last = listcol.list.GetNextSelected(last)
+            lastl.append(last)
+            indexes.append(listcol.getColumnText(last,0))
+        dial.Destroy()
+        column = [actives.index(val) for val in indexes]
+        column.sort()
+        with open(pathout, 'w') as f :
+            f.write('\n'.join([`val` for val in column]))
+
+class PrepSimi :
+    def __init__(self, parent, parametres, indices_simi) :    
+        self.parametres = parametres
+        self.dial = dialog.PrefSimi(parent, -1, self.parametres, indices_simi) 
+        self.dial.CenterOnParent()
+        self.val = self.dial.ShowModal()
+        if self.val == wx.ID_OK :
+            self.make_param()
+
+    def make_param(self) :
+        self.select = self.dial.check_colch.GetValue()
+        if self.parametres.get('first', True) :
+            keep_coord = False
+        else :
+            keep_coord = self.dial.check_coord.GetValue()
+        param = {'coeff' : self.dial.choice1.GetSelection(),
+                          'layout' : self.dial.choice2.GetSelection(),
+                          'type_graph' : self.dial.choice3.GetSelection(),
+                          'arbremax' : self.dial.check1.GetValue(),
+                          'coeff_tv' : self.dial.check_s_size.GetValue(),
+                          'coeff_tv_nb' : self.dial.spin_tv.GetValue(),
+                          'tvprop' : self.dial.check2.GetValue(),
+                          'tvmin' : self.dial.spin_tvmin.GetValue(),
+                          'tvmax' : self.dial.spin_tvmax.GetValue(),
+                          'coeff_te' : self.dial.check3.GetValue(),
+                          'coeff_temin' : self.dial.spin_temin.GetValue(),
+                          'coeff_temax' : self.dial.spin_temax.GetValue(),
+                          'label_e' : self.dial.check_elab.GetValue(),
+                          'label_v' : self.dial.check_vlab.GetValue(),
+                          'vcex' : self.dial.check_vcex.GetValue(),
+                          'vcexmin' : self.dial.spin_vcexmin.GetValue(),
+                          'vcexmax' : self.dial.spin_vcexmax.GetValue(),
+                          'cex' : self.dial.spin_cex.GetValue(),
+                          'seuil_ok' : self.dial.check_seuil.GetValue(),
+                          'seuil' : self.dial.spin_seuil.GetValue(),
+                          'cols' : self.dial.cols.GetColour(),
+                          'cola' : self.dial.cola.GetColour(),
+                          'width' : self.dial.spin_width.GetValue(),
+                          'height' : self.dial.spin_height.GetValue(),
+                          'first' : False,
+                          'keep_coord' : keep_coord,
+                          'alpha' : self.dial.slider_sphere.GetValue(),
+                          'film' : self.dial.film.GetValue()
+                          }
+        if 'cexfromchi' in self.parametres :
+            param['cexfromchi'] = self.dial.checkit.GetValue()
+        if 'sfromchi' in self.parametres :
+            param['sfromchi'] = self.dial.checki.GetValue()
+        if 'vlabcolor' in self.parametres :
+           param['vlabcolor'] = self.parametres['vlabcolor']
+        if 'check_bystar' in dir(self.dial) :
+            param['bystar'] = self.dial.check_bystar.GetValue()
+            param['stars'] = self.parametres['stars']
+        self.parametres.update(param)
+

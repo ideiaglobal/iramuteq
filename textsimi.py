@@ -3,17 +3,18 @@
 #Copyright (c) 2008-2011 Pierre Ratinaud
 #Lisense: GNU/GPL
 
-from chemins import ConstructPathOut, construct_simipath
+from chemins import ffr, simipath
 from corpus import Corpus
 import os
 from analysetxt import AnalyseText
 from ConfigParser import RawConfigParser
 from guifunct import getPage, getCorpus
 from dialog import StatDialog
-from functions import indices_simi, progressbar, treat_var_mod
+from guifunct import SelectColumn, PrepSimi
+from functions import indices_simi, progressbar, treat_var_mod, read_list_file, print_liste
 from tableau import Tableau
 from tabsimi import DoSimi
-from PrintRScript import PrintRScript
+from PrintRScript import PrintSimiScript
 import wx
 from copy import copy
 
@@ -21,17 +22,29 @@ import logging
 
 logger = logging.getLogger('iramuteq.textsimi')
 
-
-
 class SimiTxt(AnalyseText): 
     def doanalyse(self) :
+        self.parametres['type'] = 'simitxt'
+        self.pathout.basefiles(simipath)
         self.indices = indices_simi
         self.makesimiparam()
+        #FIXME
+        self.actives = self.corpus.make_actives_limit(3)
+        dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)]) 
+        SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'])
         self.makefiles()
         prep = PrepSimi(self.ira, self.parametres, indices_simi)
         self.parametres = prep.parametres
-        script = PrintSimScript(self)
-
+        script = PrintSimiScript(self)
+        script.make_script()
+        self.doR(script.scriptout)
+        if self.parametres['type_graph'] == 1:
+            if os.path.exists(self.pathout['liste_graph']):
+                graph_simi = read_list_file(self.pathout['liste_graph'])
+                graph_simi.append([os.path.basename(script.filename), script.txtgraph])
+            else :
+                graph_simi = [[os.path.basename(script.filename), script.txtgraph]]
+            print_liste(self.pathout['liste_graph'], graph_simi)
 
     def preferences(self) :
         dial = StatDialog(self, self.parent)
@@ -52,7 +65,7 @@ class SimiTxt(AnalyseText):
     def makesimiparam(self) :
         self.paramsimi = {'coeff' : 0,
                           'layout' : 2,
-                          'type' : 1,
+                          'type_graph' : 1,
                           'arbremax' : 1,
                           'coeff_tv' : 1,
                           'coeff_tv_nb' : 0,
@@ -84,8 +97,8 @@ class SimiTxt(AnalyseText):
                           }
         self.parametres.update(self.paramsimi)
 
-    def makefiles(self) :
-        self.actives, lim = self.corpus.make_actives_nb(self.parametres.get('max_actives',1500), 1)
+    def makefiles(self, lim=3) :
+        #self.actives, lim = self.corpus.make_actives_nb(self.parametres.get('max_actives',1500), 1)
         self.parametres['eff_min_forme'] = lim
         self.parametres['nbactives'] = len(self.actives)
         self.parametres['fromprof'] = True
@@ -98,144 +111,19 @@ class SimiTxt(AnalyseText):
         self.parametres['stars'] = copy(self.listet)
         self.parametres['sfromchi'] = False
 
-class PrepSimi :
-    def _init_(self, parent, parametres, indices_simi) :    
-        self.parametres = parametres
-        self.dial = PrefSimi(parent, -1, self.parametres, indices_simi) 
-        self.dial.CenterOnParent()
-        self.val = self.dial.ShowModal()
-        if self.val == wx.ID_OK :
-            self.make_param()
-
-    def make_param(self) :
-        self.select = self.dial.check_colch.GetValue()
-        param = {'coeff' : self.dial.choice1.GetSelection(),
-                          'layout' : self.dial.choice2.GetSelection(),
-                          'type' : self.dial.choice3.GetSelection(),
-                          'arbremax' : self.dial.check1.GetValue(),
-                          'coeff_tv' : self.dial.check_s_size.GetValue(),
-                          'coeff_tv_nb' : self.dial.spin_tv.GetValue(),
-                          'tvprop' : self.dial.check2.GetValue(),
-                          'tvmin' : self.dial.spin_tvmin.GetValue(),
-                          'tvmax' : self.dial.spin_tvmax.GetValue(),
-                          'coeff_te' : self.dial.check3.GetValue(),
-                          'coeff_temin' : self.dial.spin_temin.GetValue(),
-                          'coeff_temax' : self.dial.spin_temax.GetValue(),
-                          'label_e' : self.dial.check_elab.GetValue(),
-                          'label_v' : self.dial.check_vlab.GetValue(),
-                          'vcex' : self.dial.check_vcex.GetValue(),
-                          'vcexmin' : self.dial.spin_vcexmin.GetValue(),
-                          'vcexmax' : self.dial.spin_vcexmax.GetValue(),
-                          'cex' : self.dial.spin_cex.GetValue(),
-                          'seuil_ok' : self.dial.check_seuil.GetValue(),
-                          'seuil' : self.dial.spin_seuil.GetValue(),
-                          'cols' : self.dial.cols.GetColour(),
-                          'cola' : self.dial.cola.GetColour(),
-                          'width' : self.dial.spin_width.GetValue(),
-                          'height' : self.dial.spin_height.GetValue(),
-                          'first' : False,
-                          'keep_coord' : keep_coord,
-                          'alpha' : self.dial.slider_sphere.GetValue(),
-                          'film' : self.dial.film.GetValue()
-                          }
-        if 'cexfromchi' in self.parametres :
-            param['cexfromchi'] = self.dial.checkit.GetValue()
-        if 'sfromchi' in self.parametres :
-            param['sfromchi'] = self.dial.checki.GetValue()
-        if 'vlabcolor' in self.parametres :
-           param['vlabcolor'] = self.parametres['vlabcolor']
-        if 'check_bystar' in dir(self.dial) :
-            param['bystar'] = self.dial.check_bystar.GetValue()
-            param['stars'] = self.parametres['stars']
-        self.parametres.update(param)
-
-class PrintSimiScript(PrintRScript) :
-    def make_script(self) :
-        self.load(['igraph', 'proxy', 'Matrix'])
-        self.source([self.analyse.parent.RscriptsPath['simi'], self.analyse.parent.RscriptsPath['Rgraph']])
-        txt = """
-        dm.path <- "%s"
-        cn.path <- "%s"
-        selected.col <- "%s"
-        """ % (self.pathout['mat01.csv'], self.pathout['actives.csv'], self.pathout['selected.csv'])
-        
-        txt += """
-        dm <- dm[, selected.col+1]
-        """
-        if self.parametres['coeff'] == 0 :
-            method = 'cooc'
-            txt += """
-            method <- 'cooc'
-            mat <- make.a(dm)
-            """
-        else :
-            txt += """
-            dm <- as.matrix(dm)
-            """
-        if self.parametres['coeff'] == 1 :
-            method = 'prcooc'
-            txt += """
-            method <- 'Russel'
-            mat <- simil(dm, method = 'Russel', diag = TRUE, upper = TRUE, by_rows = FALSE)
-            """
-        elif self.analyses.indices[self.parametres['coeff']] == 'binomial' :
-            method = 'binomial'
-            txt += """
-            method <- 'binomial'
-            mat <- binom.sim(dm)
-            """
-        else :
-            method = self.types[self.paramsimi['coeff']]
-            txt += """
-            method <-"%s"
-            mat <- simil(dm, method = method, diag = TRUE, upper = TRUE, by_rows = FALSE)
-            """ % self.analyse.indices[self.parametres['coeff']]
-        txt += """
-        mat <- as.matrix(stats::as.dist(mat,diag=TRUE,upper=TRUE))
-        mat[is.na(mat)] <- 0
-        mat[is.infinite(mat)] <- 0
-        """
-        if self.parametres['layout'] == 0 : layout = 'random'
-        if self.parametres['layout'] == 1 : layout = 'circle'
-        if self.parametres['layout'] == 2 : layout = 'frutch'
-        if self.parametres['layout'] == 3 : layout = 'kawa'
-        if self.parametres['layout'] == 4 : layout = 'graphopt'
-        
-        txt += """
-        eff <- colSums(dm)
-        g.ori <- graph.adjacency(mat, mode='lower', weighted = TRUE)
-        w.ori <- E(g.ori)$weight
-        if (max.tree) {
-            if (method == 'cooc') {
-                E(g.ori)$weight <- 1 / w.ori
-            } else {
-                E(g.ori)$weigth <- 1 - w.ori
-            }
-            g.max <- minimum.spanning.tree(g.ori)
-            if (method == 'cooc') {
-                E(g.max)$weight <- 1 / E(g.max)$weight
-            } else {
-                E(g.max)$weight <- 1 - E(g.max)$weight
-            }
-            g.toplot <- g.max
-        } else {
-            g.toplot <- g.ori
-        }
-        """
-            
 
 
-        self.tableau = Tableau(self.parent, '')
-        self.tableau.listactives = self.actives
-        self.tableau.parametre['fromtxt'] = True
-        self.corpus.lems_eff = dict([[lem,[self.corpus.lems[lem].freq]] for lem in self.actives])
-        #print('ATTENTION  ETOILES')
-        #self.paramsimi['bystar'] = True
-        self.tableau.listet = copy(self.listet)
-        #self.paramsimi['cexfromchi'] = True
-        #self.paramsimi['vlabcolor'] = True
-        self.tableau.actives = copy(self.corpus.lems_eff)
-        DoSimi(self, fromprof = self.pathout['mat01.csv'], param = self.paramsimi, pathout = self.pathout.dirout)
+#        self.tableau = Tableau(self.parent, '')
+#        self.tableau.listactives = self.actives
+#        self.tableau.parametre['fromtxt'] = True
+#        self.corpus.lems_eff = dict([[lem,[self.corpus.lems[lem].freq]] for lem in self.actives])
+#        #print('ATTENTION  ETOILES')
+#        #self.paramsimi['bystar'] = True
+#        self.tableau.listet = copy(self.listet)
+#        #self.paramsimi['cexfromchi'] = True
+#        #self.paramsimi['vlabcolor'] = True
+#        self.tableau.actives = copy(self.corpus.lems_eff)
+#        DoSimi(self, fromprof = self.pathout['mat01.csv'], param = self.paramsimi, pathout = self.pathout.dirout)
 
 #class SimiTxt :
 #    def __init__(self, parent, cmd = False, param = None):

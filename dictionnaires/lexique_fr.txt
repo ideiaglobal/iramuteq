@@ -4956,7 +4956,7 @@ amérindiens	amérindien	nom	m	p	0.14	0	0.08	0
 amérique	amérique	nom	f	s	0.34	1.08	0.34	1.08	
 améthyste	améthyste	nom	f	s	0.22	0.81	0.2	0.27	
 améthystes	améthyste	nom	f	p	0.22	0.81	0.02	0.54	
-an	an	nom	m	s	866.58	685.81	148.41	76.76	
+an	an	nom_sup	m	s	866.58	685.81	148.41	76.76	
 ana	ana	nom	m		4.91	0.14	4.91	0.14	
 anabaptiste	anabaptiste	adj		s	0.01	0.41	0.01	0.34	
 anabaptistes	anabaptiste	nom		p	0	0.34	0	0.34	
@@ -5504,7 +5504,7 @@ anormaux	anormal	adj	m	p	7.4	7.91	0.76	0.61
 anosmie	anosmie	nom	f	s	0.07	0	0.07	0	
 anosmique	anosmique	adj	m	s	0.01	0.07	0.01	0.07	
 anoxie	anoxie	nom	f	s	0.09	0	0.09	0	
-ans	an	nom	m	p	866.58	685.81	718.17	609.05	
+ans	an	nom_sup	m	p	866.58	685.81	718.17	609.05	
 anse	anse	nom	f	s	0.47	6.08	0.33	4.86	
 anses	anse	nom	f	p	0.47	6.08	0.14	1.22	
 ansée	ansé	adj	f	s	0.02	0.07	0.01	0	

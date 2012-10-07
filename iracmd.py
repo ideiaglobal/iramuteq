@@ -53,9 +53,9 @@ class CmdLine :
         parser = OptionParser()
     
         parser.add_option("-f", "--file", dest="filename", help="chemin du corpus", metavar="FILE", default=False)
-        parser.add_option("-t", "--type", dest="type_analyse", help="type d'analyse", metavar="TYPE D'ANALYSE", default='False')
+        parser.add_option("-t", "--type", dest="type_analyse", help="type d'analyse", metavar="TYPE D'ANALYSE", default=False)
 
-        parser.add_option("-c", "--conf", dest="configfile", help="chemin du fichier de configuration", metavar="CONF", default=False)
+        parser.add_option("-c", "--conf", dest="configfile", help="chemin du fichier de configuration", metavar="CONF", default=None)
         parser.add_option("-e", "--enc", dest="encodage", help="encodage du corpus", metavar="ENC", default=locale.getpreferredencoding())
         parser.add_option("-l", "--lang", dest="language", help="langue du corpus", metavar="LANG", default='french')
         parser.add_option("-r", "--read", dest="read", help="lire un corpus", metavar="READ", default = False)
@@ -63,8 +63,12 @@ class CmdLine :
         (options, args) = parser.parse_args()
         print args
         print options
-        if options.configfile :
-            self.ConfigPath[options.type_analyse] = os.path.abspath(options.configfile)
+        options.type_analyse
+        if options.configfile is not None:
+            config = DoConf(os.path.abspath(options.configfile)).getoptions()
+        elif options.type_analyse :
+            config = DoConf(self.ConfigPath[options.type_analyse]).getoptions()
+            #self.ConfigPath[options.type_analyse] = os.path.abspath(options.configfile)
         self.TEMPDIR = tempfile.mkdtemp('iramuteq') 
         self.RscriptsPath = ConstructRscriptsPath(AppliPath)
         self.PathPath = ConfigParser()
@@ -102,8 +106,16 @@ class CmdLine :
             corpus.conn_all()
             corpus.make_lems()
             corpus.parse_active(gramact, gramsup)
-            log.warning('ATTENTION gethapaxuces')
-            corpus.gethapaxuces()
+#            log.warning('ATTENTION gethapaxuces')
+#            MakeUciStat(corpus)
+#            qfqsdf
+            #corpus.gethapaxuces()
+            #ucisize = corpus.getucisize()
+            #ucisize = [`val` for val in ucisize]
+            #uciet = [uci.etoiles[1] for uci in corpus.ucis]
+            #res = zip(uciet, ucisize)
+            #with open('ucisize.csv', 'w') as f :
+            #    f.write('\n'.join(['\t'.join(val) for val in res]))
                 #    self.content = f.read()
                 #self.content = self.content.replace('\r','')
             if options.type_analyse == 'alceste' :
@@ -112,7 +124,8 @@ class CmdLine :
                     #zerzre
                 #corpus.read_corpus()
                 #corpus.parse_active(gramact, gramsup)
-                Alceste(self, corpus)
+                config['type'] = 'alceste'
+                Alceste(self, corpus, parametres = config)
             #    self.Text = AnalyseAlceste(self, cmd = True, big = True)
                 #self.Text = AnalyseAlceste(self, cmd = True)
             elif options.type_analyse == 'pam' :

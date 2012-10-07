@@ -10,6 +10,7 @@ from ConfigParser import ConfigParser
 from subprocess import Popen, call, PIPE
 import thread
 import os
+import ast
 import sys
 import csv
 import platform
@@ -130,6 +131,12 @@ class DoConf :
         for option in self.conf.options(section) :
             if self.conf.get(section, option).isdigit() :
                 parametres[option] = int(self.conf.get(section, option))
+            elif self.conf.get(section, option) == 'False' :
+                parametres[option] = False
+            elif self.conf.get(section, option) == 'True' :
+                parametres[option] = True
+            elif self.conf.get(section, option).startswith('(') and self.conf.get(section, option).endswith(')') :
+                parametres[option] = ast.literal_eval(self.conf.get(section, option))
             else :
                 parametres[option] = self.conf.get(section, option)
         if 'type' not in parametres :
@@ -145,6 +152,10 @@ class DoConf :
                     self.conf.set(section, option, `parametres[i][option]`)
                 elif isinstance(parametres[i][option], basestring) :
                     self.conf.set(section, option, parametres[i][option].encode('utf8'))
+                elif isinstance(parametres[i][option], wx.Colour) :
+                    self.conf.set(section, option, str(parametres[i][option]))
+                else :
+                    self.conf.set(section, option, `parametres[i][option]`)
         if outfile is None :
             outfile = self.configfile
         print outfile

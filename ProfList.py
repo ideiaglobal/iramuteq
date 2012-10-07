@@ -588,11 +588,24 @@ class ProfListctrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             del ntab
             ntab2.sort(reverse = True)
             ntab2 = ntab2[:limite]
+            nuces = [val[1] for val in ntab2]
             dlg.Update(3, u'concordancier...')
-            ucestxt = [corpus.ucis_paras_uces[val[1][0]][val[1][1]][val[1][2]] for val in ntab2]
-            ucestxt = [corpus.make_concord(self.la, ' '.join(uce), 'red') for uce in ucestxt]
+            #ucestxt = [corpus.ucis_paras_uces[val[1][0]][val[1][1]][val[1][2]] for val in ntab2]
+            ucestxt1 = [row for row in corpus.getconcorde(nuces)]
+            ucestxt = []
+            ucis_txt = []
+            for uce in ucestxt1 :
+                ucetxt = ' '+uce[1]+' '
+                ucis_txt.append(' '.join(corpus.ucis[corpus.getucefromid(uce[0]).uci].etoiles) + '<br>')
+                for lem in self.la :
+                    listmot = corpus.getlems()[lem].formes
+                    for id in listmot :
+                        forme = corpus.getforme(id).forme
+                        ucetxt = ucetxt.replace(' '+forme+' ', '<font color=red> ' + forme + ' </font>')
+                ucestxt.append(ucetxt)        
+            #ucestxt = [corpus.make_concord(self.la, ' '.join(uce), 'red') for uce in ucestxt]
             dlg.Update(4, u'texte...')
-            ucis_txt = [' '.join(corpus.ucis[val[1][0]][0]) for val in ntab2]
+            #ucis_txt = [' '.join(corpus.ucis[val[1][0]][0]) for val in ntab2]
             win = message(self, -1, u"UCE caractéristiques - Classe %i" % self.cl, size=(600, 500), style=wx.DEFAULT_FRAME_STYLE)
             win.html = '<html>\n' + '<br><br>'.join(['<br>'.join([ucis_txt[i], 'score : ' + str(ntab2[i][0]), ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
             win.HtmlPage.SetPage(win.html)
