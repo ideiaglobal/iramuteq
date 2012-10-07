@@ -910,7 +910,7 @@ class PrintSimiScript(PrintRScript) :
         self.add(txt)
         self.write()
 
-WordCloudRScript(PrintRScript) :
+class WordCloudRScript(PrintRScript) :
     def make_script(self) :
         self.Source([self.analyse.parent.RscriptsPath['Rgraph']])
         self.packages(['wordcloud'])
