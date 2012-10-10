@@ -76,11 +76,12 @@ class History :
 
     def add(self, analyse) :
         if 'corpus' in analyse :
-            if analyse['corpus'] in self.corpora :
-                if 'analyses' in self.history[analyse['corpus']] :
-                    self.history[analyse['corpus']]['analyses'].append(analyse)
+            acorpus_uuid =  analyse['corpus']
+            if acorpus_uuid in self.corpora :
+                if 'analyses' in self.history[acorpus_uuid] :
+                    self.history[acorpus_uuid]['analyses'].append(analyse)
                 else :
-                    self.history[analyse['corpus']]['analyses'] = [analyse]
+                    self.history[acorpus_uuid]['analyses'] = [analyse]
                 self.analyses[analyse['uuid']] = analyse
             else :
                 self.analyses[analyse['uuid']] = analyse
@@ -107,6 +108,9 @@ class History :
 
     def rmtab(self, analyse) :
         del self.opened[analyse['uuid']]
+    
+    def __str__(self) :
+        return str(self.history)
 
 class DoConf :
     def __init__(self, configfile=None, diff = None, parametres = None) :
@@ -158,7 +162,6 @@ class DoConf :
                     self.conf.set(section, option, `parametres[i][option]`)
         if outfile is None :
             outfile = self.configfile
-        print outfile
         with codecs.open(outfile, 'w', 'utf8') as f :
             self.conf.write(f)
 

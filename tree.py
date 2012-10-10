@@ -67,7 +67,7 @@ class LeftTree(CT.CustomTreeCtrl):
         #textctrl.Bind(wx.EVT_CHAR, self.OnTextCtrl)
         #combobox.Bind(wx.EVT_COMBOBOX, self.OnComboBox)
         #lenArtIds = len(ArtIDs) - 2
-        for x in range(len(self.h)) :
+        for x in range(len(self.history.corpora)) :
             if 'corpus_name' in self.h[self.history.order[x]] :
                 key = 'corpus_name'
             else :
@@ -524,11 +524,12 @@ class LeftTree(CT.CustomTreeCtrl):
 
         dlg.Destroy()
 
-    def AddAnalyse(self, parametres, itemParent = None) :
+    def AddAnalyse(self, parametres, itemParent = None, bold = True) :
         uuid = parametres['corpus']
         if itemParent is None :
             itemParent = self.root
         child, cookie = self.GetFirstChild(itemParent)
+        corpus = None
         while child :
             pydata = self.GetPyData(child)
             if pydata['uuid'] == uuid :
@@ -536,11 +537,15 @@ class LeftTree(CT.CustomTreeCtrl):
                 break
             self.GiveFocus(child, uuid)
             child, cookie = self.GetNextChild(itemParent, cookie)
-        item = self.AppendItem(corpus, parametres['name'])
+        #item = self.AppendItem(child, parametres['name'])
+        if corpus is not None : 
+            item = self.AppendItem(corpus, parametres['name'])
+        else :
+            item = self.AppendItem(self.root, parametres['name'])
         self.SetPyData(item, parametres)
         self.SetItemImage(item, 24, CT.TreeItemIcon_Normal)
         self.SetItemImage(item, 13, CT.TreeItemIcon_Expanded)
-        self.SetItemBold(item, True)
+        self.SetItemBold(item, bold)
         
     def OnItemAppend(self, item):
         child = self.AppendItem(self.root, item['corpus_name'])

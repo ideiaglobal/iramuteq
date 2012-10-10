@@ -26,26 +26,67 @@ class OpenAnalyse():
         self.parent = parent
         if isinstance(parametres, dict) :
             self.conf = DoConf(parametres['ira']).getoptions()
+            self.path = parametres['ira']
         else :
             self.conf = DoConf(parametres).getoptions()
+            self.path = parametres
+            self.conf = self.redopath(self.conf, parametres)
         
-        if self.conf.get('corpus', '!!') in self.parent.history.history :
-            if self.conf.get('corpus', '!!') in self.parent.history.openedcorpus :
-                log.info('corpus is already opened')
-                corpus = copycorpus(self.parent.history.openedcorpus[self.conf['corpus']]) 
-            else :
-                if os.path.exists(self.parent.history.history[self.conf['corpus']]['ira']) :
-                    corpus = Corpus(self, parametres = DoConf(self.parent.history.history[self.conf['corpus']]['ira']).getoptions('corpus'), read = self.parent.history.history[self.conf['corpus']]['ira'])
-                self.parent.history.openedcorpus[self.conf['corpus']] = corpus
+        if self.conf['type'] == 'corpus' :
+            corpus = self.opencorpus()
+        elif self.conf['corpus'] in self.parent.history.history :
+            corpus = self.openanalyse()
             if self.conf.get('lem',1) :
                corpus.make_lems(True)
             else :
                corpus.make_lems(False)
+            self.doopen(corpus)
         else :
             corpus = None
-        self.doopen(corpus)
         self.parent.history.addtab(self.conf)
-        
+    
+    def redopath(self, conf, path) :
+        #if not os.path.exists(conf['ira']) :
+        conf['ira'] = os.path.realpath(path)
+        conf['pathout'] = os.path.dirname(os.path.realpath(path))
+        DoConf(conf['ira']).makeoptions([conf['type']], [conf])
+        return conf
+    
+    def opencorpus(self) :
+        if self.conf['uuid'] not in self.parent.history.history :
+            self.parent.history.add(self.conf) 
+            log.info('add to history')
+            self.parent.tree.OnItemAppend(self.conf)
+        if self.conf['uuid'] in self.parent.history.openedcorpus :
+            log.info('corpus is already opened')
+        else :
+            corpus = Corpus(self, parametres = self.conf, read = self.parent.history.history[self.conf['uuid']]['ira'])
+            self.parent.history.openedcorpus[self.conf['uuid']] = corpus
+            self.opencorpus_analyses()
+            self.doopen(corpus)
+
+    def opencorpus_analyses(self) :
+        basepath = self.conf['pathout']
+        for root, subfolders, files in os.walk(basepath) :
+            for folder in subfolders :
+                if os.path.exists(os.path.join(folder, 'Analyse.ira')) :
+                    analyse_conf = DoConf(os.path.join(folder, 'Analyse.ira')).getoptions()
+                    analyse_conf = self.redopath(analyse_conf, os.path.join(folder, 'Analyse.ira'))
+                    if analyse_conf['corpus'] == self.conf['uuid'] :
+                        self.parent.history.add(analyse_conf)
+                        self.parent.tree.AddAnalyse(analyse_conf, bold = False)
+
+            #self.parent.tree.OnItemAppend(self.conf)
+    def openanalyse(self) :
+        if self.conf['corpus'] in self.parent.history.openedcorpus :
+            log.info('corpus is already opened')
+            corpus = self.parent.history.openedcorpus[self.conf['corpus']]
+        else :
+            if os.path.exists(self.parent.history.history[self.conf['corpus']]['ira']) :
+                corpus = Corpus(self, parametres = DoConf(self.parent.history.history[self.conf['corpus']]['ira']).getoptions('corpus'), read = self.parent.history.history[self.conf['corpus']]['ira'])
+                self.parent.history.openedcorpus[self.conf['corpus']] = corpus
+        return corpus
+
     def doopen(self, corpus) :
         print self.conf
         if self.conf['type'] == 'corpus' :

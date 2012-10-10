@@ -17,7 +17,7 @@ def OnOpen(self, type):
         elif type == "Texte":
             wildcard = "Fichier texte|*.txt|Tous les fichiers|*"
         elif type == "Analyse":
-            wildcard = "Fichier analyse|*.ira"
+            wildcard = "Fichier analyse/Corpus|*.ira;*.cira"
         defaultDir = self.PathPath.get('PATHS', 'lastpath')
         if defaultDir.strip() == '':
             defaultDir = self.UserConfigPath.replace('.iramuteq','')

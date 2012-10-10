@@ -612,7 +612,7 @@ class dolexlayout :
 
 class StatLayout:
     def __init__(self, ira, corpus, parametres):
-        self.pathout = PathOut(dirout = os.path.dirname(parametres['pathout']))
+        self.pathout = PathOut(dirout = parametres['pathout'])
         self.corpus = corpus
         self.ira = ira
         self.read_result()
