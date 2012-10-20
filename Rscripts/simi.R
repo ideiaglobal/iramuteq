@@ -268,6 +268,8 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, vertex.col = 
 	
 	if (p.type == 'rgl') {
 		library('rgl')
+        #rgl.open()
+        #par3d(cex=0.8)
 		rglplot(g.toplot,vertex.label= vire.nonascii(v.label), edge.width=we.width/10, vertex.size=0.01, vertex.color=vertex.col, vertex.label.color="black", edge.color = edge.col, layout=lo)
         los <- layout.norm(lo, -1, 1, -1, 1, -1, 1)
         rgl.spheres(los, col = vertex.col, radius = vertex.size/100, alpha = alpha)

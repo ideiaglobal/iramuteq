@@ -75,28 +75,45 @@ class ProfListctrlPanel(wx.Panel, listmix.ColumnSorterMixin):
                                  | wx.LC_EDIT_LABELS
                                  | wx.LC_SORT_ASCENDING
                                  )
-        line1 = classe[0]
+        line1 = classe.pop(0)
         limit = 0
         limitsup = 0
         i = 0
         dictdata = {}
-        limit = [i for i,b in enumerate(classe[1:]) if b[0] == '*']
-        if limit != [] :
-            limit = limit[0] - 1
-        limitsup = [i for i,b in enumerate(classe[1:]) if b[0] == '*****'] 
-        if limitsup == [] :
-            limitsup = 0
+        classen = [line for line in classe if line[0] != '*' and line[0] != '*****']
+        if len(classen) == 0 :
+            lenact = 0
+            lensup = 0
+            lenet = 0
         else :
-            limitsup = limitsup[0]
-        classen = [line for line in classe[1:] if line[0] != '*' and line[0] != '*****']
-        if limit == [] :
-            limit = len(classen) - 1
+            lenact = [i for i,b in enumerate(classe) if b[0] == '*****']
+            if lenact == [] :
+                lensup = 0
+                lenact = [i for i,b in enumerate(classe) if b[0] == '*']
+                if lenact == [] :
+                    lenact = len(classen)
+                    lenet = 0
+                else :
+                    lenact = 0
+                    lenet = len(classen)
+            else :
+                lenact = lenact[0]
+                lensup = [i for i,b in enumerate(classe[1:]) if b[0] == '*']
+                if lensup != [] :
+                   lensup = lensup[0] - lenact
+                   lenet = len(classen) - lensup
+                else :
+                   lensup == 0
+                   lenet = len(classen)
+        debsup = lenact
+                
+        self.lenact = lenact
+
+        debet = lenact + lensup
         dictdata = dict(zip([i for i in range(0,len(classen))], classen))
-        #if not self.Alceste :
-        #    limit = limit + 1
         self.list.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
         
-        self.PopulateList(dictdata, limit, limitsup, Alceste)
+        self.PopulateList(dictdata, debet, debsup, Alceste)
 
         self.Bind(wx.EVT_SIZE, self.OnSize)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick)
@@ -143,28 +160,25 @@ class ProfListctrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.list.SetColumnWidth(7, wx.LIST_AUTOSIZE)
 
         # show how to change the colour of a couple items
-        if limitsup != 0 :
-            for i in range(limitsup, limit):
-                   item = self.list.GetItem(i)
-                   item.SetTextColour(wx.RED) 
-                   self.list.SetItem(item)
-        else :           
-            limit=limit+1
+        for i in range(limitsup, limit):
+            item = self.list.GetItem(i)
+            item.SetTextColour(wx.RED) 
+            self.list.SetItem(item)
         
         for i in range(limit, len(dictdata)):
             item = self.list.GetItem(i)
             item.SetTextColour(wx.BLUE)
             self.list.SetItem(item)          
-
-        if limitsup != 0 :
-            self.la = [self.getColumnText(i,6) for i in range(0, limitsup-1)]
-            self.lchi = [float(self.getColumnText(i,4)) for i in range(0, limitsup-1)]
-            self.lfreq = [int(self.getColumnText(i,1)) for i in range(0, limitsup-1)]
+        
+        if self.lenact != 0 :
+            self.la = [self.getColumnText(i,6) for i in range(0, self.lenact)]
+            self.lchi = [float(self.getColumnText(i,4)) for i in range(0, self.lenact)]
+            self.lfreq = [int(self.getColumnText(i,1)) for i in range(0, self.lenact)]
         else :
-            self.la = [self.getColumnText(i,6) for i in range(0, limit)]
-            self.lfreq = [int(self.getColumnText(i,1)) for i in range(0, limit)]
-            self.lchi = [float(self.getColumnText(i,4)) for i in range(0, limit)]
-                
+            self.la = []
+            self.lchi = []
+            self.lfreq = []
+
     def do_greyline(self):
         for row in xrange(self.list.GetItemCount()):
             if row % 2 :

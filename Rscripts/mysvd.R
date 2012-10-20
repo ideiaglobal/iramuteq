@@ -21,13 +21,24 @@ write.sparse <- function (m, to) {
     }
   }
 }
+
+write.sparse2 <- function(m, to) {
+    stopifnot(inherits(m, "dgCMatrix"))
+    fh <- file(to, open="w")
+  
+    wl <- function(...) cat(..., "\n", file=fh)
+    wl(dim(m), length(m@x))   
+
+}
+
+print('FIXME : svdpath hardcoded !!')
 my.svd <- function(x, nu, nv) {
   stopifnot(nu==nv)
   rc <- system(paste("/usr/bin/svd -o /tmp/sout -d", nu, "/tmp/sparse.m"))
   if (rc != 0)
     stop("Couldn't run external svd code")
   d <- scan("/tmp/sout-S", skip=1)
-#FIXME : sometimes, libsvdc doesn't find solution with 2 dimensions, but does with 3 
+#FIXME : sometimes, svdlibc doesn't find solution with 2 dimensions, but does with 3 
   if (length(d)==1) {
       nu <- nu + 1
       rc <- system(paste("/usr/bin/svd -o /tmp/sout -d", nu, "/tmp/sparse.m"))

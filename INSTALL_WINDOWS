@@ -8,10 +8,11 @@ http://www.python.org/
 Numpy
 http://surfnet.dl.sourceforge.net/sourceforge/numpy/
 
-wxpython
+wxpython (2.8)
 http://surfnet.dl.sourceforge.net/sourceforge/wxpython/
 
-xlrd
+xlrd :
+http://pypi.python.org/pypi/xlrd
 
 package de R :
 rgl

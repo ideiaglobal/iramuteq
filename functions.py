@@ -21,7 +21,6 @@ import datetime
 from copy import copy
 from shutil import copyfile
 #from dialog import BugDialog
-print 'TEST LOGGING funcion'
 import logging
 
 log = logging.getLogger('iramuteq')
@@ -70,24 +69,28 @@ class History :
     
     def write(self) :
         sections = self.corpora.keys() + self.analyses.keys()
-        parametres = [self.corpora[key] for key in self.corpora.keys()] + [self.analyses[key] for key in self.analyses.keys()]
+        parametres = [self.corpora[key] for key in self.corpora.keys() if key != 'analyses'] + [self.analyses[key] for key in self.analyses.keys()]
         self.conf.makeoptions(sections, parametres)
         log.info('write history')
 
     def add(self, analyse) :
-        if 'corpus' in analyse :
+        tosave = {'uuid' : analyse['uuid'], 'ira': analyse['ira'], 'type' : analyse['type']}
+        if analyse.get('corpus', False) :
+            tosave['corpus'] = analyse['corpus']
+            tosave['name'] = analyse['name']
             acorpus_uuid =  analyse['corpus']
             if acorpus_uuid in self.corpora :
                 if 'analyses' in self.history[acorpus_uuid] :
-                    self.history[acorpus_uuid]['analyses'].append(analyse)
+                    self.history[acorpus_uuid]['analyses'].append(tosave)
                 else :
-                    self.history[acorpus_uuid]['analyses'] = [analyse]
-                self.analyses[analyse['uuid']] = analyse
+                    self.history[acorpus_uuid]['analyses'] = [tosave]
+                self.analyses[analyse['uuid']] = tosave
             else :
-                self.analyses[analyse['uuid']] = analyse
+                self.analyses[analyse['uuid']] = tosave
         elif 'corpus_name' in analyse :
-            self.history[analyse['uuid']] = analyse
-            self.corpora[analyse['uuid']] = analyse
+            tosave['corpus_name'] = analyse['corpus_name']
+            self.history[analyse['uuid']] = tosave
+            self.corpora[analyse['uuid']] = tosave
         self.write()
 
     def delete(self, uuid, corpus = False) :
