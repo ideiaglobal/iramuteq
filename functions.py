@@ -69,7 +69,7 @@ class History :
     
     def write(self) :
         sections = self.corpora.keys() + self.analyses.keys()
-        parametres = [self.corpora[key] for key in self.corpora.keys() if key != 'analyses'] + [self.analyses[key] for key in self.analyses.keys()]
+        parametres = [self.corpora[key] for key in self.corpora.keys()] + [self.analyses[key] for key in self.analyses.keys()]
         self.conf.makeoptions(sections, parametres)
         log.info('write history')
 
@@ -161,6 +161,8 @@ class DoConf :
                     self.conf.set(section, option, parametres[i][option].encode('utf8'))
                 elif isinstance(parametres[i][option], wx.Colour) :
                     self.conf.set(section, option, str(parametres[i][option]))
+                elif option == 'analyses' :
+                    pass
                 else :
                     self.conf.set(section, option, `parametres[i][option]`)
         if outfile is None :

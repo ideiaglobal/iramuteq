@@ -59,6 +59,7 @@ class OpenAnalyse():
             self.parent.tree.OnItemAppend(self.conf)
         if self.conf['uuid'] in self.parent.history.openedcorpus :
             log.info('corpus is already opened')
+            self.doopen(self.parent.history.openedcorpus[self.conf['uuid']])
         else :
             corpus = Corpus(self, parametres = self.conf, read = self.parent.history.history[self.conf['uuid']]['ira'])
             self.parent.history.openedcorpus[self.conf['uuid']] = corpus

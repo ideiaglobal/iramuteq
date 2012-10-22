@@ -547,6 +547,21 @@ class Corpus :
         if len(l) > taille_limite :
             l = l[-taille_limite:]
         return l
+
+    def find_segments_in_classe(self, list_uce, taille_segment, taille_limite):
+        d={}
+        for uce in self.getconcorde(list_uce) :
+            uce = uce[1].split()
+            d =self.count_from_list([' '.join(uce[i:i+taille_segment]) for i in range(len(uce)-(taille_segment - 1))], d)
+        l = [[d[val], val, taille_segment] for val in d if d[val] >= 3]
+        del(d)
+        l.sort()
+        if len(l) > taille_limite :
+            l = l[-taille_limite:]
+        return l
+            
+
+
          
     def make_ucecl_from_R(self, filein) :
         with open(filein, 'rU') as f :
@@ -983,7 +998,7 @@ class BuildFromAlceste(BuildCorpus) :
                 self.limitshow = 0
             else :
                 self.limitshow = self.last / 100000
-        log.debug(`iduci`, `idpara`, `iduce`)
+        log.debug(' '.join([`iduci`,`idpara`,`iduce`]))
         if self.last > self.lim :
             self.backup_uce()
             self.last = 0

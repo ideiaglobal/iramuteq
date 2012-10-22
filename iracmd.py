@@ -22,7 +22,6 @@ from textaslexico import Lexico
 from textstat import Stat
 import tempfile
 ######################################
-print '#######LOGGING TEST###########'
 import logging
 log = logging.getLogger('iramuteq')
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -54,8 +53,8 @@ class CmdLine :
     
         parser.add_option("-f", "--file", dest="filename", help="chemin du corpus", metavar="FILE", default=False)
         parser.add_option("-t", "--type", dest="type_analyse", help="type d'analyse", metavar="TYPE D'ANALYSE", default=False)
-
-        parser.add_option("-c", "--conf", dest="configfile", help="chemin du fichier de configuration", metavar="CONF", default=None)
+        parser.add_option("-c", "--conf", dest="configfile", help="chemin du fichier de configuration pour l'analyse", metavar="CONF", default=None)
+        parser.add_option("-d", "--confcorp", dest="corpusconfigfile", help="chemin du fichier de configuration pour le corpus", metavar="CONF", default=None)
         parser.add_option("-e", "--enc", dest="encodage", help="encodage du corpus", metavar="ENC", default=locale.getpreferredencoding())
         parser.add_option("-l", "--lang", dest="language", help="langue du corpus", metavar="LANG", default='french')
         parser.add_option("-r", "--read", dest="read", help="lire un corpus", metavar="READ", default = False)
@@ -66,9 +65,14 @@ class CmdLine :
         options.type_analyse
         if options.configfile is not None:
             config = DoConf(os.path.abspath(options.configfile)).getoptions()
-        elif options.type_analyse :
+        elif options.filename and options.type_analyse :
             config = DoConf(self.ConfigPath[options.type_analyse]).getoptions()
             #self.ConfigPath[options.type_analyse] = os.path.abspath(options.configfile)
+        elif options.read :
+            pass
+        else :
+            print 'rien a faire'
+            return
         self.TEMPDIR = tempfile.mkdtemp('iramuteq') 
         self.RscriptsPath = ConstructRscriptsPath(AppliPath)
         self.PathPath = ConfigParser()
@@ -78,7 +82,7 @@ class CmdLine :
         self.pref.read(self.ConfigPath['preferences'])
         self.history = History(self.ConfigPath['history'])
         #self.history.write()
-        if options.filename or options.read or options.build:
+        if options.filename or options.read :#or options.build:
             self.corpus_encodage = options.encodage
             self.corpus_lang = options.language
                 
@@ -88,13 +92,18 @@ class CmdLine :
             self.expressions = ReadDicoAsDico(self.DictPath.get(options.language + '_exp', 'french_exp'))
             if options.filename :
                 self.filename = os.path.abspath(options.filename)
-                corpus_parametres = DoConf('/home/pierre/.iramuteq/corpus.cfg').getoptions('corpus')
-                corpus_parametres['filename'] = self.filename
+                if options.corpusconfigfile is not None :
+                    corpus_parametres = DoConf(options.corpusconfigfile).getoptions('corpus')
+                else :
+                    corpus_parametres = DoConf(self.ConfigPath['corpus']).getoptions()
+                dire, corpus_parametres['filename'] = os.path.split(self.filename)
+                corpus_parametres['originalpath'] = self.filename
                 corpus_parametres['encoding'] = self.corpus_encodage
-                corpus_parametres['syscoding'] = 'utf8'
-                corpus_parametres['pathout'] = PathOut(options.filename, 'corpus').dirout
+                corpus_parametres['syscoding'] = locale.getpreferredencoding()
+                corpus_parametres['pathout'] = PathOut(self.filename, 'corpus').mkdirout()
                 corpus = BuildFromAlceste(self.filename, corpus_parametres, self.lexique, self.expressions).corpus
                 self.history.add(corpus.parametres)
+                corpus = copycorpus(corpus)
 
                 #with codecs.open(self.filename, 'r', self.corpus_encodage) as f:
             elif options.read :
