@@ -171,7 +171,8 @@ class DoConf :
             self.conf.write(f)
 
     def totext(self, parametres) :
-        txt = ['Corpus']
+        #txt = ['Corpus']
+        txt = []
         for val in parametres :
             if isinstance(parametres[val], int) :
                 txt.append(' \t\t: '.join([val, `parametres[val]`]))
@@ -316,8 +317,8 @@ def formatExceptionInfo(maxTBlevel=5):
          cla, exc, trbk = sys.exc_info()
          excName = cla.__name__
          try:
-             excArgs = exc.__dict__["args"]
-         except KeyError:
+             excArgs = exc.args[0]
+         except :
              excArgs = "<no args>"
          excTb = traceback.format_tb(trbk, maxTBlevel)
          return (excName, excArgs, excTb)
@@ -330,7 +331,7 @@ def decoupercharact(chaine, longueur, longueurOptimale, separateurs = None) :
         Si on trouve un '$', c'est fini.
         Sinon, on cherche le meilleur candidat. C'est-à-dire le rapport poids/distance le plus important.
     """
-    separateurs = [[u'.', 60.0], [u'?', 60.0], [u'!', 60.0], [u'£', 60], [u':', 50.0], [u';', 40.0], [u',', 10.0], [u' ', 0.1]]
+    separateurs = [[u'.', 60.0], [u'?', 60.0], [u'!', 60.0], [u'£$£', 60], [u':', 50.0], [u';', 40.0], [u',', 10.0], [u' ', 0.1]]
     trouve = False                 # si on a trouvé un bon séparateur
     iDecoupe = 0                # indice du caractere ou il faut decouper
     
@@ -380,28 +381,38 @@ def decoupercharact(chaine, longueur, longueurOptimale, separateurs = None) :
     # si on a rien trouvé
     return False, chaine.split(), ''
 
-def BugReport(parent):
+def BugReport(parent, error = None):
     for ch in parent.GetChildren():
         if "<class 'wx._windows.ProgressDialog'>" == str(type(ch)):
             ch.Destroy()   
+    excName, exc, excTb = formatExceptionInfo()
+    if excName == 'Exception' :
+        txt = 'Message :\n'
+    else :
+        txt = u'            !== BUG ==!       \n'
+        txt += u'*************************************\n'
+        txt += '\n'.join(excTb).replace('    ', ' ')
+        txt += excName + '\n'
+    txt += exc
+
     dial = BugDialog(parent)
-    txt = u'            !== BUG ==!       \n'
-    txt += u'*************************************\n'
-    for line in formatExceptionInfo():
-        if type(line) == type([]):
-            for don in line:
-                txt += don.replace('    ', ' ')
-        else:
-            txt += line + '\n'
+    #for line in formatExceptionInfo():
+    #    if type(line) == type([]):
+    #        for don in line:
+    #            txt += don.replace('    ', ' ')
+    #    else:
+    #        txt += line + '\n'
     if 'Rerror' in dir(parent) :
         txt += parent.Rerror
         parent.Rerror = ''
+    #if error is not None :
+    #    txt += '\n%s\n' %error
     print formatExceptionInfo()
     log.error(txt)
     dial.text_ctrl_1.write(txt)
     dial.CenterOnParent()
     dial.ShowModal()
-    raise NameError('Bug')
+    #raise Exception('Bug')
     
 def PlaySound(parent):
     if parent.pref.getboolean('iramuteq', 'sound') :
@@ -514,7 +525,7 @@ def check_Rresult(parent, pid) :
             except :
                 BugReport(parent)
     else :
-        if pid !=0 :
+        if pid != 0 :
             try :
                 raise Exception(u'Erreur R')
             except :

@@ -114,36 +114,40 @@ def getCorpus(page) :
         return None
             
 class SelectColumn :
-    def __init__(self, parent, dictcol, actives, pathout, selected = None) :
+    def __init__(self, parent, dictcol, actives, pathout, selected = None, dlg = False) :
         self.ira = parent
-        dial = dialog.SelectColDial(self.ira)
-        listcol = ListForSpec(dial, self, dictcol, ['forme', 'eff'])
-        dial.bSizer2.Add( listcol, 2, wx.ALL|wx.EXPAND, 5 )
-        dial.m_sdbSizer2.AddButton( dial.m_sdbSizer2OK )
-        dial.m_sdbSizer2.Realize()
-        dial.bSizer2.Add( dial.m_sdbSizer2, 0, wx.EXPAND, 5 )
-        dial.Layout()
-        if selected is None :
-            for row in xrange(listcol.list.GetItemCount()):
-                listcol.list.Select(row)
+        if dlg :
+            dial = dialog.SelectColDial(self.ira)
+            listcol = ListForSpec(dial, self, dictcol, ['forme', 'eff'])
+            dial.bSizer2.Add( listcol, 2, wx.ALL|wx.EXPAND, 5 )
+            dial.m_sdbSizer2.AddButton( dial.m_sdbSizer2OK )
+            dial.m_sdbSizer2.Realize()
+            dial.bSizer2.Add( dial.m_sdbSizer2, 0, wx.EXPAND, 5 )
+            dial.Layout()
+            if selected is None :
+                for row in xrange(listcol.GetItemCount()):
+                    listcol.Select(row)
+            else :
+                orderlex = dict([[listcol.getColumnText(i,0),i] for i in range(0,listcol.GetItemCount())])
+                for row in selected :
+                    listcol.Select(orderlex[actives[row]])
+            dial.CenterOnParent()
+            val = dial.ShowModal()        
+            last = listcol.GetFirstSelected()
+            lastl = [listcol.GetFirstSelected()]
+            indexes = [listcol.getColumnText(listcol.GetFirstSelected(),0)]
+            while listcol.GetNextSelected(last) != -1:
+                last = listcol.GetNextSelected(last)
+                lastl.append(last)
+                indexes.append(listcol.getColumnText(last,0))
+            dial.Destroy()
+            column = [actives.index(val) for val in indexes]
+            column.sort()
+            with open(pathout, 'w') as f :
+                f.write('\n'.join([`val` for val in column]))
         else :
-            orderlex = dict([[listcol.getColumnText(i,0),i] for i in range(0,listcol.list.GetItemCount())])
-            for row in selected :
-                listcol.list.Select(orderlex[actives[row]])
-        dial.CenterOnParent()
-        val = dial.ShowModal()        
-        last = listcol.list.GetFirstSelected()
-        lastl = [listcol.list.GetFirstSelected()]
-        indexes = [listcol.getColumnText(listcol.list.GetFirstSelected(),0)]
-        while listcol.list.GetNextSelected(last) != -1:
-            last = listcol.list.GetNextSelected(last)
-            lastl.append(last)
-            indexes.append(listcol.getColumnText(last,0))
-        dial.Destroy()
-        column = [actives.index(val) for val in indexes]
-        column.sort()
-        with open(pathout, 'w') as f :
-            f.write('\n'.join([`val` for val in column]))
+            with open(pathout, 'w') as f :
+                f.write('\n'.join([`i` for i in range(0,len(actives))]))
 
 class PrepSimi :
     def __init__(self, parent, parametres, indices_simi) :    

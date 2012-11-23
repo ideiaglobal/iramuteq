@@ -184,8 +184,10 @@ if (typegraph == 0) {
         rnames
     }
     library(rgl)
-    rn <- vire.nonascii(rownames(table.in))
+    #rn <- vire.nonascii(rownames(table.in))
+    rn <- rownames(table.in)
     rgl.open()
+    par3d(cex=0.7)
     #par3d(windowRect = c(100,100,600,600))
     rgl.bg(col = c('white', "#99bb99"), front = "lines", box=FALSE, sphere = TRUE)
     rgl.lines(c(rx), c(0, 0), c(0, 0), col = "#000000")
@@ -195,19 +197,21 @@ if (typegraph == 0) {
     text3d(0,ry[2]+1,0, ylab)
     text3d(0,0,rz[2]+1, zlab)
     rain = rainbow(clnb)
-    colors = rain[classes]
-    text3d(table.in[,1], table.in[,2], table.in[,3], rn, col='black')
-    if (tchi) {
+     if (tchi) {
         maxchi <- norm.vec(maxchi, tchi.min/100, tchi.max/100)
     } else if (!is.null(cex.par)) {
         maxchi <- norm.vec(cex.par, txt.min/100, txt.max/100)
     } else {
         maxchi <- 0.1
     }
+    colors = rain[classes]
+    text3d(table.in[,1], table.in[,2], table.in[,3], rn, col= colors , cex = cex.par)
     for (i in 1:clnb) {
         text3d(rx[2],(ry[2]+(0.2*i)),0,paste('classe',i),col=rain[i])
     }
-    rgl.spheres(table.in, col = colors, radius = maxchi, alpha = alpha)
+    #if (tchi) {
+    #    rgl.spheres(table.in, col = colors, radius = maxchi, alpha = alpha)
+    #}
 
     if (dofilm) {
         require(tcltk)

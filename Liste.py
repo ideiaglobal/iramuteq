@@ -22,20 +22,21 @@ import cStringIO
 
 #---------------------------------------------------------------------------
 
-class List(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
-    def __init__(self, parent, ID, pos=wx.DefaultPosition,
-                 size=wx.DefaultSize, style=0):
-        wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
-        listmix.ListCtrlAutoWidthMixin.__init__(self)
+#class List(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
+#    def __init__(self, parent, ID, pos=wx.DefaultPosition,
+#                 size=wx.DefaultSize, style=0):
+#        wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
+#        listmix.ListCtrlAutoWidthMixin.__init__(self)
 
 
-class ListPanel(wx.Panel, listmix.ColumnSorterMixin):
+class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
     def __init__(self, parent, gparent, dlist):
+        wx.ListCtrl.__init__( self, parent, -1, style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_HRULES|wx.LC_VRULES)
         self.parent = parent
         self.gparent = gparent
         self.source = gparent
         self.dlist = dlist
-        wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
+        #wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
         
         search_id = wx.NewId()
         self.parent.Bind(wx.EVT_MENU, self.onsearch, id = search_id)
@@ -43,97 +44,119 @@ class ListPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.SetAcceleratorTable(self.accel_tbl)
         
         self.il = wx.ImageList(16, 16)
-        self.sm_up = self.il.Add(getSmallUpArrowBitmap())
-        self.sm_dn = self.il.Add(getSmallDnArrowBitmap())
-
+        a={"sm_up":"GO_UP","sm_dn":"GO_DOWN","w_idx":"WARNING","e_idx":"ERROR","i_idx":"QUESTION"}
+        for k,v in a.items():
+            s="self.%s= self.il.Add(wx.ArtProvider_GetBitmap(wx.ART_%s,wx.ART_TOOLBAR,(16,16)))" % (k,v)
+            exec(s)
+        self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
         tID = wx.NewId()
 
-        self.list = List(self, tID,
-                                 style=wx.LC_REPORT 
-                                 | wx.BORDER_NONE
-                                 | wx.LC_EDIT_LABELS
-                                 | wx.LC_SORT_ASCENDING
-                                 )
         
+#-----------------------------------------------------------------------------------------    
+        self.attr1 = wx.ListItemAttr()
+        self.attr1.SetBackgroundColour((230, 230, 230))
+        self.attr2 = wx.ListItemAttr()
+        self.attr2.SetBackgroundColour("light blue")
+
+    #def PopulateList(self, dlist):
         
-        self.list.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-        self.PopulateList(dlist)
+        #self.InsertColumn(0,'id', wx.LIST_FORMAT_LEFT)
+#        i=1
+        self.InsertColumn(0, 'forme', wx.LIST_FORMAT_RIGHT)
+        self.InsertColumn(1, 'nb', wx.LIST_FORMAT_RIGHT)
+        self.InsertColumn(2, 'type', wx.LIST_FORMAT_RIGHT)
+        #self.InsertColumn(3, '', wx.LIST_FORMAT_RIGHT)
 
-        self.Bind(wx.EVT_SIZE, self.OnSize)
+        #ct = 0
+#        for key, data in dlist.iteritems():
+#            ct += 1
+#            index = self.InsertStringItem(sys.maxint, data[0])
+#            self.SetStringItem(index, 1, `data[1]`)
+#            self.SetStringItem(index, 2, data[2])
+#            self.SetStringItem(index, 3, '')
+#            self.SetItemData(index, key)
+        
+        self.SetColumnWidth(0, 150)   
+        self.SetColumnWidth(1, 100)  
+        self.SetColumnWidth(2, 100)
+        #self.SetColumnWidth(3, wx.LIST_AUTOSIZE)
 
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self.list)
-        self.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick, self.list)
+        self.itemDataMap = dlist
+        self.itemIndexMap = dlist.keys()
+        self.SetItemCount(len(dlist))
+
+        #self.Bind(wx.EVT_SIZE, self.OnSize)
+
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self)
+        self.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick, self)
         # for wxMSW
-        self.list.Bind(wx.EVT_COMMAND_RIGHT_CLICK, self.OnRightClick)
+        self.Bind(wx.EVT_COMMAND_RIGHT_CLICK, self.OnRightClick)
 
         # for wxGTK
-        self.list.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
-        self.itemDataMap = dlist
+        self.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
 
+        #listmix.ListCtrlAutoWidthMixin.__init__(self)
         listmix.ColumnSorterMixin.__init__(self, 3)
         self.SortListItems(1, False)
-        self.do_greyline()
-#-----------------------------------------------------------------------------------------    
+        #self.do_greyline()
 
-    def PopulateList(self, dlist):
-        
-        #self.list.InsertColumn(0,'id', wx.LIST_FORMAT_LEFT)
-#        i=1
-        self.list.InsertColumn(0, 'forme', wx.LIST_FORMAT_RIGHT)
-        self.list.InsertColumn(1, 'nb', wx.LIST_FORMAT_RIGHT)
-        self.list.InsertColumn(2, 'type', wx.LIST_FORMAT_RIGHT)
-        self.list.InsertColumn(3, '', wx.LIST_FORMAT_RIGHT)
+        #self.currentItem = 0
 
-        ct = 0
-        for key, data in dlist.iteritems():
-            ct += 1
-            index = self.list.InsertStringItem(sys.maxint, data[0])
-            self.list.SetStringItem(index, 1, `data[1]`)
-            self.list.SetStringItem(index, 2, data[2])
-            self.list.SetStringItem(index, 3, '')
-            self.list.SetItemData(index, key)
-        
-        self.list.SetColumnWidth(0, 150)   
-        self.list.SetColumnWidth(1, 100)  
-        self.list.SetColumnWidth(2, 100)
-        self.list.SetColumnWidth(3, wx.LIST_AUTOSIZE)
+    def OnGetItemText(self, item, col):
+        index=self.itemIndexMap[item]
+        s = self.itemDataMap[index][col]
+        return s
 
+    def OnGetItemAttr(self, item):
+        #index=self.itemIndexMap[item]
+        #genre=self.itemDataMap[index][2]
+        if item % 2 :
+            return self.attr1
+        else :
+            return self.attr2
 
-        self.currentItem = 0
-
-    def do_greyline(self):
-        for row in xrange(self.list.GetItemCount()):
-            if row % 2 :
-                self.list.SetItemBackgroundColour(row, (230, 230, 230))
-            else :
-                self.list.SetItemBackgroundColour(row, wx.WHITE)
+#    def do_greyline(self):
+#        for row in xrange(self.GetItemCount()):
+#            if row % 2 :
+#                self.SetItemBackgroundColour(row, (230, 230, 230))
+#            else :
+#                self.SetItemBackgroundColour(row, wx.WHITE)
                 
     def OnColClick(self, event):
-        self.do_greyline()
+        pass
+        #self.do_greyline()
         
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
     def GetListCtrl(self):
-        return self.list
+        return self
 
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
     def GetSortImages(self):
         return (self.sm_dn, self.sm_up)
 
+    def SortItems(self,sorter=cmp):
+        items = list(self.itemDataMap.keys())
+        items.sort(sorter)
+        self.itemIndexMap = items
+        
+        # redraw the list
+        self.Refresh()
+
 
     def OnRightDown(self, event):
         x = event.GetX()
         y = event.GetY()
-        item, flags = self.list.HitTest((x, y))
+        item, flags = self.HitTest((x, y))
 
         if flags & wx.LIST_HITTEST_ONITEM:
-            self.list.Select(item)
+            self.Select(item)
 
         event.Skip()
 
 
     def getColumnText(self, index, col):
-        item = self.list.GetItem(index, col)
+        item = self.GetItem(index, col)
         return item.GetText()
 
 
@@ -172,7 +195,7 @@ class ListPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def OnPopupOne(self, event):
         corpus = self.gparent.corpus
-        word = self.getColumnText(self.list.GetFirstSelected(), 0)
+        word = self.getColumnText(self.GetFirstSelected(), 0)
         lems = corpus.getlems()
         rep = []
         for forme in lems[word].formes :
@@ -186,7 +209,7 @@ class ListPanel(wx.Panel, listmix.ColumnSorterMixin):
         corpus = self.gparent.corpus
         win = message(self, -1, u"Concordancier", size=(600, 200), style=wx.DEFAULT_FRAME_STYLE)
         avap = 60
-        item = self.getColumnText(self.list.GetFirstSelected(), 0)
+        item = self.getColumnText(self.GetFirstSelected(), 0)
         listmot = corpus.getlems()[item].formes
         #uce_ok = [corpus.formes[corpus.idformes[forme].forme][1] for forme in listmot]
         uce_ok = corpus.getlemuces(item)#list(set([tuple(val) for line in uce_ok for val in line]))
@@ -240,9 +263,9 @@ class ListPanel(wx.Panel, listmix.ColumnSorterMixin):
         win.HtmlPage.SetPage(txt) 
         win.Show(True)
         
-    def OnSize(self, event):
-        w, h = self.GetClientSizeTuple()
-        self.list.SetDimensions(0, 0, w, h)
+#    def OnSize(self, event):
+#        w, h = self.GetClientSizeTuple()
+#        self.SetDimensions(0, 0, w, h)
 
 class message(wx.Frame):
     def __init__(self, *args, **kwds):

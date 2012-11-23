@@ -119,6 +119,8 @@ def ConstructConfigPath(AppliPath, user=True):
         'pam' : os.path.join(ConfigPath, 'pam.cfg'),
         'history' : os.path.join(ConfigPath, 'history.db'),
         'corpus' : os.path.join(ConfigPath, 'corpus.cfg'),
+        'stat' : os.path.join(ConfigPath, 'stat.cfg'),
+        'simitxt' : os.path.join(ConfigPath, 'simitxt.cfg'),
     }
     return DictConfigPath
 

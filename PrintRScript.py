@@ -921,11 +921,15 @@ class WordCloudRScript(PrintRScript) :
         selected.col <- read.table("%s")
         toprint <- as.matrix(act[selected.col[,1] + 1,])
         rownames(toprint) <- rownames(act)[selected.col[,1] + 1]
+        maxword <- %i
+        if (nrow(toprint) > maxword) {
+            toprint <- as.matrix(toprint[order(toprint[,1], decreasing=TRUE),])
+            toprint <- as.matrix(toprint[1:maxword,])
+        }
         open_file_graph("%s", width = %i, height = %i)
         par(bg=rgb%s)
         wordcloud(row.names(toprint), toprint[,1], scale=c(%f,%f), random.order=FALSE, colors=rgb%s)
         dev.off()
-        """ % (ffr(self.analyse.pathout['actives_eff.csv']), ffr(self.analyse.pathout['selected.csv']),
-                ffr(self.parametres['graphout']), self.parametres['width'], self.parametres['height'], bg_col, self.parametres['maxcex'], self.parametres['mincex'], txt_col)
+        """ % (ffr(self.analyse.pathout['actives_eff.csv']), ffr(self.analyse.pathout['selected.csv']), self.parametres['maxword'], ffr(self.parametres['graphout']), self.parametres['width'], self.parametres['height'], bg_col, self.parametres['maxcex'], self.parametres['mincex'], txt_col)
         self.add(txt)
         self.write()

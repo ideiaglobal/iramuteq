@@ -19,7 +19,7 @@ wx.HelpProvider_Set(provider)
 #---------------------------------------------------------------------------
 
 
-encodages = [[u'cp1252',u'Windows'], [u'utf-8',u'Linux'], [u'MacRoman',u'MacOs X'], [u'ascii', u'English'], [u'big5', u'Traditional Chinese'], [u'big5hkscs', u'Traditional Chinese'], [u'cp037', u'English'], [u'cp424', u'Hebrew'], [u'cp437', u'English'], [u'cp500', u'Western Europe'], [u'cp737', u'Greek'], [u'cp775', u'Baltic languages'], [u'cp850', u'Western Europe'], [u'cp852', u'Central and Eastern Europe'], [u'cp855', u'Bulg, Byelorus, Mace, Rus, Serb'], [u'cp856', u'Hebrew'], [u'cp857', u'Turkish'], [u'cp860', u'Portuguese'], [u'cp861', u'Icelandic'], [u'cp862', u'Hebrew'], [u'cp863', u'Canadian'], [u'cp864', u'Arabic'], [u'cp865', u'Danish, Norwegian'], [u'cp866', u'Russian'], [u'cp869', u'Greek'], [u'cp874', u'Thai'], [u'cp875', u'Greek'], [u'cp932', u'Japanese'], [u'cp949', u'Korean'], [u'cp950', u'Traditional Chinese'], [u'cp1006', u'Urdu'], [u'cp1026', u'Turkish'], [u'cp1140', u'Western Europe'], [u'cp1250', u'Central and Eastern Europe'], [u'cp1251', u'Bulg, Byelorus, Mace, Rus, Serb'], [u'cp1253', u'Greek'], [u'cp1254', u'Turkish'], [u'cp1255', u'Hebrew'], [u'cp1256', u'Arabic'], [u'cp1257', u'Baltic languages'], [u'cp1258', u'Vietnamese'], [u'euc_jp', u'Japanese'], [u'euc_jis_2004', u'Japanese'], [u'euc_jisx0213', u'Japanese'], [u'euc_kr', u'Korean'], [u'gb2312', u'Simplified Chinese'], [u'gbk', u'Unified Chinese'], [u'gb18030', u'Unified Chinese'], [u'hz', u'Simplified Chinese'], [u'iso2022_jp', u'Japanese'], [u'iso2022_jp_1', u'Japanese'], [u'iso2022_jp_2', u'Jp, K, S C, WE, G'], [u'iso2022_jp_2004', u'Japanese'], [u'iso2022_jp_3', u'Japanese'], [u'iso2022_jp_ext', u'Japanese'], [u'iso2022_kr', u'Korean'], [u'latin_1', u'West Europe'], [u'iso8859_2', u'Central and Eastern Europe'], [u'iso8859_3', u'Esperanto, Maltese'], [u'iso8859_4', u'Baltic languages'], [u'iso8859_5', u'Bulg, Byelorus, Mace, Rus, Serb'], [u'iso8859_6', u'Arabic'], [u'iso8859_7', u'Greek'], [u'iso8859_8', u'Hebrew'], [u'iso8859_9', u'Turkish'], [u'iso8859_10', u'Nordic languages'], [u'iso8859_13', u'Baltic languages'], [u'iso8859_14', u'Celtic languages'], [u'iso8859_15', u'Western Europe'], [u'iso8859_16', u'South-Eastern Europe'], [u'johab', u'Korean'], [u'koi8_r', u'Russian'], [u'koi8_u', u'Ukrainian'], [u'mac_cyrillic', u'Bulg, Byelorus, Mace, Rus, Serb'], [u'mac_greek', u'Greek'], [u'mac_iceland', u'Icelandic'], [u'mac_latin2', u'Central and Eastern Europe'], [u'mac_turkish', u'Turkish'], [u'ptcp154', u'Kazakh'], [u'shift_jis', u'Japanese'], [u'shift_jis_2004', u'Japanese'], [u'shift_jisx0213', u'Japanese'], [u'utf_32', u'all languages'], [u'utf_32_be', u'all languages'], [u'utf_32_le', u'all languages'], [u'utf_16', u'all languages'], [u'utf_16_be', u'all languages (BMP only)'], [u'utf_16_le', u'all languages (BMP only)'], [u'utf_7', u'all languages'], [u'utf_8_sig', u'all languages']]
+encodages = [[u'cp1252',u'Western Europe'], [u'utf-8',u'all languages'], [u'MacRoman',u'Western Europe'], [u'ascii', u'English'], [u'big5', u'Traditional Chinese'], [u'big5hkscs', u'Traditional Chinese'], [u'cp037', u'English'], [u'cp424', u'Hebrew'], [u'cp437', u'English'], [u'cp500', u'Western Europe'], [u'cp737', u'Greek'], [u'cp775', u'Baltic languages'], [u'cp850', u'Western Europe'], [u'cp852', u'Central and Eastern Europe'], [u'cp855', u'Bulg, Byelorus, Mace, Rus, Serb'], [u'cp856', u'Hebrew'], [u'cp857', u'Turkish'], [u'cp860', u'Portuguese'], [u'cp861', u'Icelandic'], [u'cp862', u'Hebrew'], [u'cp863', u'Canadian'], [u'cp864', u'Arabic'], [u'cp865', u'Danish, Norwegian'], [u'cp866', u'Russian'], [u'cp869', u'Greek'], [u'cp874', u'Thai'], [u'cp875', u'Greek'], [u'cp932', u'Japanese'], [u'cp949', u'Korean'], [u'cp950', u'Traditional Chinese'], [u'cp1006', u'Urdu'], [u'cp1026', u'Turkish'], [u'cp1140', u'Western Europe'], [u'cp1250', u'Central and Eastern Europe'], [u'cp1251', u'Bulg, Byelorus, Mace, Rus, Serb'], [u'cp1253', u'Greek'], [u'cp1254', u'Turkish'], [u'cp1255', u'Hebrew'], [u'cp1256', u'Arabic'], [u'cp1257', u'Baltic languages'], [u'cp1258', u'Vietnamese'], [u'euc_jp', u'Japanese'], [u'euc_jis_2004', u'Japanese'], [u'euc_jisx0213', u'Japanese'], [u'euc_kr', u'Korean'], [u'gb2312', u'Simplified Chinese'], [u'gbk', u'Unified Chinese'], [u'gb18030', u'Unified Chinese'], [u'hz', u'Simplified Chinese'], [u'iso2022_jp', u'Japanese'], [u'iso2022_jp_1', u'Japanese'], [u'iso2022_jp_2', u'Jp, K, S C, WE, G'], [u'iso2022_jp_2004', u'Japanese'], [u'iso2022_jp_3', u'Japanese'], [u'iso2022_jp_ext', u'Japanese'], [u'iso2022_kr', u'Korean'], [u'latin_1', u'West Europe'], [u'iso8859_2', u'Central and Eastern Europe'], [u'iso8859_3', u'Esperanto, Maltese'], [u'iso8859_4', u'Baltic languages'], [u'iso8859_5', u'Bulg, Byelorus, Mace, Rus, Serb'], [u'iso8859_6', u'Arabic'], [u'iso8859_7', u'Greek'], [u'iso8859_8', u'Hebrew'], [u'iso8859_9', u'Turkish'], [u'iso8859_10', u'Nordic languages'], [u'iso8859_13', u'Baltic languages'], [u'iso8859_14', u'Celtic languages'], [u'iso8859_15', u'Western Europe'], [u'iso8859_16', u'South-Eastern Europe'], [u'johab', u'Korean'], [u'koi8_r', u'Russian'], [u'koi8_u', u'Ukrainian'], [u'mac_cyrillic', u'Bulg, Byelorus, Mace, Rus, Serb'], [u'mac_greek', u'Greek'], [u'mac_iceland', u'Icelandic'], [u'mac_latin2', u'Central and Eastern Europe'], [u'mac_turkish', u'Turkish'], [u'ptcp154', u'Kazakh'], [u'shift_jis', u'Japanese'], [u'shift_jis_2004', u'Japanese'], [u'shift_jisx0213', u'Japanese'], [u'utf_32', u'all languages'], [u'utf_32_be', u'all languages'], [u'utf_32_le', u'all languages'], [u'utf_16', u'all languages'], [u'utf_16_be', u'all languages (BMP only)'], [u'utf_16_le', u'all languages (BMP only)'], [u'utf_7', u'all languages'], [u'utf_8_sig', u'all languages']]
 
 class FileOptionDialog(wx.Dialog):
     def __init__(
@@ -1493,7 +1493,7 @@ class PrefSimi ( wx.Dialog ):
 class SelectColDial ( wx.Dialog ):
     
     def __init__( self, parent ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 200,300 ), style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 400,500 ), style = wx.DEFAULT_DIALOG_STYLE )
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
@@ -2129,11 +2129,11 @@ class FindInCluster(wx.Frame):
         cl = self.formes[idb][1] - 1
         forme = self.formes[idb][0]
         profile.ProfNB.SetSelection(cl)
-        UnSelectList(profile.ProfNB.GetPage(cl).list)
-        datas = dict([[profile.ProfNB.GetPage(cl).getColumnText(i,6),i] for i in range(profile.ProfNB.GetPage(cl).list.GetItemCount())])
-        profile.ProfNB.GetPage(cl).list.SetItemState(datas[self.formes[idb][0]], wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
-        profile.ProfNB.GetPage(cl).list.Focus(datas[forme])
-        profile.ProfNB.GetPage(cl).list.SetFocus()
+        UnSelectList(profile.ProfNB.GetPage(cl))
+        datas = dict([[profile.ProfNB.GetPage(cl).getColumnText(i,6),i] for i in range(profile.ProfNB.GetPage(cl).GetItemCount())])
+        profile.ProfNB.GetPage(cl).SetItemState(datas[self.formes[idb][0]], wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
+        profile.ProfNB.GetPage(cl).Focus(datas[forme])
+        profile.ProfNB.GetPage(cl).SetFocus()
 
     def OnCloseMe(self, evt) :
         self.Close(True)
@@ -2182,10 +2182,10 @@ class SearchDial ( wx.Dialog ):
         pass
 
     def OnSearch(self, evt):
-        UnSelectList(self.listctrl.list)
+        UnSelectList(self.listctrl)
         search_word = self.search.GetValue()
         if search_word.strip() != '' :
-            formes = [self.listctrl.getColumnText(i, self.col) for i in range(self.listctrl.list.GetItemCount())]
+            formes = [self.listctrl.getColumnText(i, self.col) for i in range(self.listctrl.GetItemCount())]
             if search_word.endswith(u'*') :
                 search_word = search_word[0:-1]
                 result = [j for j, forme in enumerate(formes) if forme.startswith(search_word)]
@@ -2203,15 +2203,15 @@ class SearchDial ( wx.Dialog ):
     
     def showitems(self, items) :
         if len(items) == 1 :
-            self.listctrl.list.SetItemState(items[0], wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
-            self.listctrl.list.Focus(items[0])
-            self.listctrl.list.SetFocus()
+            self.listctrl.SetItemState(items[0], wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
+            self.listctrl.Focus(items[0])
+            self.listctrl.SetFocus()
             self.Destroy()
         else :
             for i in items :
-                self.listctrl.list.SetItemState(i, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
-            self.listctrl.list.Focus(items[0])
-            self.listctrl.list.SetFocus()
+                self.listctrl.SetItemState(i, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
+            self.listctrl.Focus(items[0])
+            self.listctrl.SetFocus()
             self.forward.Enable(True)
             self.backward.Enable(False)
             self.items = items
@@ -2229,12 +2229,13 @@ class SearchDial ( wx.Dialog ):
             first_forme = proflist[0]
             cl = first_forme[1] - 1
             profile.ProfNB.SetSelection(cl)
-            profile.ProfNB.GetPage(cl).list.SetFocus()
-            UnSelectList(profile.ProfNB.GetPage(cl).list)
-            datas = dict([[profile.ProfNB.GetPage(cl).getColumnText(i,6),i] for i in range(profile.ProfNB.GetPage(cl).list.GetItemCount())])
-            profile.ProfNB.GetPage(cl).list.SetItemState(datas[first_forme[0]], wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
-            profile.ProfNB.GetPage(cl).list.Focus(datas[first_forme[0]])
-            profile.ProfNB.GetPage(cl).list.SetFocus()
+            profile.ProfNB.GetPage(cl).SetFocus()
+            print profile.ProfNB.GetPage(cl)
+            UnSelectList(profile.ProfNB.GetPage(cl))
+            datas = dict([[profile.ProfNB.GetPage(cl).getColumnText(i,6),i] for i in range(profile.ProfNB.GetPage(cl).GetItemCount())])
+            profile.ProfNB.GetPage(cl).SetItemState(datas[first_forme[0]], wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
+            profile.ProfNB.GetPage(cl).Focus(datas[first_forme[0]])
+            profile.ProfNB.GetPage(cl).SetFocus()
             if len(proflist) == 1 :
                 self.Destroy()
             else :
@@ -2245,8 +2246,8 @@ class SearchDial ( wx.Dialog ):
             self.noresult()
 
     def onforward(self, evt) :
-        self.listctrl.list.Focus(self.items[self.forwitem])
-        self.listctrl.list.SetFocus()
+        self.listctrl.Focus(self.items[self.forwitem])
+        self.listctrl.SetFocus()
         self.forwitem += 1
         if self.forwitem == len(self.items) :
             self.forward.Enable(False)
@@ -2257,8 +2258,8 @@ class SearchDial ( wx.Dialog ):
             self.backward.Enable(True)
 
     def onbackward(self, evt) :
-        self.listctrl.list.Focus(self.items[self.backitem])
-        self.listctrl.list.SetFocus()
+        self.listctrl.Focus(self.items[self.backitem])
+        self.listctrl.SetFocus()
         self.backitem -= 1
         if self.backitem == -1 :
             self.forwitem -= 1
@@ -2279,6 +2280,7 @@ class SearchDial ( wx.Dialog ):
         self.search.Clear()
 
 def UnSelectList(liste) :
+    print liste
     if liste.GetFirstSelected() != -1 :
         last = liste.GetFirstSelected()
         liste.Select(liste.GetFirstSelected(), False)
@@ -2535,18 +2537,18 @@ class PrefWordCloud ( wx.Dialog ):
         self.m_staticline4 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline4, 0, wx.EXPAND |wx.ALL, 5 )
         
-        #self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, u"Nombre maximum de formes", wx.DefaultPosition, wx.DefaultSize, 0 )
-        #self.m_staticText5.Wrap( -1 )
-        #fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
+        self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, u"Nombre maximum de formes", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText5.Wrap( -1 )
+        fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
-        #self.spin_maxword = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10000, 600 )
-        #fgSizer1.Add( self.spin_maxword, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        self.spin_maxword = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10000, 600 )
+        fgSizer1.Add( self.spin_maxword, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        #self.m_staticline5 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-        #fgSizer1.Add( self.m_staticline5, 0, wx.EXPAND |wx.ALL, 5 )
+        self.m_staticline5 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        fgSizer1.Add( self.m_staticline5, 0, wx.EXPAND |wx.ALL, 5 )
         
-        #self.m_staticline6 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-        #fgSizer1.Add( self.m_staticline6, 0, wx.EXPAND |wx.ALL, 5 )
+        self.m_staticline6 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        fgSizer1.Add( self.m_staticline6, 0, wx.EXPAND |wx.ALL, 5 )
         
         self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, u"Taille du texte", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText6.Wrap( -1 )
@@ -2767,7 +2769,8 @@ class CorpusPref ( wx.Dialog ):
         self.parent = parent 
         langues_n = [u'français', u'english', u'german (expérimentale)', u'italian (expérimentale)', u'swedish (exp.)', u'portuguese (exp.)']
         self.langues = [u'french', u'english', u'german', 'italian', 'swedish', u'portuguese']
-        self.encodages = encodages
+        self.encodages = [enc[0].lower() for enc in encodages]
+
         ucimark = [u'****', u'0000']
         ucemethod = [u'charactères', u'occurrences', u'paragraphe']
 
@@ -2793,7 +2796,7 @@ class CorpusPref ( wx.Dialog ):
         self.m_staticText1.Wrap( -1 )
         fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
-        encodage_choicesChoices = [' - '.join(encodage) for encodage in self.encodages]
+        encodage_choicesChoices = [' - '.join(encodage) for encodage in encodages]
         self.encodage_choices = wx.Choice( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, encodage_choicesChoices, 0 )
         self.encodage_choices.SetSelection( 0 )
         fgSizer1.Add( self.encodage_choices, 0, wx.ALL, 5 )
@@ -2969,7 +2972,11 @@ class CorpusPref ( wx.Dialog ):
         pass
 
     def setparametres(self, parametres) :
-        self.encodage_choices.SetSelection(0)
+        if  locale.getpreferredencoding().lower() == 'mac-roman' :
+            enc = self.encodages.index('macroman')
+        else :
+            enc = self.encodages.index(locale.getpreferredencoding().lower())
+        self.encodage_choices.SetSelection(enc)
         self.lang_choices.SetSelection(0)
         self.repout_choices.SetValue(parametres['pathout'])
         self.ucimark_choices.SetSelection(parametres['ucimark'])
@@ -2987,7 +2994,7 @@ class CorpusPref ( wx.Dialog ):
 
     def doparametres(self) :
         parametres = {}
-        parametres['encoding'] = self.encodages[self.encodage_choices.GetSelection()][0]
+        parametres['encoding'] = encodages[self.encodage_choices.GetSelection()][0]
         parametres['lang'] = self.langues[self.lang_choices.GetSelection()]
         parametres['pathout'] = self.repout_choices.GetValue()
         parametres['ucimark'] = self.ucimark_choices.GetSelection()

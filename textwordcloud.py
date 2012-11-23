@@ -26,7 +26,13 @@ class WordCloud(AnalyseText):
     def doanalyse(self) :
         self.parametres['type'] = 'wordcloud'
         #FIXME
-        self.actives = self.corpus.make_actives_limit(3)        
+        limit = 3
+        mode = 'both'
+        if mode == 'both' :
+            self.actives = self.corpus.make_actives_limit(limit, 1)
+            self.actives += self.corpus.make_actives_limit(limit, 2)
+        elif mode == 'act' :
+            self.actives = self.corpus.make_actives_limit(limit, 1)
         dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)]) 
         SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'])
         self.make_option()
@@ -43,6 +49,7 @@ class WordCloud(AnalyseText):
             self.parametres['width'] = dial.spin_L.GetValue()
             self.parametres['height'] = dial.spin_H.GetValue()
             #maxword = dial.spin_maxword.GetValue()
+            self.parametres['maxword'] = dial.spin_maxword.GetValue()
             self.parametres['mincex'] = float(dial.spin_mincex.GetValue())/float(10)
             self.parametres['maxcex'] = float(dial.spin_maxcex.GetValue())/float(10)
             self.parametres['col_text'] = dial.color_text.GetColour()

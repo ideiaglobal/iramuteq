@@ -15,6 +15,62 @@ from functions import DoConf
 log = logging.getLogger('iramuteq.tree')
 #from agw import customtreectrl as CT
 
+class InfoDialog ( wx.Dialog ):
+    
+    def __init__( self, parent, txt, parametres ):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Informations", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        
+        self.SetSizeHintsSz( wx.Size( 400,200 ), wx.DefaultSize )
+        
+        bSizer1 = wx.BoxSizer( wx.VERTICAL )
+        
+        self.m_panel2 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+        bSizer2 = wx.BoxSizer( wx.VERTICAL )
+        
+        self.m_staticText4 = wx.StaticText( self.m_panel2, wx.ID_ANY, txt, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4.Wrap( -1 )
+        bSizer2.Add( self.m_staticText4, 0, wx.ALL, 5 )
+        
+        
+        self.m_panel2.SetSizer( bSizer2 )
+        self.m_panel2.Layout()
+        bSizer2.Fit( self.m_panel2 )
+        bSizer1.Add( self.m_panel2, 0, wx.EXPAND |wx.ALL, 5 )
+        
+        self.m_panel1 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+        fgSizer1 = wx.FlexGridSizer( 0, 2, 0, 0 )
+        fgSizer1.SetFlexibleDirection( wx.BOTH )
+        fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        
+        for val in parametres :
+            fgSizer1.Add( wx.StaticText( self.m_panel1, wx.ID_ANY, val[0], wx.DefaultPosition, wx.DefaultSize, 0 ), 0, wx.ALL, 0)
+            fgSizer1.Add( wx.StaticText( self.m_panel1, wx.ID_ANY, val[1], wx.DefaultPosition, wx.DefaultSize, 0 ), 0, wx.ALL, 0)
+            fgSizer1.Add( wx.StaticLine( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL ), 0, wx.EXPAND |wx.ALL, 0)
+            fgSizer1.Add( wx.StaticLine( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL ), 0, wx.EXPAND|wx.ALL, 0)
+
+        self.m_panel1.SetSizer( fgSizer1 )
+        self.m_panel1.Layout()
+        fgSizer1.Fit( self.m_panel1 )
+        bSizer1.Add( self.m_panel1, 0, wx.EXPAND |wx.ALL, 3 )
+        
+        m_sdbSizer1 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
+        m_sdbSizer1.Realize();
+        
+        bSizer1.Add( m_sdbSizer1, 0, wx.EXPAND, 5 )
+        
+        
+        self.SetSizer( bSizer1 )
+        self.Layout()
+        bSizer1.Fit( self )
+        
+        self.Centre( wx.BOTH )
+    
+    def __del__( self ):
+        pass
+
+
 class LeftTree(CT.CustomTreeCtrl):
 
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition,
@@ -467,11 +523,14 @@ class LeftTree(CT.CustomTreeCtrl):
         numchildren = str(self.itemdict["children"])
         itemtype = self.itemdict["itemtype"]
         pydata = self.itemdict['pydata']
-        if 'analyses' in pydata :
-            toshow = dict([[val, pydata[val]] for val in pydata if val not in['analyses', 'isload']])
-        else :
-            toshow = pydata
-        pydata = DoConf().totext(toshow)
+        #if 'analyses' in pydata :
+        #    toshow = dict([[val, pydata[val]] for val in pydata if val not in['analyses', 'isload']])
+        #else :
+        toshow = pydata['ira']
+        toshow = DoConf(toshow).getoptions()
+        txt = DoConf().totext(toshow)
+        parametres = [val.split('\t\t:') for val in txt.splitlines()]
+        parametres.sort()
 
         if itemtype == 0:
             itemtype = "Normal"
@@ -480,12 +539,7 @@ class LeftTree(CT.CustomTreeCtrl):
         else:
             itemtype = "RadioButton"
 
-        strs = "Information On Selected Item:\n\n" + "Text: " + itemtext + "\n" \
-               "Number Of Children: " + numchildren + "\n" \
-               "Item Type: " + itemtype + "\n" \
-               "Item Data Type: " + pydata + "\n"
-
-        dlg = wx.MessageDialog(self, strs, "CustomTreeCtrlDemo Info", wx.OK | wx.ICON_INFORMATION)
+        dlg = InfoDialog(self, itemtext, parametres)
         dlg.ShowModal()
         dlg.Destroy()
                 

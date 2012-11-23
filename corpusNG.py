@@ -3,6 +3,9 @@
 
 import codecs
 import os
+import gettext
+_ = gettext.gettext
+import locale
 import sys
 from time import time
 from functions import decoupercharact, ReadDicoAsDico, DoConf
@@ -16,6 +19,7 @@ from uuid import uuid4
 from chemins import PathOut
 from dialog import CorpusPref
 from functions import ReadLexique, ReadDicoAsDico
+from colors import colors
 import datetime
 
 
@@ -457,10 +461,10 @@ class Corpus :
             else :
                 self.lems[lem].act = 2
 
-    def make_actives_limit(self, limit) :
+    def make_actives_limit(self, limit, key = 1) :
         if self.idformes is None :
             self.make_idformes()
-        return [lem for lem in self.lems if self.getlemeff(lem) >= limit and self.lems[lem].act == 1]
+        return [lem for lem in self.lems if self.getlemeff(lem) >= limit and self.lems[lem].act == key]
     
     def make_actives_nb(self, nbmax, key) :
         log.info('make_actives_nb : %i - %i' % (nbmax,key))
@@ -520,7 +524,6 @@ class Corpus :
                 except IndexError :
                     det[et[0]] = 1
         print det
-            
 
     def make_and_write_profile_et(self, ucecl, fileout) :
         log.info('etoiles/classes')
@@ -528,12 +531,46 @@ class Corpus :
         with open(fileout, 'w') as f :
             f.write('\n'.join([';'.join([etoile] + [`len(set(self.getucesfrometoile(etoile)).intersection(classe))` for classe in ucecl]) for etoile in etoiles]).encode(self.parametres['syscoding']))
 
+    def make_colored_corpus(self) :
+        ucecl = {}
+        for i, lc in enumerate(self.lc) :
+            for uce in lc : 
+                ucecl[uce] = i + 1
+        for uce in self.lc0 :
+            ucecl[uce] = 0
+        color = ['black'] + colors[len(self.lc) - 1]        
+        txt = '''<html>
+        <meta http-equiv="content-Type" content="text/html; charset=%s" />
+        <body>
+''' % sys.getdefaultencoding()
+        res = self.getalluces()
+        self.make_iduces()
+        actuci = ''
+        actpara = False
+        for uce in res :
+            if self.iduces[uce[0]].uci != actuci :
+                actuci = self.iduces[uce[0]].uci
+                txt += '<br><hr>' + ' '.join(self.ucis[self.iduces[uce[0]].uci].etoiles) + '<br><br>'
+                txt += '<font color="%s">' % (color[ucecl[uce[0]]]) + uce[1] + '</font><br><br>'
+            else :
+                txt += '<font color="%s">' % (color[ucecl[uce[0]]]) + uce[1] + '</font><br><br>'
+        return txt + '\n</body></html>'
+
     def count_from_list(self, l, d) :
         for val in l :
             if val in d :
                 d[val] += 1
             else :
                 d[val] = 1
+        return d
+
+    def count_from_list_cl(self, l, d, a, clnb) :
+        for val in l :
+            if val in d :
+                d[val][a] += 1
+            else :
+                d[val] = [0] * clnb
+                d[val][a] = 1
         return d
 
     def find_segments(self, taille_segment, taille_limite) :
@@ -560,8 +597,18 @@ class Corpus :
             l = l[-taille_limite:]
         return l
             
-
-
+    def make_segments_profile(self, fileout, lenmin = 3, lenmax = 10, effmin = 50, lem = False) :
+        d = {}
+        for b, classe in enumerate(self.lc) :
+            for uce in self.getconcorde(classe) :
+                uce = uce[1].split()
+                if lem :
+                    uce = [self.formes[forme].lem for forme in uce]
+                for taille_segment in range(lenmin,lenmax) :
+                    d =self.count_from_list_cl([' '.join(uce[i:i+taille_segment]) for i in range(len(uce)-(taille_segment - 1))], d, b, len(self.lc))
+        result = [[seg] + [str(val) for val in d[seg]] for seg in d if sum(d[seg]) >= effmin]
+        with open(fileout, 'w') as f :
+            f.write('\n'.join([';'.join(line) for line in result]))
          
     def make_ucecl_from_R(self, filein) :
         with open(filein, 'rU') as f :
@@ -689,7 +736,7 @@ def decouperlist(chaine, longueur, longueurOptimale) :
         Si on trouve un '$', c'est fini.
         Sinon, on cherche le meilleur candidat. C'est-à-dire le rapport poids/distance le plus important.
     """
-    separateurs = [[u'.', 6.0], [u'?', 6.0], [u'!', 6.0], [u'£', 6.0], [u':', 5.0], [u';', 4.0], [u',', 1.0], [u' ', 0.01]]
+    separateurs = [[u'.', 6.0], [u'?', 6.0], [u'!', 6.0], [u'£$£', 6.0], [u':', 5.0], [u';', 4.0], [u',', 1.0], [u' ', 0.01]]
     dsep = dict([[val[0],val[1]] for val in separateurs])
     trouve = False                 # si on a trouvé un bon séparateur
     iDecoupe = 0                # indice du caractere ou il faut decouper
@@ -771,7 +818,7 @@ class BuildCorpus :
         if self.corpus.parametres['keep_ponct'] :
             self.ponctuation_espace = [' ', '']
         else :
-            self.ponctuation_espace =  [' ','.', u'£', ';', '?', '!', ',', ':','']
+            self.ponctuation_espace =  [' ','.', u'£$£', ';', '?', '!', ',', ':','']
         self.cleans = []
         self.tolist = self.corpus.parametres.get('tolist', 0)
         self.buildcleans()
@@ -794,13 +841,18 @@ class BuildCorpus :
 
     def dobuild(self) :    
         t1 = time()
-        self.read_corpus(self.infile)
-        self.indexdb()
-        self.corpus.parametres['ira'] = self.corpus.pathout['Corpus.cira']
-        self.time = time() - t1
-        self.dofinish()
-        DoConf().makeoptions(['corpus'],[self.corpus.parametres], self.corpus.pathout['Corpus.cira'])
-        log.info('time : %f' % (time() - t1))
+        try :
+            self.read_corpus(self.infile)
+        except Warning, args :
+            log.info('pas kool %s' % args)
+            raise Warning
+        else :    
+            self.indexdb()
+            self.corpus.parametres['ira'] = self.corpus.pathout['Corpus.cira']
+            self.time = time() - t1
+            self.dofinish()
+            DoConf().makeoptions(['corpus'],[self.corpus.parametres], self.corpus.pathout['Corpus.cira'])
+            log.info('time : %f' % (time() - t1))
 
     def connect(self) :
         self.conn_f = sqlite3.connect(self.corpus.pathout['formes.db'])
@@ -854,7 +906,7 @@ class BuildCorpus :
             self.cleans.append(self.dolower)
         if self.corpus.parametres.get('firstclean', 1) :
             self.cleans.append(self.firstclean)
-        self.rule = self.corpus.parametres.get('keep_caract', u"^a-zA-Z0-9àÀâÂäÄáÁéÉèÈêÊëËìÌîÎïÏòÒôÔöÖùÙûÛüÜçÇßœŒ’ñ.:,;!?*'_-")
+        self.rule = self.corpus.parametres.get('keep_caract', u"^a-zA-Z0-9àÀâÂäÄáÁéÉèÈêÊëËìÌîÎïÏòÒôÔöÖùÙûÛüÜçÇßœŒ’ñ.:,;!?*'_")
         self.cleans.append(self.docharact)
         if self.corpus.parametres.get('expressions', 1) :
             self.cleans.append(self.make_expression)
@@ -886,7 +938,7 @@ class BuildCorpus :
     def firstclean(self, txt) :
         txt = txt.replace(u'’',"'")
         txt = txt.replace(u'œ', u'oe')
-        return txt.replace('...',u' £ ').replace('?',' ? ').replace('.',' . ').replace('!', ' ! ').replace(',',' , ').replace(';', ' ; ').replace(':',' : ')
+        return txt.replace('...',u' £$£ ').replace('?',' ? ').replace('.',' . ').replace('!', ' ! ').replace(',',' , ').replace(';', ' ; ').replace(':',' : ').replace(u'…', ' £$£ ')
 
     def make_cleans(self, txt) :
         for clean in self.cleans :
@@ -945,28 +997,47 @@ class BuildFromAlceste(BuildCorpus) :
         iduci = -1
         idpara = -1
         iduce = -1
-        with codecs.open(infile, 'rU', self.encoding) as f :
-            for line in f :
-                if self.testuci(line) :
-                    iduci += 1
-                    if txt != [] :
-                        iduce, idpara = self.treattxt(txt, iduce, idpara, iduci - 1)
-                        txt = []
-                        self.corpus.ucis.append(Uci(iduci, line))
-                    else :
-                        self.corpus.ucis.append(Uci(iduci, line))
-                elif line.startswith(u'-*') :
-                    if txt != [] :
-                        iduce, idpara = self.treattxt(txt, iduce, idpara, iduci)
-                        txt = []
-                    idpara += 1
-                    self.corpus.ucis[-1].paras.append(line.split()[0])
-                elif line.strip() != '' and iduci != -1 :
-                    txt.append(line)
-        if txt != [] :
-            iduce, idpara = self.treattxt(txt, iduce, idpara, iduci)
-            del(txt)
-        self.backup_uce()
+        linenb = 0
+        try :
+            with codecs.open(infile, 'r', self.encoding) as f :
+                for line in f :
+                    linenb += 1
+                    line = line.rstrip('\n\r')
+                    if self.testuci(line) :
+                        iduci += 1
+                        if txt != [] :
+                            iduce, idpara = self.treattxt(txt, iduce, idpara, iduci - 1)
+                            txt = []
+                            self.corpus.ucis.append(Uci(iduci, line))
+                        else :
+                            if iduci > 0 :
+                                if self.corpus.ucis[-1].uces == [] :
+                                    log.info('linenb : %i' % linenb)
+                                    raise Exception("EmptyText %i" % linenb)
+                            self.corpus.ucis.append(Uci(iduci, line))
+                    elif line.startswith(u'-*') :
+                        if iduci != -1 :
+                            if txt != [] :
+                                iduce, idpara = self.treattxt(txt, iduce, idpara, iduci)
+                                txt = []
+                            idpara += 1
+                            self.corpus.ucis[-1].paras.append(line.split()[0])
+                        else :
+                            raise Exception('paragrapheOT')
+                    elif line.strip() != '' and iduci != -1 :
+                        txt.append(line)
+            if txt != [] and iduci != -1 :
+                iduce, idpara = self.treattxt(txt, iduce, idpara, iduci)
+                del(txt)
+            else :
+                raise Exception("EmptyText")
+            if iduci != -1  and iduce != -1:
+                self.backup_uce()
+            else : 
+                log.info(_(u"No Texte in corpora. Are you sure of the formatting ?"))
+                raise Exception('TextBeforeTextMark')
+        except UnicodeDecodeError :
+            raise Exception("CorpusEncoding")
 
     def treattxt(self, txt, iduce, idpara, iduci) :
         if self.corpus.parametres.get('ucemethod', 0) == 2 and self.corpus.parametres['douce']:
@@ -1029,7 +1100,7 @@ class BuildFromAlceste(BuildCorpus) :
 
             uce = ' '.join([val for val in texte_uce if val not in self.ponctuation_espace])
             if uce != '' : 
-                print 'RESTEE UUCEEEEEEEEEEEEE', uce
+                #print 'RESTEE UUCEEEEEEEEEEEEE', uce
                 out.append(uce)
             return out
         else :

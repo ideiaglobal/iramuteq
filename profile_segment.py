@@ -13,9 +13,11 @@ from dialog import PrefSegProf, PrefProfTypes
 from time import sleep
 
 class ProfileSegment() :
-    def __init__(self, parent, corpus) :
+    def __init__(self, parent, pathout, parametres, corpus) :
         self.parent = parent
         self.corpus = corpus
+        self.dictpathout = pathout
+        self.parametres = parametres
         dial = PrefSegProf(self.parent)
         dial.CenterOnParent()
         if dial.ShowModal() == wx.ID_OK :
@@ -37,19 +39,19 @@ class ProfileSegment() :
            self.dlg.Destroy()
     
     def make_table(self) :
-        self.corpus.make_segments_profile(self.corpus.dictpathout['segments_classes'], lenmin = self.mini, lenmax = self.maxi, effmin = self.eff, lem = self.lem)
+        self.corpus.make_segments_profile(self.dictpathout['segments_classes'], lenmin = self.mini, lenmax = self.maxi, effmin = self.eff, lem = self.lem)
 
     def make_prof(self) :
         txt = """
         load("%s")
         source("%s")
-        """ % (self.corpus.dictpathout['RData'], self.parent.RscriptsPath['chdfunct'])
+        """ % (self.dictpathout['RData'], self.parent.RscriptsPath['chdfunct'])
 
         txt += """
         dt <- read.csv2("%s", row.names = 1)
         to <- build.pond.prof(dt)
         PrintProfile(n1,to[4],NULL,to[5],NULL,clnb,"%s","%s")
-        """ % (self.corpus.dictpathout['segments_classes'], self.corpus.dictpathout['prof_seg'], self.corpus.dictpathout['antiprof_seg'])
+        """ % (self.corpus.dictpathout['segments_classes'], self.dictpathout['prof_seg'], self.dictpathout['antiprof_seg'])
         fo = tempfile.mktemp(dir=self.parent.TEMPDIR)
         with open(fo, 'w') as f :
             f.write(txt)
@@ -63,7 +65,7 @@ class ProfileSegment() :
         SelectTab = self.parent.nb.GetSelection()
         page = self.parent.nb.GetPage(SelectTab).TabChdSim
         print page
-        prof_seg = ReadProfileAsDico(self, self.corpus.dictpathout['prof_seg'], True, self.corpus.parametre['syscoding'])
+        prof_seg = ReadProfileAsDico(self, self.dictpathout['prof_seg'], True, self.parent.syscoding)
         prof_seg_nb = aui.AuiNotebook(self.parent, -1, wx.DefaultPosition)
         for i in range(0,len(self.corpus.lc)) :
             ntab = ProfListctrlPanel(self.parent, self, prof_seg[str(i + 1)], False, i + 1)

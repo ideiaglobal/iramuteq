@@ -227,6 +227,7 @@ class OpenCHDS():
        self.pathout.basefiles(ChdTxtPathOut)
        DictPathOut = self.pathout 
        self.DictPathOut = DictPathOut
+       self.dictpathout = DictPathOut
        self.parent = parent
 
        Profile = DictPathOut['PROFILE_OUT']
@@ -341,7 +342,7 @@ class OpenCHDS():
        panel.ProfNB = aui.AuiNotebook(panel, -1, wx.DefaultPosition)
        panel.ProfNB.SetArtProvider(aui.ChromeTabArt())
        #self.ProfNB.SetTabCtrlHeight(100)
-       panel.AntiProfNB = aui.AuiNotebook(panel, -1, wx.DefaultPosition)
+       #panel.AntiProfNB = aui.AuiNotebook(panel, -1, wx.DefaultPosition)
        if os.path.exists(DictPathOut['prof_seg']) :
             prof_seg = ReadProfileAsDico(self, DictPathOut['prof_seg'], False, self.encoding)
             self.prof_seg_nb = aui.AuiNotebook(panel, -1, wx.DefaultPosition)
@@ -351,9 +352,9 @@ class OpenCHDS():
             indpour = ' - '.join([ind, DictProfile[str(i + 1)][0][2]])
             print 'construction liste classe %i' % i
             self.tabprofile = ProfListctrlPanel(self.parent, self, DictProfile[str(i + 1)], Alceste, i + 1)
-            self.tabantiprofile = ProfListctrlPanel(self.parent, self, DictAnti[str(i + 1)], Alceste, i + 1)
+            #self.tabantiprofile = ProfListctrlPanel(self.parent, self, DictAnti[str(i + 1)], Alceste, i + 1)
             panel.ProfNB.AddPage(self.tabprofile, 'classe %s %s(%s%%)' % (str(i + 1), sep, indpour))
-            panel.AntiProfNB.AddPage(self.tabantiprofile, 'classe %s' % str(i + 1))
+            #panel.AntiProfNB.AddPage(self.tabantiprofile, 'classe %s' % str(i + 1))
             if os.path.exists(DictPathOut['prof_seg']) :
                 self.tab_prof_seg = ProfListctrlPanel(self.parent, self, prof_seg[str(i + 1)], False, i + 1)
                 self.prof_seg_nb.AddPage(self.tab_prof_seg, 'classe %i' % (i + 1))
@@ -368,13 +369,13 @@ class OpenCHDS():
            if os.path.exists(self.DictPathOut['afc_facteur']) :
                dictrow, first = ReadList(self.DictPathOut['afc_facteur'], self.encoding)
                self.TabAFC_facteur = ListForSpec(self.parent, parametres, dictrow, first)
-               dictrow, first = ReadList(self.DictPathOut['afc_row'], self.encoding)
-               self.TabAFC_ligne = ListForSpec(self.parent, self.parametres, dictrow, first)
-               dictrow, first = ReadList(self.DictPathOut['afc_col'], self.encoding)
-               self.TabAFC_colonne = ListForSpec(parent, self.parametres, dictrow, first)
+               #dictrow, first = ReadList(self.DictPathOut['afc_row'], self.encoding)
+               #self.TabAFC_ligne = ListForSpec(self.parent, self.parametres, dictrow, first)
+               #dictrow, first = ReadList(self.DictPathOut['afc_col'], self.encoding)
+               #self.TabAFC_colonne = ListForSpec(parent, self.parametres, dictrow, first)
                self.TabAFC.AddPage(self.TabAFC_facteur, 'Facteurs')
-               self.TabAFC.AddPage(self.TabAFC_colonne, u'Colonnes')
-               self.TabAFC.AddPage(self.TabAFC_ligne, u'Lignes')
+               #self.TabAFC.AddPage(self.TabAFC_colonne, u'Colonnes')
+               #self.TabAFC.AddPage(self.TabAFC_ligne, u'Lignes')
            
            sizer_3 = wx.BoxSizer(wx.VERTICAL)
            self.parent.nb_panel_2 = wx.Panel(panel.TabChdSim, -1)
@@ -387,7 +388,7 @@ class OpenCHDS():
            self.parent.Bind(wx.EVT_BUTTON, self.onsimi, self.parent.button_simi)
        
        panel.TabChdSim.AddPage(panel.ProfNB, 'Profils')
-       panel.TabChdSim.AddPage(panel.AntiProfNB, 'Antiprofils')
+       #panel.TabChdSim.AddPage(panel.AntiProfNB, 'Antiprofils')
        dlg.Update(4 + self.clnb, 'Affichage...')
        if clnb > 2 :
            panel.TabChdSim.AddPage(self.TabAFC, 'AFC')
@@ -456,11 +457,13 @@ class OpenCHDS():
             dlg.Destroy()
 
     def onprofseg(self, event):
-        try :
+        #try :
+            print 'plus de bug profseg'
+            print self.parametres
             corpus = self.parent.nb.GetPage(self.parent.nb.GetSelection()).corpus
-            ProfileSegment(self.parent,corpus)
-        except :
-            BugReport(self.parent)
+            ProfileSegment(self.parent, self.dictpathout, self.parametres, corpus)
+        #except :
+        #    BugReport(self.parent)
 
     def onproftype(self, event):
         try :

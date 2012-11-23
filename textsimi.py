@@ -31,10 +31,11 @@ class SimiTxt(AnalyseText):
         #FIXME
         self.actives = self.corpus.make_actives_limit(3)
         dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)]) 
-        SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'])
+        SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], dlg = self.dlg)
         self.makefiles()
-        prep = PrepSimi(self.ira, self.parametres, indices_simi)
-        self.parametres = prep.parametres
+        if self.dlg :
+            prep = PrepSimi(self.ira, self.parametres, indices_simi)
+            self.parametres = prep.parametres
         script = PrintSimiScript(self)
         script.make_script()
         self.doR(script.scriptout)

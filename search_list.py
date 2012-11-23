@@ -23,14 +23,15 @@ from chemins import ffr
 from PrintRScript import barplot, dendroandbarplot
 #---------------------------------------------------------------------------
 
-class List(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
-    def __init__(self, parent, ID, pos=wx.DefaultPosition,
-                 size=wx.DefaultSize, style=0):
-        wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
-        listmix.ListCtrlAutoWidthMixin.__init__(self)
+#class List(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
+#    def __init__(self, parent, ID, pos=wx.DefaultPosition,
+#                 size=wx.DefaultSize, style=0):
+#        wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
+#        listmix.ListCtrlAutoWidthMixin.__init__(self)
 
-class SearchList(wx.Panel, listmix.ColumnSorterMixin):
+class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin): #wx.Panel, listmix.ColumnSorterMixin):
     def __init__(self, parent,gparent, dlist,first, nbactives, nbetoiles, add_dendro=True):
+        wx.ListCtrl.__init__( self, parent, -1, style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_HRULES|wx.LC_VRULES)
         self.parent=parent
         self.gparent=gparent
         self.dlist=dlist
@@ -38,7 +39,7 @@ class SearchList(wx.Panel, listmix.ColumnSorterMixin):
         self.first = ['id','formes'] + first
         self.nbactives = nbactives
         self.nbetoiles = nbetoiles
-        wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
+        #wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
 
 
         self.il = wx.ImageList(16, 16)
@@ -48,31 +49,34 @@ class SearchList(wx.Panel, listmix.ColumnSorterMixin):
 
         tID = wx.NewId()
 
-        self.list = List(self, tID,
-                                 style=wx.LC_REPORT 
-                                 | wx.BORDER_NONE
-                                 | wx.LC_EDIT_LABELS
-                                 | wx.LC_SORT_ASCENDING
-                                 )
+        #self.list = List(self, tID,
+        #                         style=wx.LC_REPORT 
+        #                         | wx.BORDER_NONE
+        #                         | wx.LC_EDIT_LABELS
+        #                         | wx.LC_SORT_ASCENDING
+        #                         )
         
-        self.list.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+        #self.list.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
         
         self.dlist = dlist 
-        self.PopulateList(dlist,first)
         self.Bind(wx.EVT_SIZE, self.OnSize)
 
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self.list)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick)
         
         # for wxMSW
-        self.list.Bind(wx.EVT_COMMAND_RIGHT_CLICK, self.OnRightClick)
+        self.Bind(wx.EVT_COMMAND_RIGHT_CLICK, self.OnRightClick)
 
         # for wxGTK
-        self.list.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
+        self.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
         
         
         self.itemDataMap = dlist
+        self.itemIndexMap = dlist.keys()
+        self.SetItemCount(len(dlist))
         listmix.ColumnSorterMixin.__init__(self, len(first)+2)
+
+        self.PopulateList(dlist,first)
         self.SortListItems(1, False)
         self.do_greyline()
         
@@ -81,40 +85,40 @@ class SearchList(wx.Panel, listmix.ColumnSorterMixin):
     def PopulateList(self, dlist,first):
         first = ['id','formes']+first
         for i, name in enumerate(first) :
-            self.list.InsertColumn(i, name, wx.LIST_FORMAT_LEFT)
+            self.InsertColumn(i, name, wx.LIST_FORMAT_LEFT)
+        
+        #for key in dlist :
+        #    index = self.list.InsertStringItem(sys.maxint, '%5i' % key)
+        #    for i, val in enumerate(dlist[key][1:]) :
+        #        self.list.SetStringItem(index, i+1, str(dlist[key][i+1]))
+        #    self.list.SetItemData(index, key)
 
-        for key in dlist :
-            index = self.list.InsertStringItem(sys.maxint, '%5i' % key)
-            for i, val in enumerate(dlist[key][1:]) :
-                self.list.SetStringItem(index, i+1, str(dlist[key][i+1]))
-            self.list.SetItemData(index, key)
-
-        self.list.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+        self.SetColumnWidth(0, wx.LIST_AUTOSIZE)
         for i in range(1,len(first)-1):
-            self.list.SetColumnWidth(i, 130)
+            self.SetColumnWidth(i, 130)
         
         if self.nbactives +  self.nbetoiles != len(dlist) :
             #there is supp data
             for i in range(self.nbactives, (len(dlist) - self.nbetoiles)) :
-                item = self.list.GetItem(i)
+                item = self.GetItem(i)
                 item.SetTextColour(wx.RED)
-                self.list.SetItem(item)
+                self.SetItem(item)
         for i in range((len(dlist) - self.nbetoiles), len(dlist)) :
-            item = self.list.GetItem(i)
+            item = self.GetItem(i)
             item.SetTextColour(wx.BLUE)
-            self.list.SetItem(item)
+            self.SetItem(item)
         
     def do_greyline(self):
-        for row in xrange(self.list.GetItemCount()):
+        for row in xrange(self.GetItemCount()):
             if row % 2 :
-                self.list.SetItemBackgroundColour(row,(230,230,230))
+                self.SetItemBackgroundColour(row,(230,230,230))
             else :
-                self.list.SetItemBackgroundColour(row,wx.WHITE)
+                self.SetItemBackgroundColour(row,wx.WHITE)
 
 
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
     def GetListCtrl(self):
-        return self.list
+        return self
 
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
     def GetSortImages(self):
@@ -124,18 +128,21 @@ class SearchList(wx.Panel, listmix.ColumnSorterMixin):
     def OnRightDown(self, event):
         x = event.GetX()
         y = event.GetY()
-        item, flags = self.list.HitTest((x, y))
+        item, flags = self.HitTest((x, y))
 
         if flags & wx.LIST_HITTEST_ONITEM:
-            self.list.Select(item)
+            self.Select(item)
 
         event.Skip()
 
-
     def getColumnText(self, index, col):
-        item = self.list.GetItem(index, col)
+        item = self.GetItem(index, col)
         return item.GetText()
 
+    def OnGetItemText(self, item, col):
+        index=self.itemIndexMap[item]
+        s = self.itemDataMap[index][col]
+        return s
 
     def OnItemSelected(self, event):
         self.currentItem = event.m_itemIndex
@@ -173,7 +180,7 @@ class SearchList(wx.Panel, listmix.ColumnSorterMixin):
         activenotebook = self.parent.nb.GetSelection()
         page = self.parent.nb.GetPage(activenotebook)
         corpus = page.corpus
-        word = self.getColumnText(self.list.GetFirstSelected(), 0)
+        word = self.getColumnText(self.GetFirstSelected(), 0)
         lems = corpus.lems
         rep = []
         for forme in lems[word] :
@@ -186,7 +193,7 @@ class SearchList(wx.Panel, listmix.ColumnSorterMixin):
     def OnPopupTwo(self, event):
         activenotebook = self.parent.nb.GetSelection()
         page = self.parent.nb.GetPage(activenotebook)
-        item=self.getColumnText(self.list.GetFirstSelected(), 0)
+        item=self.getColumnText(self.GetFirstSelected(), 0)
         corpus = page.corpus
         win = message(self, -1, u"Concordancier", size=(600, 200),style = wx.DEFAULT_FRAME_STYLE)
         avap=60
@@ -236,11 +243,11 @@ class SearchList(wx.Panel, listmix.ColumnSorterMixin):
         win.Show(True)
 
     def OnPopupThree(self, event) :
-        datas = [self.dlist[self.list.GetItemData(self.list.GetFirstSelected())]]
-        last = self.list.GetFirstSelected()
-        while self.list.GetNextSelected(last) != -1:
-            last = self.list.GetNextSelected(last)
-            data = self.dlist[self.list.GetItemData(last)]
+        datas = [self.dlist[self.GetItemData(self.GetFirstSelected())]]
+        last = self.GetFirstSelected()
+        while self.GetNextSelected(last) != -1:
+            last = self.GetNextSelected(last)
+            data = self.dlist[self.GetItemData(last)]
             datas += [data]
         colnames = self.first[2:]
         rownames = [val[1] for val in datas]
@@ -259,11 +266,11 @@ class SearchList(wx.Panel, listmix.ColumnSorterMixin):
 
     def ongraphdendro(self, evt) :
         corpus = self.parent.corpus
-        datas = [self.dlist[self.list.GetItemData(self.list.GetFirstSelected())]]
-        last = self.list.GetFirstSelected()
-        while self.list.GetNextSelected(last) != -1:
-            last = self.list.GetNextSelected(last)
-            data = self.dlist[self.list.GetItemData(last)]
+        datas = [self.dlist[self.GetItemData(self.GetFirstSelected())]]
+        last = self.GetFirstSelected()
+        while self.GetNextSelected(last) != -1:
+            last = self.GetNextSelected(last)
+            data = self.dlist[self.GetItemData(last)]
             datas += [data]
         colnames = self.first[2:]
         rownames = [val[1] for val in datas]
@@ -282,7 +289,7 @@ class SearchList(wx.Panel, listmix.ColumnSorterMixin):
 
     def OnSize(self, event):
         w,h = self.GetClientSizeTuple()
-        self.list.SetDimensions(0, 0, w, h)
+        self.SetDimensions(0, 0, w, h)
         
     def OnColClick(self,event):
         self.do_greyline()

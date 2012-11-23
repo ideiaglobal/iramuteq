@@ -118,7 +118,7 @@ if os.getenv('HOME') != None:
 else:
     user_home = os.getenv('HOMEPATH')
 UserConfigPath = os.path.abspath(os.path.join(user_home, '.iramuteq'))
-#Si pas de fichiers de config utilisateur, on crée le repertoire
+#Si pas de fichiers de config utilisateur, on cree le repertoire
 CreateIraDirectory(UserConfigPath, AppliPath)
 #fichiers log pour windows (py2exe)
 print 'PLUS DE LOG !!!!!!!!!!'
@@ -177,37 +177,37 @@ class IraFrame(wx.Frame):
         self.mb = wx.MenuBar()
 
         file_menu = wx.Menu()
-        item = wx.MenuItem(file_menu, ID_OpenData, _(u"Open a questionnaire"), _(u"Open a questionnaire"))
+        item = wx.MenuItem(file_menu, ID_OpenData, _(u"Open a matrix"), _(u"Open a matrix"))
         item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
         file_menu.AppendItem(item)
         
-        item = wx.MenuItem(file_menu, ID_OpenText, u"Ouvrir texte", u"Ouvrir un corpus texte")
+        item = wx.MenuItem(file_menu, ID_OpenText, _(u"Open a text corpora"), _(u"Open a text corpora"))
         item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
         file_menu.AppendItem(item)
         
-        item = wx.MenuItem(file_menu, ID_OnOpenAnalyse, u"Ouvrir une Analyse", "Ouvrir une Analyse")
+        item = wx.MenuItem(file_menu, ID_OnOpenAnalyse, _(u"Open an analysis"), _("Open an analysis"))
         item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
         file_menu.AppendItem(item)
 
-        item1 = wx.MenuItem(file_menu, ID_Import, u"Importer un corpus factiva...", "Importer un corpus factiva...")
+        item1 = wx.MenuItem(file_menu, ID_Import, _(u"Import a factiva corpora..."), _("Import a factiva corpora..."))
         item1.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_TIP))
         file_menu.AppendItem(item1)
         #item1.Enable(True)
        
-        item = wx.MenuItem(file_menu, ID_SaveTab, u"Enregistrer l\'onglet sous...", u"Enregistrer l\'onglet sous ...")
+        item = wx.MenuItem(file_menu, ID_SaveTab, _(u"Save tab as..."), _(u"Save tab as..."))
         item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_SAVE_AS))
         #item.Enable(False)
         file_menu.AppendItem(item)
         
-        file_menu.Append(wx.ID_EXIT, u"Exit")
+        file_menu.Append(wx.ID_EXIT, _(u"Exit"))
         
         edit_menu = wx.Menu()
-        edit_menu.Append(wx.ID_PREFERENCES, '', u'Préférences')
+        edit_menu.Append(wx.ID_PREFERENCES, '', _(u'Preferences'))
         
         view_menu = wx.Menu()
-        view_menu.Append(ID_ACCEUIL, u"Page d'accueil")
-        view_menu.Append(ID_VIEWDATA, u"Afficher les données")
-        view_menu.Append(ID_RESULT, u'Afficher les résultats')
+        view_menu.Append(ID_ACCEUIL, _(u"Home page"))
+        view_menu.Append(ID_VIEWDATA, _(u"Show data"))
+        view_menu.Append(ID_RESULT, _(u'Show results'))
         #view_menu.AppendSeparator()
 
         analyse_menu = wx.Menu()
@@ -570,10 +570,13 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
         
         builder =  Builder(self, dlg)
         if builder.res == wx.ID_OK :
-            corpus = builder.doanalyse()
-            self.history.add(corpus.parametres)
-            self.tree.OnItemAppend(corpus.parametres)
-            OpenAnalyse(self, corpus.parametres)
+            try :
+                corpus = builder.doanalyse()
+                self.history.add(corpus.parametres)
+                self.tree.OnItemAppend(corpus.parametres)
+                OpenAnalyse(self, corpus.parametres)
+            except :
+                BugReport(self)
         #self.content = DoConf().totext(corpus.parametres)
 #        parametres = DoConf(os.path.join(UserConfigPath,'corpus.cfg')).getoptions('corpus')
 #        parametres['originalpath'] = self.filename
@@ -590,28 +593,24 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
 #        corpus = BuildFromAlceste(self.filename, parametres, self.lexique, self.expressions).corpus
         #self.corpus_encodage =  dial.encodages[dial.list_encodages.GetSelection()][0]
         #self.corpus_lang = dial.langues[dial.choice_dict.GetSelection()]
-            count = 1
-            keepGoing = dlg.Update(count, u"Lecture du fichier")
-#        try :
-#            with codecs.open(self.filename, 'rU', self.corpus_encodage) as f:
-#                self.content = f.read()
-#            #self.content = self.content.replace('\r','\n')
-#        except UnicodeDecodeError :
-#            msg = u"Ce fichier ne semble pas être encodé en %s" % self.corpus_encodage
-#            dial = wx.MessageDialog(self, msg, u"Problème d'encodage", wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
-#            dial.CenterOnParent()
-#            res = dial.ShowModal()
-#            dial.Destroy()
-#            self.OpenText()
-            self.ShowMenu(_("View"))
-            self.ShowMenu(_("Text analysis"))
-            self.ShowMenu(_(u"Spreadsheet analysis"), False)
-            self.type = "Texte"
-            self.DataTxt = False
-            self.Text = ''
-            count += 1
-            keepGoing = dlg.Update(count, u"Chargement du dictionnaire")
-        dlg.Destroy()
+            else :
+                count = 1
+                keepGoing = dlg.Update(count, u"Lecture du fichier")
+    #            msg = u"Ce fichier ne semble pas être encodé en %s" % self.corpus_encodage
+    #            dial = wx.MessageDialog(self, msg, u"Problème d'encodage", wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
+    #            dial.CenterOnParent()
+    #            res = dial.ShowModal()
+    #            dial.Destroy()
+    #            self.OpenText()
+                self.ShowMenu(_("View"))
+                self.ShowMenu(_("Text analysis"))
+                self.ShowMenu(_(u"Spreadsheet analysis"), False)
+                self.type = "Texte"
+                self.DataTxt = False
+                self.Text = ''
+                count += 1
+                keepGoing = dlg.Update(count, u"Chargement du dictionnaire")
+                dlg.Destroy()
         #self.OnViewData(wx.EVT_BUTTON)
         
     def OnExit(self, event):
@@ -707,7 +706,6 @@ Voulez-vous fermer quand même ?"""
             remove = True
         if self.nb.GetPageCount() == 1 and remove and not notebook :
             self.LastTabClose()
-
     
     def LastTabClose(self) :
         if self.nb.GetPageCount() == 1 :
@@ -991,7 +989,9 @@ Voulez-vous fermer quand même ?"""
 class IntroPanel(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        #col = randint(0, 100)
+        #col = randint(0, 255)
+        #col1 = randint(0,255)
+        #col2 = randint(0,255)
         col = 0
         bckgrdcolor = wx.Colour(col, col, col)
         self.SetBackgroundColour(bckgrdcolor)

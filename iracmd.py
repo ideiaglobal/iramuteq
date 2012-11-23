@@ -35,7 +35,7 @@ log.debug('----------TEST corpusNG-----------------')
 from analysetxt import Alceste,  gramact, gramsup
 from corpusNG import *
 
-
+#cmd = iracmd.CmdLine(args=['-f','/home/pierre/workspace/iramuteq/corpus/lru2.txt','-t','alceste'])
 
 AppliPath = os.path.abspath(os.path.dirname(os.path.realpath(sys.argv[0])))
 if os.getenv('HOME') != None:
@@ -45,10 +45,19 @@ else:
 UserConfigPath = os.path.abspath(os.path.join(user_home, '.iramuteq'))
 
 class CmdLine :
-    def __init__(self) :
+    def __init__(self, args = None) :
         self.DictPath = ConstructDicoPath(AppliPath)
         self.ConfigPath = ConstructConfigPath(UserConfigPath)
         self.syscoding = sys.getdefaultencoding()
+        self.TEMPDIR = tempfile.mkdtemp('iramuteq') 
+        self.RscriptsPath = ConstructRscriptsPath(AppliPath)
+        self.PathPath = ConfigParser()
+        self.PathPath.read(self.ConfigPath['path'])        
+        self.RPath = self.PathPath.get('PATHS', 'rpath')
+        self.pref = RawConfigParser()
+        self.pref.read(self.ConfigPath['preferences'])
+        self.history = History(self.ConfigPath['history'])
+
         parser = OptionParser()
     
         parser.add_option("-f", "--file", dest="filename", help="chemin du corpus", metavar="FILE", default=False)
@@ -58,8 +67,12 @@ class CmdLine :
         parser.add_option("-e", "--enc", dest="encodage", help="encodage du corpus", metavar="ENC", default=locale.getpreferredencoding())
         parser.add_option("-l", "--lang", dest="language", help="langue du corpus", metavar="LANG", default='french')
         parser.add_option("-r", "--read", dest="read", help="lire un corpus", metavar="READ", default = False)
+        parser.add_option("-b", "--build", action="store_true", dest="build", help = "construire un corpus", default = False)
 
-        (options, args) = parser.parse_args()
+        if args is None :
+            (options, args) = parser.parse_args()
+        else : 
+            (options, args) = parser.parse_args(args)
         print args
         print options
         options.type_analyse
@@ -68,19 +81,16 @@ class CmdLine :
         elif options.filename and options.type_analyse :
             config = DoConf(self.ConfigPath[options.type_analyse]).getoptions()
             #self.ConfigPath[options.type_analyse] = os.path.abspath(options.configfile)
+        elif options.read and options.type_analyse :
+            config = DoConf(self.ConfigPath[options.type_analyse]).getoptions()
         elif options.read :
+            pass
+        elif options.filename and options.build :
             pass
         else :
             print 'rien a faire'
             return
-        self.TEMPDIR = tempfile.mkdtemp('iramuteq') 
-        self.RscriptsPath = ConstructRscriptsPath(AppliPath)
-        self.PathPath = ConfigParser()
-        self.PathPath.read(self.ConfigPath['path'])        
-        self.RPath = self.PathPath.get('PATHS', 'rpath')
-        self.pref = RawConfigParser()
-        self.pref.read(self.ConfigPath['preferences'])
-        self.history = History(self.ConfigPath['history'])
+
         #self.history.write()
         if options.filename or options.read :#or options.build:
             self.corpus_encodage = options.encodage
@@ -101,20 +111,27 @@ class CmdLine :
                 corpus_parametres['encoding'] = self.corpus_encodage
                 corpus_parametres['syscoding'] = locale.getpreferredencoding()
                 corpus_parametres['pathout'] = PathOut(self.filename, 'corpus').mkdirout()
-                corpus = BuildFromAlceste(self.filename, corpus_parametres, self.lexique, self.expressions).corpus
-                self.history.add(corpus.parametres)
-                corpus = copycorpus(corpus)
+                try :
+                    corpus = BuildFromAlceste(self.filename, corpus_parametres, self.lexique, self.expressions).corpus
+                except Exception, txt:
+                    log.info('probleme lors de la construction: %s' %txt)
+                    corpus = None
+                    raise
+                else :
+                    self.history.add(corpus.parametres)
+                    corpus = copycorpus(corpus)
 
                 #with codecs.open(self.filename, 'r', self.corpus_encodage) as f:
             elif options.read :
                 corpus = Corpus(self, parametres = DoConf(options.read).getoptions('corpus'), read = options.read)
                 corpus.parametres['path'] = os.path.abspath(options.read)
                 pathout = os.path.dirname(os.path.dirname(os.path.abspath(options.read)))
+                self.corpus = corpus
 
-
-            corpus.conn_all()
-            corpus.make_lems()
-            corpus.parse_active(gramact, gramsup)
+            if corpus is not None :
+                corpus.conn_all()
+                corpus.make_lems()
+                corpus.parse_active(gramact, gramsup)
 #            log.warning('ATTENTION gethapaxuces')
 #            MakeUciStat(corpus)
 #            qfqsdf
@@ -127,24 +144,24 @@ class CmdLine :
             #    f.write('\n'.join(['\t'.join(val) for val in res]))
                 #    self.content = f.read()
                 #self.content = self.content.replace('\r','')
-            if options.type_analyse == 'alceste' :
-                log.debug('ATTENTION : ANALYSE NG')
-                    #print corpus.make_etoiles()
-                    #zerzre
-                #corpus.read_corpus()
-                #corpus.parse_active(gramact, gramsup)
-                config['type'] = 'alceste'
-                Alceste(self, corpus, parametres = config)
-            #    self.Text = AnalyseAlceste(self, cmd = True, big = True)
-                #self.Text = AnalyseAlceste(self, cmd = True)
-            elif options.type_analyse == 'pam' :
-                self.Text = PamTxt(self, cmd = True)
-            elif options.type_analyse == 'afcuci' :
-                self.Text = AfcUci(self, cmd = True)
-            elif options.type_analyse == 'stat' :
-                self.Text = Stat(self, corpus, config = {'type' : 'stat'})
-            elif options.type_analyse == 'spec' :
-                self.Text = Lexico(self, corpus, config = {'type' : 'spec'})
+                if options.type_analyse == 'alceste' :
+                    log.debug('ATTENTION : ANALYSE NG')
+                        #print corpus.make_etoiles()
+                        #zerzre
+                    #corpus.read_corpus()
+                    #corpus.parse_active(gramact, gramsup)
+                    config['type'] = 'alceste'
+                    self.Text = Alceste(self, corpus, parametres = config)
+                #    self.Text = AnalyseAlceste(self, cmd = True, big = True)
+                    #self.Text = AnalyseAlceste(self, cmd = True)
+                elif options.type_analyse == 'pam' :
+                    self.Text = PamTxt(self, cmd = True)
+                elif options.type_analyse == 'afcuci' :
+                    self.Text = AfcUci(self, cmd = True)
+                elif options.type_analyse == 'stat' :
+                    self.Text = Stat(self, corpus, parametres = config)
+                elif options.type_analyse == 'spec' :
+                    self.Text = Lexico(self, corpus, config = {'type' : 'spec'})
             #print self.Text.corpus.hours, 'h', self.Text.corpus.minutes,'min', self.Text.corpus.seconds, 's'
 #            self.Text.corpus.make_colored_corpus('colored.html')
 
