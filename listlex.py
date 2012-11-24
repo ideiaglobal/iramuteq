@@ -59,25 +59,6 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         
         self.dlist = dlist 
 
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self)
-        
-        # for wxMSW
-        self.Bind(wx.EVT_COMMAND_RIGHT_CLICK, self.OnRightClick)
-
-        # for wxGTK
-        self.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
-        
-        
-        self.itemDataMap = dlist
-        self.itemIndexMap = dlist.keys()
-        self.SetItemCount(len(dlist))
-        
-        listmix.ListCtrlAutoWidthMixin.__init__(self)
-        listmix.ColumnSorterMixin.__init__(self, len(first))
-        self.SortListItems(1, False)
-        
-#-----------------------------------------------------------------------------------------    
-
         i=0
         for name in first :
             self.InsertColumn(i,name,wx.LIST_FORMAT_LEFT)
@@ -87,6 +68,25 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
 
         for i in range(1,len(first)-1):
             self.SetColumnWidth(i, len(first[i]) * 10)
+        
+        self.itemDataMap = dlist
+        self.itemIndexMap = dlist.keys()
+        self.SetItemCount(len(dlist))
+        
+        #listmix.ListCtrlAutoWidthMixin.__init__(self)
+        listmix.ColumnSorterMixin.__init__(self, len(first))
+        self.SortListItems(1, 2)
+        
+#-----------------------------------------------------------------------------------------    
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self)
+        
+        # for wxMSW
+        self.Bind(wx.EVT_COMMAND_RIGHT_CLICK, self.OnRightClick)
+
+        # for wxGTK
+        self.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
+
+#-----------------------------------------------------------------------------------------    
         
     def OnGetItemText(self, item, col):
         index=self.itemIndexMap[item]
@@ -107,8 +107,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
     def GetSortImages(self):
         return (self.sm_dn, self.sm_up)
-
-
+    
     def OnRightDown(self, event):
         x = event.GetX()
         y = event.GetY()
@@ -127,7 +126,14 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         index=self.itemIndexMap[item]
         s = self.itemDataMap[index]
         return s
-
+    
+    def SortItems(self,sorter=cmp):
+        items = list(self.itemDataMap.keys())
+        items.sort(sorter)
+        self.itemIndexMap = items
+        # redraw the list
+        self.Refresh()
+    
     def OnItemSelected(self, event):
         self.currentItem = event.m_itemIndex
         event.Skip()
@@ -259,12 +265,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         win.HtmlPage.SetPage(txt)
         win.Show(True)
 
-    def SortItems(self,sorter=cmp):
-        items = list(self.itemDataMap.keys())
-        items.sort(sorter)
-        self.itemIndexMap = items
-        # redraw the list
-        self.Refresh()
+
 
 class message(wx.Frame):
     def __init__(self, *args, **kwds):

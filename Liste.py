@@ -116,13 +116,6 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
         else :
             return self.attr2
 
-#    def do_greyline(self):
-#        for row in xrange(self.GetItemCount()):
-#            if row % 2 :
-#                self.SetItemBackgroundColour(row, (230, 230, 230))
-#            else :
-#                self.SetItemBackgroundColour(row, wx.WHITE)
-                
     def OnColClick(self, event):
         pass
         #self.do_greyline()
