@@ -37,32 +37,36 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         self.dlist=dlist
         self.add_dendro=add_dendro
         self.first = ['id','formes'] + first
-        self.nbactives = nbactives
-        self.nbetoiles = nbetoiles
-        #wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
+        self.lenact = nbactives
+        self.lensup = len(dlist) - (self.lenact + nbetoiles)
 
-
+        #adding some art
         self.il = wx.ImageList(16, 16)
+        a={"sm_up":"GO_UP","sm_dn":"GO_DOWN","w_idx":"WARNING","e_idx":"ERROR","i_idx":"QUESTION"}
+        for k,v in a.items():
+            s="self.%s= self.il.Add(wx.ArtProvider_GetBitmap(wx.ART_%s,wx.ART_TOOLBAR,(16,16)))" % (k,v)
+            exec(s)
+        self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
-        self.sm_up = self.il.Add(getSmallUpArrowBitmap())
-        self.sm_dn = self.il.Add(getSmallDnArrowBitmap())
+        self.attr1 = wx.ListItemAttr()
+        self.attr1.SetBackgroundColour((220, 220, 220))
+        self.attrsg = wx.ListItemAttr()
+        self.attrsg.SetBackgroundColour((230, 230, 230))
+        self.attr2 = wx.ListItemAttr()
+        self.attr2.SetBackgroundColour((190, 249, 236))
+        self.attr2s = wx.ListItemAttr()
+        self.attr2s.SetBackgroundColour((211, 252, 244))        
+        self.attr3 = wx.ListItemAttr()
+        self.attr3.SetBackgroundColour((245, 180, 180))
+        self.attr3s = wx.ListItemAttr()
+        self.attr3s.SetBackgroundColour((245, 190, 190))
 
         tID = wx.NewId()
 
-        #self.list = List(self, tID,
-        #                         style=wx.LC_REPORT 
-        #                         | wx.BORDER_NONE
-        #                         | wx.LC_EDIT_LABELS
-        #                         | wx.LC_SORT_ASCENDING
-        #                         )
-        
-        #self.list.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-        
         self.dlist = dlist 
-        self.Bind(wx.EVT_SIZE, self.OnSize)
 
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self)
-        self.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick)
+        #self.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick)
         
         # for wxMSW
         self.Bind(wx.EVT_COMMAND_RIGHT_CLICK, self.OnRightClick)
@@ -76,46 +80,18 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         self.SetItemCount(len(dlist))
         listmix.ColumnSorterMixin.__init__(self, len(first)+2)
 
-        self.PopulateList(dlist,first)
-        self.SortListItems(1, False)
-        self.do_greyline()
+        self.SortListItems(0, True)
         
 #-----------------------------------------------------------------------------------------    
 
-    def PopulateList(self, dlist,first):
         first = ['id','formes']+first
         for i, name in enumerate(first) :
             self.InsertColumn(i, name, wx.LIST_FORMAT_LEFT)
         
-        #for key in dlist :
-        #    index = self.list.InsertStringItem(sys.maxint, '%5i' % key)
-        #    for i, val in enumerate(dlist[key][1:]) :
-        #        self.list.SetStringItem(index, i+1, str(dlist[key][i+1]))
-        #    self.list.SetItemData(index, key)
-
         self.SetColumnWidth(0, wx.LIST_AUTOSIZE)
         for i in range(1,len(first)-1):
             self.SetColumnWidth(i, 130)
         
-        if self.nbactives +  self.nbetoiles != len(dlist) :
-            #there is supp data
-            for i in range(self.nbactives, (len(dlist) - self.nbetoiles)) :
-                item = self.GetItem(i)
-                item.SetTextColour(wx.RED)
-                self.SetItem(item)
-        for i in range((len(dlist) - self.nbetoiles), len(dlist)) :
-            item = self.GetItem(i)
-            item.SetTextColour(wx.BLUE)
-            self.SetItem(item)
-        
-    def do_greyline(self):
-        for row in xrange(self.GetItemCount()):
-            if row % 2 :
-                self.SetItemBackgroundColour(row,(230,230,230))
-            else :
-                self.SetItemBackgroundColour(row,wx.WHITE)
-
-
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
     def GetListCtrl(self):
         return self
@@ -147,6 +123,35 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
     def OnItemSelected(self, event):
         self.currentItem = event.m_itemIndex
         event.Skip()
+
+    def OnGetItemAttr(self, item):
+        index=self.itemIndexMap[item]
+        #genre=self.itemDataMap[index][2]
+        if index < self.lenact :
+            if item % 2 :
+                return self.attr1
+            else :
+                return self.attrsg
+        elif index >= self.lenact and index < (self.lenact + self.lensup) :
+            if item % 2 :
+                return self.attr2
+            else :
+                return self.attr2s
+        elif index >= (self.lenact + self.lensup) :
+            if item % 2 :
+                return self.attr3
+            else :
+                return self.attr3s
+        else :
+            return None
+
+    def SortItems(self,sorter=cmp):
+        items = list(self.itemDataMap.keys())
+        items.sort(sorter)
+        self.itemIndexMap = items
+        
+        # redraw the list
+        self.Refresh()
 
     def OnRightClick(self, event):
 
@@ -286,13 +291,6 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         txt = "<img src='%s'>" % tmpgraph
         win.HtmlPage.SetPage(txt)
         win.Show(True)
-
-    def OnSize(self, event):
-        w,h = self.GetClientSizeTuple()
-        self.SetDimensions(0, 0, w, h)
-        
-    def OnColClick(self,event):
-        self.do_greyline()
 
 class message(wx.Frame):
     def __init__(self, *args, **kwds):

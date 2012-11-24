@@ -318,10 +318,14 @@ make_afc_graph <- function(toplot,classes,clnb, xlab, ylab, cex.txt = NULL, leg 
 	cl.color <- rain[classes]
 	plot(toplot[,1],toplot[,2], pch='', xlab = xlab, ylab = ylab)
 	abline(h=0,v=0, lty = 'dashed')
+    #print('ATTENTION Rgraph.R : utilisation de maptools !')
+    #library(maptools)
 	if (is.null(cex.txt))
+        #pointLabel(toplot[,1],toplot[,2],rownames(toplot),col=cl.color)
 		text(toplot[,1],toplot[,2],rownames(toplot),col=cl.color)
 	else 
-		text(toplot[,1],toplot[,2],rownames(toplot),col=cl.color, cex = cex.txt)
+		#pointLabel(toplot[,1],toplot[,2],rownames(toplot),col=cl.color, cex = cex.txt)
+        text(toplot[,1],toplot[,2],rownames(toplot),col=cl.color, cex = cex.txt)
 
     if (!cmd) {    
 	    dev.off()

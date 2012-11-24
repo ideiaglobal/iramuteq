@@ -1109,7 +1109,7 @@ class MySplashScreen(wx.SplashScreen):
             self.ShowMain()
 
     def ShowMain(self):
-        frame = IraFrame(None, -1, "IRaMuTeQ " + ConfigGlob.get('DEFAULT', 'version'), size=(950, 650))
+        frame = IraFrame(None, -1, "IRaMuTeQ " + ConfigGlob.get('DEFAULT', 'version'), size=(1100, 800))
         frame.Show()
         frame.Upgrade()
         frame.OnOpenFromCmdl()
