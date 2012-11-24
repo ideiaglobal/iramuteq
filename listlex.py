@@ -75,7 +75,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         
         #listmix.ListCtrlAutoWidthMixin.__init__(self)
         listmix.ColumnSorterMixin.__init__(self, len(first))
-        self.SortListItems(1, 2)
+        self.SortListItems(1, 0)
         
 #-----------------------------------------------------------------------------------------    
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self)
