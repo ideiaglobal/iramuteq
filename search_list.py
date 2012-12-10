@@ -120,6 +120,11 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         s = self.itemDataMap[index][col]
         return s
 
+    def OnGetItemData(self, item) :
+        index = self.itemIndexMap[item]
+        s = self.itemDataMap[index]
+        return s
+
     def OnItemSelected(self, event):
         self.currentItem = event.m_itemIndex
         event.Skip()
@@ -180,6 +185,13 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         self.PopupMenu(menu)
         menu.Destroy()
 
+    def getselectedwords(self) :
+        words = [self.getColumnText(self.GetFirstSelected(), 6)]
+        last = self.GetFirstSelected()
+        while self.GetNextSelected(last) != -1:
+            last = self.GetNextSelected(last)
+            words.append(self.getColumnText(last, 6))
+        return words
 
     def OnPopupOne(self, event):
         activenotebook = self.parent.nb.GetSelection()
@@ -248,11 +260,11 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         win.Show(True)
 
     def OnPopupThree(self, event) :
-        datas = [self.dlist[self.GetItemData(self.GetFirstSelected())]]
+        datas = [self.OnGetItemData(self.GetFirstSelected())]
         last = self.GetFirstSelected()
         while self.GetNextSelected(last) != -1:
             last = self.GetNextSelected(last)
-            data = self.dlist[self.GetItemData(last)]
+            data = self.OnGetItemData(last)
             datas += [data]
         colnames = self.first[2:]
         rownames = [val[1] for val in datas]
@@ -271,11 +283,11 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
 
     def ongraphdendro(self, evt) :
         corpus = self.parent.corpus
-        datas = [self.dlist[self.GetItemData(self.GetFirstSelected())]]
+        datas = [self.OnGetItemData(self.GetFirstSelected())]
         last = self.GetFirstSelected()
         while self.GetNextSelected(last) != -1:
             last = self.GetNextSelected(last)
-            data = self.dlist[self.GetItemData(last)]
+            data = self.OnGetItemData(last)
             datas += [data]
         colnames = self.first[2:]
         rownames = [val[1] for val in datas]

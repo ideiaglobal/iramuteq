@@ -296,7 +296,7 @@ create_afc_table <- function(x) {
 	res
 }
 
-make_afc_graph <- function(toplot,classes,clnb, xlab, ylab, cex.txt = NULL, leg = FALSE, cmd = FALSE) {
+make_afc_graph <- function(toplot,classes,clnb, xlab, ylab, cex.txt = NULL, leg = FALSE, cmd = FALSE, black = FALSE) {
 	rain <- rainbow(clnb)
     compt <- 1
     tochange <- NULL
@@ -316,6 +316,9 @@ make_afc_graph <- function(toplot,classes,clnb, xlab, ylab, cex.txt = NULL, leg 
         }
     }
 	cl.color <- rain[classes]
+    if (black) {
+        cl.color <- 'black'
+    }
 	plot(toplot[,1],toplot[,2], pch='', xlab = xlab, ylab = ylab)
 	abline(h=0,v=0, lty = 'dashed')
     #print('ATTENTION Rgraph.R : utilisation de maptools !')
@@ -509,8 +512,9 @@ make.simi.afc <- function(x,chitable,lim=0, alpha = 0.1, movie = NULL) {
     cc<-mc[cc]
     #mass<-(rowSums(x)/max(rowSums(x))) * 5
     maxchi<-norm.vec(maxchi, 0.03, 0.3)
-    rglplot(g1,vertex.label = vire.nonascii(rownames(x)),vertex.label.color='black',vertex.color=cc,vertex.size = 0.1, layout=lo, rescale=FALSE)
-    rgl.spheres(lo, col = cc, radius = maxchi, alpha = alpha)
+    rglplot(g1,vertex.label = vire.nonascii(rownames(x)),vertex.label.color= cc,vertex.label.cex = maxchi, vertex.size = 0.1, layout=lo, rescale=FALSE)
+    text3d(lo[,1], lo[,2],lo[,3], rownames(x), cex=maxchi, col=cc)
+    #rgl.spheres(lo, col = cc, radius = maxchi, alpha = alpha)
     rgl.bg(color = c('white','black'))
     if (!is.null(movie)) {
         require(tcltk)

@@ -512,18 +512,21 @@ class Corpus :
             et = etoile.split('_')
             if et[0] in det :
                 try :
-                    if et[1] in det[et[0]] :
-                        det[et[0]][et[1]] += 1
+                    endet = '_'.join(et[1:])
+                    if endet in det[et[0]] :
+                        det[et[0]][endet] += 1
                     else :
-                        det[et[0]][et[1]] = 1
+                        det[et[0]][endet] = 1
                 except IndexError :
                     det[et[0]] += 1
             else :
                 try :
-                    det[et[0]] = {et[1] :1}
+                    endet = '_'.join(et[1:])
+                    det[et[0]] = {endet :1}
                 except IndexError :
                     det[et[0]] = 1
         print det
+        return det
 
     def make_and_write_profile_et(self, ucecl, fileout) :
         log.info('etoiles/classes')
@@ -906,8 +909,9 @@ class BuildCorpus :
             self.cleans.append(self.dolower)
         if self.corpus.parametres.get('firstclean', 1) :
             self.cleans.append(self.firstclean)
-        self.rule = self.corpus.parametres.get('keep_caract', u"^a-zA-Z0-9àÀâÂäÄáÁéÉèÈêÊëËìÌîÎïÏòÒôÔöÖùÙûÛüÜçÇßœŒ’ñ.:,;!?*'_")
-        self.cleans.append(self.docharact)
+        if self.corpus.parametres['charact'] :
+            self.rule = self.corpus.parametres.get('keep_caract', u"^a-zA-Z0-9àÀâÂäÄáÁéÉèÈêÊëËìÌîÎïÏòÒôÔöÖùÙûÛüÜçÇßœŒ’ñ.:,;!?*'_")
+            self.cleans.append(self.docharact)
         if self.corpus.parametres.get('expressions', 1) :
             self.cleans.append(self.make_expression)
         if self.corpus.parametres.get('apos', 1) :
@@ -1047,7 +1051,11 @@ class BuildFromAlceste(BuildCorpus) :
             ucetxt = txt.split('laphrasepoursplitter')
         else :
             txt = ' '.join(txt)
+
+            print txt
             txt = self.make_cleans(txt)
+
+            print txt
             ucetxt = self.make_uces(txt, self.corpus.parametres['douce'])
         if self.corpus.ucis[-1].paras == [] :
             idpara += 1

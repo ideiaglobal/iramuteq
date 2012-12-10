@@ -110,6 +110,7 @@ class SimiTxt(AnalyseText):
         self.listet = self.corpus.make_etoiles()
         self.listet.sort()
         self.parametres['stars'] = copy(self.listet)
+        self.stars = copy(self.listet)
         self.parametres['sfromchi'] = False
 
 

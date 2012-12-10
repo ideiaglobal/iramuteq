@@ -952,7 +952,7 @@ class SimiLayout(DefaultTextLayout) :
         if self.actives is None :
             with codecs.open(self.pathout['actives.csv'], 'r', self.parametres['encoding']) as f :
                 self.actives = f.read()
-            self.actives = [act for act in self.actives.splitlines()]
+            self.actives = self.actives.splitlines()#[act for act in self.actives.splitlines()]
         dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
         SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], selected = selected) 
         prep = PrepSimi(self.ira, self.parametres, indices_simi)

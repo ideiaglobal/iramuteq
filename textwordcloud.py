@@ -27,15 +27,16 @@ class WordCloud(AnalyseText):
         self.parametres['type'] = 'wordcloud'
         #FIXME
         limit = 3
-        mode = 'both'
-        if mode == 'both' :
+        self.make_option()
+        if self.parametres['mode'] == 2 :
             self.actives = self.corpus.make_actives_limit(limit, 1)
             self.actives += self.corpus.make_actives_limit(limit, 2)
-        elif mode == 'act' :
+        elif self.parametres['mode'] == 0 :
             self.actives = self.corpus.make_actives_limit(limit, 1)
+        elif self.parametres['mode'] == 1 :
+            self.actives = self.corpus.make_actives_limit(limit, 2)
         dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)]) 
-        SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'])
-        self.make_option()
+        SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], dlg = True)
         self.make_wordcloud()
         script = WordCloudRScript(self)
         script.make_script()
@@ -48,12 +49,12 @@ class WordCloud(AnalyseText):
         if res == wx.ID_OK :
             self.parametres['width'] = dial.spin_L.GetValue()
             self.parametres['height'] = dial.spin_H.GetValue()
-            #maxword = dial.spin_maxword.GetValue()
             self.parametres['maxword'] = dial.spin_maxword.GetValue()
             self.parametres['mincex'] = float(dial.spin_mincex.GetValue())/float(10)
             self.parametres['maxcex'] = float(dial.spin_maxcex.GetValue())/float(10)
             self.parametres['col_text'] = dial.color_text.GetColour()
             self.parametres['col_bg'] = dial.color_bg.GetColour()
+            self.parametres['mode'] = dial.typeformeschoice.GetSelection()
             outgraph = os.path.join(os.path.dirname(self.pathout['zipf.png']), 'nuage_')
             nb = 1
             while os.path.exists(outgraph + str(nb) + '.png') :

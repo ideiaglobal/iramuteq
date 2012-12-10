@@ -278,15 +278,15 @@ class Lexico(AnalyseText) :
         mineff = self.parametres['mineff']
         #dlg = progressbar(self, maxi = 3)
         tabout = self.corpus.make_lexitable(mineff, self.listet)
-        log.warning('Fmax a 200')
-        Fmax = [line for line in tabout[1:] if sum(line[1:]) > 199]
-        formesmax = [line[0] for line in Fmax]
-        Fmax = [line[1:] for line in Fmax]
-        summax = [sum(col) for col in zip(*Fmax)]
-        tabout.append(['Fmax'] + summax)
-        tabout = [line for line in tabout if line[0] not in formesmax]
-        log.warning('ATTENTION : hapax par etoile')
-        tabout.append(['hapax'] + self.corpus.gethapaxbyet(self.listet))
+        #log.warning('Fmax a 200')
+        #Fmax = [line for line in tabout[1:] if sum(line[1:]) > 199]
+        #formesmax = [line[0] for line in Fmax]
+        #Fmax = [line[1:] for line in Fmax]
+        #summax = [sum(col) for col in zip(*Fmax)]
+        #tabout.append(['Fmax'] + summax)
+        #tabout = [line for line in tabout if line[0] not in formesmax]
+        #log.warning('ATTENTION : hapax par etoile')
+        #tabout.append(['hapax'] + self.corpus.gethapaxbyet(self.listet))
         write_tab(tabout, self.dictpathout['tableafcm'])
         
         #log.warning('ATTENTION : gethapaxuces')

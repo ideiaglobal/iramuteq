@@ -13,7 +13,6 @@ parser.add_option("-f", "--file", dest="filename",
 
 #print args
 #print options
-
 import sys
 reload(sys)
 import locale
@@ -104,8 +103,9 @@ if sys.platform == 'darwin' :
 else :
     sys.setdefaultencoding(locale.getpreferredencoding())
 #chemin de l'application
-
+#print 'ATTENTION APPLIPATH'
 AppliPath = os.path.abspath(os.path.dirname(os.path.realpath(sys.argv[0])))
+#AppliPath = '/home/pierre/workspace/iramuteqNG'
 #chemin des images
 ImagePath = os.path.join(AppliPath, 'images')
 #configuration generale
@@ -1123,7 +1123,6 @@ class MyApp(wx.App):
         Create and show the splash screen.  It will then create and show
         the main frame when it is time to do so.
         """
-
         wx.SystemOptions.SetOptionInt("mac.window-plain-transition", 1)
         self.SetAppName("Iramuteq")       
         splash = MySplashScreen()

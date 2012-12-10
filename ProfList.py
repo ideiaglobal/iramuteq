@@ -41,6 +41,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         self.Alceste = Alceste
         self.Source = gparent
         self.cl = cl
+        self.var_mod = {}
 
         line1 = profclasse.pop(0)
         classen = [line for line in profclasse if line[0] != '*' and line[0] != '*****']
@@ -367,11 +368,19 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             corpus = self.Source.corpus
         ClasseCHD(self.parent, corpus, self.cl)
 
+    def getselectedwords(self) :
+        words = [self.getColumnText(self.GetFirstSelected(), 6)]
+        last = self.GetFirstSelected()
+        while self.GetNextSelected(last) != -1:
+            last = self.GetNextSelected(last)
+            words.append(self.getColumnText(last, 6))
+        return words
+
     def quest_var_mod(self, evt) :
         if 'corpus' in dir(self.Source):
             corpus = self.Source.corpus
             if self.var_mod == {} :
-                self.var_mod = treat_var_mod([val for val in corpus.make_etoiles()])
+                self.var_mod = self.Source.corpus.make_etoiles_dict()
         else :
             corpus = self.Source.tableau
             if self.var_mod == {} :
@@ -383,10 +392,10 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         chistable.pop(0)
         vchistable = [line[1:] for line in chistable]
         fchistable = [line[0] for line in chistable]
-        word = self.getColumnText(self.GetFirstSelected(), 6)
+        word = self.getselectedwords()[0]
         if len(word.split('_')) > 1 :
-            var = word.split('_')[0]
-            words = [word for word in self.var_mod[var]]
+            var = word.split('_')
+            words = ['_'.join([var[0],word]) for word in self.var_mod[var[0]]]
             words.sort()
             tableout = []
             kwords = []
@@ -650,14 +659,8 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         chistable.pop(0)
         vchistable = [line[1:] for line in chistable]
         fchistable = [line[0] for line in chistable]
-        words = [self.getColumnText(self.GetFirstSelected(), 6)]
-        tableout = [vchistable[fchistable.index(words[0])]]
-        last = self.GetFirstSelected()
-        while self.GetNextSelected(last) != -1:
-            last = self.GetNextSelected(last)
-            word = self.getColumnText(last, 6)
-            words.append(word)
-            tableout.append(vchistable[fchistable.index(word)])
+        words = self.getselectedwords()
+        tableout = [vchistable[fchistable.index(word)] for word in words]
         tmpgraph = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
         nbcl = len(title)
         txt = barplot(tableout, words, title, self.Source.parent.RscriptsPath['Rgraph'], tmpgraph)
@@ -685,14 +688,8 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         chistable.pop(0)
         vchistable = [line[1:] for line in chistable]
         fchistable = [line[0] for line in chistable]
-        words = [self.getColumnText(self.GetFirstSelected(), 6)]
-        tableout = [vchistable[fchistable.index(words[0])]]
-        last = self.GetFirstSelected()
-        while self.GetNextSelected(last) != -1:
-            last = self.GetNextSelected(last)
-            word = self.getColumnText(last, 6)
-            words.append(word)
-            tableout.append(vchistable[fchistable.index(word)])
+        words = self.getselectedwords()
+        tableout = [vchistable[fchistable.index(word)] for word in words]
         tmpgraph = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
         txttable = 'c(' + ','.join([','.join(line) for line in tableout]) + ')'
         rownames = 'c("' + '","'.join(words) + '")'

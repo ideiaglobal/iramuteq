@@ -460,10 +460,12 @@ def print_simi3d(self):
         movie = "'" + ffr(os.path.dirname(self.DictPathOut['RData'])) + "'"
     else :
         movie = 'NULL'
-    if self.section == 'chd_dist_quest' :
-        header = 'TRUE'
-    else :
-        header = 'FALSE'
+    
+    #if self.corpus.parametres['type'] == 'corpus' :
+    #    header = 'TRUE'
+    #else :
+    #    header = 'FALSE'
+    header = 'FALSE'
     txt += """
     dm<-read.csv2("%s",row.names=1,header = %s)
     load("%s")
@@ -781,7 +783,8 @@ class PrintSimiScript(PrintRScript) :
             txt += """
             et <- list()
             """
-            for i,et in enumerate(self.tableau.etline) :
+            print self.parametres
+            for i,et in enumerate(self.parametres['stars']) :
                 txt+= """
                 et[[%i]] <- c(%s)
                 """ % (i+1, ','.join(et[1:]))

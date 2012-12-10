@@ -2550,6 +2550,21 @@ class PrefWordCloud ( wx.Dialog ):
         self.m_staticline6 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline6, 0, wx.EXPAND |wx.ALL, 5 )
         
+        self.typeformes = wx.StaticText( self, wx.ID_ANY, u"formes retenues", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.typeformes.Wrap( -1 )
+        fgSizer1.Add( self.typeformes, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        typeformeschoiceChoices = [ u"actives", u"supplémentaires", u"actives et supplémentaires" ]
+        self.typeformeschoice = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, typeformeschoiceChoices, 0 )
+        self.typeformeschoice.SetSelection( 0 )
+        fgSizer1.Add( self.typeformeschoice, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.m_staticline11 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        fgSizer1.Add( self.m_staticline11, 0, wx.EXPAND |wx.ALL, 5 )
+        
+        self.m_staticline12 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        fgSizer1.Add( self.m_staticline12, 0, wx.EXPAND |wx.ALL, 5 )        
+        
         self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, u"Taille du texte", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText6.Wrap( -1 )
         fgSizer1.Add( self.m_staticText6, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
@@ -2767,8 +2782,8 @@ class CorpusPref ( wx.Dialog ):
     def __init__( self, parent, parametres ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Préférences", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         self.parent = parent 
-        langues_n = [u'français', u'english', u'german (expérimentale)', u'italian (expérimentale)', u'swedish (exp.)', u'portuguese (exp.)']
-        self.langues = [u'french', u'english', u'german', 'italian', 'swedish', u'portuguese']
+        langues_n = [u'français', u'english', u'german (expérimentale)', u'italian (expérimentale)', u'swedish (exp.)', u'portuguese (exp.)', 'greek', 'other...']
+        self.langues = [u'french', u'english', u'german', 'italian', 'swedish', u'portuguese', 'greek', 'other']
         self.encodages = [enc[0].lower() for enc in encodages]
 
         ucimark = [u'****', u'0000']
@@ -2930,7 +2945,7 @@ class CorpusPref ( wx.Dialog ):
         self.check_ponct = wx.CheckBox( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer3.Add( self.check_ponct, 0, wx.ALL, 5 )
 
-        self.m_staticText16 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Pas d'espace entre deux formes (pour le chinois par exemple)", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText16 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Pas d'espace entre deux formes", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText16.Wrap( -1 )
         fgSizer3.Add( self.m_staticText16, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         

@@ -168,12 +168,19 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         self.PopupMenu(menu)
         menu.Destroy()
 
+    def getselectedwords(self) :
+        words = [self.getColumnText(self.GetFirstSelected(), 6)]
+        last = self.GetFirstSelected()
+        while self.GetNextSelected(last) != -1:
+            last = self.GetNextSelected(last)
+            words.append(self.getColumnText(last, 1))
+        return words
 
     def OnPopupOne(self, event):
         activenotebook = self.parent.nb.GetSelection()
         page = self.parent.nb.GetPage(activenotebook)
         corpus = page.corpus
-        word = self.getColumnText(self.GetFirstSelected(), 0)
+        word = self.getselectedwords()[0]
         lems = corpus.getlems()
         rep = []
         for forme in lems[word].formes :
