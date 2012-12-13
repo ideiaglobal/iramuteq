@@ -525,7 +525,6 @@ class Corpus :
                     det[et[0]] = {endet :1}
                 except IndexError :
                     det[et[0]] = 1
-        print det
         return det
 
     def make_and_write_profile_et(self, ucecl, fileout) :
@@ -1051,11 +1050,7 @@ class BuildFromAlceste(BuildCorpus) :
             ucetxt = txt.split('laphrasepoursplitter')
         else :
             txt = ' '.join(txt)
-
-            print txt
             txt = self.make_cleans(txt)
-
-            print txt
             ucetxt = self.make_uces(txt, self.corpus.parametres['douce'])
         if self.corpus.ucis[-1].paras == [] :
             idpara += 1

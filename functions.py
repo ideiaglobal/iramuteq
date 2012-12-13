@@ -436,7 +436,10 @@ def ReadDicoAsDico(dicopath):
     return dico
 
 def ReadLexique(parent, lang = 'french'):
-    parent.lexique = ReadDicoAsDico(parent.DictPath.get(lang, 'french'))
+    if lang != 'other' :
+        parent.lexique = ReadDicoAsDico(parent.DictPath.get(lang, 'french'))
+    else :
+        parent.lexique = {}
 
 def ReadList(filein, encoding = sys.getdefaultencoding()):
     #file = open(filein)
