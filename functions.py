@@ -151,24 +151,31 @@ class DoConf :
         return parametres
             
     def makeoptions(self, sections, parametres, outfile = None) :
+        txt = ''
         for i, section in enumerate(sections) :
+            txt += '[%s]\n' % section
             if not self.conf.has_section(section) :
                 self.conf.add_section(section)
             for option in parametres[i] :
                 if isinstance(parametres[i][option], int) :
                     self.conf.set(section, option, `parametres[i][option]`)
+                    txt += '%s = %i\n' % (option, parametres[i][option])
                 elif isinstance(parametres[i][option], basestring) :
                     self.conf.set(section, option, parametres[i][option].encode('utf8'))
+                    txt += '%s = %s\n' % (option, parametres[i][option].encode('utf8'))
                 elif isinstance(parametres[i][option], wx.Colour) :
                     self.conf.set(section, option, str(parametres[i][option]))
+                    txt += '%s = %s' % (option, str(parametres[i][option]))
                 elif option == 'analyses' :
                     pass
                 else :
                     self.conf.set(section, option, `parametres[i][option]`)
+                    txt += '%s = %s' % (option, `parametres[i][option]`)
         if outfile is None :
             outfile = self.configfile
         with codecs.open(outfile, 'w', 'utf8') as f :
-            self.conf.write(f)
+            f.write(txt)
+            #self.conf.write(f)
 
     def totext(self, parametres) :
         #txt = ['Corpus']
