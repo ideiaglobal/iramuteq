@@ -148,9 +148,9 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, libsvdc = False
         data2 <- as(data2, "dgCMatrix")
         row.names(data2) <- 1:nrow(data2)
         """ % DicoPath['TableUc2']
-    log.info('ATTENTION ############# MODEPATATE ####################')
+    #log.info('ATTENTION ############# MODEPATATE ####################')
     txt += """
-    chd1<-CHD(data1, x = nbt, mode.patate = TRUE, libsvdc = libsvdc, libsvdc.path = libsvdc.path)
+    chd1<-CHD(data1, x = nbt, mode.patate = FALSE, libsvdc = libsvdc, libsvdc.path = libsvdc.path)
     """
     
     if classif_mode == 0:
