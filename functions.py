@@ -162,19 +162,19 @@ class DoConf :
                     txt += '%s = %i\n' % (option, parametres[i][option])
                 elif isinstance(parametres[i][option], basestring) :
                     self.conf.set(section, option, parametres[i][option].encode('utf8'))
-                    txt += '%s = %s\n' % (option, parametres[i][option].encode('utf8'))
+                    txt += '%s = %s\n' % (option, parametres[i][option])
                 elif isinstance(parametres[i][option], wx.Colour) :
                     self.conf.set(section, option, str(parametres[i][option]))
-                    txt += '%s = %s' % (option, str(parametres[i][option]))
+                    txt += '%s = %s\n' % (option, str(parametres[i][option]))
                 elif option == 'analyses' :
                     pass
                 else :
                     self.conf.set(section, option, `parametres[i][option]`)
-                    txt += '%s = %s' % (option, `parametres[i][option]`)
+                    txt += '%s = %s\n' % (option, `parametres[i][option]`)
         if outfile is None :
             outfile = self.configfile
         with codecs.open(outfile, 'w', 'utf8') as f :
-            f.write(txt)
+            f.write(txt.encode('utf8'))
             #self.conf.write(f)
 
     def totext(self, parametres) :
