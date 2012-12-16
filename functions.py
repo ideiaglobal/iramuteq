@@ -174,7 +174,7 @@ class DoConf :
         if outfile is None :
             outfile = self.configfile
         with codecs.open(outfile, 'w', 'utf8') as f :
-            f.write(txt.encode('utf8'))
+            f.write(txt)
             #self.conf.write(f)
 
     def totext(self, parametres) :
