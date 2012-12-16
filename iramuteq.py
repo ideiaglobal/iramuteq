@@ -1096,7 +1096,7 @@ class MySplashScreen(wx.SplashScreen):
         bmp = wx.Image(os.path.join(ImagePath, 'splash.png')).ConvertToBitmap()
         wx.SplashScreen.__init__(self, bmp,
                                  wx.SPLASH_CENTRE_ON_SCREEN | wx.SPLASH_TIMEOUT,
-                                 3000, None, -1)
+                                 1000, None, -1)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.fc = wx.FutureCall(1500, self.ShowMain)
 

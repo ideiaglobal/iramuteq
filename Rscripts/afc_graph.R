@@ -16,6 +16,8 @@ do.select.nb <- %s
 select.nb <- %i
 do.select.chi <- %s
 select.chi <- %i
+do.select.chi.classe <- %s
+ptbycluster <- %i
 cex.txt <- %s
 txt.min <- %i
 txt.max <- %i
@@ -105,19 +107,19 @@ if ( qui == 3 ) {
         }
     }
         
-    if (over) {
-        rn <- rownames(table.in)
-        rownames(table.in) <- 1:nrow(table.in)
-        table.in <- unique(table.in)
-        rn.keep <- as.numeric(rownames(table.in))
-        rownames(table.in) <- rn[rn.keep]
-        tablechi <- tablechi[rn.keep,]
-        if (qui==0) {
-            cex.par <- cex.par[rn.keep]
-        } else {
-            cex.par <- NULL
-        }
-    } 
+#    if (over) {
+#        rn <- rownames(table.in)
+#        rownames(table.in) <- 1:nrow(table.in)
+#        table.in <- unique(table.in)
+#        rn.keep <- as.numeric(rownames(table.in))
+#        rownames(table.in) <- rn[rn.keep]
+#        tablechi <- tablechi[rn.keep,]
+#        if (qui==0) {
+#            cex.par <- cex.par[rn.keep]
+#        } else {
+#            cex.par <- NULL
+#        }
+#    } 
     if (do.select.nb) {
         if (select.nb > nrow(table.in)) select.nb <- nrow(table.in)
         row.keep <- select_point_nb(tablechi, select.nb)
@@ -128,6 +130,10 @@ if ( qui == 3 ) {
         row.keep <- select_point_chi(tablechi, select.chi)
         table.in <- table.in[row.keep,]
         tablechi <- tablechi[row.keep,]
+    } else if (do.select.chi.classe) {
+        row.keep <- select.chi.classe(tablechi, ptbycluster)
+        table.in <- table.in[row.keep,]
+        tablechi <- tablechi[row.keep,]        
     } else {
         row.keep <- 1:nrow(table.in)
     }
@@ -147,11 +153,113 @@ if ( qui == 3 ) {
     }
 }
 
+#################################################@@
+#from wordcloud
+overlap <- function(x1, y1, sw1, sh1, boxes) {
+    use.r.layout <- FALSE
+	if(!use.r.layout)
+		return(.overlap(x1,y1,sw1,sh1,boxes))
+	s <- 0
+	if (length(boxes) == 0) 
+		return(FALSE)
+	for (i in c(last,1:length(boxes))) {
+		bnds <- boxes[[i]]
+		x2 <- bnds[1]
+		y2 <- bnds[2]
+		sw2 <- bnds[3]
+		sh2 <- bnds[4]
+		if (x1 < x2) 
+			overlap <- x1 + sw1 > x2-s
+		else 
+			overlap <- x2 + sw2 > x1-s
+		
+		if (y1 < y2) 
+			overlap <- overlap && (y1 + sh1 > y2-s)
+		else 
+			overlap <- overlap && (y2 + sh2 > y1-s)
+		if(overlap){
+			last <<- i
+			return(TRUE)
+		}
+	}
+	FALSE
+}
+
+.overlap <- function(x11,y11,sw11,sh11,boxes1){
+    .Call("is_overlap",x11,y11,sw11,sh11,boxes1)
+}
+
+stopoverlap <- function(x, cex.par = NULL) {
+#from wordcloud
+    library(wordcloud)
+    tails <- "g|j|p|q|y"
+    rot.per <- 0 
+    last <- 1
+    thetaStep <- .1
+    rStep <- .5
+    toplot <- NULL
+
+#    plot.new()
+    plot(x[,1],x[,2], pch='')
+
+    words <- rownames(x)
+    if  (is.null(cex.par))  {
+        size <- rep(0.9, nrow(x))
+    } else {
+        size <- cex.par
+    }
+    #cols <- rainbow(clnb)
+    boxes <- list()
+    for (i in 1:nrow(x)) {
+        rotWord <- runif(1)<rot.per
+        r <-0
+		theta <- runif(1,0,2*pi)
+		x1<- x[i,1] 
+		y1<- x[i,2]
+		wid <- strwidth(words[i],cex=size[i])
+		ht <- strheight(words[i],cex=size[i])
+		if(grepl(tails,words[i]))
+			ht <- ht + ht*.2
+		if(rotWord){
+			tmp <- ht
+			ht <- wid
+			wid <- tmp	
+		}
+		isOverlaped <- TRUE
+		while(isOverlaped){
+			if(!overlap(x1-.5*wid,y1-.5*ht,wid,ht, boxes)) { #&&
+                toplot <- rbind(toplot, c(x1, y1, size[i], i)) 
+				#text(x1,y1,words[i],cex=size[i],offset=0,srt=rotWord*90,
+				#		col=cols[classes[i]])
+				boxes[[length(boxes)+1]] <- c(x1-.5*wid,y1-.5*ht,wid,ht)
+				isOverlaped <- FALSE
+			} else {
+				if(r>sqrt(.5)){
+					print(paste(words[i], "could not be fit on page. It will not be plotted."))
+					isOverlaped <- FALSE
+				}
+				theta <- theta+thetaStep
+				r <- r + rStep*thetaStep/(2*pi)
+				x1 <- x[i,1]+r*cos(theta)
+				y1 <- x[i,2]+r*sin(theta)
+			}
+		}
+    }
+    row.names(toplot) <- words[toplot[,4]]
+    return(toplot)
+}
+###############################################################################
+
 if (typegraph == 0) {
 
     open_file_graph(fileout, width = width, height = height)
     parcex <- taillecar/10
     par(cex = parcex)
+    if (over) {
+    table.in <- stopoverlap(table.in, cex.par=cex.par)
+    classes <- classes[table.in[,4]]
+    cex.par <- cex.par[table.in[,4]]
+    }
     make_afc_graph(table.in, classes, clnb, xlab, ylab, cex.txt = cex.par)
 
 } else {

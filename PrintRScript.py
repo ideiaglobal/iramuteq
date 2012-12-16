@@ -148,8 +148,9 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, libsvdc = False
         data2 <- as(data2, "dgCMatrix")
         row.names(data2) <- 1:nrow(data2)
         """ % DicoPath['TableUc2']
+    log.info('ATTENTION ############# MODEPATATE ####################')
     txt += """
-    chd1<-CHD(data1, x = nbt, libsvdc = libsvdc, libsvdc.path = libsvdc.path)
+    chd1<-CHD(data1, x = nbt, mode.patate = TRUE, libsvdc = libsvdc, libsvdc.path = libsvdc.path)
     """
     
     if classif_mode == 0:
@@ -417,6 +418,9 @@ def write_afc_graph(self):
     if self.param['do_select_chi'] : do_select_chi = 'TRUE'
     else : do_select_chi = 'FALSE'
 
+    if self.param['do_select_chi_classe'] : do_select_chi_classe = 'TRUE'
+    else : do_select_chi_classe = 'FALSE'
+
     if self.param['cex_txt'] : cex_txt = 'TRUE'
     else : cex_txt = 'FALSE'
 
@@ -438,6 +442,8 @@ def write_afc_graph(self):
     self.param['select_nb'],  \
     do_select_chi, \
     self.param['select_chi'], \
+    do_select_chi_classe, \
+    self.param['nbchic'], \
     cex_txt, \
     self.param['txt_min'], \
     self.param['txt_max'], \

@@ -183,6 +183,15 @@ select_point_chi <- function(tablechi, chi_limit) {
 	row_keep
 }
 
+select.chi.classe <- function(tablechi, nb) {
+    rowkeep <- NULL
+    for (i in 1:ncol(tablechi)) {
+        rowkeep <- append(rowkeep,order(tablechi[,i], decreasing = TRUE)[1:nb])
+    }
+    rowkeep <- unique(rowkeep)
+    rowkeep
+}
+
 #from summary.ca
 summary.ca.dm <- function(object, scree = TRUE, ...){
   obj <- object
@@ -296,7 +305,7 @@ create_afc_table <- function(x) {
 	res
 }
 
-make_afc_graph <- function(toplot,classes,clnb, xlab, ylab, cex.txt = NULL, leg = FALSE, cmd = FALSE, black = FALSE) {
+make_afc_graph <- function(toplot, classes, clnb, xlab, ylab, cex.txt = NULL, leg = FALSE, cmd = FALSE, black = FALSE) {
 	rain <- rainbow(clnb)
     compt <- 1
     tochange <- NULL
@@ -320,15 +329,11 @@ make_afc_graph <- function(toplot,classes,clnb, xlab, ylab, cex.txt = NULL, leg 
         cl.color <- 'black'
     }
 	plot(toplot[,1],toplot[,2], pch='', xlab = xlab, ylab = ylab)
-	abline(h=0,v=0, lty = 'dashed')
-    #print('ATTENTION Rgraph.R : utilisation de maptools !')
-    #library(maptools)
+	abline(h=0, v=0, lty = 'dashed')
 	if (is.null(cex.txt))
-        #pointLabel(toplot[,1],toplot[,2],rownames(toplot),col=cl.color)
-		text(toplot[,1],toplot[,2],rownames(toplot),col=cl.color)
+		text(toplot[,1],toplot[,2],rownames(toplot),col=cl.color, offset=0)
 	else 
-		#pointLabel(toplot[,1],toplot[,2],rownames(toplot),col=cl.color, cex = cex.txt)
-        text(toplot[,1],toplot[,2],rownames(toplot),col=cl.color, cex = cex.txt)
+        text(toplot[,1],toplot[,2],rownames(toplot),col=cl.color, cex = cex.txt, offset=0)
 
     if (!cmd) {    
 	    dev.off()

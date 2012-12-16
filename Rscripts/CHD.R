@@ -41,7 +41,7 @@ find.max <- function(dtable, chitable, compte, rmax, maxinter, sc, TT) {
     res
 }  
 
-CHD<-function(data.in, x=9, libsvdc=FALSE, libsvdc.path=NULL){
+CHD<-function(data.in, x=9, mode.patate = FALSE, libsvdc=FALSE, libsvdc.path=NULL){
 #	sink('/home/pierre/workspace/iramuteq/dev/findchi2.txt')
 	dataori <- data.in
     row.names(dataori) <- rownames(data.in)
@@ -120,107 +120,109 @@ CHD<-function(data.in, x=9, libsvdc=FALSE, libsvdc.path=NULL){
 ###################################################################
 #                  reclassement des individus                     #
 ###################################################################
-		malcl<-1000000000000
-		it<-0
-		listsub<-list()
-		#in boucle
-        ln <- which(dtable==1, arr.ind=TRUE)
-        lnz <- list()
-        lnz[1:nrow(dtable)] <- 0
-
-        for (k in 1:nrow(ln)) {lnz[[ln[k,1]]]<-append(lnz[[ln[k,1]]],ln[k,2])}
-        for (k in 1:nrow(dtable)) {lnz[[k]] <- lnz[[k]][-1]}
-		TT<-sum(dtable)
-
-		while (malcl!=0 & N1>=5 & N2>=5) {
-			it<-it+1
-			listsub[[it]]<-vector()
-            txt <- paste('nombre iteration', it)
-			#pp('nombre iteration',it)
-			vdelta<-vector()
-			#dtable[,'cl']<-cl
-			t1<-dtable[which(cl[,1]==clnb),]#[,-ncol(dtable)]
-			t2<-dtable[which(cl[,1]==clnb+1),]#[,-ncol(dtable)]
-			ncolt<-ncol(t1)
-			#pp('ncolt',ncolt)
-
-            if (N1 != 1) {
-                sc1<-colSums(t1)
-            } else {
-                sc1 <- t1
-            }
-            if (N2 != 1) {
-			    sc2<-colSums(t2)
-            } else {
-                sc2 <- t2
-            }
-			
-            sc<-sc1+sc2
-			chtableori<-rbind(sc1,sc2)
-			chtable<-chtableori
-			interori<-MyChiSq(chtableori,sc,TT)/TT#chisq.test(chtableori)$statistic#/TT
-			txt <- paste(txt, ' - interori : ',interori)
-            #pp('interori',interori)
-
-			N1<-nrow(t1)
-			N2<-nrow(t2)
-
-			#pp('N1',N1)
-			#pp('N2',N2)
-			txt <- paste(txt, 'N1:', N1,'-N2:',N2)
-            print(txt)
-            compte <- 0
-			for (l in lnz){
-                    chi.in<-chtable
-                    compte <- compte + 1
-					if(cl[compte]==clnb){
-						chtable[1,l]<-chtable[1,l]-1
-						chtable[2,l]<-chtable[2,l]+1
-					}else{
-						chtable[1,l]<-chtable[1,l]+1
-						chtable[2,l]<-chtable[2,l]-1
-					}
-					interswitch<-MyChiSq(chtable,sc,TT)/TT#chisq.test(chtable)$statistic/TT
-					ws<-interori-interswitch
-
-					if (ws<0){
-						interori<-interswitch
-						if(cl[compte]==clnb){
-							#sc1<-chtable[1,]
-							#sc2<-chtable[2,]
-							cl[compte]<-clnb+1
-							listsub[[it]]<-append(listsub[[it]],compte)
-						} else {
-							#sc1<-chtable[1,]
-							#sc2<-chtable[2,]
-							cl[compte]<-clnb
-							listsub[[it]]<-append(listsub[[it]],compte)
-						}
-						vdelta<-append(vdelta,compte)
-                    } else {
-                        chtable<-chi.in
-					}
-               }
-#			for (val in vdelta) {
-#				if (cl[val]==clnb) {
-#					cl[val]<-clnb+1
-#					listsub[[it]]<-append(listsub[[it]],val)
-#					}else {
-#					cl[val]<-clnb
-#					listsub[[it]]<-append(listsub[[it]],val)
-#				}
-#			}
-			print('###################################')
-			print('longueur < 0')
-			malcl<-length(vdelta)
-			if ((it>1)&&(!is.logical(listsub[[it]]))&&(!is.logical(listsub[[it-1]]))){
-				if (listsub[[it]]==listsub[[(it-1)]]){
-					malcl<-0
-				}
-			}
-			print(malcl)
-			print('###################################')
-		}
+        if (!mode.patate) {
+    		malcl<-1000000000000
+    		it<-0
+    		listsub<-list()
+    		#in boucle
+            ln <- which(dtable==1, arr.ind=TRUE)
+            lnz <- list()
+            lnz[1:nrow(dtable)] <- 0
+    
+            for (k in 1:nrow(ln)) {lnz[[ln[k,1]]]<-append(lnz[[ln[k,1]]],ln[k,2])}
+            for (k in 1:nrow(dtable)) {lnz[[k]] <- lnz[[k]][-1]}
+    		TT<-sum(dtable)
+    
+    		while (malcl!=0 & N1>=5 & N2>=5) {
+    			it<-it+1
+    			listsub[[it]]<-vector()
+                txt <- paste('nombre iteration', it)
+    			#pp('nombre iteration',it)
+    			vdelta<-vector()
+    			#dtable[,'cl']<-cl
+    			t1<-dtable[which(cl[,1]==clnb),]#[,-ncol(dtable)]
+    			t2<-dtable[which(cl[,1]==clnb+1),]#[,-ncol(dtable)]
+    			ncolt<-ncol(t1)
+    			#pp('ncolt',ncolt)
+    
+                if (N1 != 1) {
+                    sc1<-colSums(t1)
+                } else {
+                    sc1 <- t1
+                }
+                if (N2 != 1) {
+    			    sc2<-colSums(t2)
+                } else {
+                    sc2 <- t2
+                }
+    			
+                sc<-sc1+sc2
+    			chtableori<-rbind(sc1,sc2)
+    			chtable<-chtableori
+    			interori<-MyChiSq(chtableori,sc,TT)/TT#chisq.test(chtableori)$statistic#/TT
+    			txt <- paste(txt, ' - interori : ',interori)
+                #pp('interori',interori)
+    
+    			N1<-nrow(t1)
+    			N2<-nrow(t2)
+    
+    			#pp('N1',N1)
+    			#pp('N2',N2)
+    			txt <- paste(txt, 'N1:', N1,'-N2:',N2)
+                print(txt)
+                compte <- 0
+    			for (l in lnz){
+                        chi.in<-chtable
+                        compte <- compte + 1
+    					if(cl[compte]==clnb){
+    						chtable[1,l]<-chtable[1,l]-1
+    						chtable[2,l]<-chtable[2,l]+1
+    					}else{
+    						chtable[1,l]<-chtable[1,l]+1
+    						chtable[2,l]<-chtable[2,l]-1
+    					}
+    					interswitch<-MyChiSq(chtable,sc,TT)/TT#chisq.test(chtable)$statistic/TT
+    					ws<-interori-interswitch
+    
+    					if (ws<0){
+    						interori<-interswitch
+    						if(cl[compte]==clnb){
+    							#sc1<-chtable[1,]
+    							#sc2<-chtable[2,]
+    							cl[compte]<-clnb+1
+    							listsub[[it]]<-append(listsub[[it]],compte)
+    						} else {
+    							#sc1<-chtable[1,]
+    							#sc2<-chtable[2,]
+    							cl[compte]<-clnb
+    							listsub[[it]]<-append(listsub[[it]],compte)
+    						}
+    						vdelta<-append(vdelta,compte)
+                        } else {
+                            chtable<-chi.in
+    					}
+                   }
+    #			for (val in vdelta) {
+    #				if (cl[val]==clnb) {
+    #					cl[val]<-clnb+1
+    #					listsub[[it]]<-append(listsub[[it]],val)
+    #					}else {
+    #					cl[val]<-clnb
+    #					listsub[[it]]<-append(listsub[[it]],val)
+    #				}
+    #			}
+    			print('###################################')
+    			print('longueur < 0')
+    			malcl<-length(vdelta)
+    			if ((it>1)&&(!is.logical(listsub[[it]]))&&(!is.logical(listsub[[it-1]]))){
+    				if (listsub[[it]]==listsub[[(it-1)]]){
+    					malcl<-0
+    				}
+    			}
+    			print(malcl)
+    			print('###################################')
+    		}
+        }
 		#dtable<-cbind(dtable,'cl'=as.vector(cl))
         #dtable[,'cl'] <-as.vector(cl)
 #######################################################################

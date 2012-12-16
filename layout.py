@@ -65,8 +65,10 @@ class GraphPanelAfc(wx.Panel):
               'qui' : 0,
               'do_select_nb' : 0,
               'do_select_chi' : 0,
+              'do_select_chi_classe' : 0,
               'select_nb' : 50,
               'select_chi' : 4,
+              'nbchic' : 30,
               'over' : 0, 
               'cex_txt' : 0,
               'txt_min' : 5,
@@ -116,8 +118,10 @@ class GraphPanelAfc(wx.Panel):
                           'qui' : dial.choice2.GetSelection(),
                           'do_select_nb' : dial.check1.GetValue(),
                           'do_select_chi' : dial.check2.GetValue(),
+                          'do_select_chi_classe' : dial.check_chic.GetValue(),
                           'select_nb' : dial.spin_nb.GetValue(),
                           'select_chi' : dial.spin_chi.GetValue(),
+                          'nbchic' : dial.spin_nbchic.GetValue(),
                           'over' : dial.check3.GetValue(), 
                           'cex_txt' : dial.check4.GetValue(),
                           'txt_min' : dial.spin_min.GetValue(),
@@ -142,6 +146,12 @@ class GraphPanelAfc(wx.Panel):
                 afc <- afcf
                 afc_table <- afcf_table
                 chistabletot <- specfp
+                infp <- which(is.infinite(chistabletot) & chistabletot > 0)
+                infm <- which(is.infinite(chistabletot) & chistabletot < 0)
+                chistabletot[infp] <- 0
+                chistabletot[infm] <- 0
+                chistabletot[infp] <- max(chistabletot) + 1
+                chistabletot[infm] <- min(chistabletot) - 1
                 """ 
             elif self.itempath == 'liste_graph_afct' :
                 txt +="""

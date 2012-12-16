@@ -589,6 +589,10 @@ class PrefGraph(wx.Dialog):
         self.label_4 = wx.StaticText(self, -1, txt)
         self.check1 = wx.CheckBox(self, -1)
         self.spin_nb = wx.SpinCtrl(self, -1, '', size = (100,30), min=2, max=1000)
+        txt = u"""Prendre les x premiers points par classe"""
+        self.label_chic = wx.StaticText(self, -1, txt)
+        self.check_chic = wx.CheckBox(self, -1)
+        self.spin_nbchic = wx.SpinCtrl(self, -1, '', size = (100,30), min=2, max=1000)        
         txt = u"""Limiter le nombre de points 
 par le chi2 de liaison aux classes"""
         self.label_5 = wx.StaticText(self, -1, txt)
@@ -643,6 +647,7 @@ au chi2 d'association de la forme"""
         self.Bind(wx.EVT_CHECKBOX, self.OnCheckTchi, self.check_tchi)
         self.Bind(wx.EVT_CHOICE, self.On3D, self.choicetype)
         self.Bind(wx.EVT_CHOICE, self.OnPass, self.choice2)
+        self.Bind(wx.EVT_CHECKBOX, self.OnCheckChic, self.check_chic)
         self.__set_properties()
         self.OnNorm(wx.EVT_CHECKBOX)
         self.OnCheckTchi(wx.EVT_CHECKBOX)
@@ -663,14 +668,29 @@ au chi2 d'association de la forme"""
         self.spin3.SetValue(self.paramgraph['taillecar'])
         self.spin_nb.SetValue(self.paramgraph['select_nb'])
         self.spin_chi.SetValue(self.paramgraph['select_chi'])
+        self.spin_nbchic.SetValue(self.paramgraph['nbchic'])
         self.check1.SetValue(self.paramgraph['do_select_nb'])
         self.check2.SetValue(self.paramgraph['do_select_chi'])
+        self.check_chic.SetValue(self.paramgraph['do_select_chi_classe'])
         self.check3.SetValue(self.paramgraph['over'])
         if self.paramgraph['do_select_nb'] :
             self.spin_nb.Enable(True)
             self.spin_chi.Enable(False)
+            self.spin_nbchic.Enable(False)
+        elif self.paramgraph['do_select_chi_classe'] :
+            self.spin_nb.Enable(False)
+            self.spin_chi.Enable(False)
+            self.spin_nbchic.Enable(True)
+        elif self.paramgraph['do_select_chi'] :
+            self.spin_nb.Enable(False)
+            self.spin_chi.Enable(True)
+            self.spin_nbchic.Enable(False)
         else :
             self.spin_nb.Enable(False)
+            self.spin_chi.Enable(False)
+            self.spin_nbchic.Enable(False)
+
+            
         self.check4.SetValue(self.paramgraph['cex_txt'])
         self.spin_min.SetValue(self.paramgraph['txt_min'])
         self.spin_max.SetValue(self.paramgraph['txt_max'])
@@ -678,11 +698,6 @@ au chi2 d'association de la forme"""
         self.spin_min_tchi.SetValue(self.paramgraph['tchi_min'])
         self.spin_max_tchi.SetValue(self.paramgraph['tchi_max'])
 
-        if self.paramgraph['do_select_chi'] :
-            self.spin_nb.Enable(False)
-            self.spin_chi.Enable(True)    
-        else :
-            self.spin_chi.Enable(False)            
         self.spin_f1.SetValue(self.paramgraph['facteur'][0])
         self.spin_f2.SetValue(self.paramgraph['facteur'][1])
         self.spin_f3.SetValue(self.paramgraph['facteur'][2])
@@ -739,6 +754,14 @@ au chi2 d'association de la forme"""
         fsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND, 0)
         fsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND, 0)
         
+        fsizer.Add(self.label_chic, 0, wx.ALL | wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
+        sizer_nbchic = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_nbchic.Add(self.check_chic, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL, 5)
+        sizer_nbchic.Add(self.spin_nbchic, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL, 5)
+        fsizer.Add(sizer_nbchic, 0, wx.ALL | wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
+        fsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND, 0)
+        fsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND, 0)
+
         fsizer.Add(self.label_5, 0, wx.ALL | wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
         sizer_chi = wx.BoxSizer(wx.HORIZONTAL)
         sizer_chi.Add(self.check2, 0, wx.ALL | wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
@@ -811,21 +834,35 @@ au chi2 d'association de la forme"""
         sizer_2.Fit(self)
         self.Layout()
         
-    def OnCheck1(self,event):
+    def OnCheck1(self, event):
         if self.check1.GetValue() :
             self.check2.SetValue(False)
+            self.check_chic.SetValue(False)
             self.spin_chi.Enable(False)
             self.spin_nb.Enable(True)
+            self.spin_nbchic.Enable(False)
         else : 
             self.spin_nb.Enable(False)
             
-    def OnCheck2(self,event):
+    def OnCheck2(self, event):
         if self.check2.GetValue() :
-           self.check1.SetValue(False)
-           self.spin_nb.Enable(False)
-           self.spin_chi.Enable(True)
+            self.check1.SetValue(False)
+            self.check_chic.SetValue(False)
+            self.spin_chi.Enable(True)
+            self.spin_nb.Enable(False)
+            self.spin_nbchic.Enable(False)
         else :
            self.spin_chi.Enable(False) 
+
+    def OnCheckChic(self, event) :
+        if self.check_chic.GetValue() :
+            self.check1.SetValue(False)
+            self.check2.SetValue(False)
+            self.spin_chi.Enable(False)
+            self.spin_nb.Enable(False)
+            self.spin_nbchic.Enable(True)
+        else :
+            self.spin_nbchic.Enable(False)
 
     def OnNorm(self, event):
         if not self.check4.GetValue() :
