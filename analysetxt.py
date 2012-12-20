@@ -199,14 +199,15 @@ class Alceste(AnalyseText) :
         return self.pathout['RTxtProfGraph']
 
     def print_graph_files(self) :
-        afc_graph_list = [[os.path.basename(self.pathout['AFC2DL_OUT']), u'Variables actives - coordonnées - facteurs 1 / 2'],
-                      [os.path.basename(self.pathout['AFC2DSL_OUT']), u'variables supplémentaires - coordonnées - facteurs 1 / 2'],
-                      [os.path.basename(self.pathout['AFC2DEL_OUT']), u'Variables illustratives - Coordonnées - facteur 1 / 2'],
-                      [os.path.basename(self.pathout['AFC2DCL_OUT']), u'Classes - Coordonnées - facteur 1 / 2'],
-                      [os.path.basename(self.pathout['AFC2DCoul']), u'Variables actives - Corrélation - facteur 1 / 2'],
-                      [os.path.basename(self.pathout['AFC2DCoulSup']), u'Variables supplémentaires - Corrélation - facteur 1 / 2'],
-                      [os.path.basename(self.pathout['AFC2DCoulEt']), u'Variables illustratives - Corrélations - facteur 1 / 2'],
-                      [os.path.basename(self.pathout['AFC2DCoulCl']), u'Classes - Corrélations - facteurs 1 / 2'],]
+        mess_afc = u"La position des points n'est peut être pas exacte"
+        afc_graph_list = [[os.path.basename(self.pathout['AFC2DL_OUT']), u'Variables actives - coordonnées - 30 points par classes - facteurs 1 / 2\n%s' % mess_afc],
+                      [os.path.basename(self.pathout['AFC2DSL_OUT']), u'variables supplémentaires - coordonnées - 30 points par classes - facteurs 1 / 2\n%s' % mess_afc],
+                      [os.path.basename(self.pathout['AFC2DEL_OUT']), u'Variables illustratives - Coordonnées - 30 points par classes - facteur 1 / 2\n%s' % mess_afc],
+                      [os.path.basename(self.pathout['AFC2DCL_OUT']), u'Classes - Coordonnées - facteur 1 / 2']]
+                      #[os.path.basename(self.pathout['AFC2DCoul']), u'Variables actives - Corrélation - facteur 1 / 2'],
+                      #[os.path.basename(self.pathout['AFC2DCoulSup']), u'Variables supplémentaires - Corrélation - facteur 1 / 2'],
+                      #[os.path.basename(self.pathout['AFC2DCoulEt']), u'Variables illustratives - Corrélations - facteur 1 / 2'],
+                      #[os.path.basename(self.pathout['AFC2DCoulCl']), u'Classes - Corrélations - facteurs 1 / 2'],]
         chd_graph_list = [[os.path.basename(self.pathout['dendro1']), u'dendrogramme à partir de chd1']]
         if self.parametres['classif_mode'] == 0 :
             chd_graph_list.append([os.path.basename(self.pathout['dendro2']), u'dendrogramme à partir de chd2'])

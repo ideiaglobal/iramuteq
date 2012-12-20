@@ -207,7 +207,7 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, libsvdc = False
     save(tree.cut1, file="%s")
     classes<-n1[,ncol(n1)]
     open_file_graph("%s", width = 600, height=400)
-    plot.dendropr(tree.cut1$tree.cl,classes)
+    plot.dendropr(tree.cut1$tree.cl,classes, histo=TRUE)
     open_file_graph("%s", width = 600, height=400)
     plot(tree.cut1$dendro_tot_cl)
     dev.off()
@@ -366,33 +366,37 @@ write.csv2(gbcluster,file="%s")
         """ % (DictChdTxtOut['afc_facteur'], DictChdTxtOut['afc_col'], DictChdTxtOut['afc_row'])
     
         txt += """
-        xlab <- paste('facteur 1 - ', round(afc$facteur[1,2],2), sep = '')
-        ylab <- paste('facteur 2 - ', round(afc$facteur[2,2],2), sep = '')
-        xlab <- paste(xlab, ' %', sep = '')
-        ylab <- paste(ylab, ' %', sep = '')
+        #xlab <- paste('facteur 1 - ', round(afc$facteur[1,2],2), sep = '')
+        #ylab <- paste('facteur 2 - ', round(afc$facteur[2,2],2), sep = '')
+        #xlab <- paste(xlab, ' %', sep = '')
+        #ylab <- paste(ylab, ' %', sep = '')
         """
     
         txt += """
     PARCEX<-%s
+    xmin <- min(afc$rowcoord[,1]) + (0.1 * min(afc$rowcoord[,1]))
+    xmax <- max(afc$rowcoord[,1]) + (0.1 * max(afc$rowcoord[,1]))
+    ymin <- min(afc$rowcoord[,2]) + (0.1 * min(afc$rowcoord[,2]))
+    ymax <- max(afc$rowcoord[,2]) + (0.1 * max(afc$rowcoord[,2]))
     """ % taillecar
         txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab)
+    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab, xmin=xmin, xmax=xmax, ymin = ymin, ymax=ymax)
     """ % (DictChdTxtOut['AFC2DL_OUT'])
         txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debsup, fin=(debet-1), xlab = xlab, ylab = ylab)
+    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debsup, fin=(debet-1), xlab = xlab, ylab = ylab, xmin=xmin, xmax=xmax, ymin = ymin, ymax=ymax)
     """ % (DictChdTxtOut['AFC2DSL_OUT'])
         txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debet, fin=fin, xlab = xlab, ylab = ylab)
+    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debet, fin=fin, xlab = xlab, ylab = ylab, xmin=xmin, xmax=xmax, ymin = ymin, ymax=ymax)
     """ % (DictChdTxtOut['AFC2DEL_OUT'])
         txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col=TRUE, what='coord', xlab = xlab, ylab = ylab)
+    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col=TRUE, what='coord', xlab = xlab, ylab = ylab, xmin=xmin, xmax=xmax, ymin = ymin, ymax=ymax)
     """ % (DictChdTxtOut['AFC2DCL_OUT'])
-        txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='crl', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab)
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='crl', deb=debsup, fin=(debet-1), xlab = xlab, ylab = ylab)
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='crl', deb=debet, fin=fin, xlab = xlab, ylab = ylab)
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col=TRUE, what='crl', xlab = xlab, ylab = ylab)
-    """ % (DictChdTxtOut['AFC2DCoul'], DictChdTxtOut['AFC2DCoulSup'], DictChdTxtOut['AFC2DCoulEt'], DictChdTxtOut['AFC2DCoulCl'])
+#        txt += """
+ #   PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='crl', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab)
+ #   PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='crl', deb=debsup, fin=(debet-1), xlab = xlab, ylab = ylab)
+  #  PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='crl', deb=debet, fin=fin, xlab = xlab, ylab = ylab)
+ #   PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col=TRUE, what='crl', xlab = xlab, ylab = ylab)
+ #   """ % (DictChdTxtOut['AFC2DCoul'], DictChdTxtOut['AFC2DCoulSup'], DictChdTxtOut['AFC2DCoulEt'], DictChdTxtOut['AFC2DCoulCl'])
        
     txt += """
 #rm(dataact)

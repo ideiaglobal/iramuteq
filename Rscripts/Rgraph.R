@@ -1,18 +1,18 @@
 ############FIXME##################
-PlotDendroComp <- function(chd,filename,reso) {
-   jpeg(filename,res=reso)
-   par(cex=PARCEX)
-   plot(chd,which.plots=2, hang=-1)
-   dev.off()
-}
-
-PlotDendroHori <- function(dendrocutupper,filename,reso) {
-   jpeg(filename,res=reso)
-   par(cex=PARCEX)
-   nP <- list(col=3:2, cex=c(0.5, 0.75), pch= 21:22, bg= c('light blue', 'pink'),lab.cex = 0.75, lab.col = 'tomato')
-   plot(dendrocutupper,nodePar= nP, edgePar = list(col='gray', lwd=2),horiz=TRUE, center=FALSE)
-   dev.off()
-}
+#PlotDendroComp <- function(chd,filename,reso) {
+#   jpeg(filename,res=reso)
+#   par(cex=PARCEX)
+#   plot(chd,which.plots=2, hang=-1)
+#   dev.off()
+#}
+#
+#PlotDendroHori <- function(dendrocutupper,filename,reso) {
+#   jpeg(filename,res=reso)
+#   par(cex=PARCEX)
+#   nP <- list(col=3:2, cex=c(0.5, 0.75), pch= 21:22, bg= c('light blue', 'pink'),lab.cex = 0.75, lab.col = 'tomato')
+#   plot(dendrocutupper,nodePar= nP, edgePar = list(col='gray', lwd=2),horiz=TRUE, center=FALSE)
+#   dev.off()
+#}
 
 PlotDendroCut <- function(chd,filename,reso,clusternb) {   
    h.chd <- as.hclust(chd)
@@ -30,20 +30,20 @@ PlotDendroCut <- function(chd,filename,reso,clusternb) {
    dev.off()
 }
 
-PlotAfc<- function(afc, filename, width=800, height=800, quality=100, reso=200, toplot=c('all','all'), PARCEX=PARCEX) {
-	if (Sys.info()["sysname"]=='Darwin') {
-		width<-width/74.97
-		height<-height/74.97
-		quartz(file=filename,type='jpeg',width=width,height=height)
-	} else {
-		jpeg(filename,width=width,height=height,quality=quality,res=reso)
-	}
-	par(cex=PARCEX)
-	plot(afc,what=toplot,labels=c(1,1),contrib=c('absolute','relative'))
-	dev.off()
-}
+#PlotAfc<- function(afc, filename, width=800, height=800, quality=100, reso=200, toplot=c('all','all'), PARCEX=PARCEX) {
+#	if (Sys.info()["sysname"]=='Darwin') {
+#		width<-width/74.97
+#		height<-height/74.97
+#		quartz(file=filename,type='jpeg',width=width,height=height)
+#	} else {
+#		jpeg(filename,width=width,height=height,quality=quality,res=reso)
+#	}
+#	par(cex=PARCEX)
+#	plot(afc,what=toplot,labels=c(1,1),contrib=c('absolute','relative'))
+#	dev.off()
+#}
 
-PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axetoplot=c(1,2), deb=0,fin=0, width=800, height=800, quality=100, reso=200, parcex=PARCEX, xlab = NULL, ylab = NULL) {
+PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axetoplot=c(1,2), deb=0,fin=0, width=900, height=900, quality=100, reso=200, parcex=PARCEX, xlab = NULL, ylab = NULL, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NUL) {
 	if (col) {
 		if (what == 'coord') {
 			rowcoord <- as.matrix(afc$colcoord)
@@ -59,7 +59,6 @@ PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axeto
 	}
 	x <- axetoplot[1]
 	y <- axetoplot[2]
-	
 	if (col)
 		rownames(rowcoord) <- afc$colnames
 	if (!col){
@@ -73,20 +72,45 @@ PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axeto
 	}
 	clnb <- ncol(chisqrtable)
 	
-	if (!col) classes <- as.matrix(apply(chitable,1,which.max))
-	else  classes <- 1:clnb 
-	ntabtot <- cbind(rowcoord, classes)
+	if (!col) {
+        classes <- as.matrix(apply(chitable,1,which.max))
+        cex.par <- norm.vec(apply(chitable,1,max), 0.8,3)
+        row.keep <- select.chi.classe(chitable, 60)
+        rowcoord <- rowcoord[row.keep,]
+        classes <- classes[row.keep]
+        cex.par <- cex.par[row.keep]
+	} else {
+        classes <- 1:clnb
+        cex.par <- rep(1,clnb)
+    }
+	#ntabtot <- cbind(rowcoord, classes)
 	#if (!col) ntabtot <- ntabtot[row_keep,]
+    xlab <- paste('facteur ', x, ' -')
+    ylab <- paste('facteur ', y, ' -')
+    xlab <- paste(xlab,round(afc_table$facteur[x,2],2),sep = ' ')
+    xlab <- paste(xlab,' %%',sep = '')
+    ylab <- paste(ylab,round(afc_table$facteur[y,2],2),sep = ' ')
+    ylab <- paste(ylab,' %%',sep = '')
+
 	open_file_graph(filename, width = width, height = height)
 	par(cex=PARCEX)
-	plot(rowcoord[,x],rowcoord[,y], pch='', xlab = xlab, ylab = ylab)
-	abline(h=0,v=0)
-	for (i in 1:clnb) {
-		ntab <- subset(ntabtot,ntabtot[,ncol(ntabtot)] == i)
-		if (nrow(ntab) != 0)
-			text(ntab[,x],ntab[,y],rownames(ntab),col=rainbow(clnb)[i])
-	}
-	dev.off()
+
+    table.in <- rowcoord[order(cex.par, decreasing = TRUE),]
+    classes <- classes[order(cex.par, decreasing = TRUE)]
+    cex.par <- cex.par[order(cex.par, decreasing = TRUE)]
+    table.in <- stopoverlap(table.in, cex.par=cex.par)
+    classes <- classes[table.in[,4]]
+    cex.par <- cex.par[table.in[,4]]
+    make_afc_graph(table.in, classes, clnb, xlab, ylab, cex.txt = cex.par, xminmax=c(xmin,xmax), yminmax=c(ymin,ymax))
+    
+	#plot(rowcoord[,x],rowcoord[,y], pch='', xlab = xlab, ylab = ylab)
+	#abline(h=0,v=0)
+	#for (i in 1:clnb) {
+	#	ntab <- subset(ntabtot,ntabtot[,ncol(ntabtot)] == i)
+	#	if (nrow(ntab) != 0)
+	#		text(ntab[,x],ntab[,y],rownames(ntab),col=rainbow(clnb)[i])
+	#}
+	#dev.off()
 }
 
 filename.to.svg <- function(filename) {
@@ -96,11 +120,14 @@ filename.to.svg <- function(filename) {
 
 open_file_graph <- function (filename, width=800, height = 800, quality = 100, svg = FALSE) {
 	if (Sys.info()["sysname"] == 'Darwin') {
-		width <- width/74.97
-		height <- height/74.97
-		quartz(file = filename, type = 'jpeg', width = width, height = height)
+        width <- width/74.97
+        height <- height/74.97
+        if (!svg) {
+		    quartz(file = filename, type = 'png', width = width, height = height)
+        } else {
+            svg(filename.to.svg(filename), width=width, height=height)
+        }
 	} else {
-        #print('ATTENTION SVG!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         #library(RSvgDevice)
         if (svg) {
             svg(filename.to.svg(filename), width=width/74.97, height=height/74.97)
@@ -109,6 +136,98 @@ open_file_graph <- function (filename, width=800, height = 800, quality = 100, s
         }
 	}
 }
+
+#################################################@@
+#from wordcloud
+overlap <- function(x1, y1, sw1, sh1, boxes) {
+    use.r.layout <- FALSE
+	if(!use.r.layout)
+		return(.overlap(x1,y1,sw1,sh1,boxes))
+	s <- 0
+	if (length(boxes) == 0) 
+		return(FALSE)
+	for (i in c(last,1:length(boxes))) {
+		bnds <- boxes[[i]]
+		x2 <- bnds[1]
+		y2 <- bnds[2]
+		sw2 <- bnds[3]
+		sh2 <- bnds[4]
+		if (x1 < x2) 
+			overlap <- x1 + sw1 > x2-s
+		else 
+			overlap <- x2 + sw2 > x1-s
+		
+		if (y1 < y2) 
+			overlap <- overlap && (y1 + sh1 > y2-s)
+		else 
+			overlap <- overlap && (y2 + sh2 > y1-s)
+		if(overlap){
+			last <<- i
+			return(TRUE)
+		}
+	}
+	FALSE
+}
+
+.overlap <- function(x11,y11,sw11,sh11,boxes1){
+    .Call("is_overlap",x11,y11,sw11,sh11,boxes1)
+}
+########################################################
+stopoverlap <- function(x, cex.par = NULL) {
+#from wordcloud
+    library(wordcloud)
+    tails <- "g|j|p|q|y"
+    rot.per <- 0 
+    last <- 1
+    thetaStep <- .1
+    rStep <- .5
+    toplot <- NULL
+
+#    plot.new()
+    plot(x[,1],x[,2], pch='')
+
+    words <- rownames(x)
+    if  (is.null(cex.par))  {
+        size <- rep(0.9, nrow(x))
+    } else {
+        size <- cex.par
+    }
+    #cols <- rainbow(clnb)
+    boxes <- list()
+    for (i in 1:nrow(x)) {
+        rotWord <- runif(1)<rot.per
+        r <-0
+		theta <- runif(1,0,2*pi)
+		x1<- x[i,1] 
+		y1<- x[i,2]
+		wid <- strwidth(words[i],cex=size[i])
+		ht <- strheight(words[i],cex=size[i])
+	    ht <- (ht + ht*.2) + .01
+        wid <- (wid + wid*.1) + .01
+		isOverlaped <- TRUE
+		while(isOverlaped){
+			if(!overlap(x1-.5*wid,y1-.5*ht,wid,ht, boxes)) { #&&
+                toplot <- rbind(toplot, c(x1, y1, size[i], i)) 
+				#text(x1,y1,words[i],cex=size[i],offset=0,srt=rotWord*90,
+				#		col=cols[classes[i]])
+				boxes[[length(boxes)+1]] <- c(x1-.5*wid,y1-.5*ht,wid,ht)
+				isOverlaped <- FALSE
+			} else {
+				if(r>sqrt(.5)){
+					print(paste(words[i], "could not be fit on page. It will not be plotted."))
+					isOverlaped <- FALSE
+				}
+				theta <- theta+thetaStep
+				r <- r + rStep*thetaStep/(2*pi)
+                x1 <- x[i,1]+r*cos(theta)
+				y1 <- x[i,2]+r*sin(theta)
+			}
+		}
+    }
+    row.names(toplot) <- words[toplot[,4]]
+    return(toplot)
+}
+###############################################################################
 
 make_tree_tot <- function (chd) {
 	library(ape)
@@ -185,6 +304,9 @@ select_point_chi <- function(tablechi, chi_limit) {
 
 select.chi.classe <- function(tablechi, nb) {
     rowkeep <- NULL
+    if (nb > nrow(tablechi)) {
+        nb <- nrow(tablechi)
+    }
     for (i in 1:ncol(tablechi)) {
         rowkeep <- append(rowkeep,order(tablechi[,i], decreasing = TRUE)[1:nb])
     }
@@ -305,7 +427,13 @@ create_afc_table <- function(x) {
 	res
 }
 
-make_afc_graph <- function(toplot, classes, clnb, xlab, ylab, cex.txt = NULL, leg = FALSE, cmd = FALSE, black = FALSE) {
+make_afc_graph <- function(toplot, classes, clnb, xlab, ylab, cex.txt = NULL, leg = FALSE, cmd = FALSE, black = FALSE, xminmax=NULL, yminmax=NULL) {
+    if (is.null(xminmax)) {
+        xminmax <- c(min(toplot[,1]) + (0.1 * min(toplot[,1])), max(toplot[,1]) + (0.1 * max(toplot[,1])))
+    }
+    if (is.null(yminmax)) {
+        yminmax <- c(min(toplot[,2]) + (0.1 * min(toplot[,2])), max(toplot[,2]) + (0.1 * max(toplot[,2])))
+    }
 	rain <- rainbow(clnb)
     compt <- 1
     tochange <- NULL
@@ -328,7 +456,7 @@ make_afc_graph <- function(toplot, classes, clnb, xlab, ylab, cex.txt = NULL, le
     if (black) {
         cl.color <- 'black'
     }
-	plot(toplot[,1],toplot[,2], pch='', xlab = xlab, ylab = ylab)
+	plot(toplot[,1],toplot[,2], pch='', xlab = xlab, ylab = ylab, xlim=xminmax, ylim = yminmax)
 	abline(h=0, v=0, lty = 'dashed')
 	if (is.null(cex.txt))
 		text(toplot[,1],toplot[,2],rownames(toplot),col=cl.color, offset=0)
