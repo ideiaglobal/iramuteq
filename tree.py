@@ -102,7 +102,7 @@ class LeftTree(CT.CustomTreeCtrl):
 #        smileidx = il.Add(images.Smiles.GetBitmap())
 #        numicons = il.GetImageCount()
 
-        self.AssignImageList(il)
+        #self.AssignImageList(il)
         self.count = 0
         self.log = log
 
