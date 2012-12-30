@@ -265,12 +265,12 @@ make_dendro_cut_tuple <- function(dendro_in, coordok, classeuce, x, nbt = 9) {
 	dendro <- gsub('a','',dendro)
 	dendro_tot_cl <- read.tree(text = dendro)
 	#FIXME
-	for (i in 1:10) {
+	for (i in 1:100) {
 		for (cl in 1:clnb) {
 			dendro <- gsub(paste('\\(',cl,',',cl,'\\)',sep=''),cl,dendro)
 		}
 	}
-	for (i in 1:10) {
+	for (i in 1:100) {
 		dendro <- gsub(paste('\\(',0,',',0,'\\)',sep=''),0,dendro)
 		for (cl in 1:clnb) {
 			dendro <- gsub(paste('\\(',0,',',cl,'\\)',sep=''),cl,dendro)
@@ -429,10 +429,10 @@ create_afc_table <- function(x) {
 
 make_afc_graph <- function(toplot, classes, clnb, xlab, ylab, cex.txt = NULL, leg = FALSE, cmd = FALSE, black = FALSE, xminmax=NULL, yminmax=NULL) {
     if (is.null(xminmax)) {
-        xminmax <- c(min(toplot[,1]) + (0.1 * min(toplot[,1])), max(toplot[,1]) + (0.1 * max(toplot[,1])))
+        xminmax <- c(min(toplot[,1], na.rm = TRUE) + (0.1 * min(toplot[,1], na.rm = TRUE)), max(toplot[,1], na.rm = TRUE) + (0.1 * max(toplot[,1], na.rm = TRUE)))
     }
     if (is.null(yminmax)) {
-        yminmax <- c(min(toplot[,2]) + (0.1 * min(toplot[,2])), max(toplot[,2]) + (0.1 * max(toplot[,2])))
+        yminmax <- c(min(toplot[,2], na.rm = TRUE) + (0.1 * min(toplot[,2], na.rm = TRUE)), max(toplot[,2], na.rm = TRUE) + (0.1 * max(toplot[,2], na.rm = TRUE)))
     }
 	rain <- rainbow(clnb)
     compt <- 1

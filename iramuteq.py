@@ -281,9 +281,9 @@ class IraFrame(wx.Frame):
         #                  CenterPane())
         self._mgr.AddPane(IntroPanel(self), aui.AuiPaneInfo().Name("Intro_Text").
                           CenterPane())
-        if not os.path.exists(os.path.join(UserConfigPath, 'history.db')) :
-            with open(os.path.join(UserConfigPath, 'history.db'), 'w') as f :
-                f.write('')
+        #if not os.path.exists(os.path.join(UserConfigPath, 'history.db')) :
+        #    with open(os.path.join(UserConfigPath, 'history.db'), 'w') as f :
+        #        f.write('')
         self.history = History(os.path.join(UserConfigPath, 'history.db'))
         self.tree = LeftTree(self)
         self._mgr.AddPane(self.tree, aui.AuiPaneInfo().Name("lefttree").Caption("Navigateur").
