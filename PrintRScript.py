@@ -374,10 +374,10 @@ write.csv2(gbcluster,file="%s")
     
         txt += """
     PARCEX<-%s
-    xmin <- min(afc$rowcoord[,1]) + (0.1 * min(afc$rowcoord[,1]))
-    xmax <- max(afc$rowcoord[,1]) + (0.1 * max(afc$rowcoord[,1]))
-    ymin <- min(afc$rowcoord[,2]) + (0.1 * min(afc$rowcoord[,2]))
-    ymax <- max(afc$rowcoord[,2]) + (0.1 * max(afc$rowcoord[,2]))
+    xmin <- min(afc$rowcoord[,1], na.rm = TRUE) + (0.1 * min(afc$rowcoord[,1], na.rm = TRUE))
+    xmax <- max(afc$rowcoord[,1], na.rm = TRUE) + (0.1 * max(afc$rowcoord[,1], na.rm = TRUE))
+    ymin <- min(afc$rowcoord[,2], na.rm = TRUE) + (0.1 * min(afc$rowcoord[,2], na.rm = TRUE))
+    ymax <- max(afc$rowcoord[,2], na.rm = TRUE) + (0.1 * max(afc$rowcoord[,2], na.rm = TRUE))
     """ % taillecar
         txt += """
     PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab, xmin=xmin, xmax=xmax, ymin = ymin, ymax=ymax)
@@ -644,29 +644,37 @@ class PrintSimiScript(PrintRScript) :
         self.txtgraph = ''
         self.packages(['igraph', 'proxy', 'Matrix'])
         self.sources([self.analyse.parent.RscriptsPath['simi'], self.analyse.parent.RscriptsPath['Rgraph']])
-        txt = """
-        dm.path <- "%s"
-        cn.path <- "%s"
-        selected.col <- "%s"
-        """ % (self.pathout['mat01.csv'], self.pathout['actives.csv'], self.pathout['selected.csv'])
-        txt += """
-        dm <-readMM(dm.path)
-        cn <- read.table(cn.path, sep=';', quote='"')
-        colnames(dm) <- cn[,1]
-        sel.col <- read.csv2(selected.col)
-        dm <- dm[, sel.col[,1] + 1]
-        """
-
-        if self.parametres['coeff'] == 0 :
-            method = 'cooc'
+        txt = ''
+        if not self.parametres['keep_coord'] :
             txt += """
-            method <- 'cooc'
-            mat <- make.a(dm)
+            dm.path <- "%s"
+            cn.path <- "%s"
+            selected.col <- "%s"
+            """ % (self.pathout['mat01.csv'], self.pathout['actives.csv'], self.pathout['selected.csv'])
+            txt += """
+            dm <-readMM(dm.path)
+            cn <- read.table(cn.path, sep=';', quote='"')
+            colnames(dm) <- cn[,1]
+            sel.col <- read.csv2(selected.col)
+            dm <- dm[, sel.col[,1] + 1]
             """
         else :
             txt += """
-            dm <- as.matrix(dm)
-            """
+            load("%s")
+            """ % self.pathout['RData.RData']
+        
+        if self.parametres['coeff'] == 0 :
+            method = 'cooc'
+            if not self.parametres['keep_coord'] :
+                txt += """
+                method <- 'cooc'
+                mat <- make.a(dm)
+                """
+        else :
+            if not self.parametres['keep_coord'] :
+                txt += """
+                dm <- as.matrix(dm)
+                """
         if self.parametres['coeff'] == 1 :
             method = 'prcooc'
             txt += """
@@ -675,26 +683,30 @@ class PrintSimiScript(PrintRScript) :
             """
         elif self.analyse.indices[self.parametres['coeff']] == 'binomial' :
             method = 'binomial'
-            txt += """
-            method <- 'binomial'
-            mat <- binom.sim(dm)
-            """
+            if not self.parametres['keep_coord'] :
+                txt += """
+                method <- 'binomial'
+                mat <- binom.sim(dm)
+                """
         elif self.parametres['coeff'] != 0 :
             method = self.analyse.indices[self.parametres['coeff']]
+            if not self.parametres['keep_coord'] :
+                txt += """
+                method <-"%s"
+                mat <- simil(dm, method = method, diag = TRUE, upper = TRUE, by_rows = FALSE)
+                """ % self.analyse.indices[self.parametres['coeff']]
+        if not self.parametres['keep_coord'] :
             txt += """
-            method <-"%s"
-            mat <- simil(dm, method = method, diag = TRUE, upper = TRUE, by_rows = FALSE)
-            """ % self.analyse.indices[self.parametres['coeff']]
-        txt += """
-        mat <- as.matrix(stats::as.dist(mat,diag=TRUE,upper=TRUE))
-        mat[is.na(mat)] <- 0
-        mat[is.infinite(mat)] <- 0
-        """
+            mat <- as.matrix(stats::as.dist(mat,diag=TRUE,upper=TRUE))
+            mat[is.na(mat)] <- 0
+            mat[is.infinite(mat)] <- 0
+            """
         if self.parametres['layout'] == 0 : layout = 'random'
         if self.parametres['layout'] == 1 : layout = 'circle'
         if self.parametres['layout'] == 2 : layout = 'frutch'
         if self.parametres['layout'] == 3 : layout = 'kawa'
         if self.parametres['layout'] == 4 : layout = 'graphopt'
+
 
         self.filename=''
         if self.parametres['type_graph'] == 0 : type = 'tkplot'
@@ -793,14 +805,13 @@ class PrintSimiScript(PrintRScript) :
             txt += """
             et <- list()
             """
-            print self.parametres
-            for i,et in enumerate(self.parametres['stars']) :
+            for i, line in enumerate(self.parametres['listet']) :
                 txt+= """
                 et[[%i]] <- c(%s)
-                """ % (i+1, ','.join(et[1:]))
+                """ % (i+1, ','.join([`val + 1` for val in line]))
             txt+= """
             unetoile <- c('%s')
-            """ % ("','".join([val[0] for val in self.tableau.etline]))
+            """ % ("','".join([val for val in self.parametres['selectedstars']]))
             txt += """
             fsum <- NULL
             rs <- rowSums(dm)
@@ -825,7 +836,7 @@ class PrintSimiScript(PrintRScript) :
             cols <- vertex.label.color
             chivertex.size <- norm.vec(toblack, vcexminmax[1],  vcexminmax[2])
             
-            """ % (self.parent.RscriptsPath['chdfunct'])
+            """ % (self.analyse.parent.RscriptsPath['chdfunct'])
         else :
             txt += """
             vertex.label.color <- 'black' 

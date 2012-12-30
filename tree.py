@@ -123,18 +123,18 @@ class LeftTree(CT.CustomTreeCtrl):
         #textctrl.Bind(wx.EVT_CHAR, self.OnTextCtrl)
         #combobox.Bind(wx.EVT_COMBOBOX, self.OnComboBox)
         #lenArtIds = len(ArtIDs) - 2
-        for x in range(len(self.history.corpora)) :
-            if 'corpus_name' in self.h[self.history.order[x]] :
-                key = 'corpus_name'
-            else :
-                key = 'name'
-            child = self.AppendItem(self.root, self.h[self.history.order[x]][key])
+        for corpus in self.h :
+            #if 'corpus_name' in self.h[self.history.order[x]] :
+            #    key = 'corpus_name'
+            #else :
+            #    key = 'name'
+            child = self.AppendItem(self.root, corpus['corpus_name'])
             #if x == 1:
             #    child = self.AppendItem(self.root, "Item %d" % x + "\nHello World\nHappy wxPython-ing!")
             #    self.SetItemBold(child, True)
             #else:
             #    child = self.AppendItem(self.root, "Item %d" % x)
-            self.SetPyData(child, self.h[self.history.order[x]])
+            self.SetPyData(child, corpus)
             self.SetItemImage(child, 24, CT.TreeItemIcon_Normal)
             self.SetItemImage(child, 13, CT.TreeItemIcon_Expanded)
 
@@ -154,14 +154,14 @@ class LeftTree(CT.CustomTreeCtrl):
             #    elif y == 4 and x == 1:
             #        last = self.AppendItem(child, "item %d-%s" % (x, chr(ord("a")+y)), wnd=combobox)
             #    else:
-            if 'corpus_name' in self.h[self.history.order[x]] :
-                if 'analyses' in self.h[self.history.order[x]] :
-                    for y in self.h[self.history.order[x]]['analyses'] :
-                        last = self.AppendItem(child, y['name'], ct_type=0)
-                            
-                        self.SetPyData(last, y)
-                        self.SetItemImage(last, 24, CT.TreeItemIcon_Normal)
-                        self.SetItemImage(last, 13, CT.TreeItemIcon_Expanded)
+           # if 'corpus_name' in self.h[self.history.order[x]] :
+            if 'analyses' in corpus :
+                for y in corpus['analyses'] :
+                    last = self.AppendItem(child, y['name'], ct_type=0)
+                        
+                    self.SetPyData(last, y)
+                    self.SetItemImage(last, 24, CT.TreeItemIcon_Normal)
+                    self.SetItemImage(last, 13, CT.TreeItemIcon_Expanded)
     
             #    if random.randint(0, 3) == 0:
             #        self.SetItemLeftImage(last, random.randint(0, lenArtIds))
@@ -558,9 +558,9 @@ class LeftTree(CT.CustomTreeCtrl):
         
         pydata = self.itemdict['pydata']
         if 'corpus_name' in pydata :
-            self.history.delete(pydata['uuid'], True)
+            self.history.delete(pydata, True)
         else :
-            self.history.delete(pydata['uuid'])
+            self.history.delete(pydata)
         self.DeleteChildren(self.current)
         self.Delete(self.current)
         self.current = None

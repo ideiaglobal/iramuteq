@@ -6,7 +6,8 @@
 
 from chemins import ConstructPathOut, construct_simipath, ffr
 from functions import print_liste, exec_rcode, read_list_file, check_Rresult, indices_simi, treat_var_mod
-from dialog import PrefSimi, SelectColDial, OptLexi
+from dialog import SelectColDial, OptLexi
+from guifunct import PrefSimi
 from listlex import *
 import wx
 import wx.lib.agw.aui as aui

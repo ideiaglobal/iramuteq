@@ -74,19 +74,24 @@ class AnalyseText :
             #if self.corpus.lems is None :
             self.corpus.make_lems(lem = self.parametres['lem'])
             corpus.parse_active(gramact, gramsup)
-            self.doanalyse()
-            self.time = time() - self.t1
-            minutes, seconds = divmod(self.time, 60)
-            hours, minutes = divmod(minutes, 60)            
-            self.parametres['time'] = '%.0fh %.0fm %.0fs' % (hours, minutes, seconds)
-            self.parametres['ira'] = self.pathout['Analyse.ira']
-            DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
-            self.ira.history.add(self.parametres)
-            if dlg :
-                dlg.Destroy()
-                OpenAnalyse(self.parent, self.parametres['ira'])
-                self.ira.tree.AddAnalyse(self.parametres)
-                self.val = 5100
+            result_analyse = self.doanalyse()
+            if result_analyse is None :
+                 self.time = time() - self.t1
+                 minutes, seconds = divmod(self.time, 60)
+                 hours, minutes = divmod(minutes, 60)            
+                 self.parametres['time'] = '%.0fh %.0fm %.0fs' % (hours, minutes, seconds)
+                 self.parametres['ira'] = self.pathout['Analyse.ira']
+                 DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
+                 self.ira.history.add(self.parametres)
+                 if dlg :
+                     dlg.Destroy()
+                     OpenAnalyse(self.parent, self.parametres['ira'])
+                     self.ira.tree.AddAnalyse(self.parametres)
+                     self.val = 5100
+            else :
+                 self.val = False
+                 if dlg :
+                     dlg.Destroy()
         else :
             if dlg :
                 dlg.Destroy()

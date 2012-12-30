@@ -527,6 +527,17 @@ class Corpus :
                     det[et[0]] = 1
         return det
 
+    def make_etline(self, listet) :
+        etuces = [[] for et in listet]
+        for uci in self.ucis :
+            get = list(set(uci.etoiles).intersection(listet))
+            if len(get) > 1 :
+                return '2 variables sur la meme ligne'
+            elif get != [] :
+                etuces[listet.index(get[0])] += [uce.ident for uce in uci.uces]
+        return etuces
+            
+
     def make_and_write_profile_et(self, ucecl, fileout) :
         log.info('etoiles/classes')
         etoiles = self.make_etoiles()

@@ -964,27 +964,30 @@ class SimiLayout(DefaultTextLayout) :
                 self.actives = f.read()
             self.actives = self.actives.splitlines()#[act for act in self.actives.splitlines()]
         dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
-        SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], selected = selected) 
-        prep = PrepSimi(self.ira, self.parametres, indices_simi)
-        self.parametres = prep.parametres
-        script = PrintSimiScript(self)
-        script.make_script()
-        pid = exec_rcode(self.ira.RPath, script.scriptout, wait = True)
-        check_Rresult(self.ira, pid)
-        if self.parametres['type_graph'] == 1:
-            if os.path.exists(self.pathout['liste_graph']):
-                graph_simi = read_list_file(self.pathout['liste_graph'])
-                graph_simi.append([os.path.basename(script.filename), script.txtgraph])
-            else :
-                graph_simi = [[os.path.basename(script.filename), script.txtgraph]]
-            print_liste(self.pathout['liste_graph'], graph_simi)
-        DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
-        if self.parametres['type_graph'] == 1:
-            self.graphpan.sizer_3.Add(wx.StaticBitmap(self.graphpan.panel_1, -1, wx.Bitmap(script.filename, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-            self.graphpan.sizer_3.Add(wx.StaticText(self.graphpan.panel_1,-1, script.txtgraph), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-            self.graphpan.sizer_3.Fit(self.graphpan.panel_1)
-            self.graphpan.Layout()
-            self.graphpan.panel_1.Scroll(0,self.graphpan.panel_1.GetScrollRange(wx.VERTICAL))
+        #res = SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], selected = selected, dlg = True) 
+        #if res.ok :
+        prep = PrepSimi(self.ira, self, self.parametres,self.pathout['selected.csv'], self.actives, indices_simi, wordlist = dictcol, selected = selected)
+        if prep.val == wx.ID_OK :
+            self.parametres = prep.parametres
+
+            script = PrintSimiScript(self)
+            script.make_script()
+            pid = exec_rcode(self.ira.RPath, script.scriptout, wait = True)
+            check_Rresult(self.ira, pid)
+            if self.parametres['type_graph'] == 1:
+                if os.path.exists(self.pathout['liste_graph']):
+                    graph_simi = read_list_file(self.pathout['liste_graph'])
+                    graph_simi.append([os.path.basename(script.filename), script.txtgraph])
+                else :
+                    graph_simi = [[os.path.basename(script.filename), script.txtgraph]]
+                print_liste(self.pathout['liste_graph'], graph_simi)
+            DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
+            if self.parametres['type_graph'] == 1:
+                self.graphpan.sizer_3.Add(wx.StaticBitmap(self.graphpan.panel_1, -1, wx.Bitmap(script.filename, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+                self.graphpan.sizer_3.Add(wx.StaticText(self.graphpan.panel_1,-1, script.txtgraph), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+                self.graphpan.sizer_3.Fit(self.graphpan.panel_1)
+                self.graphpan.Layout()
+                self.graphpan.panel_1.Scroll(0,self.graphpan.panel_1.GetScrollRange(wx.VERTICAL))
 
     def export(self, evt) :
         pass

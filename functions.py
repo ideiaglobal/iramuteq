@@ -20,6 +20,7 @@ import locale
 import datetime
 from copy import copy
 from shutil import copyfile
+import shelve
 #from dialog import BugDialog
 import logging
 
@@ -35,76 +36,116 @@ class History :
         self.syscoding = syscoding
         self.corpora = {}
         self.openedcorpus = {}
+        self.orph = []
         self.analyses = {}
-        self.history = {}
+        self.history = []
         self.opened = {}
         self.read()
 
     def read(self) :
-        self.conf = DoConf(self.filein)
-        self.order = {}
-        self.ordera = {}
-        for i, section in enumerate(self.conf.conf.sections()) :
-            if self.conf.conf.has_option(section, 'corpus_name') :
-                self.corpora[section] = self.conf.getoptions(section)
-                self.order[len(self.order)] = section
-            else :
-                self.analyses[section] = self.conf.getoptions(section)
-                self.ordera[len(self.ordera)] = section
-        todel = []
-        for corpus in self.corpora :
-            self.history[corpus] = copy(self.corpora[corpus])
-        for analyse in self.analyses :
-            if self.analyses[analyse]['corpus'] in self.corpora :
-                if 'analyses' in self.history[self.analyses[analyse]['corpus']] :
-                    self.history[self.analyses[analyse]['corpus']]['analyses'].append(self.analyses[analyse])
-                    todel.append(analyse)
-                else :
-                    self.history[self.analyses[analyse]['corpus']]['analyses'] = [self.analyses[analyse]]
-                    todel.append(analyse)
-            else :
-                 self.history[analyse] = self.analyses[analyse]
-        #for analyse in todel :
-        #    del self.analyses[analyse]
-    
-    def write(self) :
-        sections = self.corpora.keys() + self.analyses.keys()
-        parametres = [self.corpora[key] for key in self.corpora.keys()] + [self.analyses[key] for key in self.analyses.keys()]
-        self.conf.makeoptions(sections, parametres)
-        log.info('write history')
+        d = shelve.open(self.filein)
+        self.history = d.get('history', [])
+        self.ordercorpus = dict([[corpus['uuid'], i] for i, corpus in enumerate(self.history)])
+        self.corpus = dict([[corpus['uuid'], corpus] for i, corpus in enumerate(self.history)])
+        self.analyses = dict([[analyse['uuid'], analyse] for corpus in self.history for analyse in corpus.get('analyses', [])])
+        #corpusorder = d.get('corpusorder',[])
+        #self.analyseorder = d['analyseorder']
+        #self.order = [uuid for uuid in self.history]
+        #self.order = dict([[i, uuid] for i, uuid in enumerate(self.order)])
+        #self.order = dict([[i, corpus] for i, corpus in enumerate(corpusorder)])
+        #for uuid in self.history :
+        #    if 'corpus_name' in self.history[uuid] :
+        #        self.corpora[uuid] = self.history[uuid]
+        d.close()
 
+#    def read(self) :
+#        self.conf = DoConf(self.filein)
+#        self.order = {}
+#        self.ordera = {}
+#        for i, section in enumerate(self.conf.conf.sections()) :
+#            if self.conf.conf.has_option(section, 'corpus_name') :
+#                self.corpora[section] = self.conf.getoptions(section)
+#                self.order[len(self.order)] = section
+#            else :
+#                self.analyses[section] = self.conf.getoptions(section)
+#                self.ordera[len(self.ordera)] = section
+#        todel = []
+#        for corpus in self.corpora :
+#            self.history[corpus] = copy(self.corpora[corpus])
+#        for analyse in self.analyses :
+#            if self.analyses[analyse]['corpus'] in self.corpora :
+#                if 'analyses' in self.history[self.analyses[analyse]['corpus']] :
+#                    self.history[self.analyses[analyse]['corpus']]['analyses'].append(self.analyses[analyse])
+#                    todel.append(analyse)
+#                else :
+#                    self.history[self.analyses[analyse]['corpus']]['analyses'] = [self.analyses[analyse]]
+#                    todel.append(analyse)
+#            else :
+#                 self.history[analyse] = self.analyses[analyse]
+#        #for analyse in todel :
+#        #    del self.analyses[analyse]
+    def write(self) :
+        d = shelve.open(self.filein)
+        d['history'] = self.history
+        #order = [i for i in self.order]
+        #order.sort()
+        #d['corpusorder'] = [self.order[i] for i in order]
+        d.close()
+
+    
+#    def write(self) :
+#        sections = self.corpora.keys() + self.analyses.keys()
+#        parametres = [self.corpora[key] for key in self.corpora.keys()] + [self.analyses[key] for key in self.analyses.keys()]
+#        self.conf.makeoptions(sections, parametres)
+#        log.info('write history')
+#
     def add(self, analyse) :
+        log.info('add to history %s' % analyse.get('corpus_name', 'pas un corpus'))
         tosave = {'uuid' : analyse['uuid'], 'ira': analyse['ira'], 'type' : analyse['type']}
         if analyse.get('corpus', False) :
+            if analyse['uuid'] in self.analyses :
+                return
             tosave['corpus'] = analyse['corpus']
             tosave['name'] = analyse['name']
             acorpus_uuid =  analyse['corpus']
-            if acorpus_uuid in self.corpora :
-                if 'analyses' in self.history[acorpus_uuid] :
-                    self.history[acorpus_uuid]['analyses'].append(tosave)
+            if acorpus_uuid in self.ordercorpus :
+                if 'analyses' in self.history[self.ordercorpus[acorpus_uuid]] :
+                    self.history[self.ordercorpus[acorpus_uuid]]['analyses'].append(tosave)
                 else :
-                    self.history[acorpus_uuid]['analyses'] = [tosave]
-                self.analyses[analyse['uuid']] = tosave
+                    self.history[self.ordercorpus[acorpus_uuid]]['analyses'] = [tosave]
+                #self.analyses[analyse['uuid']] = tosave
             else :
-                self.analyses[analyse['uuid']] = tosave
-        elif 'corpus_name' in analyse :
-            tosave['corpus_name'] = analyse['corpus_name']
-            self.history[analyse['uuid']] = tosave
-            self.corpora[analyse['uuid']] = tosave
-        self.write()
-
-    def delete(self, uuid, corpus = False) :
-        if corpus :
-            del self.corpora[uuid]
-            self.conf.conf.remove_section(uuid)
-            for analyse in self.history[uuid].get('analyses', [False]) :
-                if analyse :
-                    del self.analyses[analyse['uuid']]
-                    self.conf.conf.remove_section(analyse['uuid'])
+                self.orph.append(tosave)
+                #self.order[len(self.order)] = analyse['uuid']
+                #self.analyses[analyse['uuid']] = tosave
         else :
-            del self.analyses[uuid]
-            self.conf.conf.remove_section(uuid)
+            tosave['corpus_name'] = analyse['corpus_name']
+            self.history.append(tosave)
+            #self.order[len(self.order)] = analyse['uuid']
+            #self.corpora[analyse['uuid']] = tosave
         self.write()
+        self.read()
+
+    def delete(self, analyse, corpus = False) :
+        if corpus :
+            #del self.history[uuid]
+            self.history.pop(self.ordercorpus[analyse['uuid']])
+            #todel = [i for i in self.order if self.order[i] == uuid]
+            #del self.order[todel[0]]
+            #del self.corpora[uuid]
+            #del self.corpora[uuid]
+            #self.conf.conf.remove_section(uuid)
+            #for analyse in self.history[uuid].get('analyses', [False]) :
+            #    if analyse :
+            #        del self.analyses[analyse['uuid']]
+            #        self.conf.conf.remove_section(analyse['uuid'])
+        else :
+            todel = [i for i, ana in enumerate(self.corpus[analyse['corpus']]['analyses']) if ana['uuid'] == analyse['uuid']][0]
+            self.history[self.ordercorpus[analyse['corpus']]]['analyses'].pop(todel)
+            #del self.analyses[uuid]
+            #self.conf.conf.remove_section(uuid)
+        self.write()
+        self.read()
 
     def addtab(self, analyse) :
         self.opened[analyse['uuid']] = analyse
@@ -143,6 +184,8 @@ class DoConf :
             elif self.conf.get(section, option) == 'True' :
                 parametres[option] = True
             elif self.conf.get(section, option).startswith('(') and self.conf.get(section, option).endswith(')') :
+                parametres[option] = ast.literal_eval(self.conf.get(section, option))
+            elif self.conf.get(section, option).startswith('[') and self.conf.get(section, option).endswith(']') :
                 parametres[option] = ast.literal_eval(self.conf.get(section, option))
             else :
                 parametres[option] = self.conf.get(section, option)

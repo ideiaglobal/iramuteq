@@ -239,7 +239,8 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, vertex.col = 
             par(mar=c(2,2,1,0))
         }
         par(pch=' ')
-        plot(g.toplot,vertex.label='', edge.width=we.width, vertex.size=vertex.size, vertex.color=vertex.col, vertex.label.color='white', edge.label=we.label, edge.label.cex=cex, edge.color=edge.col, vertex.label.cex = 0, layout=lo)
+        plot(g.toplot,vertex.label='', edge.width=we.width, vertex.size=vertex.size, vertex.color=vertex.col, vertex.label.color='white', edge.label=we.label, edge.label.cex=cex, edge.color=edge.col, vertex.label.cex = 0, layout=lo)#, rescale = FALSE)
+        #txt.layout <- lo
         txt.layout <- layout.norm(lo, -1, 1, -1, 1, -1, 1)
         #txt.layout <- txt.layout[order(label.cex),]
         #vertex.label.color <- vertex.label.color[order(label.cex)]

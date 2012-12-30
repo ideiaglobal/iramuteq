@@ -31,21 +31,33 @@ class SimiTxt(AnalyseText):
         #FIXME
         self.actives = self.corpus.make_actives_limit(3)
         dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)]) 
-        SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], dlg = self.dlg)
-        self.makefiles()
+        continu = False
         if self.dlg :
-            prep = PrepSimi(self.ira, self.parametres, indices_simi)
-            self.parametres = prep.parametres
-        script = PrintSimiScript(self)
-        script.make_script()
-        self.doR(script.scriptout)
-        if self.parametres['type_graph'] == 1:
-            if os.path.exists(self.pathout['liste_graph']):
-                graph_simi = read_list_file(self.pathout['liste_graph'])
-                graph_simi.append([os.path.basename(script.filename), script.txtgraph])
-            else :
-                graph_simi = [[os.path.basename(script.filename), script.txtgraph]]
-            print_liste(self.pathout['liste_graph'], graph_simi)
+            #cont = SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], dlg = self.dlg)
+            #if cont.ok :
+            self.listet = self.corpus.make_etoiles()
+            self.listet.sort()
+            self.stars = copy(self.listet)
+            self.parametres['stars'] = copy(self.listet)
+            self.parametres['sfromchi'] = False
+            prep = PrepSimi(self.ira, self, self.parametres, self.pathout['selected.csv'], self.actives, indices_simi, wordlist=dictcol)
+            if prep.val == wx.ID_OK :
+                continu = True
+                self.parametres = prep.parametres
+        if continu :
+            self.makefiles()
+            script = PrintSimiScript(self)
+            script.make_script()
+            self.doR(script.scriptout)
+            if self.parametres['type_graph'] == 1:
+                if os.path.exists(self.pathout['liste_graph']):
+                    graph_simi = read_list_file(self.pathout['liste_graph'])
+                    graph_simi.append([os.path.basename(script.filename), script.txtgraph])
+                else :
+                    graph_simi = [[os.path.basename(script.filename), script.txtgraph]]
+                print_liste(self.pathout['liste_graph'], graph_simi)
+        else : 
+            return False
 
     def preferences(self) :
         dial = StatDialog(self, self.parent)
@@ -107,11 +119,7 @@ class SimiTxt(AnalyseText):
         with open(self.pathout['actives.csv'], 'w') as f :
             f.write('\n'.join(self.actives).encode(self.ira.syscoding))
 
-        self.listet = self.corpus.make_etoiles()
-        self.listet.sort()
-        self.parametres['stars'] = copy(self.listet)
-        self.stars = copy(self.listet)
-        self.parametres['sfromchi'] = False
+
 
 
 
