@@ -205,9 +205,9 @@ class Alceste(AnalyseText) :
 
     def print_graph_files(self) :
         mess_afc = u"La position des points n'est peut être pas exacte"
-        afc_graph_list = [[os.path.basename(self.pathout['AFC2DL_OUT']), u'Variables actives - coordonnées - 30 points par classes - facteurs 1 / 2\n%s' % mess_afc],
-                      [os.path.basename(self.pathout['AFC2DSL_OUT']), u'variables supplémentaires - coordonnées - 30 points par classes - facteurs 1 / 2\n%s' % mess_afc],
-                      [os.path.basename(self.pathout['AFC2DEL_OUT']), u'Variables illustratives - Coordonnées - 30 points par classes - facteur 1 / 2\n%s' % mess_afc],
+        afc_graph_list = [[os.path.basename(self.pathout['AFC2DL_OUT']), u'Variables actives - coordonnées - 30 points par classes - facteurs 1 / 2 - %s' % mess_afc],
+                      [os.path.basename(self.pathout['AFC2DSL_OUT']), u'variables supplémentaires - coordonnées - 30 points par classes - facteurs 1 / 2 - %s' % mess_afc],
+                      [os.path.basename(self.pathout['AFC2DEL_OUT']), u'Variables illustratives - Coordonnées - 30 points par classes - facteur 1 / 2 - %s' % mess_afc],
                       [os.path.basename(self.pathout['AFC2DCL_OUT']), u'Classes - Coordonnées - facteur 1 / 2']]
                       #[os.path.basename(self.pathout['AFC2DCoul']), u'Variables actives - Corrélation - facteur 1 / 2'],
                       #[os.path.basename(self.pathout['AFC2DCoulSup']), u'Variables supplémentaires - Corrélation - facteur 1 / 2'],

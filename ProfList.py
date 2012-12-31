@@ -57,7 +57,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         except ValueError: 
             self.lensup = 0
         self.lenet = len(profclasse) - (self.lenact + self.lensup)
-        print self.lenact, self.lensup, self.lenet
+#        print self.lenact, self.lensup, self.lenet
         for i,  line in enumerate(classen) :
             line[0] = i
         dictdata = dict(zip([i for i in range(0,len(classen))], classen))
@@ -154,7 +154,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 
     def OnItemSelected(self, event):
         self.currentItem = event.m_itemIndex
-        print 'OnItemSelected: "%s", "%s", "%s", "%s"\n' % (self.currentItem, self.GetItemText(self.currentItem), self.getColumnText(self.currentItem, 1), self.getColumnText(self.currentItem, 2))
+        #print 'OnItemSelected: "%s", "%s", "%s", "%s"\n' % (self.currentItem, self.GetItemText(self.currentItem), self.getColumnText(self.currentItem, 1), self.getColumnText(self.currentItem, 2))
         #self.log.WriteText('OnItemSelected: "%s", "%s", "%s", "%s"\n' %
         #                   (self.currentItem,
         #                    self.GetItemText(self.currentItem),
@@ -163,7 +163,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 
     def OnItemActivated(self, event):
         self.currentItem = event.m_itemIndex
-        print "OnItemActivated: %s\nTopItem: %s\n" % (self.GetItemText(self.currentItem), self.GetTopItem())
+        #print "OnItemActivated: %s\nTopItem: %s\n" % (self.GetItemText(self.currentItem), self.GetTopItem())
         #self.log.WriteText("OnItemActivated: %s\nTopItem: %s\n" %
         #                   (self.GetItemText(self.currentItem), self.GetTopItem()))
 
@@ -410,7 +410,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             file.write(txt)
             file.close()
             exec_rcode(self.Source.parent.RPath, tmpscript, wait = True)
-            win = MessageImage(self, -1, u"Graphique", size=(700, 500),style = wx.DEFAULT_FRAME_STYLE)
+            win = MessageImage(self,u"Graphique", size=(700, 500))
             win.addsaveimage(tmpgraph)
             txt = "<img src='%s'>" % tmpgraph
             win.HtmlPage.SetPage(txt)
@@ -641,7 +641,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             #ucestxt = [corpus.make_concord(self.la, ' '.join(uce), 'red') for uce in ucestxt]
             dlg.Update(4, u'texte...')
             #ucis_txt = [' '.join(corpus.ucis[val[1][0]][0]) for val in ntab2]
-            win = message(self, -1, u"UCE caractéristiques - Classe %i" % self.cl, size=(600, 500), style=wx.DEFAULT_FRAME_STYLE)
+            win = message(self, u"UCE caractéristiques - Classe %i" % self.cl, (750, 600))
             win.html = '<html>\n' + '<br><br>'.join(['<br>'.join([ucis_txt[i], 'score : ' + str(ntab2[i][0]), ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
             win.HtmlPage.SetPage(win.html)
             dlg.Destroy()
@@ -670,7 +670,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         file.close()
         
         exec_rcode(self.Source.parent.RPath, tmpscript, wait = True)
-        win = MessageImage(self, -1, u"Graphique", size=(700, 500),style = wx.DEFAULT_FRAME_STYLE)
+        win = MessageImage(self, u"Graphique", size=(700, 500))
         win.addsaveimage(tmpgraph)
         txt = "<img src='%s'>" % tmpgraph
         win.HtmlPage.SetPage(txt)
@@ -714,7 +714,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         file.write(txt)
         file.close()
         exec_rcode(self.Source.parent.RPath, tmpscript, wait = True)
-        win = MessageImage(self, -1, u"Graphique", size=(700, 500),style = wx.DEFAULT_FRAME_STYLE)
+        win = MessageImage(self, u"Graphique", size=(700, 500))
         win.addsaveimage(tmpgraph)
         txt = "<img src='%s'>" % tmpgraph
         win.HtmlPage.SetPage(txt)
@@ -729,7 +729,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             last = self.GetNextSelected(last)
             ListWord.append(self.getColumnText(last, 6))
         listmot = [forme for item in ListWord for forme in corpus.getlems()[item].formes]
-        win = message(self, -1, title, size=(600, 500), style=wx.DEFAULT_FRAME_STYLE)
+        win = message(self, title, size=(750, 600))
         toshow = ['<html>\n<H1>Concordancier</H1>\n']
         toshow.append('<h3><font color=%s>' % color + ' '.join(ListWord) + '</font></h3><br>')
         duce = {}
@@ -1265,7 +1265,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             if ucef != [] :
                 nb = len(ucef)
                 rep.append([corpus.getforme(forme).forme, nb])
-        win = message(self, -1, u"Formes associées", size=(300, 200), style=wx.DEFAULT_FRAME_STYLE)
+        win = message(self, u"Formes associées", wx.Size(300, 200))
         win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
         win.HtmlPage.SetPage(win.html)
         win.Show(True)
@@ -1588,17 +1588,23 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 #    def OnCloseWindow(self, event):
 #        self.Destroy()
 #
-class message(wx.Frame):
-    def __init__(self, *args, **kwds):
-        kwds["style"] = wx.DEFAULT_FRAME_STYLE
-        wx.Frame.__init__(self, *args, **kwds)
+class message(wx.Dialog):
+    def __init__(self, parent, title, size):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_DIALOG_STYLE )
+		
+        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+
+        #kwds["style"] = wx.DEFAULT_FRAME_STYLE
+        #wx.Frame.__init__(self, *args, **kwds)
         self.html = ""
         self.HtmlPage=wx.html.HtmlWindow(self, -1)
+        self.HtmlPage.SetMinSize( size )
         if "gtk2" in wx.PlatformInfo:
             self.HtmlPage.SetStandardFonts()
         self.HtmlPage.SetFonts('Courier','Courier')
-        self.button_1 = wx.Button(self, -1, "Fermer")
-        self.button_2 = wx.Button(self, -1, u"Enregistrer...")
+
+        self.button_1 = wx.Button(self, wx.ID_CANCEL)
+        self.button_2 = wx.Button(self, wx.ID_SAVE)
 
         self.Bind(wx.EVT_BUTTON, self.OnSavePage, self.button_2)
         self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
@@ -1606,15 +1612,21 @@ class message(wx.Frame):
         self.__do_layout()
 
     def __do_layout(self):
-        sizer_1 = wx.BoxSizer(wx.VERTICAL)
+        #sizer_1 = wx.BoxSizer(wx.VERTICAL)
         sizer_2 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2.Add(self.HtmlPage, 1, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
-        sizer_2.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ADJUST_MINSIZE, 0)
-        sizer_2.Add(self.button_2, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ADJUST_MINSIZE, 0)
-        sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
-        self.SetAutoLayout(True)
-        self.SetSizer(sizer_1)
+        sizer_2.Add(self.HtmlPage, 0, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
+        m_sdbSizer1 = wx.StdDialogButtonSizer()
+        m_sdbSizer1.AddButton(  self.button_1 )
+        m_sdbSizer1.AddButton(  self.button_2 )
+        m_sdbSizer1.Realize()
+        #sizer_2.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ADJUST_MINSIZE, 0)
+        #sizer_2.Add(self.button_2, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ADJUST_MINSIZE, 0)
+        #sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
+        sizer_2.Add(m_sdbSizer1, 1, wx.EXPAND, 5)
+        #self.SetAutoLayout(True)
+        self.SetSizer(sizer_2)
         self.Layout()
+        sizer_2.Fit( self )
 
     def OnSavePage(self, evt) :
         dlg = wx.FileDialog(

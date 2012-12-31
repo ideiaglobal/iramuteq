@@ -481,7 +481,7 @@ bibliothèques de R"""
         m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
         self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
         m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
-        m_sdbSizer1.Realize();
+        m_sdbSizer1.Realize()
         bSizer1.Add( m_sdbSizer1, 0, wx.EXPAND, 5 )
         
         self.SetSizer( bSizer1 )

@@ -45,6 +45,8 @@ class GraphPanelAfc(wx.Panel):
         self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "courier"))
         self.labels = []
         self.listimg = []
+        self.buts = []
+        self.list_graph = list_graph
         self.TabCHD = self.parent.GetParent()
         self.nb = self.TabCHD.GetParent()
         self.ira = self.nb.GetParent()
@@ -53,10 +55,15 @@ class GraphPanelAfc(wx.Panel):
         self.butafc = wx.BitmapButton(self, -1, afc_img)
         self.Bind(wx.EVT_BUTTON, self.afc_graph, self.butafc)
         self.dirout = os.path.dirname(self.Dict['ira'])
+        b = 0
         for i in range(0,len(list_graph)):
             if os.path.exists(os.path.join(self.dirout,list_graph[i][0])) :
                 self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
                 self.labels.append(wx.StaticText(self.panel_1, -1, list_graph[i][1]))
+                self.buts.append(wx.Button(self.panel_1, wx.ID_DELETE, name = `i - b`))
+            else :
+                self.list_graph.pop(i)
+                b += 1
                 
         self.param = { 'typegraph' : 0, 
               'width' : 800,
@@ -91,6 +98,7 @@ class GraphPanelAfc(wx.Panel):
         self.panel_1.SetScrollRate(20, 20)
 
     def __do_layout(self):    
+        log.info('do layout')
         self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
         self.sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
         self.sizer_3 = wx.BoxSizer(wx.VERTICAL)
@@ -98,9 +106,36 @@ class GraphPanelAfc(wx.Panel):
         for i in range(0, len(self.listimg)):
             self.sizer_3.Add(self.listimg[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
             self.sizer_3.Add(self.labels[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+            self.sizer_3.Add(self.buts[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+            self.Bind(wx.EVT_BUTTON, self.on_delete_image, self.buts[i])
         self.panel_1.SetSizer(self.sizer_3)
         self.sizer_2.Add(self.panel_1, 1, wx.EXPAND, 0)
         self.SetSizer(self.sizer_2) 
+
+    def on_delete_image(self, event) :
+        image_id = int(event.GetEventObject().GetName())
+        image_path = self.list_graph[image_id][0]
+        message = 'This file will be delete : %s.\nAre you sure ?' % os.path.join(self.dirout, image_path)
+        dial = wx.MessageDialog(self, message, style = wx.YES_NO)
+        res = dial.ShowModal()
+        if res == wx.ID_YES :
+            dial.Destroy()
+            log.info('delete image %i' % image_id)
+            oldimg = self.listimg.pop(image_id)
+            oldimg.Destroy()
+            oldlab = self.labels.pop(image_id)
+            oldlab.Destroy()
+            No = [but.Destroy() for but in self.buts]
+            self.buts = [wx.Button(self.panel_1, wx.ID_DELETE, name = `i`) for i, img in enumerate(self.listimg)]
+            todel = self.list_graph.pop(image_id)
+            os.remove(os.path.join(self.dirout, todel[0]))
+            print_liste(self.Dict[self.itempath], self.list_graph)
+            self.__do_layout()
+            self.sizer_3.Fit(self.panel_1)
+            self.Layout()
+        else :
+            dial.Destroy()
+        
 
     def afc_graph(self,event):
         #dirout = os.path.dirname(self.Dict['ira'])
@@ -181,11 +216,15 @@ class GraphPanelAfc(wx.Panel):
                 if self.param['over'] : txt += u' - Eviter les recouvrements'
                 if self.param['cex_txt'] : txt += u' - taille du texte proportionnel à la masse'
                 if self.param['tchi'] : txt += u' - taille du texte proportionnel au chi2 d\'association'
-                list_graph = read_list_file(self.DictPathOut[self.itempath], self.coding)
-                list_graph.append([self.fileout, txt])
-                print_liste(self.DictPathOut[self.itempath], list_graph)
-                self.sizer_3.Add(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(self.fileout, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-                self.sizer_3.Add(wx.StaticText(self.panel_1,-1, txt), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+                #list_graph = read_list_file(self.DictPathOut[self.itempath], self.coding)
+                self.list_graph.append([self.fileout, txt])
+                print_liste(self.DictPathOut[self.itempath], self.list_graph)
+                self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(self.fileout, wx.BITMAP_TYPE_ANY)))
+                self.sizer_3.Add( self.listimg[-1], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+                self.labels.append(wx.StaticText(self.panel_1,-1, txt))
+                self.sizer_3.Add(self.labels[-1], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+                self.buts.append(wx.Button(self.panel_1, wx.ID_DELETE, name = `len(self.list_graph) - 1`))
+                self.sizer_3.Add(self.buts[-1], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
                 self.sizer_3.Fit(self.panel_1)
                 self.Layout()
     
@@ -269,8 +308,8 @@ class OpenCHDS():
  
        DictProfile = ReadProfileAsDico(self, Profile, Alceste, self.encoding)
        self.DictProfile = DictProfile
-       print 'lecture des antiprofils'
-       DictAnti = ReadProfileAsDico(self, AntiProfile, Alceste, self.encoding)
+       #print 'lecture des antiprofils'
+       #DictAnti = ReadProfileAsDico(self, AntiProfile, Alceste, self.encoding)
 
        panel = wx.Panel(parent, -1)
        sizer1 = wx.BoxSizer(wx.VERTICAL)
@@ -360,7 +399,6 @@ class OpenCHDS():
             dlg.Update(3+i, 'Classe %i' %(i+1))
             ind = '/'.join(DictProfile[str(i + 1)][0][0:2])
             indpour = ' - '.join([ind, DictProfile[str(i + 1)][0][2]])
-            print 'construction liste classe %i' % i
             self.tabprofile = ProfListctrlPanel(self.parent, self, DictProfile[str(i + 1)], Alceste, i + 1)
             #self.tabantiprofile = ProfListctrlPanel(self.parent, self, DictAnti[str(i + 1)], Alceste, i + 1)
             panel.ProfNB.AddPage(self.tabprofile, 'classe %s %s(%s%%)' % (str(i + 1), sep, indpour))
@@ -371,7 +409,7 @@ class OpenCHDS():
 
        if clnb > 2 :
            self.TabAFC = aui.AuiNotebook(panel.TabChdSim, -1, wx.DefaultPosition)
-    
+           log.info('read AFC') 
            list_graph=read_list_file(DictPathOut['liste_graph_afc'], self.encoding)
            self.tabAFCGraph = GraphPanelAfc(self.TabAFC, DictPathOut, list_graph, self.clnb, coding=self.encoding)
            self.TabAFC.AddPage(self.tabAFCGraph, 'AFC')

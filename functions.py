@@ -595,47 +595,51 @@ def read_list_file(filename, encoding = sys.getdefaultencoding()):
         ncontent=[line.replace('\n','').split(';') for line in content if line.strip() != '']
     return ncontent
         
-class MessageImage(wx.Frame):
-    def __init__(self, *args, **kwds):
+class MessageImage(wx.Dialog):
+    def __init__(self, parent,title, size):
         # begin wxGlade: MyFrame.__init__
-        kwds["style"] = wx.DEFAULT_FRAME_STYLE
-        wx.Frame.__init__(self, *args, **kwds)
+       # kwds["style"] = wx.DEFAULT_FRAME_STYLE
+        #wx.Dialog.__init__(self, *args, **kwds)
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_DIALOG_STYLE )
+        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         #self.text_ctrl_1 = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE)
         self.imageFile = False
         self.imagename = u"chi_classe.png"
         self.HtmlPage = wx.html.HtmlWindow(self, -1)
+        self.HtmlPage.SetMinSize(size)
         if "gtk2" in wx.PlatformInfo:
             self.HtmlPage.SetStandardFonts()
         self.HtmlPage.SetFonts('Courier', 'Courier')
         
-        self.button_1 = wx.Button(self, -1, u"Fermer")
+        self.button_1 = wx.Button(self, wx.ID_CANCEL)
+        self.button_2 = wx.Button(self, wx.ID_SAVE)
         self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
-        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
-        self.__do_layout()
+        self.Bind(wx.EVT_BUTTON, self.OnSaveImage, self.button_2)
+        self.do_layout()
         # end wxGlade
 
-    def __do_layout(self):
+    def do_layout(self):
         # begin wxGlade: MyFrame.__do_layout
-        sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        self.sizer_2 = wx.BoxSizer(wx.VERTICAL)
-        self.sizer_2.Add(self.HtmlPage, 1, wx.EXPAND | wx.ADJUST_MINSIZE, 0)
-        self.sizer_2.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ADJUST_MINSIZE, 0)
-        sizer_1.Add(self.sizer_2, 1, wx.EXPAND, 0)
-        self.SetAutoLayout(True)
-        self.SetSizer(sizer_1)
+        self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
+        self.sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
+        self.sizer_1.Add(self.HtmlPage, 0, wx.EXPAND, 0)
+        #self.sizer_2.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ADJUST_MINSIZE, 0)
+        #self.sizer_1.Add(self.sizer_2, 1, wx.EXPAND, 0)
+
+        self.m_sdbSizer1 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer1.AddButton(  self.button_2 )
+        self.m_sdbSizer1.AddButton(  self.button_1 )
+        self.m_sdbSizer1.Realize()
+        self.sizer_1.Add(self.m_sdbSizer1, 0, wx.EXPAND, 5)
+        self.SetSizer(self.sizer_1)
+        self.Layout()
+        self.sizer_1.Fit( self )
         # end wxGlade
 
     def addsaveimage(self, imageFile) :
         self.imageFile = imageFile
-        self.button_2 = wx.Button(self, -1, u"Enregistrer l'image...")
-        self.Bind(wx.EVT_BUTTON, self.OnSaveImage, self.button_2)
-        self.sizer_2.Add(self.button_2, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ADJUST_MINSIZE, 0)
-        self.Layout()
-
+        
     def OnCloseMe(self, event):
-        self.Close(True)
-
-    def OnCloseWindow(self, event):
         self.Destroy()
 
     def OnSaveImage(self, event) :
