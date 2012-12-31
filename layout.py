@@ -56,14 +56,16 @@ class GraphPanelAfc(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.afc_graph, self.butafc)
         self.dirout = os.path.dirname(self.Dict['ira'])
         b = 0
+        todel = []
         for i in range(0,len(list_graph)):
             if os.path.exists(os.path.join(self.dirout,list_graph[i][0])) :
                 self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
                 self.labels.append(wx.StaticText(self.panel_1, -1, list_graph[i][1]))
                 self.buts.append(wx.Button(self.panel_1, wx.ID_DELETE, name = `i - b`))
             else :
-                self.list_graph.pop(i)
+                todel.append(i)
                 b += 1
+        self.list_graph = [graph for i, graph in enumerate(self.list_graph) if i not in todel]
                 
         self.param = { 'typegraph' : 0, 
               'width' : 800,
