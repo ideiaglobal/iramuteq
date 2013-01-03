@@ -1645,7 +1645,6 @@ class SearchDial ( wx.Dialog ):
             cl = first_forme[1] - 1
             profile.ProfNB.SetSelection(cl)
             profile.ProfNB.GetPage(cl).SetFocus()
-            print profile.ProfNB.GetPage(cl)
             UnSelectList(profile.ProfNB.GetPage(cl))
             datas = dict([[profile.ProfNB.GetPage(cl).getColumnText(i,6),i] for i in range(profile.ProfNB.GetPage(cl).GetItemCount())])
             profile.ProfNB.GetPage(cl).SetItemState(datas[first_forme[0]], wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)

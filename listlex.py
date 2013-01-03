@@ -211,28 +211,31 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         win.HtmlPage.SetPage(txt)
         win.Show(True)
 
+    def getinf(self, txt) :
+        if txt == float('Inf') :
+            return 'Inf'
+        elif txt == float('-Inf') :
+            return '-Inf'
+        else :
+            return `txt`
+
     def OnPopupThree(self, event) :
-        print self.GetFirstSelected()
         datas = [self.GetItemData(self.GetFirstSelected())]
-        print datas
         last = self.GetFirstSelected()
         while self.GetNextSelected(last) != -1:
             last = self.GetNextSelected(last)
             data = self.GetItemData(last)
             datas += [data]
         colnames = self.first[1:]
-        table = [[str(val) for val in line[1:]] for line in datas]
+        table = [[self.getinf(val) for val in line[1:]] for line in datas]
         rownames = [val[0] for val in datas]
         tmpgraph = tempfile.mktemp(dir=self.parent.TEMPDIR)
-
         txt = barplot(table, rownames, colnames, self.parent.RscriptsPath['Rgraph'], tmpgraph)
-
         tmpscript = tempfile.mktemp(dir=self.parent.TEMPDIR)
-        file = open(tmpscript,'w')
-        file.write(txt)
-        file.close()
+        with open(tmpscript,'w') as f :
+            f.write(txt)
         exec_rcode(self.parent.RPath, tmpscript, wait = True)
-        win = MessageImage(self, -1, u"Graphique", size=(700, 500),style = wx.DEFAULT_FRAME_STYLE)
+        win = MessageImage(self, u"Graphique", size=(700, 500))
         win.addsaveimage(tmpgraph)
         txt = "<img src='%s'>" % tmpgraph
         win.HtmlPage.SetPage(txt)

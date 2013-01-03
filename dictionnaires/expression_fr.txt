@@ -28,10 +28,6 @@ ad vitam aeternam	ad_vitam_aeternam	ADV			0	0.2	0	0.2
 adjudant-chef	adjudant_chef	NOM	m	s	2.57	2.7	2.57	2.57	
 adjudant-major	adjudant_major	NOM	m	s	0.05	0	0.05	0	
 adjudants-chefs	adjudant_chef	NOM	m	p	2.57	2.7	0	0.14	
-afin d	afin_d	PRE			0.04	0.07	0.04	0.07	
-afin de	afin_de	PRE			15.64	43.18	15.64	43.18	
-afin qu	afin_qu	CON			0.05	0	0.05	0	
-afin que	afin_que	CON			9.63	14.93	9.63	14.93	
 afro-américain	afro_américain	NOM	m	s	0.95	0	0.48	0	
 afro-américaine	afro_américain	ADJ	f	s	0.67	0	0.23	0	
 afro-américains	afro_américain	NOM	m	p	0.95	0	0.39	0	

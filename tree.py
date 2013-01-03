@@ -20,7 +20,7 @@ class InfoDialog ( wx.Dialog ):
     def __init__( self, parent, txt, parametres ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Informations", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         
-        self.SetSizeHintsSz( wx.Size( 400,200 ), wx.DefaultSize )
+        self.SetSizeHintsSz( wx.Size( 500,200 ), wx.DefaultSize )
         
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
         
@@ -42,16 +42,21 @@ class InfoDialog ( wx.Dialog ):
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
+        txtctrl = []
         for val in parametres :
             fgSizer1.Add( wx.StaticText( self.m_panel1, wx.ID_ANY, val[0], wx.DefaultPosition, wx.DefaultSize, 0 ), 0, wx.ALL, 0)
-            fgSizer1.Add( wx.StaticText( self.m_panel1, wx.ID_ANY, val[1], wx.DefaultPosition, wx.DefaultSize, 0 ), 0, wx.ALL, 0)
+            #fgSizer1.Add( wx.StaticText( self.m_panel1, wx.ID_ANY, val[1], wx.DefaultPosition, wx.DefaultSize, 0 ), 0, wx.ALL, 0)
+            txtctrl.append( wx.TextCtrl( self.m_panel1, wx.ID_ANY, val[1], wx.DefaultPosition, (500, 20), wx.TE_READONLY ) )
+            txtctrl[-1].SetBackgroundColour('#DDE8EB')
+            #wx.SystemSettings.GetColour(wx.SYS_COLOUR_GRAYTEXT))
+            fgSizer1.Add( txtctrl[-1], 0, wx.ALL|wx.EXPAND, 0)
             fgSizer1.Add( wx.StaticLine( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL ), 0, wx.EXPAND |wx.ALL, 0)
             fgSizer1.Add( wx.StaticLine( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL ), 0, wx.EXPAND|wx.ALL, 0)
 
         self.m_panel1.SetSizer( fgSizer1 )
         self.m_panel1.Layout()
         fgSizer1.Fit( self.m_panel1 )
-        bSizer1.Add( self.m_panel1, 0, wx.EXPAND |wx.ALL, 3 )
+        bSizer1.Add( self.m_panel1, 0, wx.EXPAND|wx.ALL, 3 )
         
         m_sdbSizer1 = wx.StdDialogButtonSizer()
         self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )

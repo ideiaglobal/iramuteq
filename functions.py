@@ -48,57 +48,13 @@ class History :
         self.ordercorpus = dict([[corpus['uuid'], i] for i, corpus in enumerate(self.history)])
         self.corpus = dict([[corpus['uuid'], corpus] for i, corpus in enumerate(self.history)])
         self.analyses = dict([[analyse['uuid'], analyse] for corpus in self.history for analyse in corpus.get('analyses', [])])
-        #corpusorder = d.get('corpusorder',[])
-        #self.analyseorder = d['analyseorder']
-        #self.order = [uuid for uuid in self.history]
-        #self.order = dict([[i, uuid] for i, uuid in enumerate(self.order)])
-        #self.order = dict([[i, corpus] for i, corpus in enumerate(corpusorder)])
-        #for uuid in self.history :
-        #    if 'corpus_name' in self.history[uuid] :
-        #        self.corpora[uuid] = self.history[uuid]
         d.close()
 
-#    def read(self) :
-#        self.conf = DoConf(self.filein)
-#        self.order = {}
-#        self.ordera = {}
-#        for i, section in enumerate(self.conf.conf.sections()) :
-#            if self.conf.conf.has_option(section, 'corpus_name') :
-#                self.corpora[section] = self.conf.getoptions(section)
-#                self.order[len(self.order)] = section
-#            else :
-#                self.analyses[section] = self.conf.getoptions(section)
-#                self.ordera[len(self.ordera)] = section
-#        todel = []
-#        for corpus in self.corpora :
-#            self.history[corpus] = copy(self.corpora[corpus])
-#        for analyse in self.analyses :
-#            if self.analyses[analyse]['corpus'] in self.corpora :
-#                if 'analyses' in self.history[self.analyses[analyse]['corpus']] :
-#                    self.history[self.analyses[analyse]['corpus']]['analyses'].append(self.analyses[analyse])
-#                    todel.append(analyse)
-#                else :
-#                    self.history[self.analyses[analyse]['corpus']]['analyses'] = [self.analyses[analyse]]
-#                    todel.append(analyse)
-#            else :
-#                 self.history[analyse] = self.analyses[analyse]
-#        #for analyse in todel :
-#        #    del self.analyses[analyse]
     def write(self) :
         d = shelve.open(self.filein)
         d['history'] = self.history
-        #order = [i for i in self.order]
-        #order.sort()
-        #d['corpusorder'] = [self.order[i] for i in order]
         d.close()
-
     
-#    def write(self) :
-#        sections = self.corpora.keys() + self.analyses.keys()
-#        parametres = [self.corpora[key] for key in self.corpora.keys()] + [self.analyses[key] for key in self.analyses.keys()]
-#        self.conf.makeoptions(sections, parametres)
-#        log.info('write history')
-#
     def add(self, analyse) :
         log.info('add to history %s' % analyse.get('corpus_name', 'pas un corpus'))
         tosave = {'uuid' : analyse['uuid'], 'ira': analyse['ira'], 'type' : analyse['type']}
@@ -113,37 +69,20 @@ class History :
                     self.history[self.ordercorpus[acorpus_uuid]]['analyses'].append(tosave)
                 else :
                     self.history[self.ordercorpus[acorpus_uuid]]['analyses'] = [tosave]
-                #self.analyses[analyse['uuid']] = tosave
             else :
                 self.orph.append(tosave)
-                #self.order[len(self.order)] = analyse['uuid']
-                #self.analyses[analyse['uuid']] = tosave
         else :
             tosave['corpus_name'] = analyse['corpus_name']
             self.history.append(tosave)
-            #self.order[len(self.order)] = analyse['uuid']
-            #self.corpora[analyse['uuid']] = tosave
         self.write()
         self.read()
 
     def delete(self, analyse, corpus = False) :
         if corpus :
-            #del self.history[uuid]
             self.history.pop(self.ordercorpus[analyse['uuid']])
-            #todel = [i for i in self.order if self.order[i] == uuid]
-            #del self.order[todel[0]]
-            #del self.corpora[uuid]
-            #del self.corpora[uuid]
-            #self.conf.conf.remove_section(uuid)
-            #for analyse in self.history[uuid].get('analyses', [False]) :
-            #    if analyse :
-            #        del self.analyses[analyse['uuid']]
-            #        self.conf.conf.remove_section(analyse['uuid'])
         else :
             todel = [i for i, ana in enumerate(self.corpus[analyse['corpus']]['analyses']) if ana['uuid'] == analyse['uuid']][0]
             self.history[self.ordercorpus[analyse['corpus']]]['analyses'].pop(todel)
-            #del self.analyses[uuid]
-            #self.conf.conf.remove_section(uuid)
         self.write()
         self.read()
 
@@ -226,8 +165,12 @@ class DoConf :
         for val in parametres :
             if isinstance(parametres[val], int) :
                 txt.append(' \t\t: '.join([val, `parametres[val]`]))
-            else :
+            elif isinstance(parametres[val], basestring) :
                 txt.append(' \t\t: '.join([val, parametres[val]]))
+            elif val in ['listet', 'stars'] :
+                pass
+            else :
+                txt.append(' \t\t: '.join([val, `parametres[val]`]))
         return '\n'.join(txt)
 
 
@@ -485,9 +428,12 @@ def ReadDicoAsDico(dicopath):
             dico[line[0]] = line[1:]
     return dico
 
-def ReadLexique(parent, lang = 'french'):
+def ReadLexique(parent, lang = 'french', filein = None):
     if lang != 'other' :
-        parent.lexique = ReadDicoAsDico(parent.DictPath.get(lang, 'french'))
+        if filein is None :
+            parent.lexique = ReadDicoAsDico(parent.DictPath.get(lang, 'french'))
+        else :
+            parent.lexique = ReadDicoAsDico(filein)
     else :
         parent.lexique = {}
 
@@ -518,7 +464,7 @@ def ReadList(filein, encoding = sys.getdefaultencoding()):
     return dict, first
 
 def exec_rcode(rpath, rcode, wait = True, graph = False):
-    print rpath, rcode
+    log.info("R Script : %s" % rcode)
     needX11 = False
     if sys.platform == 'darwin' :
         try :
@@ -597,12 +543,8 @@ def read_list_file(filename, encoding = sys.getdefaultencoding()):
         
 class MessageImage(wx.Dialog):
     def __init__(self, parent,title, size):
-        # begin wxGlade: MyFrame.__init__
-       # kwds["style"] = wx.DEFAULT_FRAME_STYLE
-        #wx.Dialog.__init__(self, *args, **kwds)
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_DIALOG_STYLE )
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
-        #self.text_ctrl_1 = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE)
         self.imageFile = False
         self.imagename = u"chi_classe.png"
         self.HtmlPage = wx.html.HtmlWindow(self, -1)
@@ -616,15 +558,11 @@ class MessageImage(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
         self.Bind(wx.EVT_BUTTON, self.OnSaveImage, self.button_2)
         self.do_layout()
-        # end wxGlade
 
     def do_layout(self):
-        # begin wxGlade: MyFrame.__do_layout
         self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
         self.sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.sizer_1.Add(self.HtmlPage, 0, wx.EXPAND, 0)
-        #self.sizer_2.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ADJUST_MINSIZE, 0)
-        #self.sizer_1.Add(self.sizer_2, 1, wx.EXPAND, 0)
+        self.sizer_1.Add(self.HtmlPage, 2, wx.EXPAND, 0)
 
         self.m_sdbSizer1 = wx.StdDialogButtonSizer()
         self.m_sdbSizer1.AddButton(  self.button_2 )
@@ -634,7 +572,6 @@ class MessageImage(wx.Dialog):
         self.SetSizer(self.sizer_1)
         self.Layout()
         self.sizer_1.Fit( self )
-        # end wxGlade
 
     def addsaveimage(self, imageFile) :
         self.imageFile = imageFile

@@ -996,11 +996,9 @@ class BuildCorpus :
 
 
 class BuildFromAlceste(BuildCorpus) :
-    #def __init___(self, infile, parametres_corpus) :
-    #    BuildCorpus.__init__(self, infile, parametres_corpus)
-
-
     def read_corpus(self, infile) :
+        if self.dlg is not None :
+            self.dlg.Pulse('textes : 0 - segments : 0')
         self.limitshow = 0
         self.count = 1
         if self.corpus.parametres['ucimark'] == 0 :
@@ -1011,11 +1009,9 @@ class BuildFromAlceste(BuildCorpus) :
         iduci = -1
         idpara = -1
         iduce = -1
-        linenb = 0
         try :
             with codecs.open(infile, 'r', self.encoding) as f :
-                for line in f :
-                    linenb += 1
+                for linenb, line in enumerate(f) :
                     line = line.rstrip('\n\r')
                     if self.testuci(line) :
                         iduci += 1
@@ -1026,9 +1022,14 @@ class BuildFromAlceste(BuildCorpus) :
                         else :
                             if iduci > 0 :
                                 if self.corpus.ucis[-1].uces == [] :
-                                    log.info('linenb : %i' % linenb)
-                                    raise Exception("EmptyText %i" % linenb)
+                                    log.info(u'Empty text : %i' % linenb)
+                                    iduci -= 1
+                                    self.corpus.ucis.pop()
+                                    #raise Exception("EmptyText %i" % linenb)
                             self.corpus.ucis.append(Uci(iduci, line))
+                        if self.dlg is not None :
+                            if not (iduci + 1) % 10 :
+                                self.dlg.Pulse('textes : %i - segments : %i' % (iduci + 1, iduce +1))
                     elif line.startswith(u'-*') :
                         if iduci != -1 :
                             if txt != [] :
@@ -1048,7 +1049,7 @@ class BuildFromAlceste(BuildCorpus) :
             if iduci != -1  and iduce != -1:
                 self.backup_uce()
             else : 
-                log.info(_(u"No Texte in corpora. Are you sure of the formatting ?"))
+                log.info(_(u"No Text in corpora. Are you sure of the formatting ?"))
                 raise Exception('TextBeforeTextMark')
         except UnicodeDecodeError :
             raise Exception("CorpusEncoding")
@@ -1076,13 +1077,13 @@ class BuildFromAlceste(BuildCorpus) :
             for word in uce :
                 self.last += 1
                 self.corpus.add_word(word)
-        if self.dlg is not None :
-            if self.limitshow > self.count :
-                self.dlg.Pulse('uci: %i - uce : %i' % (iduci + 1, iduce +1))
-                self.count += 1
-                self.limitshow = 0
-            else :
-                self.limitshow = self.last / 100000
+        #if self.dlg is not None :
+        #    if self.limitshow > self.count :
+        #        self.dlg.Pulse('textes : %i - segments : %i' % (iduci + 1, iduce +1))
+        #        self.count += 1
+        #        self.limitshow = 0
+        #    else :
+        #        self.limitshow = self.last / 100000
         log.debug(' '.join([`iduci`,`idpara`,`iduce`]))
         if self.last > self.lim :
             self.backup_uce()

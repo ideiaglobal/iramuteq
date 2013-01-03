@@ -237,10 +237,10 @@ class Lexico(AnalyseText) :
             else :
                 self.parametres['indice'] = 'chi2'
             self.parametres['clnb'] = len(ListEt)
-            if dial.checklem.GetValue() :
-                self.parametres['lem'] = 1 
-            else :
-                self.parametres['lem'] = 0
+            #if dial.checklem.GetValue() :
+            #    self.parametres['lem'] = 1 
+            #else :
+            #    self.parametres['lem'] = 0
             dial.Destroy()
             return self.parametres
         else :

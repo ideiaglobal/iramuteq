@@ -33,7 +33,6 @@ import agw.aui as aui
 import wx.html
 import wx.grid
 import wx.lib.hyperlink as hl
-#from wx.lib.wordwrap import wordwrap
 #------------------------------------
 from functions import BugReport, PlaySound, ReadLexique, History, DoConf, ReadDicoAsDico, progressbar
 from checkversion import NewVersion
@@ -103,9 +102,7 @@ if sys.platform == 'darwin' :
 else :
     sys.setdefaultencoding(locale.getpreferredencoding())
 #chemin de l'application
-#print 'ATTENTION APPLIPATH'
 AppliPath = os.path.abspath(os.path.dirname(os.path.realpath(sys.argv[0])))
-#AppliPath = '/home/pierre/workspace/iramuteqNG'
 #chemin des images
 ImagePath = os.path.join(AppliPath, 'images')
 #configuration generale
@@ -121,24 +118,15 @@ UserConfigPath = os.path.abspath(os.path.join(user_home, '.iramuteq'))
 #Si pas de fichiers de config utilisateur, on cree le repertoire
 CreateIraDirectory(UserConfigPath, AppliPath)
 #fichiers log pour windows (py2exe)
-print 'PLUS DE LOG !!!!!!!!!!'
-print 'LOGGING TEST'
 log = logging.getLogger('iramuteq')
 fh = logging.FileHandler(os.path.join(UserConfigPath,'stdout.log'))
 ch = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 fh.setFormatter(formatter)
 log.addHandler(ch)
 log.addHandler(fh)
 log.setLevel(logging.INFO)
-#debug = False
-#if not debug :
-#    if sys.platform == 'win32' or sys.platform == 'darwin':
-#        sys.stdout = open(os.path.join(UserConfigPath,'stdout.log'), 'w')
-#        sys.stderr = open(os.path.join(UserConfigPath,'stderr.log'), 'w')
-#chemin des fichiers de configuration utilisateur
-#print sys.argv[0]
 ConfigPath = ConstructConfigPath(UserConfigPath)
 #####################################################################
 
@@ -515,7 +503,6 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
             self._mgr.UnInit()
             del self._mgr
             self.Destroy()
-            ##FIXME
             #if sys.platform == 'win32' :
             #    os.system("taskkill /im iramuteq.exe /f")
             #    print 'meurtre de process'
@@ -769,21 +756,6 @@ Voulez-vous fermer quand même ?"""
     def OnAcceuil(self, event):
         self.ShowAPane(u"Intro_Text")
         event.Skip()
-    #???
-#    def OnCreateTab(self, event):
-#        if not self._mgr.GetPane("Tab_content").name == "Tab_content":
-#            self._mgr.AddPane(self.CreateTabCtrl(), aui.AuiPaneInfo().
-#                              Name("Tab_content").
-#                              CenterPane())
-#            self._mgr.GetPane("Intro_Text").Hide()
-#            self._mgr.GetPane("Tab_content").Show()
-#            self.ctrl.Bind(aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self.OnCloseTab)
-#        else :
-#            page = wx.TextCtrl(self, -1, str(text), style=wx.TE_MULTILINE)
-#            self.ctrl.AddPage(page, "qsdqsd")
-#            self.ctrl.SetSelection(self.ctrl.GetPageCount() - 1)
-#        self._mgr.Update()
-    
     
     def CreateHTMLCtrl(self):
         ctrl = wx.html.HtmlWindow(self, -1, wx.DefaultPosition, wx.Size(400, 300))
@@ -1096,9 +1068,9 @@ class MySplashScreen(wx.SplashScreen):
         bmp = wx.Image(os.path.join(ImagePath, 'splash.png')).ConvertToBitmap()
         wx.SplashScreen.__init__(self, bmp,
                                  wx.SPLASH_CENTRE_ON_SCREEN | wx.SPLASH_TIMEOUT,
-                                 1000, None, -1)
+                                 2000, None, -1)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
-        self.fc = wx.FutureCall(1500, self.ShowMain)
+        self.fc = wx.FutureCall(1, self.ShowMain)
 
     def OnClose(self, evt):
         evt.Skip()

@@ -535,9 +535,17 @@ def barplot(table, rownames, colnames, rgraph, tmpgraph, intxt = False) :
     if not intxt :
         #FIXME
         txt = """
-            inf <- NA
             di <- matrix(data=%s, nrow=%i, byrow = TRUE)
-            di[is.na(di)] <- max(di, na.rm=TRUE) + 2
+            toinf <- which(di == Inf)
+            tominf <- which(di == -Inf)
+            if (length(toinf)) {
+                di[toinf] <- NA
+                di[toinf] <- max(di, na.rm = TRUE) + 2
+            }
+            if (length(tominf)) {
+                di[tominf] <- NA
+                di[tominf] <- min(di, na.rm = TRUE) - 2
+            }
             rownames(di)<- %s
             colnames(di) <- %s
         """ % (txttable, rownb, rownames, colnames)
@@ -553,7 +561,20 @@ def barplot(table, rownames, colnames, rgraph, tmpgraph, intxt = False) :
     	par(mar=c(0,0,0,0))
 	    layout(matrix(c(1,2),1,2, byrow=TRUE),widths=c(3,lcm(7)))
         par(mar=c(2,2,1,0))
-        coord <- barplot(as.matrix(di), beside = TRUE, col = color, space = c(0.1,0.6))
+        yp = ifelse(length(toinf), 0.2, 0)
+        ym = ifelse(length(tominf), 0.2, 0)
+        ymin <- ifelse(!length(which(di < 0)), 0, min(di) - ym)
+        coord <- barplot(as.matrix(di), beside = TRUE, col = color, space = c(0.1,0.6), ylim=c(ymin, max(di) + yp))
+        if (length(toinf)) {
+            coordinf <- coord[toinf]
+            valinf <- di[toinf]
+            text(x=coordinf, y=valinf + 0.1, 'i')
+        }
+        if (length(tominf)) {
+            coordinf <- coord[toinf]
+            valinf <- di[toinf]
+            text(x=coordinf, y=valinf - 0.1, 'i')
+        }            
         c <- colMeans(coord)
         c1 <- c[-1]
         c2 <- c[-length(c)]
