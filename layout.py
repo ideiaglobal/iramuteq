@@ -127,12 +127,19 @@ class GraphPanelAfc(wx.Panel):
             oldimg.Destroy()
             oldlab = self.labels.pop(image_id)
             oldlab.Destroy()
-            No = [but.Destroy() for but in self.buts]
-            self.buts = [wx.Button(self.panel_1, wx.ID_DELETE, name = `i`) for i, img in enumerate(self.listimg)]
+            oldbut = self.buts.pop(image_id)
+            oldbut.Show(False)
+            #No = [but.Destroy() for but in self.buts]
+            #self.buts = [wx.Button(self.panel_1, wx.ID_DELETE, name = `i`) for i, img in enumerate(self.listimg)]
+            for i, but in enumerate(self.buts) :
+                but.SetName(`i`)
             todel = self.list_graph.pop(image_id)
             os.remove(os.path.join(self.dirout, todel[0]))
             print_liste(self.Dict[self.itempath], self.list_graph)
-            self.__do_layout()
+            #self.sizer_1.Destroy()
+            #self.sizer_2.Destroy()
+            #self.sizer_3.Destroy()
+            #self.__do_layout()
             self.sizer_3.Fit(self.panel_1)
             self.Layout()
         else :

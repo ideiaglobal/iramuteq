@@ -35,7 +35,7 @@ class FileOptionDialog(wx.Dialog):
         self.PostCreate(pre)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        grid_sizer = wx.FlexGridSizer(5, 2, 2, 2)
+        grid_sizer = wx.FlexGridSizer(0, 2, 2, 2)
 ##############################
 
         label = wx.StaticText(self, -1, u"La première ligne contient les noms de colonne")
@@ -379,7 +379,7 @@ class PrefDialog ( wx.Dialog ):
         
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
         
-        fgSizer1 = wx.FlexGridSizer( 4, 3, 0, 0 )
+        fgSizer1 = wx.FlexGridSizer( 0, 3, 0, 0 )
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
@@ -706,13 +706,13 @@ au chi2 d'association de la forme"""
 
     def __do_layout(self):
         sizer_2 = wx.BoxSizer(wx.VERTICAL)
-        fsizer = wx.FlexGridSizer(12,2,0,5)
-        grid_min = wx.FlexGridSizer(1, 2, 0, 0)
-        grid_max = wx.FlexGridSizer(1, 2, 0, 0)
-        grid_minmax = wx.FlexGridSizer(1, 2, 0, 0)
-        grid_min_tchi = wx.FlexGridSizer(1, 2, 0, 0)
-        grid_max_tchi = wx.FlexGridSizer(1, 2, 0, 0)
-        grid_minmax_tchi = wx.FlexGridSizer(1, 2, 0, 0)
+        fsizer = wx.FlexGridSizer(0,2,0,5)
+        grid_min = wx.FlexGridSizer(0, 2, 0, 0)
+        grid_max = wx.FlexGridSizer(0, 2, 0, 0)
+        grid_minmax = wx.FlexGridSizer(0, 2, 0, 0)
+        grid_min_tchi = wx.FlexGridSizer(0, 2, 0, 0)
+        grid_max_tchi = wx.FlexGridSizer(0, 2, 0, 0)
+        grid_minmax_tchi = wx.FlexGridSizer(0, 2, 0, 0)
 
         sizer_3 = wx.BoxSizer(wx.VERTICAL)
         
@@ -778,7 +778,7 @@ au chi2 d'association de la forme"""
         
         sizer_2.Add(fsizer, 0, wx.EXPAND, 0)
         
-        bsizer_1 = wx.FlexGridSizer(3,3,0,0)
+        bsizer_1 = wx.FlexGridSizer(0,3,0,0)
         bsizer_1.Add(self.label_7, 0, wx.ALL | wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
         bsizer_1.Add(self.check4, 0, wx.ALL | wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5)
         grid_min.Add(self.label_min, 0,wx.ALL |  wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL, 5)
@@ -821,7 +821,7 @@ au chi2 d'association de la forme"""
         
         sizer_2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND, 5)
         
-        fsizer2 = wx.FlexGridSizer(2,2,0,0)
+        fsizer2 = wx.FlexGridSizer(0,2,0,0)
         fsizer2.Add(self.label_sphere, 0, wx.ALL | wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
         fsizer2.Add(self.slider_sphere, 0, wx.ALL | wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
         fsizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND, 0)
@@ -1097,7 +1097,7 @@ class StatDialog(wx.Dialog):
 
     def __do_layout(self) :
         first = wx.BoxSizer(wx.VERTICAL)
-        sizer = wx.FlexGridSizer(4,2,0,0)
+        sizer = wx.FlexGridSizer(0,2,0,0)
         sizer.Add(self.label_lem, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT, 5)
         sizer.Add(self.radio_lem, 0, wx.ALIGN_LEFT, 5)
         sizer.Add(wx.StaticLine(self),0, wx.ALIGN_LEFT, 5)
@@ -1168,7 +1168,7 @@ class LexDialog( wx.Dialog ):
         
         bSizer2 = wx.BoxSizer( wx.VERTICAL )
         
-        fgSizer2 = wx.FlexGridSizer( 2, 2, 0, 0 )
+        fgSizer2 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer2.SetFlexibleDirection( wx.BOTH )
         fgSizer2.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
@@ -1212,7 +1212,7 @@ class PrefUCECarac(wx.Dialog):
         wx.Dialog.__init__(self, *args, **kwds)
         self.parent = parent
         first = wx.BoxSizer(wx.VERTICAL)
-        sizer = wx.FlexGridSizer(2,2,0,0)
+        sizer = wx.FlexGridSizer(0,2,0,0)
         self.label_type = wx.StaticText(self, -1, u"Score de classement")
         sizer.Add(self.label_type, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT, 5)
         self.radio_type = wx.RadioBox(self, -1, u"", choices=[u'absolu (somme des chi2 des formes marquées de l\'UCE)', u'relatif (moyenne des chi2 des formes marquées de l\'UCE)'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
@@ -1243,7 +1243,7 @@ class PrefSegProf(wx.Dialog) :
         self.label = wx.StaticText( self, wx.ID_ANY, txt, wx.DefaultPosition, wx.DefaultSize, 0 ) 
         bSizer1.Add( self.label, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
 
-        fgSizer1 = wx.FlexGridSizer( 2, 2, 0, 0 )
+        fgSizer1 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
@@ -1314,7 +1314,7 @@ class PrefQuestAlc ( wx.Dialog ):
         #---------------------------------------------------------------
         bSizer2 = wx.BoxSizer( wx.VERTICAL )
         
-        fgSizer1 = wx.FlexGridSizer( 2, 2, 0, 0 )
+        fgSizer1 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
@@ -1738,7 +1738,7 @@ class OptLexi(wx.Dialog):
     def __do_layout(self):
         # begin wxGlade: MyDialog.__do_layout
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2 = wx.FlexGridSizer(2,2,0,0)
+        sizer_2 = wx.FlexGridSizer(0,2,0,0)
         sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
         #sizer_2.Add(self.labellem, 0, wx.ALIGN_CENTER_VERTICAL, 3)
         #sizer_2.Add(self.checklem, 0, wx.ALIGN_CENTER_VERTICAL, 3)
@@ -2445,3 +2445,56 @@ class CorpusPref ( wx.Dialog ):
                 else :
                     parametres[val] = 0
         return parametres
+
+class message(wx.Dialog):
+    def __init__(self, parent, title, size, save = True):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_DIALOG_STYLE )
+	self.save = save	
+        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+
+        self.html = ""
+        self.HtmlPage=wx.html.HtmlWindow(self, -1)
+        self.HtmlPage.SetMinSize( size )
+        if "gtk2" in wx.PlatformInfo:
+            self.HtmlPage.SetStandardFonts()
+        self.HtmlPage.SetFonts('Courier','Courier')
+
+        self.button_1 = wx.Button(self, wx.ID_CANCEL)
+
+        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
+        if self.save :
+            self.button_2 = wx.Button(self, wx.ID_SAVE)
+            self.Bind(wx.EVT_BUTTON, self.OnSavePage, self.button_2)
+        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
+        self.__do_layout()
+
+    def __do_layout(self):
+        sizer_2 = wx.BoxSizer(wx.VERTICAL)
+        sizer_2.Add(self.HtmlPage, 0, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
+        m_sdbSizer1 = wx.StdDialogButtonSizer()
+        m_sdbSizer1.AddButton(  self.button_1 )
+        if self.save :
+            m_sdbSizer1.AddButton(  self.button_2 )
+        m_sdbSizer1.Realize()
+        sizer_2.Add(m_sdbSizer1, 1, wx.EXPAND, 5)
+        self.SetSizer(sizer_2)
+        self.Layout()
+        sizer_2.Fit( self )
+
+    def OnSavePage(self, evt) :
+        dlg = wx.FileDialog(
+            self, message="Enregistrer sous...", defaultDir=os.getcwd(),
+            defaultFile="concordancier.html", wildcard="html|*.html", style=wx.SAVE | wx.OVERWRITE_PROMPT
+            )
+        dlg.SetFilterIndex(2)
+        dlg.CenterOnParent()
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+            with open(path, 'w') as f :
+                f.write(self.html)
+
+    def OnCloseMe(self, event):
+        self.Close(True)
+
+    def OnCloseWindow(self, event):
+        self.Destroy()

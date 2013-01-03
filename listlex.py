@@ -169,7 +169,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         menu.Destroy()
 
     def getselectedwords(self) :
-        words = [self.getColumnText(self.GetFirstSelected(), 6)]
+        words = [self.getColumnText(self.GetFirstSelected(), 0)]
         last = self.GetFirstSelected()
         while self.GetNextSelected(last) != -1:
             last = self.GetNextSelected(last)

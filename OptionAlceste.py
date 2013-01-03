@@ -76,7 +76,7 @@ analysée (2 = automatique)"""
     def __do_layout(self):
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
         sizer_2 = wx.BoxSizer(wx.VERTICAL)
-        grid_sizer2 = wx.FlexGridSizer(15, 2, 0, 0)
+        grid_sizer2 = wx.FlexGridSizer(0, 2, 0, 0)
         grid_button = wx.FlexGridSizer(1, 3, 0, 0)
         
         #grid_sizer2.Add(self.label_dict, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)

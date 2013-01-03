@@ -19,6 +19,7 @@ import  wx.lib.mixins.listctrl  as  listmix
 import cStringIO
 import tempfile
 from functions import exec_rcode, MessageImage
+from dialog import message
 from chemins import ffr
 from PrintRScript import barplot, dendroandbarplot
 #---------------------------------------------------------------------------
@@ -80,7 +81,6 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         self.SetItemCount(len(dlist))
         listmix.ColumnSorterMixin.__init__(self, len(first)+2)
 
-        self.SortListItems(0, True)
         
 #-----------------------------------------------------------------------------------------    
 
@@ -92,6 +92,8 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         for i in range(1,len(first)-1):
             self.SetColumnWidth(i, 130)
         
+        self.SortListItems(0, True)
+
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
     def GetListCtrl(self):
         return self
@@ -202,7 +204,7 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         rep = []
         for forme in lems[word] :
              rep.append([forme, corpus.formes[forme][0]])
-        win = message(self, -1, u"Formes associées", size=(300, 200), style=wx.DEFAULT_FRAME_STYLE)
+        win = message(self, u"Formes associées", size=(300, 200))
         win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
         win.HtmlPage.SetPage(win.html)
         win.Show(True)
@@ -212,7 +214,7 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         page = self.parent.nb.GetPage(activenotebook)
         item=self.getColumnText(self.GetFirstSelected(), 0)
         corpus = page.corpus
-        win = message(self, -1, u"Concordancier", size=(600, 200),style = wx.DEFAULT_FRAME_STYLE)
+        win = message(self, u"Concordancier", size=(600, 200))
         avap=60
         listmot = corpus.lems[item]
         uce_ok = [corpus.formes[forme][1] for forme in listmot]
@@ -275,7 +277,7 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         with open(tmpscript,'w') as f :
             f.write(txt)
         exec_rcode(self.parent.parent.RPath, tmpscript, wait = True)
-        win = MessageImage(self, -1, u"Graphique", size=(700, 500),style = wx.DEFAULT_FRAME_STYLE)
+        win = MessageImage(self, u"Graphique", size=(700, 500))
         win.addsaveimage(tmpgraph)
         txt = "<img src='%s'>" % tmpgraph
         win.HtmlPage.SetPage(txt)
@@ -298,77 +300,77 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         with open(tmpscript,'w') as f :
             f.write(txt)
         exec_rcode(self.parent.parent.RPath, tmpscript, wait = True)
-        win = MessageImage(self, -1, u"Graphique", size=(700, 500),style = wx.DEFAULT_FRAME_STYLE)
+        win = MessageImage(self, u"Graphique", size=(700, 500))
         win.addsaveimage(tmpgraph)
         txt = "<img src='%s'>" % tmpgraph
         win.HtmlPage.SetPage(txt)
         win.Show(True)
 
-class message(wx.Frame):
-    def __init__(self, *args, **kwds):
-        # begin wxGlade: MyFrame.__init__
-        kwds["style"] = wx.DEFAULT_FRAME_STYLE
-        wx.Frame.__init__(self, *args, **kwds)
-        self.HtmlPage=wx.html.HtmlWindow(self, -1)
-        if "gtk2" in wx.PlatformInfo:
-            self.HtmlPage.SetStandardFonts()
-        self.HtmlPage.SetFonts('Courier','Courier')
-        
-        
-        self.button_1 = wx.Button(self, -1, "Fermer")
-        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
-        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
-        self.__do_layout()
-        # end wxGlade
-
-    def __do_layout(self):
-        # begin wxGlade: MyFrame.__do_layout
-        sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2.Add(self.HtmlPage, 1, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
-        sizer_2.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ADJUST_MINSIZE, 0)
-        sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
-        self.SetAutoLayout(True)
-        self.SetSizer(sizer_1)
-        self.Layout()
-        # end wxGlade
-        
-    def OnCloseMe(self, event):
-        self.Close(True)
-
-    def OnCloseWindow(self, event):
-        self.Destroy()
-
-
-def getSmallUpArrowData():
-    return \
-'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x10\x00\x00\x00\x10\x08\x06\
-\x00\x00\x00\x1f\xf3\xffa\x00\x00\x00\x04sBIT\x08\x08\x08\x08|\x08d\x88\x00\
-\x00\x00<IDAT8\x8dcddbf\xa0\x040Q\xa4{h\x18\xf0\xff\xdf\xdf\xffd\x1b\x00\xd3\
-\x8c\xcf\x10\x9c\x06\xa0k\xc2e\x08m\xc2\x00\x97m\xd8\xc41\x0c \x14h\xe8\xf2\
-\x8c\xa3)q\x10\x18\x00\x00R\xd8#\xec\xb2\xcd\xc1Y\x00\x00\x00\x00IEND\xaeB`\
-\x82' 
-
-def getSmallUpArrowBitmap():
-    return wx.BitmapFromImage(getSmallUpArrowImage())
-
-def getSmallUpArrowImage():
-    stream = cStringIO.StringIO(getSmallUpArrowData())
-    return wx.ImageFromStream(stream)
-
-#----------------------------------------------------------------------
-def getSmallDnArrowData():
-    return \
-"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x10\x00\x00\x00\x10\x08\x06\
-\x00\x00\x00\x1f\xf3\xffa\x00\x00\x00\x04sBIT\x08\x08\x08\x08|\x08d\x88\x00\
-\x00\x00HIDAT8\x8dcddbf\xa0\x040Q\xa4{\xd4\x00\x06\x06\x06\x06\x06\x16t\x81\
-\xff\xff\xfe\xfe'\xa4\x89\x91\x89\x99\x11\xa7\x0b\x90%\ti\xc6j\x00>C\xb0\x89\
-\xd3.\x10\xd1m\xc3\xe5*\xbc.\x80i\xc2\x17.\x8c\xa3y\x81\x01\x00\xa1\x0e\x04e\
-?\x84B\xef\x00\x00\x00\x00IEND\xaeB`\x82" 
-
-def getSmallDnArrowBitmap():
-    return wx.BitmapFromImage(getSmallDnArrowImage())
-
-def getSmallDnArrowImage():
-    stream = cStringIO.StringIO(getSmallDnArrowData())
-    return wx.ImageFromStream(stream)
+#class message(wx.Dialog):
+#    def __init__(self, *args, **kwds):
+#        # begin wxGlade: MyFrame.__init__
+#        kwds["style"] = wx.DEFAULT_FRAME_STYLE
+#        wx.Frame.__init__(self, *args, **kwds)
+#        self.HtmlPage=wx.html.HtmlWindow(self, -1)
+#        if "gtk2" in wx.PlatformInfo:
+#            self.HtmlPage.SetStandardFonts()
+#        self.HtmlPage.SetFonts('Courier','Courier')
+#        
+#        
+#        self.button_1 = wx.Button(self, -1, "Fermer")
+#        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
+#        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
+#        self.__do_layout()
+#        # end wxGlade
+#
+#    def __do_layout(self):
+#        # begin wxGlade: MyFrame.__do_layout
+#        sizer_1 = wx.BoxSizer(wx.VERTICAL)
+#        sizer_2 = wx.BoxSizer(wx.VERTICAL)
+#        sizer_2.Add(self.HtmlPage, 1, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
+#        sizer_2.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ADJUST_MINSIZE, 0)
+#        sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
+#        self.SetAutoLayout(True)
+#        self.SetSizer(sizer_1)
+#        self.Layout()
+#        # end wxGlade
+#        
+#    def OnCloseMe(self, event):
+#        self.Close(True)
+#
+#    def OnCloseWindow(self, event):
+#        self.Destroy()
+#
+#
+#def getSmallUpArrowData():
+#    return \
+#'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x10\x00\x00\x00\x10\x08\x06\
+#\x00\x00\x00\x1f\xf3\xffa\x00\x00\x00\x04sBIT\x08\x08\x08\x08|\x08d\x88\x00\
+#\x00\x00<IDAT8\x8dcddbf\xa0\x040Q\xa4{h\x18\xf0\xff\xdf\xdf\xffd\x1b\x00\xd3\
+#\x8c\xcf\x10\x9c\x06\xa0k\xc2e\x08m\xc2\x00\x97m\xd8\xc41\x0c \x14h\xe8\xf2\
+#\x8c\xa3)q\x10\x18\x00\x00R\xd8#\xec\xb2\xcd\xc1Y\x00\x00\x00\x00IEND\xaeB`\
+#\x82' 
+#
+#def getSmallUpArrowBitmap():
+#    return wx.BitmapFromImage(getSmallUpArrowImage())
+#
+#def getSmallUpArrowImage():
+#    stream = cStringIO.StringIO(getSmallUpArrowData())
+#    return wx.ImageFromStream(stream)
+#
+##----------------------------------------------------------------------
+#def getSmallDnArrowData():
+#    return \
+#"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x10\x00\x00\x00\x10\x08\x06\
+#\x00\x00\x00\x1f\xf3\xffa\x00\x00\x00\x04sBIT\x08\x08\x08\x08|\x08d\x88\x00\
+#\x00\x00HIDAT8\x8dcddbf\xa0\x040Q\xa4{\xd4\x00\x06\x06\x06\x06\x06\x16t\x81\
+#\xff\xff\xfe\xfe'\xa4\x89\x91\x89\x99\x11\xa7\x0b\x90%\ti\xc6j\x00>C\xb0\x89\
+#\xd3.\x10\xd1m\xc3\xe5*\xbc.\x80i\xc2\x17.\x8c\xa3y\x81\x01\x00\xa1\x0e\x04e\
+#?\x84B\xef\x00\x00\x00\x00IEND\xaeB`\x82" 
+#
+#def getSmallDnArrowBitmap():
+#    return wx.BitmapFromImage(getSmallDnArrowImage())
+#
+#def getSmallDnArrowImage():
+#    stream = cStringIO.StringIO(getSmallDnArrowData())
+#    return wx.ImageFromStream(stream)

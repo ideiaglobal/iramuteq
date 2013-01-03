@@ -20,7 +20,7 @@ import  wx.lib.mixins.listctrl  as  listmix
 from tabsimi import DoSimi
 from listlex import ListForSpec
 from chemins import ConstructPathOut, ffr
-from dialog import PrefExport, PrefUCECarac, SearchDial
+from dialog import PrefExport, PrefUCECarac, SearchDial, message
 from tableau import Tableau
 from search_tools import SearchFrame
 import webbrowser
@@ -1593,53 +1593,55 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 #    def OnCloseWindow(self, event):
 #        self.Destroy()
 #
-class message(wx.Dialog):
-    def __init__(self, parent, title, size):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_DIALOG_STYLE )
-		
-        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
-
-        self.html = ""
-        self.HtmlPage=wx.html.HtmlWindow(self, -1)
-        self.HtmlPage.SetMinSize( size )
-        if "gtk2" in wx.PlatformInfo:
-            self.HtmlPage.SetStandardFonts()
-        self.HtmlPage.SetFonts('Courier','Courier')
-
-        self.button_1 = wx.Button(self, wx.ID_CANCEL)
-        self.button_2 = wx.Button(self, wx.ID_SAVE)
-
-        self.Bind(wx.EVT_BUTTON, self.OnSavePage, self.button_2)
-        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
-        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
-        self.__do_layout()
-
-    def __do_layout(self):
-        sizer_2 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2.Add(self.HtmlPage, 0, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
-        m_sdbSizer1 = wx.StdDialogButtonSizer()
-        m_sdbSizer1.AddButton(  self.button_1 )
-        m_sdbSizer1.AddButton(  self.button_2 )
-        m_sdbSizer1.Realize()
-        sizer_2.Add(m_sdbSizer1, 1, wx.EXPAND, 5)
-        self.SetSizer(sizer_2)
-        self.Layout()
-        sizer_2.Fit( self )
-
-    def OnSavePage(self, evt) :
-        dlg = wx.FileDialog(
-            self, message="Enregistrer sous...", defaultDir=os.getcwd(),
-            defaultFile="concordancier.html", wildcard="html|*.html", style=wx.SAVE | wx.OVERWRITE_PROMPT
-            )
-        dlg.SetFilterIndex(2)
-        dlg.CenterOnParent()
-        if dlg.ShowModal() == wx.ID_OK:
-            path = dlg.GetPath()
-            with open(path, 'w') as f :
-                f.write(self.html)
-
-    def OnCloseMe(self, event):
-        self.Close(True)
-
-    def OnCloseWindow(self, event):
-        self.Destroy()
+#class message(wx.Dialog):
+#    def __init__(self, parent, title, size, save = True):
+#        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_DIALOG_STYLE )
+#	self.save = save	
+#        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+#
+#        self.html = ""
+#        self.HtmlPage=wx.html.HtmlWindow(self, -1)
+#        self.HtmlPage.SetMinSize( size )
+#        if "gtk2" in wx.PlatformInfo:
+#            self.HtmlPage.SetStandardFonts()
+#        self.HtmlPage.SetFonts('Courier','Courier')
+#
+#        self.button_1 = wx.Button(self, wx.ID_CANCEL)
+#
+#        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
+#        if self.save :
+#            self.button_2 = wx.Button(self, wx.ID_SAVE)
+#            self.Bind(wx.EVT_BUTTON, self.OnSavePage, self.button_2)
+#        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
+#        self.__do_layout()
+#
+#    def __do_layout(self):
+#        sizer_2 = wx.BoxSizer(wx.VERTICAL)
+#        sizer_2.Add(self.HtmlPage, 0, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
+#        m_sdbSizer1 = wx.StdDialogButtonSizer()
+#        m_sdbSizer1.AddButton(  self.button_1 )
+#        if self.save :
+#            m_sdbSizer1.AddButton(  self.button_2 )
+#        m_sdbSizer1.Realize()
+#        sizer_2.Add(m_sdbSizer1, 1, wx.EXPAND, 5)
+#        self.SetSizer(sizer_2)
+#        self.Layout()
+#        sizer_2.Fit( self )
+#
+#    def OnSavePage(self, evt) :
+#        dlg = wx.FileDialog(
+#            self, message="Enregistrer sous...", defaultDir=os.getcwd(),
+#            defaultFile="concordancier.html", wildcard="html|*.html", style=wx.SAVE | wx.OVERWRITE_PROMPT
+#            )
+#        dlg.SetFilterIndex(2)
+#        dlg.CenterOnParent()
+#        if dlg.ShowModal() == wx.ID_OK:
+#            path = dlg.GetPath()
+#            with open(path, 'w') as f :
+#                f.write(self.html)
+#
+#    def OnCloseMe(self, event):
+#        self.Close(True)
+#
+#    def OnCloseWindow(self, event):
+#        self.Destroy()

@@ -7,13 +7,8 @@ Usage:
 
 from setuptools import setup
 import os
-DATA_FILES=['configuration','Rscripts','images','dictionnaires','locale','son_fin.wav']
-#DATA_FILES=[]
-#for rep in replist :
-#	DATA_FILES+=os.listdir(rep)
-print DATA_FILES
+DATA_FILES=['configuration','Rscripts','images','dictionnaires','locale', 'Rlib','son_fin.wav']
 APP = ['iramuteq.py']
-#DATA_FILES = ['-r', 'configuration*,Rscripts/*']
 OPTIONS = {'argv_emulation': True,
 	'iconfile':('images/iraicone.icns')}
 
