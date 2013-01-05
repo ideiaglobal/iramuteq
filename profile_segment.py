@@ -64,7 +64,6 @@ class ProfileSegment() :
     def do_layout(self) :
         SelectTab = self.parent.nb.GetSelection()
         page = self.parent.nb.GetPage(SelectTab).TabChdSim
-        print page
         prof_seg = ReadProfileAsDico(self, self.dictpathout['prof_seg'], True, self.parent.syscoding)
         prof_seg_nb = aui.AuiNotebook(self.parent, -1, wx.DefaultPosition)
         for i in range(0,len(self.corpus.lc)) :
@@ -74,9 +73,10 @@ class ProfileSegment() :
         page.SetSelection(page.GetPageCount() - 1)
 
 class ProfilType() :
-    def __init__(self, parent, corpus) :
+    def __init__(self, parent, corpus, parametres) :
         self.parent = parent
         self.corpus = corpus
+        self.parametres = parametres
         self.outprof = self.corpus.dictpathout['prof_type']
         dial = PrefProfTypes(self.parent)
         dial.fbb.SetValue(self.outprof)
@@ -87,10 +87,10 @@ class ProfilType() :
                 alceste = True
             else :
                 alceste = False
-            if 'outprof' in self.corpus.parametre :
-                self.corpus.parametre['outprof'][self.outprof] = alceste
-            else :
-                self.corpus.parametre['outprof'] = {self.outprof: alceste}
+            #if 'outprof' in self.corpus.parametre :
+            #    self.corpus.parametre['outprof'][self.outprof] = alceste
+            #else :
+            #    self.corpus.parametre['outprof'] = {self.outprof: alceste}
             self.dlg = progressbar(self, maxi = 4)
             self.dlg.Update(1, u'Recherche des types')
             self.make_table()
@@ -102,7 +102,7 @@ class ProfilType() :
             self.dlg.Destroy()
     
     def make_table(self) :
-        self.corpus.prof_type()
+        self.corpus.make_proftype(self.corpus.dictpathout['type_cl'])
 
     def make_prof(self, alceste = True) :
         txt = """

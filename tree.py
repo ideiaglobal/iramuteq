@@ -5,21 +5,28 @@
 #Lisense: GNU GPL
 
 import wx
+import os
+import webbrowser
 import wx.lib.agw.customtreectrl as CT
 import logging
 from openanalyse import OpenAnalyse
 from corpusNG import Corpus, copycorpus
-from functions import DoConf
-
+from functions import DoConf, GetTxtProfile
+from profile_segment import ProfileSegment, ProfilType
+from search_tools import SearchFrame
+from dialog import PrefSimpleFile, PrefExport
+from layout import open_antiprofil
 
 log = logging.getLogger('iramuteq.tree')
-#from agw import customtreectrl as CT
 
 class InfoDialog ( wx.Dialog ):
     
     def __init__( self, parent, txt, parametres ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Informations", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
-        
+        if len(parametres) > 30 :
+            nb = 4
+        else :
+            nb = 2       
         self.SetSizeHintsSz( wx.Size( 500,200 ), wx.DefaultSize )
         
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
@@ -38,7 +45,8 @@ class InfoDialog ( wx.Dialog ):
         bSizer1.Add( self.m_panel2, 0, wx.EXPAND |wx.ALL, 5 )
         
         self.m_panel1 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-        fgSizer1 = wx.FlexGridSizer( 0, 2, 0, 0 )
+
+        fgSizer1 = wx.FlexGridSizer( 0, nb, 0, 0 )
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
@@ -46,12 +54,12 @@ class InfoDialog ( wx.Dialog ):
         for val in parametres :
             fgSizer1.Add( wx.StaticText( self.m_panel1, wx.ID_ANY, val[0], wx.DefaultPosition, wx.DefaultSize, 0 ), 0, wx.ALL, 0)
             #fgSizer1.Add( wx.StaticText( self.m_panel1, wx.ID_ANY, val[1], wx.DefaultPosition, wx.DefaultSize, 0 ), 0, wx.ALL, 0)
-            txtctrl.append( wx.TextCtrl( self.m_panel1, wx.ID_ANY, val[1], wx.DefaultPosition, (500, 20), wx.TE_READONLY ) )
+            txtctrl.append( wx.TextCtrl( self.m_panel1, wx.ID_ANY, val[1], wx.DefaultPosition, (450, 20), wx.TE_READONLY ) )
             txtctrl[-1].SetBackgroundColour('#DDE8EB')
             #wx.SystemSettings.GetColour(wx.SYS_COLOUR_GRAYTEXT))
             fgSizer1.Add( txtctrl[-1], 0, wx.ALL|wx.EXPAND, 0)
-            fgSizer1.Add( wx.StaticLine( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL ), 0, wx.EXPAND |wx.ALL, 0)
-            fgSizer1.Add( wx.StaticLine( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL ), 0, wx.EXPAND|wx.ALL, 0)
+            #fgSizer1.Add( wx.StaticLine( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL ), 0, wx.EXPAND |wx.ALL, 0)
+            #fgSizer1.Add( wx.StaticLine( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL ), 0, wx.EXPAND|wx.ALL, 0)
 
         self.m_panel1.SetSizer( fgSizer1 )
         self.m_panel1.Layout()
@@ -100,14 +108,6 @@ class LeftTree(CT.CustomTreeCtrl):
         
         il = wx.ImageList(16, 16)
 
-#        for items in ArtIDs[1:-1]:
-#            bmp = wx.ArtProvider_GetBitmap(eval(items), wx.ART_TOOLBAR, (16, 16))
-#            il.Add(bmp)
-
-#        smileidx = il.Add(images.Smiles.GetBitmap())
-#        numicons = il.GetImageCount()
-
-        #self.AssignImageList(il)
         self.count = 0
         self.log = log
 
@@ -120,46 +120,12 @@ class LeftTree(CT.CustomTreeCtrl):
             self.SetItemImage(self.root, 24, CT.TreeItemIcon_Normal)
             self.SetItemImage(self.root, 13, CT.TreeItemIcon_Expanded)
 
-        #textctrl = wx.TextCtrl(self, -1, "I Am A Simple\nMultiline wx.TexCtrl", style=wx.TE_MULTILINE)
-        #self.gauge = wx.Gauge(self, -1, 50, style=wx.GA_HORIZONTAL|wx.GA_SMOOTH)
-        #self.gauge.SetValue(0)
-        #combobox = wx.ComboBox(self, -1, choices=["That", "Was", "A", "Nice", "Holyday!"], style=wx.CB_READONLY|wx.CB_DROPDOWN)
-
-        #textctrl.Bind(wx.EVT_CHAR, self.OnTextCtrl)
-        #combobox.Bind(wx.EVT_COMBOBOX, self.OnComboBox)
-        #lenArtIds = len(ArtIDs) - 2
         for corpus in self.h :
-            #if 'corpus_name' in self.h[self.history.order[x]] :
-            #    key = 'corpus_name'
-            #else :
-            #    key = 'name'
             child = self.AppendItem(self.root, corpus['corpus_name'])
-            #if x == 1:
-            #    child = self.AppendItem(self.root, "Item %d" % x + "\nHello World\nHappy wxPython-ing!")
-            #    self.SetItemBold(child, True)
-            #else:
-            #    child = self.AppendItem(self.root, "Item %d" % x)
             self.SetPyData(child, corpus)
             self.SetItemImage(child, 24, CT.TreeItemIcon_Normal)
             self.SetItemImage(child, 13, CT.TreeItemIcon_Expanded)
 
-            #if random.randint(0, 3) == 0:
-            #    self.SetItemLeftImage(child, random.randint(0, lenArtIds))
-
-            #for y in range(5):
-            #    if y == 0 and x == 1:
-            #        last = self.AppendItem(child, "item %d-%s" % (x, chr(ord("a")+y)), ct_type=2, wnd=self.gauge)
-            #    elif y == 1 and x == 2:
-            #        last = self.AppendItem(child, "Item %d-%s" % (x, chr(ord("a")+y)), ct_type=1, wnd=textctrl)
-            #        if random.randint(0, 3) == 1:
-            #            self.SetItem3State(last, True)
-            #            
-            #    elif 2 < y < 4:
-            #        last = self.AppendItem(child, "item %d-%s" % (x, chr(ord("a")+y)))
-            #    elif y == 4 and x == 1:
-            #        last = self.AppendItem(child, "item %d-%s" % (x, chr(ord("a")+y)), wnd=combobox)
-            #    else:
-           # if 'corpus_name' in self.h[self.history.order[x]] :
             if 'analyses' in corpus :
                 for y in corpus['analyses'] :
                     last = self.AppendItem(child, y['name'], ct_type=0)
@@ -168,27 +134,6 @@ class LeftTree(CT.CustomTreeCtrl):
                     self.SetItemImage(last, 24, CT.TreeItemIcon_Normal)
                     self.SetItemImage(last, 13, CT.TreeItemIcon_Expanded)
     
-            #    if random.randint(0, 3) == 0:
-            #        self.SetItemLeftImage(last, random.randint(0, lenArtIds))
-                    
-            #for z in range(len(self.history[x]) - 1):
-
-#                if z > 2:
-#                    item = self.AppendItem(last,  "item %d-%s-%d" % (x, chr(ord("a")+y), z), ct_type=0)
-#                    #if random.randint(0, 3) == 1:
-#                    #    self.SetItem3State(item, True)
-#                elif 0 < z <= 2:
-#                    item = self.AppendItem(last,  "item %d-%s-%d" % (x, chr(ord("a")+y), z), ct_type=0)
-#                elif z == 0:
-#                    item = self.AppendItem(last,  "item %d-%s-%d" % (x, chr(ord("a")+y), z))
-#                    #self.SetItemHyperText(item, True)
-#                self.SetPyData(item, None)
-#                self.SetItemImage(item, 28, CT.TreeItemIcon_Normal)
-#                self.SetItemImage(item, 28, CT.TreeItemIcon_Selected)
-
-             #       if random.randint(0, 3) == 0:
-             #           self.SetItemLeftImage(item, random.randint(0, lenArtIds))
-
         self.Bind(wx.EVT_LEFT_DCLICK, self.OnLeftDClick)
         #self.Bind(wx.EVT_IDLE, self.OnIdle)
 
@@ -206,8 +151,8 @@ class LeftTree(CT.CustomTreeCtrl):
         mainframe = wx.GetTopLevelParent(self)
         
         if not hasattr(mainframe, "leftpanel"):
-            self.Bind(CT.EVT_TREE_ITEM_EXPANDED, self.OnItemExpanded)
-            self.Bind(CT.EVT_TREE_ITEM_COLLAPSED, self.OnItemCollapsed)
+            #self.Bind(CT.EVT_TREE_ITEM_EXPANDED, self.OnItemExpanded)
+            #self.Bind(CT.EVT_TREE_ITEM_COLLAPSED, self.OnItemCollapsed)
             self.Bind(CT.EVT_TREE_SEL_CHANGED, self.OnSelChanged)
             self.Bind(CT.EVT_TREE_SEL_CHANGING, self.OnSelChanging)
             self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
@@ -385,6 +330,30 @@ class LeftTree(CT.CustomTreeCtrl):
             self.Bind(wx.EVT_MENU, self.OnSpec, spec)
             self.Bind(wx.EVT_MENU, self.OnSimiTxt, simi)
             self.Bind(wx.EVT_MENU, self.OnWordCloud, wdc)
+        elif pydata.get('type', False) == 'alceste'  and pydata['uuid'] in self.parent.history.opened :
+            openmenu = wx.Menu()
+            antipro = openmenu.Append(wx.ID_ANY, u"antiprofils")
+            menu.AppendMenu(wx.ID_ANY, u"Ouvrir...", openmenu)
+
+            profsr = menu.Append(wx.ID_ANY, u"Profils des segments répétés")
+            profgram = menu.Append(wx.ID_ANY, u"Profils des types")
+            export_corpus = menu.Append(wx.ID_ANY, u"Exporter le corpus")
+            colored = menu.Append(wx.ID_ANY, u"Corpus en couleur")
+            navig = menu.Append(wx.ID_ANY, u"Outil de navigation")
+            statclasse = menu.Append(wx.ID_ANY, u"Statistiques par classe")
+            rapport = menu.Append(wx.ID_ANY, u"Rapport")
+            
+            menu.AppendSeparator()
+            
+            self.Bind(wx.EVT_MENU, self.OpenAntipro, antipro)
+            self.Bind(wx.EVT_MENU, self.OnProfSR, profsr)
+            self.Bind(wx.EVT_MENU, self.OnProfGram, profgram)
+            self.Bind(wx.EVT_MENU, self.OnExportCorpus, export_corpus)
+            self.Bind(wx.EVT_MENU, self.OnColored, colored)
+            self.Bind(wx.EVT_MENU, self.OnNavig, navig)
+            self.Bind(wx.EVT_MENU, self.StatClasse, statclasse)
+            self.Bind(wx.EVT_MENU, self.OnRapport, rapport)
+
 
         itemdelete = menu.Append(wx.ID_ANY, "Supprimer de l'historique")
         if item == self.GetRootItem():
@@ -431,6 +400,98 @@ class LeftTree(CT.CustomTreeCtrl):
 
     def OnWordCloud(self, evt) :
         self.parent.OnWordCloud(evt, self.getcorpus(self.itemdict))
+
+    def OnProfSR(self, evt) :
+        ProfileSegment(self.parent, self.page.dictpathout, self.page.parametres, self.page.corpus)
+
+    def OnProfGram(self, evt) :
+        ProfilType(self.parent, self.page.corpus, self.page.parametres)
+
+    def OnExportCorpus(self, evt) :
+        dial = PrefExport(self, self.parent)
+        dial.fbb.SetValue(os.path.join(os.path.dirname(self.page.dictpathout['ira']), 'export_corpus.txt'))
+        dial.CenterOnParent()
+        res = dial.ShowModal()
+        if res == wx.ID_OK :
+            if dial.radio_type.GetSelection() == 0 : alc = True
+            else : alc = False
+            if dial.radio_lem.GetSelection() == 0 : lem = True
+            else : lem = False
+            self.page.corpus.export_corpus_classes(dial.fbb.GetValue(), alc = alc, lem = lem)
+            msg = u"Fini !"
+            dial.Destroy()
+            dlg = wx.MessageDialog(self.parent, msg, u"Export", wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+            dlg.CenterOnParent()
+            dlg.ShowModal()
+            dlg.Destroy()
+
+    def OnColored(self, evt) :
+        dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.html', 'title': 'Corpus en couleur'})
+        dial.fbb.SetValue(os.path.join(os.path.dirname(self.page.dictpathout['ira']), 'corpus_couleur.html'))
+        dial.CenterOnParent()
+        res = dial.ShowModal()
+        if res == wx.ID_OK :
+            fileout = dial.fbb.GetValue()
+            dial.Destroy()
+            txt = self.page.corpus.make_colored_corpus()
+            with open(fileout, 'w') as f :
+                f.write(txt)
+            msg = u"Fini !\nVoulez-vous ouvrir le corpus dans votre navigateur ?"
+            dlg = wx.MessageDialog(self.parent, msg, u"Corpus en couleur", wx.NO | wx.YES | wx.NO_DEFAULT | wx.ICON_QUESTION)
+            dlg.CenterOnParent()
+            if dlg.ShowModal() == wx.ID_YES :
+                webbrowser.open(fileout)
+            dlg.Destroy()
+
+    def OnNavig(self, evt):
+        if 'FrameSearch' not in dir(self.page) :
+            self.page.FrameSearch = SearchFrame(self.parent, -1, u"Rechercher...", self.page.corpus)
+        self.page.FrameSearch.Show()
+
+    def StatClasse(self, evt):
+        dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.csv', 'title': 'Stat par classe'})
+        dial.fbb.SetValue( os.path.join(os.path.dirname(self.page.dictpathout['ira']), 'stat_par_classe.csv'))
+        dial.CenterOnParent()
+        res = dial.ShowModal()
+        if res == wx.ID_OK :
+            fileout = dial.fbb.GetValue()
+            dial.Destroy()
+            self.page.corpus.get_stat_by_cluster(fileout)
+            msg = u"Fini !"
+            dlg = wx.MessageDialog(self.parent, msg, u"Stat par classe", wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+            dlg.CenterOnParent()
+            if dlg.ShowModal() == wx.ID_OK :
+                dlg.Destroy()        
+
+    def OpenAntipro(self, evt) :
+        find = False
+        for i in range(0, self.page.TabChdSim.GetPageCount()) :
+            page = self.page.TabChdSim.GetPage(i)
+            if self.page.TabChdSim.GetPageText(i) == 'Antiprofils' :
+                self.page.TabChdSim.SetSelection(i)
+                find = True
+                break
+        if not find :
+            open_antiprofil(self.page, self.page.dictpathout['ANTIPRO_OUT'], self.parent.syscoding)
+            self.page.TabChdSim.SetSelection(self.page.TabChdSim.GetPageCount() - 1)
+
+    def OnRapport(self, evt) :
+        dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.txt', 'title': 'Rapport'})
+        dial.fbb.SetValue(self.page.dictpathout['rapport'])
+        dial.CenterOnParent()
+        res = dial.ShowModal()
+        if res == wx.ID_OK :
+            fileout = dial.fbb.GetValue()
+            dial.Destroy()
+            with open(fileout, 'w') as f :
+                f.write(self.page.debtext + '\n' + GetTxtProfile(self.page.DictProfile, self.page.cluster_size))
+            msg = u"Fini !"
+            dlg = wx.MessageDialog(self.parent, msg, u"Rapport", wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+            dlg.CenterOnParent()
+            dlg.ShowModal()
+            dlg.Destroy()
+        else :
+            dial.Destroy()
 
     def OnItemBackground(self, event):
 
@@ -545,6 +606,7 @@ class LeftTree(CT.CustomTreeCtrl):
             itemtype = "RadioButton"
 
         dlg = InfoDialog(self, itemtext, parametres)
+        dlg.CenterOnParent()
         dlg.ShowModal()
         dlg.Destroy()
                 
@@ -674,6 +736,7 @@ class LeftTree(CT.CustomTreeCtrl):
         else :
             OpenAnalyse(self.parent, pydata)
             self.SetItemBold(item, True)
+            self.OnSelChanged(pydata = pydata)
         #if item and (flags & CT.TREE_HITTEST_ONITEMLABEL):
         #    if self.GetAGWWindowStyleFlag() & CT.TR_EDIT_LABELS:
         #        self.log.info("OnLeftDClick: %s (manually starting label edit)"% self.GetItemText(item) + "\n")
@@ -719,26 +782,20 @@ class LeftTree(CT.CustomTreeCtrl):
         event.Skip()
 
         
-    def OnSelChanged(self, event):
-        item = event.GetItem()
-        pydata = self.GetPyData(item)
+    def OnSelChanged(self, event = None, pydata = None):
+        if event is not None :
+            item = event.GetItem()
+            pydata = self.GetPyData(item)
         if pydata is not None :
             if pydata['uuid'] in self.parent.history.opened :
                 for i in range(self.parent.nb.GetPageCount()) :
-                    page = self.parent.nb.GetPage(i)
-                    if 'parametres' in dir(page) :
-                        if page.parametres['uuid'] == pydata['uuid'] :
+                    self.page = self.parent.nb.GetPage(i)
+                    if 'parametres' in dir(self.page) :
+                        if self.page.parametres['uuid'] == pydata['uuid'] :
                             self.parent.nb.SetSelection(i)
                             break
-
-        #self.item = event.GetItem()
-        #if self.item:
-        #    self.
-            #self.log.info("OnSelChanged: %s" % self.GetItemText(self.item))
-        #    if wx.Platform == '__WXMSW__':
-               # self.log.info(", BoundingRect: %s" % self.GetBoundingRect(self.item, True) + "\n")
-       #        pass
-        event.Skip()
+        if event is not None :
+            event.Skip()
 
 
     def OnSelChanging(self, event):
@@ -751,7 +808,7 @@ class LeftTree(CT.CustomTreeCtrl):
                 olditemtext = "None"
             else:
                 olditemtext = self.GetItemText(olditem)
-            self.log.info("OnSelChanging: From %s" % olditemtext + " To %s" % self.GetItemText(item) + "\n")
+            #self.log.info("OnSelChanging: From %s" % olditemtext + " To %s" % self.GetItemText(item) + "\n")
                 
         event.Skip()
 

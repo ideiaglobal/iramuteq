@@ -540,11 +540,23 @@ def barplot(table, rownames, colnames, rgraph, tmpgraph, intxt = False) :
             tominf <- which(di == -Inf)
             if (length(toinf)) {
                 di[toinf] <- NA
-                di[toinf] <- max(di, na.rm = TRUE) + 2
+                valmax <- max(di, na.rm = TRUE)
+                if (valmax <= 0) {
+                    valmax <- 2
+                } else {
+                    valmax <- valmax + 2
+                }
+                di[toinf] <- valmax
             }
             if (length(tominf)) {
                 di[tominf] <- NA
-                di[tominf] <- min(di, na.rm = TRUE) - 2
+                valmin <- min(di, na.rm = TRUE)
+                if (valmin >=0) {
+                    valmin <- -2
+                } else {
+                    valmin <- valmin -2
+                }
+                di[tominf] <- valmin
             }
             rownames(di)<- %s
             colnames(di) <- %s

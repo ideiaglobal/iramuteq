@@ -127,6 +127,19 @@ class Corpus :
         res = self.cformes.execute('SELECT uces FROM uces where id=? ORDER BY id;', (`wordid`,))
         return list(itertools.chain(*[[int(val) for val in row[0].split()] if not isinstance(row[0], int) else [row[0]] for row in res]))
 
+    def getformeuceseff(self, formeid) :
+        if isinstance(formeid, basestring) :
+            formeid = self.formes[formeid].ident
+        res = self.cformes.execute('SELECT uces FROM uces where id=? ORDER BY id;', (`formeid`,))
+        uces = list(itertools.chain(*[[int(val) for val in row[0].split()] if not isinstance(row[0], int) else [row[0]] for row in res]))
+        query = 'SELECT eff FROM eff where id=%i ORDER BY id' % formeid
+        res = self.cformes.execute(query)
+        eff = list(itertools.chain(*[[int(val) for val in row[0].split()] if not isinstance(row[0], int) else [row[0]] for row in res]))
+        formeuceeff = {}
+        for i, uce in enumerate(uces) :
+            formeuceeff[uce] = formeuceeff.get(uce, 0) + eff[i]
+        return formeuceeff    
+
     def getlemuces(self, lem) :
         formesid = ', '.join([`val` for val in self.lems[lem].formes])
         query = 'SELECT uces FROM uces where id IN (%s) ORDER BY id' % formesid
@@ -137,7 +150,7 @@ class Corpus :
         uces = self.getlemuces(lem)
         return list(set([self.getucefromid(val).uci for val in uces]))
 
-    def getlemuceseff(self, lem) :
+    def getlemuceseff(self, lem, luces = None) :
         formesid = ', '.join([`val` for val in self.lems[lem].formes])
         query = 'SELECT uces FROM uces where id IN (%s) ORDER BY id' % formesid
         res = self.cformes.execute(query)
@@ -251,7 +264,7 @@ class Corpus :
             self.iduces = dict([[uce.ident, uce] for uci in self.ucis for uce in uci.uces])
 
     def make_lexitable(self, mineff, etoiles) :
-        tokeep = [lem for lem in self.lems if self.lems[lem].freq > mineff]
+        tokeep = [lem for lem in self.lems if self.lems[lem].freq >= mineff]
         etuces = [[] for et in etoiles]
         for uci in self.ucis :
             get = list(set(uci.etoiles).intersection(etoiles))
@@ -385,6 +398,28 @@ class Corpus :
                     actpara = self.iduces[uce[0]].para
                     ident += 1
                     f.write('\n'.join([self.ucis[self.iduces[uce[0]].uci].paras[ident].encode(self.parametres['syscoding']), uce[1].encode(self.parametres['syscoding'])]) + '\n')
+    
+    def export_corpus_classes(self, outf, alc = True, lem = False) :
+        ucecl = {}
+        for i, lc in enumerate(self.lc) :
+            for uce in lc : 
+                ucecl[uce] = i + 1
+        for uce in self.lc0 :
+            ucecl[uce] = 0
+        res = self.getalluces()
+        self.make_iduces()
+        with open(outf, 'w') as f :
+            for uce in res :
+                guce = uce[1]
+                actuci = self.iduces[uce[0]].uci
+                if lem :
+                    guce = ' '.join([self.formes[forme].lem for forme in guce.split()])
+                if alc :
+                    etline = ' '.join(self.ucis[self.iduces[uce[0]].uci].etoiles + ['*classe_%i' % ucecl[uce[0]]])
+                else :
+                    etline = ' '.join(['<' + '='.join(et.split('_')) + '>' for et in self.ucis[self.iduces[uce[0]].uci].etoiles[1:]])
+                f.write(etline.encode(self.parametres['syscoding']) + '\n')
+                f.write(guce.encode(self.parametres['syscoding']) + '\n\n')
 
     def make_and_write_sparse_matrix_from_uces(self, actives, outfile, listuce = False) :
         log.info('make_and_write_sparse_matrix_from_uces %s' % outfile)
@@ -451,7 +486,9 @@ class Corpus :
     def parse_active(self, gramact, gramsup = None) :
         log.info('parse actives')
         for lem in self.lems :
-            if self.lems[lem].gram in gramact :
+            if lem.startswith('_') and lem.endswith('_') :
+                self.lems[lem].act = 2
+            elif self.lems[lem].gram in gramact :
                 self.lems[lem].act = 1
             elif gramsup is not None :
                 if self.lems[lem].gram in gramsup :
@@ -622,7 +659,23 @@ class Corpus :
         result = [[seg] + [str(val) for val in d[seg]] for seg in d if sum(d[seg]) >= effmin]
         with open(fileout, 'w') as f :
             f.write('\n'.join([';'.join(line) for line in result]))
-         
+    
+    def make_proftype(self, outf) :
+        res = {}
+        for lem in self.lems :
+            gram = self.lems[lem].gram
+            if not gram in res :
+                res[gram] = [0 for val in self.lc]
+            lemuceeff = self.getlemuceseff(lem)
+            for i, classe in enumerate(self.lc) :
+                concern = set(classe).intersection(lemuceeff.keys())
+                res[gram][i] += sum([lemuceeff[uce] for uce in concern])
+        res = [[gram] + [`val` for val in res[gram]] for gram in res]
+        res.sort()
+        with open(outf, 'w') as f :
+            f.write('\n'.join([';'.join(line) for line in res]).encode(self.parametres['syscoding']))
+
+
     def make_ucecl_from_R(self, filein) :
         with open(filein, 'rU') as f :
             c = f.readlines()
@@ -637,6 +690,28 @@ class Corpus :
         self.lc = [[uce[0] for uce in self.lc if uce[1] == i] for i in range(clnb+1)]
         self.lc0 = self.lc.pop(0)
         #return ucecl
+    
+    def get_stat_by_cluster(self, outf) :
+        log.info('get_stat_by_cluster')
+        t1 = time()
+        occurrences = dict([[i + 1, 0] for i in range(len(self.lc))])
+        formescl = dict([[i + 1, 0] for i in range(len(self.lc))])
+        hapaxcl = dict([[i + 1, 0] for i in range(len(self.lc))])
+        lenclasses = dict([[i+1,len(cl)] for i, cl in enumerate(self.lc)])
+        sets = [set(cl) for cl in self.lc]
+        for forme in self.formes :
+            formeuceeff = self.getformeuceseff(forme)
+            for i, classe in enumerate(self.lc) :
+                concern = sets[i].intersection(formeuceeff.keys())
+                if len(concern) :
+                    occurrences[i+1] += sum([formeuceeff[uce] for uce in concern])
+                    formescl[i+1] += 1
+                    if self.formes[forme].freq == 1 :
+                        hapaxcl[i+1] += 1
+        toprint = '\n'.join([';'.join([`i`, `occurrences[i]`, `formescl[i]`, `hapaxcl[i]`, `lenclasses[i]`, `float(hapaxcl[i])/float(formescl[i])`]) for i in occurrences])
+        with open(outf, 'w') as f :
+            f.write(toprint)
+        log.info('%f' % (time() - t1))        
 
     def gethapaxbyet(self, etoiles) :
         hapaxuces = [self.getlemuces(forme)[0] for forme in self.lems if self.lems[forme].freq == 1]

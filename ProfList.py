@@ -154,18 +154,9 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 
     def OnItemSelected(self, event):
         self.currentItem = event.m_itemIndex
-        #print 'OnItemSelected: "%s", "%s", "%s", "%s"\n' % (self.currentItem, self.GetItemText(self.currentItem), self.getColumnText(self.currentItem, 1), self.getColumnText(self.currentItem, 2))
-        #self.log.WriteText('OnItemSelected: "%s", "%s", "%s", "%s"\n' %
-        #                   (self.currentItem,
-        #                    self.GetItemText(self.currentItem),
-        #                    self.getColumnText(self.currentItem, 1),
-        #                    self.getColumnText(self.currentItem, 2)))
 
     def OnItemActivated(self, event):
         self.currentItem = event.m_itemIndex
-        #print "OnItemActivated: %s\nTopItem: %s\n" % (self.GetItemText(self.currentItem), self.GetTopItem())
-        #self.log.WriteText("OnItemActivated: %s\nTopItem: %s\n" %
-        #                   (self.GetItemText(self.currentItem), self.GetTopItem()))
 
     def getColumnText(self, index, col):
         item = self.GetItem(index, col)
@@ -173,9 +164,6 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 
     def OnItemDeselected(self, evt):
         pass
-        #self.log.WriteText("OnItemDeselected: %s" % evt.m_itemIndex)
-
-
     #---------------------------------------------------
     # These methods are callbacks for implementing the
     # "virtualness" of the list...
@@ -200,7 +188,6 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 
     def OnGetItemAttr(self, item):
         index=self.itemIndexMap[item]
-        #genre=self.itemDataMap[index][2]
         if index < self.lenact :
             if item % 2 :
                 return self.attr1
@@ -218,15 +205,6 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 return self.attr3s
         else :
             return None
-
-#        if genre=="Rock":
-#            return self.attr2
-#        elif genre=="Jazz":
-#            return self.attr1
-#        elif genre=="New Age":
-#            return self.attr3
-#        else:
-#            return None
 
     #---------------------------------------------------
     # Matt C, 2006/02/22

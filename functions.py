@@ -264,7 +264,7 @@ def treat_line_alceste(i, line) :
         line[5] = str(float(line[5].replace(',', '.')))[0:7]
     return [i, int(line[0]), int(line[1]), float(line[2]), float(line[3]), line[6], line[4], line[5]]
 
-def ReadProfileAsDico(parent, File, Alceste=False, encoding = sys.getdefaultencoding()):
+def ReadProfileAsDico(File, Alceste=False, encoding = sys.getdefaultencoding()):
     #print 'lecture des profils : ReadProfileAsDico'
     #if Alceste :
     #    print 'lecture du dictionnaire de type'
@@ -274,7 +274,6 @@ def ReadProfileAsDico(parent, File, Alceste=False, encoding = sys.getdefaultenco
     dictlem = {}
     print 'lecture des profiles'
     #encoding = sys.getdefaultencoding()
-    print encoding
     FileReader = codecs.open(File, 'r', encoding)
     Filecontent = FileReader.readlines()
     FileReader.close()
@@ -298,11 +297,11 @@ def ReadProfileAsDico(parent, File, Alceste=False, encoding = sys.getdefaultenco
         DictProfile[cluster] = [valclusters[i]] + prof[i]
     return DictProfile
 
-def GetTxtProfile(dictprofile) :
+def GetTxtProfile(dictprofile, cluster_size) :
     proflist = []
     for classe in range(0, len(dictprofile)) :
         prof = dictprofile[str(classe + 1)]
-        clinfo = prof[0]
+        clinfo = cluster_size[classe]
         proflist.append('\n'.join([' '.join(['classe %i' % (classe + 1), '-', '%s uce sur %s - %s%%' % (clinfo[0], clinfo[1], clinfo[2])]), '\n'.join(['%5s|%5s|%6s|%6s|%8s|%8s|%20s\t%10s' % tuple([str(val) for val in line]) for line in prof if len(line)==8])]))
     return '\n\n'.join(proflist)
 
@@ -541,9 +540,9 @@ def read_list_file(filename, encoding = sys.getdefaultencoding()):
         ncontent=[line.replace('\n','').split(';') for line in content if line.strip() != '']
     return ncontent
         
-class MessageImage(wx.Dialog):
+class MessageImage(wx.Frame):
     def __init__(self, parent,title, size):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_FRAME_STYLE )
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         self.imageFile = False
         self.imagename = u"chi_classe.png"

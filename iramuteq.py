@@ -295,7 +295,6 @@ class IraFrame(wx.Frame):
         self.Sheet = MySheet(self)
         #self._mgr.AddPane(self.Sheet, wx.aui.AuiPaneInfo().Name("Data").CenterPane())
         self._mgr.AddPane(self.Sheet, aui.AuiPaneInfo().Name("Data").CenterPane())
-        #self.nb.Bind(wx.aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self.OnCloseTab)
         self.nb.Bind(aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self.OnCloseTab)
         self.nb.Bind(aui.EVT_AUINOTEBOOK_PAGE_CHANGED, self.OnPageChanged)
         # add the toolbars to the manager
@@ -652,14 +651,14 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             self.tree.GiveFocus(uuid=npage.parametres['uuid'])
 
     def OnCloseTab(self, evt):
-        log.info('Closing tab %s' % str(evt.GetEventObject()))
+        #log.info('Closing tab %s' % str(evt.GetEventObject()))
         ctrl = evt.GetEventObject()
         if isinstance(ctrl.GetParent(), aui.AuiNotebook) or isinstance(ctrl.GetParent(), wx.Panel):
             notebook = True
         else :
             notebook = False
         page = self.nb.GetPage(self.nb.GetSelection())
-        if 'parametres' in dir(page) :
+        if 'parametres' in dir(page) and isinstance(ctrl.GetParent(), IraFrame) :
             self.history.rmtab(page.parametres)
             self.tree.CloseItem(uuid = page.parametres['uuid'])
         TabTitle = self.nb.GetPageText(self.nb.GetSelection())
