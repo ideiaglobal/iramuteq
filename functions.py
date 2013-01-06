@@ -388,23 +388,14 @@ def BugReport(parent, error = None):
     txt += exc
 
     dial = BugDialog(parent)
-    #for line in formatExceptionInfo():
-    #    if type(line) == type([]):
-    #        for don in line:
-    #            txt += don.replace('    ', ' ')
-    #    else:
-    #        txt += line + '\n'
     if 'Rerror' in dir(parent) :
         txt += parent.Rerror
         parent.Rerror = ''
-    #if error is not None :
-    #    txt += '\n%s\n' %error
-    print formatExceptionInfo()
-    log.error(txt)
+    log.info(txt)
     dial.text_ctrl_1.write(txt)
     dial.CenterOnParent()
     dial.ShowModal()
-    #raise Exception('Bug')
+    dial.Destroy()
     
 def PlaySound(parent):
     if parent.pref.getboolean('iramuteq', 'sound') :
@@ -462,6 +453,12 @@ def ReadList(filein, encoding = sys.getdefaultencoding()):
         i += 1
     return dict, first
 
+def exec_RCMD(rpath, command) :
+    log.info('R CMD INSTALL %s' % command)
+    rpath = rpath.replace('\\','\\\\')
+    error = call(["%s" % rpath, 'CMD', 'INSTALL', "%s" % command])
+    return error
+
 def exec_rcode(rpath, rcode, wait = True, graph = False):
     log.info("R Script : %s" % rcode)
     needX11 = False
@@ -518,16 +515,18 @@ def check_Rresult(parent, pid) :
             if error[1] is None :
                 error[1] = 'None'
             parent.Rerror = '\n'.join([str(pid.returncode), '\n'.join(error)])
-            try :
-                raise Exception('\n'.join(u'Erreur R', '\n'.join(error[1:])))
-            except :
-                BugReport(parent)
+            #try :
+            raise Exception('\n'.join([u'Erreur R', '\n'.join(error[1:])]))
+            return False
+            #except :
+            #    BugReport(parent)
     else :
         if pid != 0 :
-            try :
-                raise Exception(u'Erreur R')
-            except :
-                BugReport(parent)
+            #try :
+            raise Exception(u'Erreur R')
+            return False
+            #except :
+            #    BugReport(parent)
 
 def print_liste(filename,liste):
     with open(filename,'w') as f :

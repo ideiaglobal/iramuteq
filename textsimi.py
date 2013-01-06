@@ -48,7 +48,8 @@ class SimiTxt(AnalyseText):
             self.makefiles()
             script = PrintSimiScript(self)
             script.make_script()
-            self.doR(script.scriptout)
+            if not self.doR(script.scriptout) :
+                return False
             if self.parametres['type_graph'] == 1:
                 if os.path.exists(self.pathout['liste_graph']):
                     graph_simi = read_list_file(self.pathout['liste_graph'])

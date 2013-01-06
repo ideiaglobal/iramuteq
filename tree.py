@@ -303,6 +303,7 @@ class LeftTree(CT.CustomTreeCtrl):
         itemtype = self.GetItemType(item)
         text = self.GetItemText(item)
         pydata = self.GetPyData(item)
+        self.pydata = pydata
         
         self.current = item
         self.itemdict = {"ishtml": ishtml, "back": back, "fore": fore, "isbold": isbold,
@@ -377,29 +378,36 @@ class LeftTree(CT.CustomTreeCtrl):
         self.PopupMenu(menu)
         menu.Destroy()
 
-    def getcorpus(self, itemdict):
-        if itemdict['pydata']['uuid'] in self.parent.history.openedcorpus :
-            return copycorpus(self.parent.history.openedcorpus[itemdict['pydata']['uuid']])
+    def getcorpus(self):
+        if self.pydata['uuid'] in self.parent.history.openedcorpus :
+            return copycorpus(self.parent.history.openedcorpus[self.pydata['uuid']])
+        elif 'corpus_name' in self.pydata :
+            return Corpus(self.parent, parametres = DoConf(self.pydata['ira']).getoptions('corpus'), read = True)
         else :
-            return Corpus(self.parent, parametres = DoConf(itemdict['pydata']['ira']).getoptions('corpus'), read = True)
+            cuuid = self.pydata['corpus']
+            if cuuid in self.parent.history.openedcorpus :
+                return copycorpus(self.parent.history.openedcorpus[cuuid])
+            else :
+                irapath = self.parent.history.corpus[cuuid]['ira']
+                return Corpus(self.parent, parametres = DoConf(irapath).getoptions('corpus'), read = True)
 
     def OnSpec(self, evt) :
-        self.parent.OnTextSpec(evt, self.getcorpus(self.itemdict))
+        self.parent.OnTextSpec(evt, self.getcorpus())
 
     def OnStat(self, evt) :
-        self.parent.OnTextStat(evt, self.getcorpus(self.itemdict))
+        self.parent.OnTextStat(evt, self.getcorpus())
         
     def OnAlceste(self, evt) :
-        self.parent.OnTextAlceste(evt, self.getcorpus(self.itemdict))
+        self.parent.OnTextAlceste(evt, self.getcorpus())
 
     def OnPam(self, evt) :
         print 'rien'
 
     def OnSimiTxt(self, evt) :
-        self.parent.OnSimiTxt(evt, self.getcorpus(self.itemdict))
+        self.parent.OnSimiTxt(evt, self.getcorpus())
 
     def OnWordCloud(self, evt) :
-        self.parent.OnWordCloud(evt, self.getcorpus(self.itemdict))
+        self.parent.OnWordCloud(evt, self.getcorpus())
 
     def OnProfSR(self, evt) :
         ProfileSegment(self.parent, self.page.dictpathout, self.page.parametres, self.page.corpus)
@@ -787,6 +795,7 @@ class LeftTree(CT.CustomTreeCtrl):
             item = event.GetItem()
             pydata = self.GetPyData(item)
         if pydata is not None :
+            self.pydata = pydata
             if pydata['uuid'] in self.parent.history.opened :
                 for i in range(self.parent.nb.GetPageCount()) :
                     self.page = self.parent.nb.GetPage(i)

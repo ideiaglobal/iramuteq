@@ -61,7 +61,7 @@ from textcheckcorpus import checkcorpus
 from openanalyse import OpenAnalyse
 from corpusNG import BuildFromAlceste, Builder
 from sheet import MySheet
-from checkinstall import CreateIraDirectory, CheckRPath, FindRPAthWin32, FindRPathNix, CheckRapp, CheckRPackages, IsNew, UpgradeConf, CopyConf, RLibsAreInstalled
+from checkinstall import CreateIraDirectory, CheckRPath, FindRPAthWin32, FindRPathNix, CheckRPackages, IsNew, UpgradeConf, CopyConf, RLibsAreInstalled
 from chemins import ConstructRscriptsPath, ConstructConfigPath, ConstructDicoPath, ConstructGlobalPath, PathOut
 from parse_factiva_xml import ImportFactiva
 from tree import LeftTree
@@ -127,6 +127,13 @@ fh.setFormatter(formatter)
 log.addHandler(ch)
 log.addHandler(fh)
 log.setLevel(logging.INFO)
+
+
+class writer(object):
+    def write(self, data):
+        if data.strip() != '' :
+            log.info('BUG : %s' % data)
+sys.stderr = writer()
 ConfigPath = ConstructConfigPath(UserConfigPath)
 #####################################################################
 
@@ -419,17 +426,13 @@ class IraFrame(wx.Frame):
 Le chemin de l'executable de R n'a pas été trouvé.
 Si R n'est pas installé, vous devez l'installer (http://www.r-project.org/).
 Si R n'est pas installé dans le répertoire par défaut
-(C:\Program Files\R\R-2.x.x\R.exe sous windows ou /usr/bin/R sous linux ou Mac Os X)
+(souvent C:\Program Files\R\R-2.x.x\R.exe sous windows ou /usr/bin/R sous linux ou Mac Os X)
 vous devez signaler le chemin de l'éxecutable de R dans les préférences.""" 
             dlg = wx.MessageDialog(self, msg, u"Problème de configuration", wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
             dlg.CenterOnParent()
             if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
                  evt.Veto()
-            else :
-                print 'ok'
-        if sys.platform == 'darwin':
-            self.Rapp = self.PathPath.get('PATHS', 'rapp')
-            RappOk = CheckRapp(self.Rapp)
+            dlg.Destroy()
         self.DataPop = False
         self.DataTxt = False
         self.Text = ''
@@ -814,18 +817,22 @@ Voulez-vous fermer quand même ?"""
             BugReport(self)
 
     def OnSimiTxt(self, evt, corpus = None) :
-            print 'PLUS DE BUG SUR SIMITXT'
-        #try :
+        #    print 'PLUS DE BUG SUR SIMITXT'
+        try :
             #self.Text = SimiTxt(self)
+            if corpus is None :
+                corpus = self.tree.getcorpus()            
             self.Text = SimiTxt(self, corpus, parametres = {'type': 'simitxt'}, dlg = progressbar(self, 3))
             if self.Text.val == wx.ID_OK :
                 PlaySound(self)
-        #except :
-        #    BugReport(self)
+        except :
+            BugReport(self)
     
     def OnWordCloud(self, evt, corpus = None) :
         #    print 'PLUS DE BUG SUR WORDCLOUD'
         try :
+            if corpus is None :
+                corpus = self.tree.getcorpus()            
             self.Text = WordCloud(self, corpus, parametres = {'type' : 'wordcloud'}, dlg = progressbar(self, 3))
             if self.Text.val == wx.ID_OK :
                 PlaySound(self)
@@ -848,6 +855,8 @@ Voulez-vous fermer quand même ?"""
     def OnTextStat(self, event, corpus = None):
             print 'PAS DE BUG SUR TEXT STAT'
         #try:
+            if corpus is None :
+                corpus = self.tree.getcorpus()
             self.Text = Stat(self, corpus, parametres = {'type': 'stat'}, dlg = progressbar(self, 7))
             
             if self.Text.val == wx.ID_OK :
@@ -859,6 +868,8 @@ Voulez-vous fermer quand même ?"""
         #try:
             #self.Text = AsLexico(self)
             print('ATTENTION : PLUS DE BUG SUR LEXICO')
+            if corpus is None :
+                corpus = self.tree.getcorpus()
             self.Text = Lexico(self, corpus, parametres = {'type' : 'spec'}, dlg = progressbar(self, 3))
             if self.Text.val == wx.ID_OK :
                 PlaySound(self)
@@ -879,16 +890,16 @@ Voulez-vous fermer quand même ?"""
             BugReport(self)
 
     def OnTextAlceste(self, event, corpus = None):
-        #try:
-            print('ATTENTION : PLUS DE BUG SUR ALCESTE')
+        try:
+            #print('ATTENTION : PLUS DE BUG SUR ALCESTE')
             #RunAnalyse(self, corpus, Alceste, OptAlceste)
+            if corpus is None :
+                corpus = self.tree.getcorpus()            
             self.Text = Alceste(self, corpus, parametres = {'type': 'alceste'}, dlg = progressbar(self,6))
-            #self.history.addtab(self.Text.parametres)
-            #OpenAnalyse(self, self.Text.parametres['ira'])
             if self.Text.val == wx.ID_OK:
                 PlaySound(self)
-        #except:
-        #    BugReport(self)
+        except:
+            BugReport(self)
 
     def OnPamSimple(self, event):
         try:

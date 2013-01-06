@@ -64,7 +64,7 @@ class ProfileSegment() :
     def do_layout(self) :
         SelectTab = self.parent.nb.GetSelection()
         page = self.parent.nb.GetPage(SelectTab).TabChdSim
-        prof_seg = ReadProfileAsDico(self, self.dictpathout['prof_seg'], True, self.parent.syscoding)
+        prof_seg = ReadProfileAsDico(self.dictpathout['prof_seg'], True, self.parent.syscoding)
         prof_seg_nb = aui.AuiNotebook(self.parent, -1, wx.DefaultPosition)
         for i in range(0,len(self.corpus.lc)) :
             ntab = ProfListctrlPanel(self.parent, self, prof_seg[str(i + 1)], False, i + 1)
@@ -139,7 +139,7 @@ class ProfilType() :
         page = self.parent.nb.GetPage(SelectTab).TabChdSim
         prof_seg_nb = aui.AuiNotebook(self.parent, -1, wx.DefaultPosition)
         if alceste :
-            prof_seg = ReadProfileAsDico(self, self.outprof, True)
+            prof_seg = ReadProfileAsDico(self.outprof, True)
             for i in range(0,len(self.corpus.lc)) :
                 ntab = ProfListctrlPanel(self.parent, self, prof_seg[str(i + 1)], False, i + 1)
                 prof_seg_nb.AddPage(ntab, 'classe %i' % (i + 1))

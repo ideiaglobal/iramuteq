@@ -52,6 +52,7 @@ class AnalyseText :
         self.dlg = dlg
         self.dialok = True
         self.parametres = parametres
+        self.val = False
         self.pathout = PathOut(corpus.parametres['originalpath'], analyse_type = parametres['type'], dirout = corpus.parametres['pathout'])
         self.parametres = self.make_config(parametres)
         log.info(self.pathout.dirout)
@@ -125,7 +126,7 @@ class AnalyseText :
                 sleep(0.2)
             else :
                 sleep(0.2)
-        check_Rresult(self.ira, pid)
+        return check_Rresult(self.ira, pid)
 
 
 

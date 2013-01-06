@@ -8,11 +8,14 @@ import os
 import sys
 import shutil
 from chemins import ConstructConfigPath
-from functions import exec_rcode
+from functions import exec_rcode, exec_RCMD
 import wx
 import tempfile
 from ConfigParser import *
 from time import sleep
+import logging
+
+log = logging.getLogger('iramuteq.checkinstall')
 
 def IsNew(self):
     version_glob = self.ConfigGlob.get('DEFAULT', 'version_nb').split('.')
@@ -100,18 +103,29 @@ def FindRPathNix():
         BestPath='/usr/local/bin/R'
     return BestPath
 
-def CheckRapp(Path):
-    return os.path.exists(Path)
-
 def RLibsAreInstalled(self) :
     rlibs = self.pref.get('iramuteq', 'rlibs')
-    if rlibs == 'false' :
+    if rlibs == 'false' or rlibs == 'False' :
         return False
     else :
         return True
 
+def install_textometrieR(self) :
+    dlg = wx.ProgressDialog("Installation de textometrieR",
+    "Veuillez patientez...",
+    maximum= 2,
+    parent=self,
+    style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT
+    )
+    dlg.Center()
+    dlg.Update(1, 'Installation de textometrieR')
+    path = os.path.join(self.AppliPath, 'Rlib', 'textometrieR')
+    exec_RCMD(self.RPath, path)
+    dlg.Update(2,'fini')
+    dlg.Destroy()
+
 def CheckRPackages(self):
-    listdep = ['ca', 'gee', 'ape', 'igraph','proxy', 'Matrix','wordcloud']
+    listdep = ['ca', 'gee', 'ape', 'igraph','proxy', 'wordcloud', 'textometrieR']
     nolib = []
     i=0
     dlg = wx.ProgressDialog("Test des librairies de R", "test en cours...", maximum = len(listdep), parent=self, style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT)
@@ -121,14 +135,20 @@ def CheckRPackages(self):
         dlg.Update(i, "test de %s" % bib)
         txt = """library("%s")""" % bib
         tmpscript = tempfile.mktemp(dir=self.TEMPDIR)
-        file = open(tmpscript, 'w')
-        file.write(txt)
-        file.close()
+        with open(tmpscript, 'w') as f :
+            f.write(txt)
         test = exec_rcode(self.RPath, tmpscript, wait = True)
         if test :
+            log.info('packages %s : NOT INSTALLED' % bib)
             nolib.append(bib)
+        else :
+            log.info('packages %s : OK' % bib)
     dlg.Update(len(listdep),'fini')
     dlg.Destroy()
+    install_textoR = False
+    if 'textometrieR' in nolib :
+         nolib.pop(nolib.index('textometrieR'))
+         install_textoR = True
     if nolib != [] :
         txt = '\n'.join(nolib)
         msg = u"""Les bibliothèques de R suivantes sont manquantes :
@@ -142,8 +162,8 @@ Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
         Tapez install.packages('nom de la bibiothèque')
         
 - ou laisser IRamuteq les installer automatiquement en cliquant sur VALIDER .
-        Les bibliothèques seront téléchargées depuis le site miroir de R du CICT de Toulouse.
-        """ % txt
+        Les bibliothèques seront téléchargées depuis le site miroir de R %s.
+        """ % (txt, self.pref.get('iramuteq','rmirror'))
         dial = wx.MessageDialog(self, msg, u"Installation incomplète", wx.OK | wx.CANCEL | wx.NO_DEFAULT | wx.ICON_WARNING)
         dial.CenterOnParent()
         val = dial.ShowModal()
@@ -157,6 +177,7 @@ Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
             dlg.Center()
             dlg.Update(1, u"installation...") 
             compt = 0
+
             for bib in nolib :
                 compt += 1
                 dlg.Update(compt, u"installation librairie %s" % bib)
@@ -172,22 +193,21 @@ Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
                 .libPaths
                 """
                 txt += """
-                install.packages("%s", repos = 'http://cran.cict.fr')
-                """ % bib
+                install.packages("%s", repos = "%s")
+                """ % (bib, self.pref.get('iramuteq','rmirror'))
                 tmpscript = tempfile.mktemp(dir=self.TEMPDIR)
-                file = open(tmpscript, 'w')
-                file.write(txt)
-                file.close()
+                with open(tmpscript, 'w') as f :
+                    f.write(txt)
                 test = exec_rcode(self.RPath, tmpscript, wait = False)
                 while test.poll() == None :
                     dlg.Pulse(u"installation librairie %s" % bib)
                     sleep(0.2)
             dlg.Update(len(nolib) + 1, 'fin')
             dlg.Destroy()
-        else :
-            pass
         dial.Destroy()
-    else :
+    if install_textoR :
+         install_textometrieR(self)
+    if nolib == [] and not install_textoR :
         self.pref.set('iramuteq', 'rlibs', True)
         with open(self.ConfigPath['preferences'], 'w') as f :
             self.pref.write(f)

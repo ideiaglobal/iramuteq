@@ -526,7 +526,8 @@ class Corpus :
                         lim -= 1
             else :
                 stop = nbmax - 1
-        log.info('nb actives = %i - eff min = %i ' % (stop, lim))
+                lim = effs[stop]
+        log.info('nb actives = %i - eff min = %i ' % (stop + 1, lim))
         return [val[1] for val in allactives[0:stop + 1]], lim
 
     def make_and_write_profile(self, actives, ucecl, fileout) :
