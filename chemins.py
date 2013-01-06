@@ -117,7 +117,6 @@ def ConstructConfigPath(AppliPath, user=True):
         'path': os.path.join(ConfigPath, 'path.cfg'),
         'preferences' : os.path.join(ConfigPath, 'iramuteq.cfg'),
         'pam' : os.path.join(ConfigPath, 'pam.cfg'),
-        'history' : os.path.join(ConfigPath, 'history.db'),
         'corpus' : os.path.join(ConfigPath, 'corpus.cfg'),
         'stat' : os.path.join(ConfigPath, 'stat.cfg'),
         'simitxt' : os.path.join(ConfigPath, 'simitxt.cfg'),

@@ -10,7 +10,7 @@ import os
 #ALCESTE
 from PrintRScript import RchdTxt, AlcesteTxtProf
 from OptionAlceste import OptionAlc 
-from layout import PrintRapport
+#from layout import PrintRapport
 from openanalyse import OpenAnalyse
 from time import time
 ######################################
@@ -53,7 +53,10 @@ class AnalyseText :
         self.dialok = True
         self.parametres = parametres
         self.val = False
-        self.pathout = PathOut(corpus.parametres['originalpath'], analyse_type = parametres['type'], dirout = corpus.parametres['pathout'])
+        if not 'pathout' in self.parametres :
+            self.pathout = PathOut(corpus.parametres['originalpath'], analyse_type = parametres['type'], dirout = corpus.parametres['pathout'])
+        else :
+            self.pathout = PathOut(filename = corpus.parametres['originalpath'], dirout = self.parametres['pathout'], analyse_type = self.parametres['name'])
         self.parametres = self.make_config(parametres)
         log.info(self.pathout.dirout)
         if self.parametres is not None :

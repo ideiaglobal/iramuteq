@@ -54,7 +54,7 @@ from analysetxt import Alceste
 from textdist import PamTxt
 from textstat import Stat
 from textaslexico import Lexico
-from textsimi import SimiTxt
+from textsimi import SimiTxt, SimiFromCluster
 from textwordcloud import WordCloud
 from profile_segment import ProfileSegment
 from textcheckcorpus import checkcorpus
@@ -149,10 +149,13 @@ class IraFrame(wx.Frame):
         self.images_path = os.path.join(AppliPath,'images')
         self.UserConfigPath = UserConfigPath
         self.RscriptsPath = ConstructRscriptsPath(AppliPath)
-        self.DictPath = ConstructDicoPath(AppliPath)
+        #self.DictPath = ConstructDicoPath(AppliPath)
+        self.DictPath = ConstructDicoPath(UserConfigPath)
         self.ConfigGlob = ConfigGlob
         self.ConfigPath = ConstructConfigPath(UserConfigPath)
         self.pref = RawConfigParser()
+        #workaround for import problem
+        self.SimiFromCluster = SimiFromCluster
         #langues
         mylocale = wx.Locale(wx.LANGUAGE_FRENCH)
         mylocale.AddCatalogLookupPathPrefix(os.path.join(AppliPath,'locale'))

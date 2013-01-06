@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2011 Pierre Ratinaud
+#Copyright (c) 2008-2013 Pierre Ratinaud
 #Lisense: GNU/GPL
 
 from chemins import ffr, simipath
 #from corpus import Corpus
 import os
 from analysetxt import AnalyseText
-from ConfigParser import RawConfigParser
-from guifunct import getPage, getCorpus
+#from ConfigParser import RawConfigParser
+#from guifunct import getPage, getCorpus
 from dialog import StatDialog
 from guifunct import SelectColumn, PrepSimi
 from functions import indices_simi, progressbar, treat_var_mod, read_list_file, print_liste
-from tableau import Tableau
-from tabsimi import DoSimi
+#from tableau import Tableau
+#from tabsimi import DoSimi
 from PrintRScript import PrintSimiScript
 import wx
 from copy import copy
@@ -115,14 +115,67 @@ class SimiTxt(AnalyseText):
         #self.actives, lim = self.corpus.make_actives_nb(self.parametres.get('max_actives',1500), 1)
         self.parametres['eff_min_forme'] = lim
         self.parametres['nbactives'] = len(self.actives)
-        self.parametres['fromprof'] = True
+        self.parametres['fromprof'] = False
         self.corpus.make_and_write_sparse_matrix_from_uces(self.actives, self.pathout['mat01.csv'], self.pathout['listeuce1.csv'])
         with open(self.pathout['actives.csv'], 'w') as f :
             f.write('\n'.join(self.actives).encode(self.ira.syscoding))
 
 
 
+class SimiFromCluster(SimiTxt) :
+    def __init__(self, ira, corpus, actives, numcluster, parametres = None, dlg = False) :
+        self.actives = actives
+        self.numcluster = numcluster
+        parametres['name'] = 'simi_classe_%i' % (numcluster + 1)
+        SimiTxt.__init__(self, ira, corpus, parametres, dlg)
+    
+    def preferences(self) :
+        return self.parametres
 
+    def doanalyse(self) :
+        self.parametres['type'] = 'clustersimitxt'
+        self.pathout.basefiles(simipath)
+        self.indices = indices_simi
+        self.makesimiparam()
+        if 'bystar' in self.parametres :
+            del self.parametres['bystar']
+        dictcol = dict([[i, [act, self.corpus.getlemclustereff(act, self.numcluster)]] for i, act in enumerate(self.actives)]) 
+        continu = True
+        if self.dlg :
+            #self.listet = self.corpus.make_etoiles()
+            #self.listet.sort()
+            self.stars = []#copy(self.listet)
+            self.parametres['stars'] = False#copy(self.listet)
+            self.parametres['sfromchi'] = True
+            prep = PrepSimi(self.ira, self, self.parametres, self.pathout['selected.csv'], self.actives, indices_simi, wordlist=dictcol)
+            if prep.val == wx.ID_OK :
+                continu = True
+                self.parametres = prep.parametres
+            else :
+                continu = False
+        if continu :
+            self.makefiles()
+            script = PrintSimiScript(self)
+            script.make_script()
+            if self.doR(script.scriptout) :
+                return False
+            if self.parametres['type_graph'] == 1:
+                if os.path.exists(self.pathout['liste_graph']):
+                    graph_simi = read_list_file(self.pathout['liste_graph'])
+                    graph_simi.append([os.path.basename(script.filename), script.txtgraph])
+                else :
+                    graph_simi = [[os.path.basename(script.filename), script.txtgraph]]
+                print_liste(self.pathout['liste_graph'], graph_simi)
+        else : 
+            return False
+
+    def makefiles(self) :
+        self.parametres['eff_min_forme'] = 3
+        self.parametres['nbactives'] = len(self.actives)
+        self.parametres['fromprof'] = True
+        self.corpus.make_and_write_sparse_matrix_from_classe(self.actives, self.corpus.lc[self.numcluster], self.pathout['mat01.csv'])
+        with open(self.pathout['actives.csv'], 'w') as f :
+            f.write('\n'.join(self.actives).encode(self.ira.syscoding))        
 
 #        self.tableau = Tableau(self.parent, '')
 #        self.tableau.listactives = self.actives

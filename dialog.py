@@ -2329,7 +2329,7 @@ class CorpusPref ( wx.Dialog ):
         fgSizer4.Add( self.check_charact, 0, wx.ALL, 5 )
         
         self.txt_charact = wx.TextCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.txt_charact.SetMinSize( wx.Size( 200,-1 ) )
+        self.txt_charact.SetMinSize( wx.Size( 400,-1 ) )
         
         fgSizer4.Add( self.txt_charact, 0, wx.ALL|wx.EXPAND, 5 )
         

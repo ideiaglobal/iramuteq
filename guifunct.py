@@ -1324,26 +1324,27 @@ class PrepSimi :
         self.dial.CenterOnParent()
         self.val = self.dial.ShowModal()
         if self.val == wx.ID_OK :
-            if self.dial.check_bystar.GetValue() :
-                variables = treat_var_mod(self.parametres['stars'])
-                vardial = dialog.OptLexi(parent) 
-                vardial.listet = self.parametres['stars']
-                vardial.variables = [v for v in variables]
-                for et in vardial.variables :
-                    vardial.list_box_1.Append(et)
-                nval = vardial.ShowModal()
-                if nval == wx.ID_OK :
-                    if vardial.choice.GetSelection() == 1 :
-                        listet = [vardial.listet[i] for i in vardial.list_box_1.GetSelections()]
-                    else :
-                        listet = variables[vardial.variables[vardial.list_box_1.GetSelections()[0]]]
-                    self.dial.Destroy()
-                    vardial.Destroy()
-                    self.etline = source.corpus.make_etline(listet)
-                    self.parametres['selectedstars'] = listet
-                    self.parametres['listet'] = self.etline
-                else:
-                    vardial.Destroy()
+            if 'bystar' in self.parametres :
+                if self.dial.check_bystar.GetValue() :
+                    variables = treat_var_mod(self.parametres['stars'])
+                    vardial = dialog.OptLexi(parent) 
+                    vardial.listet = self.parametres['stars']
+                    vardial.variables = [v for v in variables]
+                    for et in vardial.variables :
+                        vardial.list_box_1.Append(et)
+                    nval = vardial.ShowModal()
+                    if nval == wx.ID_OK :
+                        if vardial.choice.GetSelection() == 1 :
+                            listet = [vardial.listet[i] for i in vardial.list_box_1.GetSelections()]
+                        else :
+                            listet = variables[vardial.variables[vardial.list_box_1.GetSelections()[0]]]
+                        self.dial.Destroy()
+                        vardial.Destroy()
+                        self.etline = source.corpus.make_etline(listet)
+                        self.parametres['selectedstars'] = listet
+                        self.parametres['listet'] = self.etline
+                    else:
+                        vardial.Destroy()
             last = self.dial.listcol.GetFirstSelected()
             lastl = [self.dial.listcol.GetFirstSelected()]
             indexes = [self.dial.listcol.getColumnText(self.dial.listcol.GetFirstSelected(),0)]

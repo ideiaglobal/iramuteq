@@ -7,7 +7,7 @@
 import os
 import sys
 import shutil
-from chemins import ConstructConfigPath
+from chemins import ConstructConfigPath, ConstructDicoPath
 from functions import exec_rcode, exec_RCMD
 import wx
 import tempfile
@@ -54,6 +54,8 @@ def UpgradeConf(self) :
 def CreateIraDirectory(UserConfigPath,AppliPath):
     if not os.path.exists(UserConfigPath):
         os.mkdir(UserConfigPath)
+    if not os.path.exists(os.path.join(UserConfigPath, 'dictionnaires')) :
+        os.mkdir(os.path.join(UserConfigPath, 'dictionnaires'))
 
 def CopyConf(self) :
     DictUser = self.ConfigPath
@@ -67,6 +69,11 @@ def CopyConf(self) :
         if item == u'preferences' :
             if not os.path.exists(filein) :
                 shutil.copyfile(DictAppli[item],filein)
+    dicoUser = self.DictPath
+    dicoAppli = ConstructDicoPath(self.AppliPath)
+    for fi in dicoUser :
+        if not os.path.exists(dicoUser[fi]) :
+            shutil.copyfile(dicoAppli[fi], dicoUser[fi])
 
 def CheckRPath(PathPath):
     if not os.path.exists(PathPath.get('PATHS','rpath')):

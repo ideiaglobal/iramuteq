@@ -12,7 +12,7 @@ from tableau import Tableau
 import os
 import shelve
 #from ConfigParser import *
-from tabsimi import DoSimi
+#from tabsimi import DoSimi
 from functions import BugReport, DoConf
 import logging
 
@@ -98,7 +98,7 @@ class OpenAnalyse():
         elif self.conf['type'] == 'alceste' :
             self.parent.ShowMenu(_("Text analysis"))
             OpenCHDS(self.parent,  corpus, self.conf, Alceste = True)
-        elif self.conf['type'] == 'simitxt' :
+        elif self.conf['type'] == 'simitxt' or self.conf['type'] == 'clustersimitxt' :
             self.parent.ShowMenu(_("Text analysis"))
             SimiLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'wordcloud' :

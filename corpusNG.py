@@ -163,6 +163,9 @@ class Corpus :
             lemuceeff[uce] = lemuceeff.get(uce, 0) + eff[i]
         return lemuceeff    
 
+    def getlemclustereff(self, lem, cluster) :
+        return len(list(set(self.lc[cluster]).intersection(self.getlemuces(lem))))
+
     def getlemeff(self, lem) :
         return self.lems[lem].freq
 
@@ -1220,6 +1223,9 @@ class Builder :
             ReadLexique(self.parent, lang = parametres['lang'])
             self.parent.expressions = ReadDicoAsDico(self.parent.DictPath.get(parametres['lang']+'_exp', 'french_exp'))
             self.parametres = parametres
+        else :
+            if self.dlg is not None :
+                self.dlg.Destroy()
         dial.Destroy()
 
     def doanalyse(self) :

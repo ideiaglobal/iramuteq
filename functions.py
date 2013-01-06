@@ -520,6 +520,8 @@ def check_Rresult(parent, pid) :
             return False
             #except :
             #    BugReport(parent)
+        else :
+            return None
     else :
         if pid != 0 :
             #try :
@@ -527,6 +529,8 @@ def check_Rresult(parent, pid) :
             return False
             #except :
             #    BugReport(parent)
+        else :
+            return None
 
 def print_liste(filename,liste):
     with open(filename,'w') as f :
