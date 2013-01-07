@@ -1156,13 +1156,6 @@ class BuildFromAlceste(BuildCorpus) :
             for word in uce :
                 self.last += 1
                 self.corpus.add_word(word)
-        #if self.dlg is not None :
-        #    if self.limitshow > self.count :
-        #        self.dlg.Pulse('textes : %i - segments : %i' % (iduci + 1, iduce +1))
-        #        self.count += 1
-        #        self.limitshow = 0
-        #    else :
-        #        self.limitshow = self.last / 100000
         log.debug(' '.join([`iduci`,`idpara`,`iduce`]))
         if self.last > self.lim :
             self.backup_uce()
@@ -1174,27 +1167,13 @@ class BuildFromAlceste(BuildCorpus) :
         if douce :
             out = []
             reste, texte_uce, suite = self.decouper(self.prep_txt(txt), self.ucesize + 15, self.ucesize)
-#            print 'reste'
-#            print reste
-#            print 'texte_uce'
-#            print texte_uce
-#            print 'suite'
-#            print suite
             while reste :
                 uce = ' '.join([val for val in texte_uce if val not in self.ponctuation_espace])
                 if uce != '' :
                     out.append(uce)
                 reste, texte_uce, suite = self.decouper(suite, self.ucesize + 15, self.ucesize)
-#                print 'reste'
-#                print reste
-#                print 'texte_uce'
-#                print texte_uce
-#                print 'suite'
-#                print suite
-
             uce = ' '.join([val for val in texte_uce if val not in self.ponctuation_espace])
             if uce != '' : 
-                #print 'RESTEE UUCEEEEEEEEEEEEE', uce
                 out.append(uce)
             return out
         else :

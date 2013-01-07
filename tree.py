@@ -733,18 +733,19 @@ class LeftTree(CT.CustomTreeCtrl):
         
         pt = event.GetPosition()
         item, flags = self.HitTest(pt)
-        pydata = self.GetPyData(item)
-        if pydata['uuid'] in self.parent.history.opened :
-            for i in range(self.parent.nb.GetPageCount()) :
-                page = self.parent.nb.GetPage(i)
-                if 'parametres' in dir(page) :
-                    if page.parametres['uuid'] == pydata['uuid'] :
-                        self.parent.nb.SetSelection(i)
-                        break
-        else :
-            OpenAnalyse(self.parent, pydata)
-            self.SetItemBold(item, True)
-            self.OnSelChanged(pydata = pydata)
+        if item is not None :
+            pydata = self.GetPyData(item)
+            if pydata['uuid'] in self.parent.history.opened :
+                for i in range(self.parent.nb.GetPageCount()) :
+                    page = self.parent.nb.GetPage(i)
+                    if 'parametres' in dir(page) :
+                        if page.parametres['uuid'] == pydata['uuid'] :
+                            self.parent.nb.SetSelection(i)
+                            break
+            else :
+                OpenAnalyse(self.parent, pydata)
+                self.SetItemBold(item, True)
+                self.OnSelChanged(pydata = pydata)
         #if item and (flags & CT.TREE_HITTEST_ONITEMLABEL):
         #    if self.GetAGWWindowStyleFlag() & CT.TR_EDIT_LABELS:
         #        self.log.info("OnLeftDClick: %s (manually starting label edit)"% self.GetItemText(item) + "\n")

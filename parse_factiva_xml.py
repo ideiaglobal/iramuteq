@@ -12,7 +12,8 @@ import codecs
 import sys
 import re
 import wx
-
+from parse_factiva_mail import ParseFactivaMail
+from parse_factiva_txt import ParseFactivaPaste
 
 def ParseDocument(filename) :
     print filename
@@ -154,18 +155,23 @@ class PrefImport(wx.Dialog):
 
 
 class ImportFactiva():
-    def __init__(self,parent):
+    def __init__(self, parent, methode):
        self.dial =  PrefImport(parent)
        self.dial.CenterOnParent()
        val = self.dial.ShowModal()
        if val == wx.ID_OK :
            xmldir = self.dial.dbb.GetValue()
            corp_out = self.dial.fbb.GetValue()
-           res = getcorpus_from_xml(xmldir, corp_out)
-           if res != 'ok' :
+           if methode == 'xml' :
+                res = getcorpus_from_xml(xmldir, corp_out)
+           elif methode == 'mail' :
+               res = ParseFactivaMail(xmldir, corp_out, 'utf8', parent.syscoding)
+           elif methode == 'txt' :
+               res = ParseFactivaPaste(xmldir, corp_out, 'utf8', parent.syscoding)
+           if res == 'nofile' :
                 dlg = wx.MessageDialog(parent, u"Pas de fichier \'.xml\' dans %s" % xmldir, 'ATTENTION', wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
                 dlg.CenterOnParent()
                 dlg.ShowModal()
-           else :
-                parent.filename = corp_out
-                parent.OpenText()
+           #else :
+           #     parent.filename = corp_out
+           #     parent.OpenText()

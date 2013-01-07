@@ -64,6 +64,7 @@ from sheet import MySheet
 from checkinstall import CreateIraDirectory, CheckRPath, FindRPAthWin32, FindRPathNix, CheckRPackages, IsNew, UpgradeConf, CopyConf, RLibsAreInstalled
 from chemins import ConstructRscriptsPath, ConstructConfigPath, ConstructDicoPath, ConstructGlobalPath, PathOut
 from parse_factiva_xml import ImportFactiva
+
 from tree import LeftTree
 ##########################################################
 ID_OpenData = wx.NewId()
@@ -187,9 +188,16 @@ class IraFrame(wx.Frame):
         item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
         file_menu.AppendItem(item)
 
-        item1 = wx.MenuItem(file_menu, ID_Import, _(u"Import a factiva corpora..."), _("Import a factiva corpora..."))
-        item1.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_TIP))
-        file_menu.AppendItem(item1)
+        
+        menuFactiva = wx.Menu()
+        fact_from_xml = wx.MenuItem(menuFactiva, wx.ID_ANY, _(u"from xml"))
+        fact_from_mail = wx.MenuItem(menuFactiva, wx.ID_ANY, _(u"from mail"))
+        fact_from_txt = wx.MenuItem(menuFactiva, wx.ID_ANY, _(u"from copy/paste"))
+        menuFactiva.AppendItem(fact_from_xml)
+        menuFactiva.AppendItem(fact_from_mail)
+        menuFactiva.AppendItem(fact_from_txt)
+
+        file_menu.AppendMenu(-1, _(u"Import from factiva"), menuFactiva)
         #item1.Enable(True)
        
         item = wx.MenuItem(file_menu, ID_SaveTab, _(u"Save tab as..."), _(u"Save tab as..."))
@@ -332,7 +340,9 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnOpenData, id=ID_OpenData)
         self.Bind(wx.EVT_MENU, self.OnOpenText, id=ID_OpenText)
         self.Bind(wx.EVT_MENU, self.OnOpenAnalyse, id=ID_OnOpenAnalyse)
-        self.Bind(wx.EVT_MENU, self.import_factiva, id= ID_Import)
+        self.Bind(wx.EVT_MENU, self.import_factiva_xml, fact_from_xml)
+        self.Bind(wx.EVT_MENU, self.import_factiva_mail, fact_from_mail)
+        self.Bind(wx.EVT_MENU, self.import_factiva_txt, fact_from_txt)
         self.Bind(wx.EVT_MENU, self.OnFreq, id=ID_Freq)
         self.Bind(wx.EVT_MENU, self.OnChi2, id=ID_Chi2)
         self.Bind(wx.EVT_MENU, self.OnStudent, id=ID_Student)
@@ -886,9 +896,21 @@ Voulez-vous fermer quand même ?"""
         except:
             BugReport(self)
 
-    def import_factiva(self,event):
+    def import_factiva_xml(self,event):
         try :
-            ImportFactiva(self)
+            ImportFactiva(self, 'xml')
+        except :
+            BugReport(self)
+
+    def import_factiva_mail(self, evt) :
+        try :
+            ImportFactiva(self, 'mail')
+        except :
+            BugReport(self)
+
+    def import_factiva_txt(self, evt) :
+        try :
+            ImportFactiva(self, 'txt')
         except :
             BugReport(self)
 
