@@ -10,7 +10,7 @@ import os
 #ALCESTE
 from PrintRScript import RchdTxt, AlcesteTxtProf
 from OptionAlceste import OptionAlc 
-#from layout import PrintRapport
+from layout import PrintRapport
 from openanalyse import OpenAnalyse
 from time import time
 ######################################

@@ -202,8 +202,8 @@ stopoverlap <- function(x, cex.par = NULL) {
 		y1<- x[i,2]
 		wid <- strwidth(words[i],cex=size[i])
 		ht <- strheight(words[i],cex=size[i])
-	    ht <- (ht + ht*.2) + .01
-        wid <- (wid + wid*.1) + .01
+	    ht <- (ht + ht*.08)
+        wid <- (wid + wid*.15)
 		isOverlaped <- TRUE
 		while(isOverlaped){
 			if(!overlap(x1-.5*wid,y1-.5*ht,wid,ht, boxes)) { #&&
@@ -213,7 +213,7 @@ stopoverlap <- function(x, cex.par = NULL) {
 				boxes[[length(boxes)+1]] <- c(x1-.5*wid,y1-.5*ht,wid,ht)
 				isOverlaped <- FALSE
 			} else {
-				if(r>sqrt(.5)){
+				if(r>sqrt(.1)){
 					print(paste(words[i], "could not be fit on page. It will not be plotted."))
 					isOverlaped <- FALSE
 				}
