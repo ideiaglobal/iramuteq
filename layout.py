@@ -6,6 +6,7 @@
 
 import os
 import wx
+import wx.lib.hyperlink as hl
 #import wx.lib.agw.aui as aui
 import agw.aui as aui
 from chemins import ConstructPathOut, ChdTxtPathOut, FFF, ffr, PathOut, StatTxtPathOut, simipath
@@ -59,7 +60,11 @@ class GraphPanelAfc(wx.Panel):
         todel = []
         for i in range(0,len(list_graph)):
             if os.path.exists(os.path.join(self.dirout,list_graph[i][0])) :
-                self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
+                filename, ext = os.path.splitext(list_graph[i][0])
+                if ext == '.svg' :
+                    self.listimg.append(hl.HyperLinkCtrl(self.panel_1, -1, os.path.join(self.dirout,list_graph[i][0]), URL=os.path.join(self.dirout,list_graph[i][0])))
+                else :
+                    self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
                 self.labels.append(wx.StaticText(self.panel_1, -1, list_graph[i][1]))
                 self.buts.append(wx.Button(self.panel_1, wx.ID_DELETE, name = `i - b`))
             else :
@@ -129,17 +134,11 @@ class GraphPanelAfc(wx.Panel):
             oldlab.Destroy()
             oldbut = self.buts.pop(image_id)
             oldbut.Show(False)
-            #No = [but.Destroy() for but in self.buts]
-            #self.buts = [wx.Button(self.panel_1, wx.ID_DELETE, name = `i`) for i, img in enumerate(self.listimg)]
             for i, but in enumerate(self.buts) :
                 but.SetName(`i`)
             todel = self.list_graph.pop(image_id)
             os.remove(os.path.join(self.dirout, todel[0]))
             print_liste(self.Dict[self.itempath], self.list_graph)
-            #self.sizer_1.Destroy()
-            #self.sizer_2.Destroy()
-            #self.sizer_3.Destroy()
-            #self.__do_layout()
             self.sizer_3.Fit(self.panel_1)
             self.Layout()
         else :
@@ -204,9 +203,8 @@ class GraphPanelAfc(wx.Panel):
                 """
             txt += write_afc_graph(self)
             filetmp = tempfile.mktemp()
-            file = open(filetmp,'w')
-            file.write(txt)
-            file.close()
+            with open(filetmp, 'w') as f :
+                f.write(txt)
             pid = exec_rcode(self.ira.RPath, filetmp)
             check_Rresult(self.ira, pid)
             if self.param['typegraph'] == 0 :
@@ -225,9 +223,15 @@ class GraphPanelAfc(wx.Panel):
                 if self.param['cex_txt'] : txt += u' - taille du texte proportionnel à la masse'
                 if self.param['tchi'] : txt += u' - taille du texte proportionnel au chi2 d\'association'
                 #list_graph = read_list_file(self.DictPathOut[self.itempath], self.coding)
-                self.list_graph.append([self.fileout, txt])
+                if self.param['svg'] :
+                    filename, ext = os.path.splitext(self.fileout)
+                    self.fileout = filename + '.svg'
+                self.list_graph.append([os.path.basename(self.fileout), txt])
                 print_liste(self.DictPathOut[self.itempath], self.list_graph)
-                self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(self.fileout, wx.BITMAP_TYPE_ANY)))
+                if not self.param['svg'] :
+                    self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(self.fileout, wx.BITMAP_TYPE_ANY)))
+                else :
+                    self.listimg.append(hl.HyperLinkCtrl(self.panel_1, -1, self.fileout, URL=self.fileout))
                 self.sizer_3.Add( self.listimg[-1], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
                 self.labels.append(wx.StaticText(self.panel_1,-1, txt))
                 self.sizer_3.Add(self.labels[-1], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)

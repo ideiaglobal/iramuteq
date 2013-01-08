@@ -435,6 +435,9 @@ def write_afc_graph(self):
     if self.param['tchi'] : tchi = 'TRUE'
     else : tchi = 'FALSE'
 
+    if self.param['svg'] : svg = 'TRUE'
+    else : svg = 'FALSE'
+
     with open(self.RscriptsPath['afc_graph'], 'r') as f:
         txt = f.read()
 
@@ -464,7 +467,8 @@ def write_afc_graph(self):
     tchi,\
     self.param['tchi_min'],\
     self.param['tchi_max'],\
-    ffr(os.path.dirname(self.fileout)))
+    ffr(os.path.dirname(self.fileout)),\
+    svg)
     return scripts
         
 def print_simi3d(self):

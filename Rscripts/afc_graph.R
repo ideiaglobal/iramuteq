@@ -31,6 +31,7 @@ tchi <- %s
 tchi.min <- %i
 tchi.max <- %i
 dirout <- '%s'
+do.svg <- %s
 xminmax <- NULL
 yminmax <- NULL
 
@@ -156,7 +157,7 @@ if (is.null(xminmax)) {
 
 if (typegraph == 0) {
 
-    open_file_graph(fileout, width = width, height = height)
+    open_file_graph(fileout, width = width, height = height, svg = do.svg)
     parcex <- taillecar/10
     par(cex = parcex)
     if (over) {
