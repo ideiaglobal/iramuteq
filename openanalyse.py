@@ -64,7 +64,7 @@ class OpenAnalyse():
             log.info('add to history')
             self.parent.tree.OnItemAppend(self.conf)
         if self.conf['uuid'] in self.parent.history.openedcorpus :
-            log.info('corpus is already opened')
+            log.info('corpus is already opened 1')
             self.doopen(self.parent.history.openedcorpus[self.conf['uuid']])
         else :
             corpus = Corpus(self, parametres = self.conf, read = self.parent.history.history[self.parent.history.ordercorpus[self.conf['uuid']]]['ira'])
@@ -73,19 +73,24 @@ class OpenAnalyse():
             self.doopen(corpus)
 
     def opencorpus_analyses(self) :
+        log.info('open analysis')
         basepath = self.conf['pathout']
+        analyses = []
         for root, subfolders, files in os.walk(basepath) :
             for folder in subfolders :
                 if os.path.exists(os.path.join(folder, 'Analyse.ira')) :
                     analyse_conf = DoConf(os.path.join(folder, 'Analyse.ira')).getoptions()
                     analyse_conf = self.redopath(analyse_conf, os.path.join(folder, 'Analyse.ira'))
                     if analyse_conf['corpus'] == self.conf['uuid'] :
-                        self.parent.history.add(analyse_conf)
-                        self.parent.tree.AddAnalyse(analyse_conf, bold = False)
+                        analyses.append(analyse_conf)
+        if len(analyses) :
+            self.parent.history.addmultiple(analyses)
+        for analyse in analyses :
+            self.parent.tree.AddAnalyse(analyse, bold = False)
 
     def openanalyse(self) :
         if self.conf['corpus'] in self.parent.history.openedcorpus :
-            log.info('corpus is already opened')
+            log.info('corpus is already opened 2')
             corpus = self.parent.history.openedcorpus[self.conf['corpus']]
         else :
             if os.path.exists(self.parent.history.history[self.parent.history.ordercorpus[self.conf['corpus']]]['ira']) :

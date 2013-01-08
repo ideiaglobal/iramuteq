@@ -662,6 +662,7 @@ au chi2 d'association de la forme"""
             self.film.Enable(False)
             self.spin_f3.Enable(False)
             self.slider_sphere.Enable(False)
+        self.choix_format.SetSelection(self.paramgraph['svg'])
         self.choice1.SetSelection(self.paramgraph['what'])
         self.choice2.SetSelection(self.paramgraph['qui'])
         self.spin_chi.SetValue(self.paramgraph['select_nb'])

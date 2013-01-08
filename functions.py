@@ -77,9 +77,25 @@ class History :
         self.write()
         self.read()
 
+    def addmultiple(self, analyses) :
+        for analyse in analyses :
+            tosave = {'uuid' : analyse['uuid'], 'ira': analyse['ira'], 'type' : analyse['type']}
+            corpus = analyse['uuid']
+            tosave['corpus'] = corpus
+            tosave['name'] = analyse['name']
+            if corpus in self.corpus :
+                if 'analyses' in self.history[self.ordercorpus[corpus]] :
+                    self.history[self.ordercorpus[corpus]]['analyses'].append(tosave)
+                else :
+                    self.history[self.ordercorpus[corpus]]['analyses'] = [tosave]
+        self.write()
+        self.read()
+
     def delete(self, analyse, corpus = False) :
         if corpus :
             self.history.pop(self.ordercorpus[analyse['uuid']])
+            if analyse['uuid'] in self.openedcorpus :
+                del self.openedcorpus[analyse['uuid']]
         else :
             todel = [i for i, ana in enumerate(self.corpus[analyse['corpus']]['analyses']) if ana['uuid'] == analyse['uuid']][0]
             self.history[self.ordercorpus[analyse['corpus']]]['analyses'].pop(todel)
