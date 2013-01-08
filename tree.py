@@ -244,17 +244,21 @@ class LeftTree(CT.CustomTreeCtrl):
             self.CloseItem(child, uuid)
             child, cookie = self.GetNextChild(itemParent, cookie)
 
-    def GiveFocus(self, itemParent = None, uuid = None) :
+    def GiveFocus(self, itemParent = None, uuid = None, bold = False) :
         if itemParent is None :
             itemParent = self.root
         child, cookie = self.GetFirstChild(itemParent)
+        print child, cookie
         while child :
             pydata = self.GetPyData(child)
             if pydata['uuid'] == uuid :
                 self.SelectItem(child)
-                break
+                if bold :
+                    self.SetItemBold(child, True)
+                return 'kool'
             self.GiveFocus(child, uuid)
             child, cookie = self.GetNextChild(itemParent, cookie)
+        return 'pas kool'
 
     def OnRightDown(self, event):
         

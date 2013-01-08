@@ -576,6 +576,8 @@ class PrefGraph(wx.Dialog):
         else :
             choix=[u'2D' ,u'3D']
         self.choicetype = wx.Choice(self, -1, (100,50), choices=choix)
+        self.label_format = wx.StaticText(self, -1, u"Format de l'image")
+        self.choix_format =  wx.Choice(self, -1, (100,50), choices = ['png', 'svg'])        
         self.label_1 = wx.StaticText(self, -1, u'Largeur')
         self.spin1 = wx.SpinCtrl(self, -1, '',size = (100,30), min=100, max=5000)
         self.label_2 = wx.StaticText(self, -1, u'Hauteur')
@@ -718,6 +720,11 @@ au chi2 d'association de la forme"""
         
         fsizer.Add(self.labeltype, 0, wx.ALL | wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
         fsizer.Add(self.choicetype, 0, wx.ALL | wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
+        fsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND, 0)
+        fsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND, 0)
+
+        fsizer.Add(self.label_format, 0, wx.ALL | wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
+        fsizer.Add(self.choix_format, 0, wx.ALL | wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
         fsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND, 0)
         fsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND, 0)
 

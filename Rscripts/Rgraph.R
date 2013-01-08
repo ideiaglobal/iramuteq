@@ -43,7 +43,7 @@ PlotDendroCut <- function(chd,filename,reso,clusternb) {
 #	dev.off()
 #}
 
-PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axetoplot=c(1,2), deb=0,fin=0, width=900, height=900, quality=100, reso=200, parcex=PARCEX, xlab = NULL, ylab = NULL, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NUL) {
+PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axetoplot=c(1,2), deb=0,fin=0, width=900, height=900, quality=100, reso=200, parcex=PARCEX, xlab = NULL, ylab = NULL, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL) {
 	if (col) {
 		if (what == 'coord') {
 			rowcoord <- as.matrix(afc$colcoord)
@@ -429,10 +429,10 @@ create_afc_table <- function(x) {
 
 make_afc_graph <- function(toplot, classes, clnb, xlab, ylab, cex.txt = NULL, leg = FALSE, cmd = FALSE, black = FALSE, xminmax=NULL, yminmax=NULL) {
     if (is.null(xminmax)) {
-        xminmax <- c(min(toplot[,1], na.rm = TRUE) + (0.1 * min(toplot[,1], na.rm = TRUE)), max(toplot[,1], na.rm = TRUE) + (0.1 * max(toplot[,1], na.rm = TRUE)))
+        xminmax <- c(min(toplot[,1], na.rm = TRUE) + ((max(cex.txt)/10) * min(toplot[,1], na.rm = TRUE)), max(toplot[,1], na.rm = TRUE) + ((max(cex.txt)/10) * max(toplot[,1], na.rm = TRUE)))
     }
     if (is.null(yminmax)) {
-        yminmax <- c(min(toplot[,2], na.rm = TRUE) + (0.1 * min(toplot[,2], na.rm = TRUE)), max(toplot[,2], na.rm = TRUE) + (0.1 * max(toplot[,2], na.rm = TRUE)))
+        yminmax <- c(min(toplot[,2], na.rm = TRUE) + ((max(cex.txt)/10) * min(toplot[,2], na.rm = TRUE)), max(toplot[,2], na.rm = TRUE) + ((max(cex.txt)/10) * max(toplot[,2], na.rm = TRUE)))
     }
 	rain <- rainbow(clnb)
     compt <- 1

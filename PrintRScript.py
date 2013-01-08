@@ -173,12 +173,12 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, libsvdc = False
         """ % DicoPath['listeuce2']
         
     txt += """
-#    rm(data1)
+    rm(data1)
     """
     
     if classif_mode == 0:
         txt += """
-#        rm(data2)
+        rm(data2)
         """
     txt += """
     chd.result <- Rchdtxt("%s",mincl=%i,classif_mode=%i, nbt = nbt)
@@ -378,6 +378,10 @@ write.csv2(gbcluster,file="%s")
     xmax <- max(afc$rowcoord[,1], na.rm = TRUE) + (0.1 * max(afc$rowcoord[,1], na.rm = TRUE))
     ymin <- min(afc$rowcoord[,2], na.rm = TRUE) + (0.1 * min(afc$rowcoord[,2], na.rm = TRUE))
     ymax <- max(afc$rowcoord[,2], na.rm = TRUE) + (0.1 * max(afc$rowcoord[,2], na.rm = TRUE))
+    print(xmin)
+    print(xmax)
+    print(ymin)
+    print(ymax)
     """ % taillecar
         txt += """
     PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab, xmin=xmin, xmax=xmax, ymin = ymin, ymax=ymax)
@@ -554,7 +558,7 @@ def barplot(table, rownames, colnames, rgraph, tmpgraph, intxt = False) :
                 if (valmin >=0) {
                     valmin <- -2
                 } else {
-                    valmin <- valmin -2
+                    valmin <- valmin - 2
                 }
                 di[tominf] <- valmin
             }

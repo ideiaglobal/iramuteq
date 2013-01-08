@@ -89,6 +89,7 @@ class GraphPanelAfc(wx.Panel):
               'facteur' : [1,2,3],
               'alpha' : 10,
               'clnb' : clnb,
+              'svg' : 0,
             }
 
         self.__set_properties()
@@ -155,6 +156,10 @@ class GraphPanelAfc(wx.Panel):
         dial.CenterOnParent()
         val = dial.ShowModal()
         if val == wx.ID_OK :
+            if dial.choix_format.GetSelection() == 0 :
+                svg = 0
+            else :
+                svg = 1
             self.param = {'typegraph' : dial.choicetype.GetSelection(),
                           'width' : dial.spin1.GetValue(),
                           'height' : dial.spin2.GetValue(),
@@ -177,7 +182,8 @@ class GraphPanelAfc(wx.Panel):
                           'facteur' : [dial.spin_f1.GetValue(),dial.spin_f2.GetValue(), dial.spin_f3.GetValue()],
                           'clnb' : self.clnb,
                           'film' : str(dial.film.GetValue()).upper(),
-                          'alpha' : dial.slider_sphere.GetValue()
+                          'alpha' : dial.slider_sphere.GetValue(),
+                          'svg' : svg
                         }
             self.nb.parent = self.ira
             self.DictPathOut = self.Dict
@@ -190,12 +196,6 @@ class GraphPanelAfc(wx.Panel):
                 afc <- afcf
                 afc_table <- afcf_table
                 chistabletot <- specfp
-                infp <- which(is.infinite(chistabletot) & chistabletot > 0)
-                infm <- which(is.infinite(chistabletot) & chistabletot < 0)
-                chistabletot[infp] <- 0
-                chistabletot[infm] <- 0
-                chistabletot[infp] <- max(chistabletot) + 1
-                chistabletot[infm] <- min(chistabletot) - 1
                 """ 
             elif self.itempath == 'liste_graph_afct' :
                 txt +="""
@@ -587,9 +587,8 @@ def PrintRapport(self, corpus, parametres, txt = True):
 temps d'analyse : %s
 ###########################
 """ % parametres['time']
-    file = open(self.pathout['pre_rapport'], 'w')
-    file.write(txt)
-    file.close()
+    with open(self.pathout['pre_rapport'], 'w') as f :
+        f.write(txt)
 
 class dolexlayout :
     def __init__(self, ira, corpus, parametres):

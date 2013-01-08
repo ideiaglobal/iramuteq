@@ -12,7 +12,7 @@ from tableau import Tableau
 import os
 import shelve
 #from ConfigParser import *
-#from tabsimi import DoSimi
+from tabsimi import DoSimi
 from functions import BugReport, DoConf
 import logging
 
@@ -33,12 +33,22 @@ class OpenAnalyse():
         if self.conf['type'] == 'corpus' :
             corpus = self.opencorpus()
         elif self.conf['corpus'] in self.parent.history.corpus :
+            print 'corpus in history.corpus'
+            if self.conf['uuid'] in self.parent.history.analyses :
+                intree  = True
+            else :
+                intree = False
             corpus = self.openanalyse()
             if self.conf.get('lem',1) :
                corpus.make_lems(True)
             else :
                corpus.make_lems(False)
             self.doopen(corpus)
+            if not intree :
+                self.parent.tree.AddAnalyse(self.conf)
+            else :
+                print 'passe apr la'
+                print self.parent.tree.GiveFocus(uuid = self.conf['uuid'], bold = True)
         else :
             corpus = None
         self.parent.history.addtab(self.conf)
@@ -83,6 +93,7 @@ class OpenAnalyse():
             if os.path.exists(self.parent.history.history[self.parent.history.ordercorpus[self.conf['corpus']]]['ira']) :
                 corpus = Corpus(self, parametres = DoConf(self.parent.history.history[self.parent.history.ordercorpus[self.conf['corpus']]]['ira']).getoptions('corpus'), read = self.parent.history.history[self.parent.history.ordercorpus[self.conf['corpus']]]['ira'])
                 self.parent.history.openedcorpus[self.conf['corpus']] = corpus
+        self.parent.history.add(self.conf)
         return corpus
 
     def doopen(self, corpus) :
@@ -104,3 +115,4 @@ class OpenAnalyse():
         elif self.conf['type'] == 'wordcloud' :
             self.parent.ShowMenu(_("Text analysis"))
             WordCloudLayout(self.parent, corpus, self.conf)
+        

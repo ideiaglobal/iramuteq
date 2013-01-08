@@ -20,7 +20,7 @@ from copy import copy
 
 import logging
 
-logger = logging.getLogger('iramuteq.textsimi')
+log = logging.getLogger('iramuteq.textsimi')
 
 class SimiTxt(AnalyseText): 
     def doanalyse(self) :
@@ -48,7 +48,8 @@ class SimiTxt(AnalyseText):
             self.makefiles()
             script = PrintSimiScript(self)
             script.make_script()
-            if not self.doR(script.scriptout) :
+            if not self.doR(script.scriptout, dlg = self.dlg, message = 'R...') :
+                log.info('Problem')
                 return False
             if self.parametres['type_graph'] == 1:
                 if os.path.exists(self.pathout['liste_graph']):
@@ -157,7 +158,7 @@ class SimiFromCluster(SimiTxt) :
             self.makefiles()
             script = PrintSimiScript(self)
             script.make_script()
-            if self.doR(script.scriptout) :
+            if not self.doR(script.scriptout, dlg = self.dlg, message = 'R ...') :
                 return False
             if self.parametres['type_graph'] == 1:
                 if os.path.exists(self.pathout['liste_graph']):

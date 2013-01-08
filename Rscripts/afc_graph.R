@@ -31,6 +31,10 @@ tchi <- %s
 tchi.min <- %i
 tchi.max <- %i
 dirout <- '%s'
+#xmin <- xmin
+#xmax <- xmax
+#ymin <- ymin
+#ymax <- ymax
 
 xlab <- paste('facteur ', x, ' -')
 ylab <- paste('facteur ', y, ' -')
@@ -58,10 +62,10 @@ if ( qui == 3 ) {
     }
     classes <- c(1:clnb)
     maxchi <- 1
-    cex.par <- NULL
+    cex.par <- rep(taillecar/10, nrow(table.in))
 } else {
     if ( what == 0 ) table.in <- afc$rowcoord
-    if ( what == 1 ) table.in <- afc$rowcrl*2
+    if ( what == 1 ) table.in <- afc$rowcrl
     rownames(table.in) <- afc$rownames
     tablechi <- chistabletot
     rn.keep <- c()
@@ -107,19 +111,6 @@ if ( qui == 3 ) {
         }
     }
         
-#    if (over) {
-#        rn <- rownames(table.in)
-#        rownames(table.in) <- 1:nrow(table.in)
-#        table.in <- unique(table.in)
-#        rn.keep <- as.numeric(rownames(table.in))
-#        rownames(table.in) <- rn[rn.keep]
-#        tablechi <- tablechi[rn.keep,]
-#        if (qui==0) {
-#            cex.par <- cex.par[rn.keep]
-#        } else {
-#            cex.par <- NULL
-#        }
-#    } 
     if (do.select.nb) {
         if (select.nb > nrow(table.in)) select.nb <- nrow(table.in)
         row.keep <- select_point_nb(tablechi, select.nb)
@@ -139,7 +130,12 @@ if ( qui == 3 ) {
     }
     classes <- apply(tablechi, 1, which.max)
     maxchi <- apply(tablechi, 1, max)
-    
+    infp <-  which(is.infinite(maxchi) & maxchi > 0)
+    if (length(infp)) {
+        maxchi[infp] <- NA
+        valmax <- max(maxchi, na.rm = TRUE)
+        maxchi[infp] <- valmax + 2
+    } 
     if (cex.txt) {
         #row.keep <- append(row.keep, rn.keep)
         #row.keep <- unique(row.keep)
@@ -149,7 +145,7 @@ if ( qui == 3 ) {
         cex.par <- maxchi
         cex.par <- norm.vec(cex.par, tchi.min/10, tchi.max/10)
     } else {
-        cex.par <- NULL
+        cex.par <- rep(taillecar/10, nrow(table.in))
     }
 }
 

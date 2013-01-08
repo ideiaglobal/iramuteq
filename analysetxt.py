@@ -150,7 +150,7 @@ class Alceste(AnalyseText) :
         elif self.parametres['classif_mode'] == 2 :
             self.corpus.make_and_write_sparse_matrix_from_uci(self.actives, self.pathout['TableUc1'], self.pathout['listeuce1'])
         Rscript = self.printRscript()
-        self.doR(Rscript)
+        self.doR(Rscript, dlg = self.dlg, message = 'CHD...')
         #self.lc = make_ucecl_from_R(self.pathout['uce'])
         #self.lc0 = self.lc.pop(0)
         self.corpus.make_ucecl_from_R(self.pathout['uce'])
@@ -161,7 +161,7 @@ class Alceste(AnalyseText) :
         self.clnb = len(self.corpus.lc)
         self.parametres['clnb'] = self.clnb
         Rscript = self.printRscript2()
-        self.doR(Rscript)
+        self.doR(Rscript, dlg = self.dlg, message = 'profils et A.F.C. ...')
         self.time = time() - self.t1
         minutes, seconds = divmod(self.time, 60)
         hours, minutes = divmod(minutes, 60)            

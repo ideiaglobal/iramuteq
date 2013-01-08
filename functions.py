@@ -64,7 +64,7 @@ class History :
             tosave['corpus'] = analyse['corpus']
             tosave['name'] = analyse['name']
             acorpus_uuid =  analyse['corpus']
-            if acorpus_uuid in self.ordercorpus :
+            if acorpus_uuid in self.corpus :
                 if 'analyses' in self.history[self.ordercorpus[acorpus_uuid]] :
                     self.history[self.ordercorpus[acorpus_uuid]]['analyses'].append(tosave)
                 else :
@@ -511,6 +511,7 @@ def check_Rresult(parent, pid) :
     if isinstance(pid, Popen) :
         if pid.returncode != 0 :
             error = pid.communicate()
+            print error
             error = [str(error[0]), error[1]]
             if error[1] is None :
                 error[1] = 'None'
@@ -521,7 +522,7 @@ def check_Rresult(parent, pid) :
             #except :
             #    BugReport(parent)
         else :
-            return None
+            return True
     else :
         if pid != 0 :
             #try :
@@ -530,7 +531,7 @@ def check_Rresult(parent, pid) :
             #except :
             #    BugReport(parent)
         else :
-            return None
+            return True
 
 def print_liste(filename,liste):
     with open(filename,'w') as f :

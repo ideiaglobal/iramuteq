@@ -168,8 +168,8 @@ class OptionPam(wx.Dialog):
         
         self.label_1 = wx.StaticText(self, -1, u"Lemmatisation")
         self.radio_1 = wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
-        self.label_exp = wx.StaticText(self, -1, u"Utiliser le dict. des expressions")
-        self.radio_exp =  wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
+        #self.label_exp = wx.StaticText(self, -1, u"Utiliser le dict. des expressions")
+        #self.radio_exp =  wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
         txt = u"""Methode de construction
 de la matrice des distances"""
         self.label_12 = wx.StaticText(self, -1, txt)
@@ -212,10 +212,10 @@ de la matrice des distances"""
         else:
             self.radio_1.SetSelection(1)
         expressions = self.pamconf.getboolean('pam', 'expressions')
-        if expressions :
-            self.radio_exp.SetSelection(0)
-        else :
-            self.radio_exp.SetSelection(1)
+        #if expressions :
+        #    self.radio_exp.SetSelection(0)
+        #else :
+        #    self.radio_exp.SetSelection(1)
         self.choice_1.SetSelection(self.distance.index(self.pamconf.get('pam', 'method')))
         if self.pamconf.get('pam', 'cluster_type') == u'pam' :
             self.radio_box_3.SetSelection(0)
