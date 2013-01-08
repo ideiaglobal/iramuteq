@@ -72,7 +72,7 @@ def CopyConf(self) :
     dicoUser = self.DictPath
     dicoAppli = ConstructDicoPath(self.AppliPath)
     for fi in dicoUser :
-        if not os.path.exists(dicoUser[fi]) :
+        if not os.path.exists(dicoUser[fi]) and os.path.exists(dicoAppli[fi]):
             shutil.copyfile(dicoAppli[fi], dicoUser[fi])
 
 def CheckRPath(PathPath):
