@@ -94,11 +94,10 @@ PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axeto
 
 	open_file_graph(filename, width = width, height = height)
 	par(cex=PARCEX)
-
     table.in <- rowcoord[order(cex.par, decreasing = TRUE),]
     classes <- classes[order(cex.par, decreasing = TRUE)]
     cex.par <- cex.par[order(cex.par, decreasing = TRUE)]
-    table.in <- stopoverlap(table.in, cex.par=cex.par)
+    table.in <- stopoverlap(table.in, cex.par=cex.par, xlim = c(xmin,xmax), ylim = c(ymin,ymax))
     classes <- classes[table.in[,4]]
     cex.par <- cex.par[table.in[,4]]
     make_afc_graph(table.in, classes, clnb, xlab, ylab, cex.txt = cex.par, xminmax=c(xmin,xmax), yminmax=c(ymin,ymax))
@@ -173,7 +172,7 @@ overlap <- function(x1, y1, sw1, sh1, boxes) {
     .Call("is_overlap",x11,y11,sw11,sh11,boxes1)
 }
 ########################################################
-stopoverlap <- function(x, cex.par = NULL) {
+stopoverlap <- function(x, cex.par = NULL, xlim = NULL, ylim = NULL) {
 #from wordcloud
     library(wordcloud)
     tails <- "g|j|p|q|y"
@@ -184,7 +183,7 @@ stopoverlap <- function(x, cex.par = NULL) {
     toplot <- NULL
 
 #    plot.new()
-    plot(x[,1],x[,2], pch='')
+    plot(x[,1],x[,2], pch='', xlim = xlim, ylim = ylim)
 
     words <- rownames(x)
     if  (is.null(cex.par))  {
@@ -202,8 +201,6 @@ stopoverlap <- function(x, cex.par = NULL) {
 		y1<- x[i,2]
 		wid <- strwidth(words[i],cex=size[i])
 		ht <- strheight(words[i],cex=size[i])
-	    ht <- (ht + ht*.08)
-        wid <- (wid + wid*.15)
 		isOverlaped <- TRUE
 		while(isOverlaped){
 			if(!overlap(x1-.5*wid,y1-.5*ht,wid,ht, boxes)) { #&&
@@ -213,7 +210,7 @@ stopoverlap <- function(x, cex.par = NULL) {
 				boxes[[length(boxes)+1]] <- c(x1-.5*wid,y1-.5*ht,wid,ht)
 				isOverlaped <- FALSE
 			} else {
-				if(r>sqrt(.1)){
+				if(r>sqrt(.5)){
 					print(paste(words[i], "could not be fit on page. It will not be plotted."))
 					isOverlaped <- FALSE
 				}
@@ -428,13 +425,8 @@ create_afc_table <- function(x) {
 }
 
 make_afc_graph <- function(toplot, classes, clnb, xlab, ylab, cex.txt = NULL, leg = FALSE, cmd = FALSE, black = FALSE, xminmax=NULL, yminmax=NULL) {
-    if (is.null(xminmax)) {
-        xminmax <- c(min(toplot[,1], na.rm = TRUE) + ((max(cex.txt)/10) * min(toplot[,1], na.rm = TRUE)), max(toplot[,1], na.rm = TRUE) + ((max(cex.txt)/10) * max(toplot[,1], na.rm = TRUE)))
-    }
-    if (is.null(yminmax)) {
-        yminmax <- c(min(toplot[,2], na.rm = TRUE) + ((max(cex.txt)/10) * min(toplot[,2], na.rm = TRUE)), max(toplot[,2], na.rm = TRUE) + ((max(cex.txt)/10) * max(toplot[,2], na.rm = TRUE)))
-    }
-	rain <- rainbow(clnb)
+    
+    rain <- rainbow(clnb)
     compt <- 1
     tochange <- NULL
     for (my.color in rain) {
