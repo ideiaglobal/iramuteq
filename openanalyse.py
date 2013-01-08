@@ -33,7 +33,6 @@ class OpenAnalyse():
         if self.conf['type'] == 'corpus' :
             corpus = self.opencorpus()
         elif self.conf['corpus'] in self.parent.history.corpus :
-            print 'corpus in history.corpus'
             if self.conf['uuid'] in self.parent.history.analyses :
                 intree  = True
             else :
@@ -43,12 +42,11 @@ class OpenAnalyse():
                corpus.make_lems(True)
             else :
                corpus.make_lems(False)
-            self.doopen(corpus)
             if not intree :
-                self.parent.tree.AddAnalyse(self.conf)
+                self.parent.tree.AddAnalyse(self.conf, bold = True)
             else :
-                print 'passe apr la'
-                print self.parent.tree.GiveFocus(uuid = self.conf['uuid'], bold = True)
+                self.parent.tree.GiveFocus(uuid = self.conf['uuid'], bold = True)
+            self.doopen(corpus)
         else :
             corpus = None
         self.parent.history.addtab(self.conf)
