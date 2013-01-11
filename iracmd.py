@@ -20,6 +20,7 @@ from ConfigParser import *
 #from textafcuci import AfcUci
 from textaslexico import Lexico
 from textstat import Stat
+from tools import SubCorpus
 import tempfile
 ######################################
 import logging
@@ -56,7 +57,7 @@ class CmdLine :
         self.RPath = self.PathPath.get('PATHS', 'rpath')
         self.pref = RawConfigParser()
         self.pref.read(self.ConfigPath['preferences'])
-        self.history = History(self.ConfigPath['history'])
+        self.history = History(os.path.join(UserConfigPath, 'history.db'))
 
         parser = OptionParser()
     
@@ -124,14 +125,17 @@ class CmdLine :
                 #with codecs.open(self.filename, 'r', self.corpus_encodage) as f:
             elif options.read :
                 corpus = Corpus(self, parametres = DoConf(options.read).getoptions('corpus'), read = options.read)
-                corpus.parametres['path'] = os.path.abspath(options.read)
+                corpus.parametres['pathout'] = os.path.dirname(os.path.abspath(options.read))
                 pathout = os.path.dirname(os.path.dirname(os.path.abspath(options.read)))
                 self.corpus = corpus
 
             if corpus is not None :
                 corpus.conn_all()
+                corpus = SubCorpus(self, corpus, [0,1,2,3,4,5,6,7])
+                corpus.conn_all()
                 corpus.make_lems()
                 corpus.parse_active(gramact, gramsup)
+                print corpus.getlemconcorde('de').fetchall()
 #            log.warning('ATTENTION gethapaxuces')
 #            MakeUciStat(corpus)
 #            qfqsdf
@@ -159,7 +163,7 @@ class CmdLine :
                 elif options.type_analyse == 'afcuci' :
                     self.Text = AfcUci(self, cmd = True)
                 elif options.type_analyse == 'stat' :
-                    self.Text = Stat(self, corpus, parametres = config)
+                    self.Text = Stat(self, corpus, parametres = {'type':'stat'})
                 elif options.type_analyse == 'spec' :
                     self.Text = Lexico(self, corpus, config = {'type' : 'spec'})
             #print self.Text.corpus.hours, 'h', self.Text.corpus.minutes,'min', self.Text.corpus.seconds, 's'

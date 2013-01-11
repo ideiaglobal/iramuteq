@@ -2457,7 +2457,7 @@ class CorpusPref ( wx.Dialog ):
 class message(wx.Dialog):
     def __init__(self, parent, title, size, save = True):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_DIALOG_STYLE )
-	self.save = save	
+        self.save = save    
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 
         self.html = ""
@@ -2506,3 +2506,105 @@ class message(wx.Dialog):
 
     def OnCloseWindow(self, event):
         self.Destroy()
+
+class ExtractDialog ( wx.Dialog ):
+    
+    def __init__( self, parent, option ):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+
+        self.option = option
+        
+        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        
+        fgSizer1 = wx.FlexGridSizer( 0, 2, 0, 0 )
+        fgSizer1.SetFlexibleDirection( wx.BOTH )
+        fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Corpus", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1.Wrap( -1 )
+        fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
+        
+        self.corpusfile = wx.FilePickerCtrl( self, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.txt", wx.DefaultPosition, wx.Size( -1,-1 ), wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST|wx.FLP_OPEN )
+        self.corpusfile.SetMinSize( wx.Size( 500,-1 ) )
+        
+        fgSizer1.Add( self.corpusfile, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+        
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"Encodage", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2.Wrap( -1 )
+        fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        encodageChoices = [' - '.join(encodage) for encodage in encodages]
+        self.encodage = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, encodageChoices, 0 )
+        self.encodage.SetSelection( 0 )
+        self.encodage.SetMinSize( wx.Size( 200,-1 ) )
+        
+        fgSizer1.Add( self.encodage, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+        
+        if option == 'splitvar' :
+            self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"Variable (avec * mais sans le _ )", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_staticText3.Wrap( -1 )
+            fgSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+            
+            self.txtvar = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.txtvar.SetMinSize( wx.Size( 200,-1 ) )
+            
+            fgSizer1.Add( self.txtvar, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+        
+        if option == 'mods' :
+            self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, u"Modalités (une par ligne, avec * )", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_staticText4.Wrap( -1 )
+            fgSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+            
+            self.txtmods = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE )
+            self.txtmods.SetMinSize( wx.Size( 200,150 ) )
+            
+            fgSizer1.Add( self.txtmods, 0, wx.ALL|wx.EXPAND, 5 )
+            
+            self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, u"Format de l'extraction", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_staticText5.Wrap( -1 )
+            fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+            
+            extractformatChoices = [ u"Un seul fichier", u"Un fichier par modalité" ]
+            self.extractformat = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, extractformatChoices, 1, wx.RA_SPECIFY_COLS )
+            self.extractformat.SetSelection( 0 )
+            fgSizer1.Add( self.extractformat, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+            
+        
+        fgSizer1.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
+        
+        m_sdbSizer1 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
+        self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
+        m_sdbSizer1.Realize();
+        
+        fgSizer1.Add( m_sdbSizer1, 1, wx.EXPAND, 5 )
+        
+        
+        self.SetSizer( fgSizer1 )
+        self.Layout()
+        fgSizer1.Fit( self )
+        
+        self.Centre( wx.BOTH )
+
+    def make_param(self) :
+        parametres = {}
+        le = [enc[0].lower() for enc in encodages]
+        parametres['filein'] = self.corpusfile.GetPath()
+        encodage = le[self.encodage.GetSelection()]
+        parametres['encodein'] = encodage
+        if self.option == 'splitvar' :
+            parametres['var'] = self.txtvar.GetValue()
+        if self.option == 'mods' :
+            parametres['mods'] = self.txtmods.GetValue().splitlines()
+            if self.extractformat.GetSelection() == 0 :
+                parametres['onefile'] = True
+            else :
+                parametres['onefile'] = False
+        parametres['encodeout'] = locale.getpreferredencoding()
+        print parametres
+        return parametres
+    
+    def __del__( self ):
+        pass

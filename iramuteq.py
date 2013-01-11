@@ -64,6 +64,7 @@ from sheet import MySheet
 from checkinstall import CreateIraDirectory, CheckRPath, FindRPAthWin32, FindRPathNix, CheckRPackages, IsNew, UpgradeConf, CopyConf, RLibsAreInstalled
 from chemins import ConstructRscriptsPath, ConstructConfigPath, ConstructDicoPath, ConstructGlobalPath, PathOut
 from parse_factiva_xml import ImportFactiva
+from tools import Extract
 
 from tree import LeftTree
 ##########################################################
@@ -196,13 +197,20 @@ class IraFrame(wx.Frame):
         menuFactiva.AppendItem(fact_from_xml)
         menuFactiva.AppendItem(fact_from_mail)
         menuFactiva.AppendItem(fact_from_txt)
-
         file_menu.AppendMenu(-1, _(u"Import from factiva"), menuFactiva)
-        #item1.Enable(True)
-       
+
+        menuTools = wx.Menu()
+        splitvar = wx.MenuItem(menuTools, wx.ID_ANY, _(u"Split from variable"))
+        extractmod = wx.MenuItem(menuTools, wx.ID_ANY, _(u"Extract mods"))
+        menuTools.AppendItem(splitvar)
+        menuTools.AppendItem(extractmod)
+        self.ID_splitvar = splitvar.GetId()
+        self.ID_extractmod = extractmod.GetId()
+        file_menu.AppendMenu(-1, _(u"Tools"), menuTools)
+
+               
         item = wx.MenuItem(file_menu, ID_SaveTab, _(u"Save tab as..."), _(u"Save tab as..."))
         item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_SAVE_AS))
-        #item.Enable(False)
         file_menu.AppendItem(item)
         
         file_menu.Append(wx.ID_EXIT, _(u"Exit"))
@@ -343,6 +351,8 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.import_factiva_xml, fact_from_xml)
         self.Bind(wx.EVT_MENU, self.import_factiva_mail, fact_from_mail)
         self.Bind(wx.EVT_MENU, self.import_factiva_txt, fact_from_txt)
+        self.Bind(wx.EVT_MENU, self.ExtractTools, splitvar)
+        self.Bind(wx.EVT_MENU, self.ExtractTools, extractmod)
         self.Bind(wx.EVT_MENU, self.OnFreq, id=ID_Freq)
         self.Bind(wx.EVT_MENU, self.OnChi2, id=ID_Chi2)
         self.Bind(wx.EVT_MENU, self.OnStudent, id=ID_Student)
@@ -475,7 +485,9 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
     #Disable SaveTabAs
         file_menu = self.mb.GetMenu(0)
         items = file_menu.GetMenuItems()
-        items[4].Enable(DISEN)
+        for item in items :
+            if item.GetId() == ID_SaveTab :
+                item.Enable(DISEN)
     
     def ShowMenu(self, menu, Show=True):
         menu_pos = self.mb.FindMenu(menu)
@@ -913,6 +925,13 @@ Voulez-vous fermer quand même ?"""
             ImportFactiva(self, 'txt')
         except :
             BugReport(self)
+
+    def ExtractTools(self, evt) :
+        ID = evt.GetId()
+        if ID == self.ID_splitvar :
+            Extract(self, 'splitvar')
+        else :
+            Extract(self, 'mods')
 
     def OnTextAlceste(self, event, corpus = None):
         try:

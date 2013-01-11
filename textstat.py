@@ -124,8 +124,8 @@ class Stat(AnalyseText) :
             else :
                 with open(self.pathout['%s.txt' % 'glob'], 'w') as f :
                     f.write(self.result['glob'].encode(self.parent.syscoding))
-            self.parametres['pathout'] = self.pathout['Analyse.ira']
-            DoConf().makeoptions(['stat'],[self.parametres], self.pathout['Analyse.ira'])
+            #self.parametres['pathout'] = self.pathout['Analyse.ira']
+            #DoConf().makeoptions(['stat'],[self.parametres], self.pathout['Analyse.ira'])
 
 
 #class Stat():

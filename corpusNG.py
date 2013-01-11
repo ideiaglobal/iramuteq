@@ -196,18 +196,6 @@ class Corpus :
         res = self.getalluces()
         return [len(uce[1].split()) for uce in res]
 
-#    def getlemseff(self) :
-#        if self.idformes is None :
-#            self.make_idformes()
-#        return dict([[lem, sum([self.idformes[forme].freq for forme in self.lems[lem]])] for lem in self.lems])
-
-#    def getlemsefftype(self) :
-#        if self.idformes is None :
-#            self.make_idformes()
-#        if self.lems is None :
-#            self.make_lems()
-#        return dict([[lem, [sum([self.idformes[forme].freq for forme in self.lems[lem]]), '', self.idformes[self.lems[lem].keys()[0]].gram]] for lem in self.lems])
-
     def getconcorde(self, uces) :
         return self.cuces.execute('select * from uces where id IN (%s);' % ', '.join([`i` for i in uces])) 
 
