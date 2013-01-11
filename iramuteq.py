@@ -28,8 +28,8 @@ import logging
 #------------------------------------
 import wx
 #import wx.aui
-#import wx.lib.agw.aui as aui
-import agw.aui as aui
+import wx.lib.agw.aui as aui
+#import agw.aui as aui
 import wx.html
 import wx.grid
 import wx.lib.hyperlink as hl

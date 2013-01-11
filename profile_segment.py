@@ -6,7 +6,8 @@
 
 import tempfile
 from ProfList import *
-import agw.aui as aui
+#import agw.aui as aui
+import wx.lib.agw.aui as aui
 from functions import exec_rcode, check_Rresult, ReadProfileAsDico, ReadList
 from listlex import *
 from dialog import PrefSegProf, PrefProfTypes

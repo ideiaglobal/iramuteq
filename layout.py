@@ -7,7 +7,8 @@
 import os
 import wx
 import wx.lib.hyperlink as hl
-import agw.aui as aui
+#import agw.aui as aui
+import wx.lib.agw.aui as aui
 from chemins import ConstructPathOut, ChdTxtPathOut, FFF, ffr, PathOut, StatTxtPathOut, simipath
 from ConfigParser import ConfigParser
 from functions import ReadProfileAsDico, GetTxtProfile, read_list_file, ReadList, exec_rcode, print_liste, BugReport, DoConf, indices_simi, check_Rresult, progressbar
