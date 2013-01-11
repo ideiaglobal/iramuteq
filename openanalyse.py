@@ -6,12 +6,10 @@
 
 from chemins import ChdTxtPathOut, StatTxtPathOut, construct_simipath
 from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout
-#from corpus import Corpus
-from corpusNG import Corpus, copycorpus
+from corpus import Corpus, copycorpus
 from tableau import Tableau
 import os
 import shelve
-#from ConfigParser import *
 from tabsimi import DoSimi
 from functions import BugReport, DoConf
 import logging

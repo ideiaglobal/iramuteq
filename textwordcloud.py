@@ -10,13 +10,11 @@ from ConfigParser import RawConfigParser
 from functions import sortedby, progressbar, CreateIraFile, exec_rcode, check_Rresult, MessageImage
 from dialog import StatDialog, PrefWordCloud
 from PrintRScript import WordCloudRScript
-#from openanalyse import OpenAnalyse
 #from ttparser import * 
 import tempfile
 from time import sleep
 import wx
 import os
-#from corpusNG import Corpus
 import logging
 
 logger = logging.getLogger('iramuteq.textwordcloud')

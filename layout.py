@@ -7,7 +7,6 @@
 import os
 import wx
 import wx.lib.hyperlink as hl
-#import wx.lib.agw.aui as aui
 import agw.aui as aui
 from chemins import ConstructPathOut, ChdTxtPathOut, FFF, ffr, PathOut, StatTxtPathOut, simipath
 from ConfigParser import ConfigParser
@@ -22,12 +21,11 @@ from Liste import *
 from search_tools import SearchFrame
 from dialog import PrefGraph, PrefExport, PrefSimpleFile, PrefDendro
 from guifunct import SelectColumn, PrepSimi
-from corpusNG import Corpus
+from corpus import Corpus
 import datetime
 import sys
 import tempfile
 import shutil
-#import webbrowser
 import codecs
 import logging
 

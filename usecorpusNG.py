@@ -1,4 +1,4 @@
-from corpusNG import *
+from corpus import *
 from functions import DoConf
 
 corpus_encodage = 'cp1252'

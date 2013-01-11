@@ -10,7 +10,7 @@ import webbrowser
 import wx.lib.agw.customtreectrl as CT
 import logging
 from openanalyse import OpenAnalyse
-from corpusNG import Corpus, copycorpus
+from corpus import Corpus, copycorpus
 from functions import DoConf, GetTxtProfile
 from profile_segment import ProfileSegment, ProfilType
 from search_tools import SearchFrame

@@ -1,48 +1,21 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#from corpusNG import Corpus
+#lisence : GNU GPL
+#copyright : 2012-2013 (c) Pierre Ratinaud
+
 import logging
 from chemins import PathOut, ChdTxtPathOut
 from functions import exec_rcode, check_Rresult, DoConf, print_liste
 from time import time, sleep
 from uuid import uuid4
 import os
-#ALCESTE
 from PrintRScript import RchdTxt, AlcesteTxtProf
 from OptionAlceste import OptionAlc 
 from layout import PrintRapport
 from openanalyse import OpenAnalyse
 from time import time
-######################################
-print '#######LOGGING TEST###########'
+
 log = logging.getLogger('iramuteq.analyse')
-#formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-#ch = logging.StreamHandler()
-#ch.setFormatter(formatter)
-#log.addHandler(ch)
-#log.setLevel(logging.INFO)
-#######################################
-
-#def make_ucecl_from_R(filein) :
-#    with open(filein, 'rU') as f :
-#        c = f.readlines()
-#    c.pop(0)
-#    ucecl = []
-#    for line in c :
-#        line = line.replace('\n', '').replace('"', '').split(';')
-#        ucecl.append([int(line[0]) - 1, int(line[1])])
-#    classesl = [val[1] for val in ucecl]
-#    clnb = max(classesl)
-#    ucecl = sorted(ucecl, key=itemgetter(1))
-#    ucecl = [[uce[0] for uce in ucecl if uce[1] == i] for i in range(clnb+1)]
-#    return ucecl
-#
-#def make_lc(self, uces, classes, clnb) :    
-#    self.lc = [[] for classe in range(0,clnb)]
-#    for i in range(0,clnb):
-#        self.lc[i] = [uce for j, uce in enumerate(uces) if i+1 == classes[j]]
-#    self.lc0 = [uce for j, uce in enumerate(uces) if 0 == classes[j]]
-
 
 class AnalyseText :
     def __init__(self, ira, corpus, parametres = None, dlg = False) :
@@ -75,7 +48,6 @@ class AnalyseText :
             self.parametres['type'] = parametres['type']
             self.parametres['encoding'] = self.ira.syscoding
             self.t1 = time()
-            #if self.corpus.lems is None :
             self.corpus.make_lems(lem = self.parametres['lem'])
             corpus.parse_active(gramact, gramsup)
             result_analyse = self.doanalyse()
@@ -135,7 +107,6 @@ class AnalyseText :
 
 class Alceste(AnalyseText) :
     def doanalyse(self) :
-        #self.pathout = PathOut(self.corpus.parametres['filename'], 'alceste')
         self.parametres['type'] = 'alceste'
         self.pathout.basefiles(ChdTxtPathOut)
         self.actives, lim = self.corpus.make_actives_nb(self.parametres['max_actives'], 1)
@@ -151,8 +122,6 @@ class Alceste(AnalyseText) :
             self.corpus.make_and_write_sparse_matrix_from_uci(self.actives, self.pathout['TableUc1'], self.pathout['listeuce1'])
         Rscript = self.printRscript()
         self.doR(Rscript, dlg = self.dlg, message = 'CHD...')
-        #self.lc = make_ucecl_from_R(self.pathout['uce'])
-        #self.lc0 = self.lc.pop(0)
         self.corpus.make_ucecl_from_R(self.pathout['uce'])
         self.corpus.make_and_write_profile(self.actives, self.corpus.lc, self.pathout['Contout'])
         self.sup, lim = self.corpus.make_actives_nb(self.parametres['max_actives'], 2)
@@ -213,10 +182,6 @@ class Alceste(AnalyseText) :
                       [os.path.basename(self.pathout['AFC2DSL_OUT']), u'variables supplémentaires - coordonnées - 30 points par classes - facteurs 1 / 2 - %s' % mess_afc],
                       [os.path.basename(self.pathout['AFC2DEL_OUT']), u'Variables illustratives - Coordonnées - 30 points par classes - facteur 1 / 2 - %s' % mess_afc],
                       [os.path.basename(self.pathout['AFC2DCL_OUT']), u'Classes - Coordonnées - facteur 1 / 2']]
-                      #[os.path.basename(self.pathout['AFC2DCoul']), u'Variables actives - Corrélation - facteur 1 / 2'],
-                      #[os.path.basename(self.pathout['AFC2DCoulSup']), u'Variables supplémentaires - Corrélation - facteur 1 / 2'],
-                      #[os.path.basename(self.pathout['AFC2DCoulEt']), u'Variables illustratives - Corrélations - facteur 1 / 2'],
-                      #[os.path.basename(self.pathout['AFC2DCoulCl']), u'Classes - Corrélations - facteurs 1 / 2'],]
         chd_graph_list = [[os.path.basename(self.pathout['dendro1']), u'dendrogramme à partir de chd1']]
         if self.parametres['classif_mode'] == 0 :
             chd_graph_list.append([os.path.basename(self.pathout['dendro2']), u'dendrogramme à partir de chd2'])
@@ -259,8 +224,3 @@ keys = {'art_def' : 2,
 
 gramact = [k for k in keys if keys[k] == 1]
 gramsup = [k for k in keys if keys[k] == 2]
-
-#corpus = Corpus('', {'filename': '/home/pierre/workspace/iramuteq/dev/testcorpus.txt','formesdb':'formes.db', 'ucesdb': 'uces.db', 'corpusdb' : 'corpus.db', 'syscoding' : 'utf-8'})
-#corpus.read_corpus()
-#corpus.parse_active(gramact, gramsup)
-#Alceste(corpus).doanalyse()

@@ -59,7 +59,7 @@ from textwordcloud import WordCloud
 from profile_segment import ProfileSegment
 from textcheckcorpus import checkcorpus
 from openanalyse import OpenAnalyse
-from corpusNG import BuildFromAlceste, Builder
+from corpus import BuildFromAlceste, Builder
 from sheet import MySheet
 from checkinstall import CreateIraDirectory, CheckRPath, FindRPAthWin32, FindRPathNix, CheckRPackages, IsNew, UpgradeConf, CopyConf, RLibsAreInstalled
 from chemins import ConstructRscriptsPath, ConstructConfigPath, ConstructDicoPath, ConstructGlobalPath, PathOut

@@ -18,6 +18,8 @@ from ConfigParser import *
 #from textchdalc import AnalyseAlceste
 #from textdist import PamTxt
 #from textafcuci import AfcUci
+from analysetxt import Alceste,  gramact, gramsup
+from corpus import Corpus, copycorpus
 from textaslexico import Lexico
 from textstat import Stat
 from tools import SubCorpus
@@ -32,9 +34,7 @@ log.addHandler(ch)
 log.setLevel(logging.DEBUG)
 #######################################
 
-log.debug('----------TEST corpusNG-----------------')
-from analysetxt import Alceste,  gramact, gramsup
-from corpusNG import *
+
 
 #cmd = iracmd.CmdLine(args=['-f','/home/pierre/workspace/iramuteq/corpus/lru2.txt','-t','alceste'])
 
@@ -81,7 +81,6 @@ class CmdLine :
             config = DoConf(os.path.abspath(options.configfile)).getoptions()
         elif options.filename and options.type_analyse :
             config = DoConf(self.ConfigPath[options.type_analyse]).getoptions()
-            #self.ConfigPath[options.type_analyse] = os.path.abspath(options.configfile)
         elif options.read and options.type_analyse :
             config = DoConf(self.ConfigPath[options.type_analyse]).getoptions()
         elif options.read :
@@ -92,13 +91,11 @@ class CmdLine :
             print 'rien a faire'
             return
 
-        #self.history.write()
-        if options.filename or options.read :#or options.build:
+        if options.filename or options.read :
             self.corpus_encodage = options.encodage
             self.corpus_lang = options.language
                 
 
-            #print 'PAS DE CODECS POUR CABLE'
             ReadLexique(self, lang = options.language)
             self.expressions = ReadDicoAsDico(self.DictPath.get(options.language + '_exp', 'french_exp'))
             if options.filename :
@@ -121,8 +118,6 @@ class CmdLine :
                 else :
                     self.history.add(corpus.parametres)
                     corpus = copycorpus(corpus)
-
-                #with codecs.open(self.filename, 'r', self.corpus_encodage) as f:
             elif options.read :
                 corpus = Corpus(self, parametres = DoConf(options.read).getoptions('corpus'), read = options.read)
                 corpus.parametres['pathout'] = os.path.dirname(os.path.abspath(options.read))
@@ -131,11 +126,11 @@ class CmdLine :
 
             if corpus is not None :
                 corpus.conn_all()
-                corpus = SubCorpus(self, corpus, [0,1,2,3,4,5,6,7])
-                corpus.conn_all()
+                #corpus = SubCorpus(self, corpus, [0,1,2,3,4,5,6,7])
+                #corpus.conn_all()
                 corpus.make_lems()
                 corpus.parse_active(gramact, gramsup)
-                print corpus.getlemconcorde('de').fetchall()
+                #print corpus.getlemconcorde('de').fetchall()
 #            log.warning('ATTENTION gethapaxuces')
 #            MakeUciStat(corpus)
 #            qfqsdf
