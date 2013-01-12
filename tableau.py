@@ -7,12 +7,15 @@ import codecs
 import sys
 import xlrd
 import ooolib
+import os
 import tempfile
 import re
 import htmlentitydefs
-from numpy import *
 import shelve
+from uuid import uuid4
+import logging
 
+log = logging.getLogger('iramuteq.tableau')
 
 ##
 # Removes HTML or XML character references and entities from a text string.
@@ -55,8 +58,11 @@ class Tableau() :
         self.parametre = {'filename' : filename}
         self.parametre['filetype'] = filetype
         self.parametre['encodage'] = encodage
+        self.parametre['pathout'] = os.path.dirname(os.path.abspath(filename))
         self.parametre['mineff'] = 3
         self.parametre['syscoding'] = sys.getdefaultencoding()
+        self.parametre['type'] = 'matrix'
+        self.parametre['name'] = 'unNOm'
         self.sups = {}
         self.actives = {}
         self.listactives = None
@@ -71,6 +77,7 @@ class Tableau() :
         self.colnb = 0
         self.rownb = 0
         self.classes = []
+        self.parametres = self.parametre
 
     def read_tableau(self, fileout) :
         d=shelve.open(fileout)
@@ -200,9 +207,8 @@ class Tableau() :
         return dico
     
     def select_col(self, listcol) :
-        ArTable = array(self.linecontent)
-        selcol = ArTable[:, listcol]
-        selcol = selcol.tolist()
+        dc = dict(zip(listcol, listcol))
+        selcol = [[val for i, val in enumerate(row) if i in dc] for row in self.linecontent]
         return selcol
     
     def write01(self, fileout, dico, linecontent) :
@@ -220,10 +226,7 @@ class Tableau() :
     def make_01_from_selection(self, listact, listsup = None, dowrite = True) :
         selcol = self.select_col(listact)
         self.actives = self.make_dico(selcol)
-        if 'Act01' in self.dictpathout and dowrite:
-            self.write01(self.dictpathout['Act01'], self.actives, selcol)
-        elif 'mat01' in self.dictpathout and dowrite:
-            self.write01(self.dictpathout['mat01'], self.actives, selcol)
+        self.write01(self.dictpathout['mat01'], self.actives, selcol)
         if listsup is not None :
             selcol = self.select_col(listsup)
             self.sups = self.make_dico(selcol)

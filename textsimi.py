@@ -61,21 +61,21 @@ class SimiTxt(AnalyseText):
         else : 
             return False
 
-    def preferences(self) :
-        dial = StatDialog(self, self.parent)
-        dial.CenterOnParent()
-        val = dial.ShowModal()
-        if val == 5100 :
-            if dial.radio_lem.GetSelection() == 0 :
-                lem = 1
-            else :
-                lem = 0            
-            self.parametres['lem'] = lem
-            dial.Destroy()
-            return self.parametres
-        else :
-            dial.Destroy()
-            return None
+#    def preferences(self) :
+#        dial = StatDialog(self, self.parent)
+#        dial.CenterOnParent()
+#        val = dial.ShowModal()
+#        if val == 5100 :
+#            if dial.radio_lem.GetSelection() == 0 :
+#                lem = 1
+#            else :
+#                lem = 0            
+#            self.parametres['lem'] = lem
+#            dial.Destroy()
+#            return self.parametres
+#        else :
+#            dial.Destroy()
+#            return None
 
     def makesimiparam(self) :
         self.paramsimi = {'coeff' : 0,

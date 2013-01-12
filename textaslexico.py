@@ -208,10 +208,11 @@ class Lexico(AnalyseText) :
         tmpscript = open(tmpfile, 'w')
         tmpscript.write(txt)
         tmpscript.close()
-        pid = exec_rcode(self.parent.RPath, tmpfile, wait = False)
-        while pid.poll() == None :
-            sleep(0.2)
-        check_Rresult(self.parent, pid)
+        self.doR(tmpfile, dlg = self.dlg, message = 'R...')
+        #pid = exec_rcode(self.parent.RPath, tmpfile, wait = False)
+        #while pid.poll() == None :
+        #    sleep(0.2)
+        #check_Rresult(self.parent, pid)
 
     def preferences(self) :
         listet = self.corpus.make_etoiles()
@@ -294,9 +295,11 @@ class Lexico(AnalyseText) :
 
         tabout = self.corpus.make_efftype_from_etoiles(self.listet)
         write_tab(tabout, self.dictpathout['tabletypem'])
-        #dlg.Update(2, u'R...')
+        if self.dlg :
+            self.dlg.Update(2, u'R...')
         self.DoR()
-        #dlg.Update(3, u'Chargement...')
+        if self.dlg :
+            self.dlg.Update(3, u'Chargement...')
         afcf_graph_list = [[os.path.basename(self.dictpathout['afcf_row']), u'lignes'],\
                             [os.path.basename(self.dictpathout['afcf_col']), u'colonnes']]
         afct_graph_list = [[os.path.basename(self.dictpathout['afct_row']), u'lignes'],\

@@ -12,7 +12,6 @@ import wx
 import os
 import sys
 import tempfile
-from numpy import *
 from functions import exec_rcode, check_Rresult
 from time import sleep
 

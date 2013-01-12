@@ -4,7 +4,7 @@
 #Copyright (c) 2008-2012, Pierre Ratinaud
 #Lisense: GNU/GPL
 
-from chemins import ChdTxtPathOut, StatTxtPathOut, construct_simipath
+from chemins import ChdTxtPathOut, StatTxtPathOut, construct_simipath, PathOut
 from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout
 from corpus import Corpus, copycorpus
 from tableau import Tableau
@@ -12,6 +12,7 @@ import os
 import shelve
 from tabsimi import DoSimi
 from functions import BugReport, DoConf
+from tableau import Tableau
 import logging
 
 log = logging.getLogger('iramuteq.openanalyse')
@@ -30,7 +31,7 @@ class OpenAnalyse():
         
         if self.conf['type'] == 'corpus' :
             corpus = self.opencorpus()
-        elif self.conf['corpus'] in self.parent.history.corpus :
+        elif self.conf.get('corpus', False) in self.parent.history.corpus :
             if self.conf['uuid'] in self.parent.history.analyses :
                 intree  = True
             else :
@@ -47,6 +48,19 @@ class OpenAnalyse():
             self.doopen(corpus)
         else :
             corpus = None
+            if isinstance(parametres, dict) :
+                tableau = Tableau(parent, parametres['ira'])
+            else :
+                tableau = Tableau(parent, parametres)
+            tableau.parametres = self.conf 
+            tableau.dictpathout = PathOut(filename = tableau.parametres['filename'], dirout = self.conf['pathout'], analyse_type = self.conf['type'])
+            tableau.dictpathout.basefiles(ChdTxtPathOut)
+            tableau.read_tableau(tableau.dictpathout['db'])
+            if self.parent.tree.IsInTree(uuid = self.conf['uuid']) :
+                self.parent.tree.GiveFocus(uuid = self.conf['uuid'], bold = True)
+            else :
+                self.parent.tree.AddAnalyse(self.conf, bold = True)
+            self.doopen(tableau)
         self.parent.history.addtab(self.conf)
     
     def redopath(self, conf, path) :
@@ -116,4 +130,7 @@ class OpenAnalyse():
         elif self.conf['type'] == 'wordcloud' :
             self.parent.ShowMenu(_("Text analysis"))
             WordCloudLayout(self.parent, corpus, self.conf)
+        elif self.conf['type'] == 'gnepamatrix' :
+            self.parent.ShowMenu(_("Spreadsheet analysis"))
+            OpenCHDS(self.parent,  corpus, self.conf, Alceste = False)
         

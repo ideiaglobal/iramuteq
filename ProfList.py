@@ -49,13 +49,17 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             self.lenact = profclasse.index([u'*****', u'*', u'*', u'*', u'*', u'*', '', ''])
             profclasse.pop(self.lenact)
         except ValueError:
-            self.lenact = len(profclasse)
+            try :
+                self.lenact = profclasse.index([u'*', u'*', u'*', u'*', u'*', u'*', '', ''])
+                profclasse.pop(self.lenact)
+            except ValueError:
+                self.lenact = len(profclasse)
         try :
             self.lensup = profclasse.index([u'*', u'*', u'*', u'*', u'*', u'*', '', ''])
             self.lensup = self.lensup - self.lenact
             profclasse.pop(self.lensup)
         except ValueError: 
-            self.lensup = 0
+            self.lensup = len(profclasse) - self.lenact
         self.lenet = len(profclasse) - (self.lenact + self.lensup)
 #        print self.lenact, self.lensup, self.lenet
         for i,  line in enumerate(classen) :

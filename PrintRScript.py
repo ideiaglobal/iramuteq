@@ -275,7 +275,7 @@ def RchdQuest(DicoPath, RscriptPath, nbcl = 10, mincl = 10):
     chd.result<-Rchdquest("%s","%s","%s", nbt = nbt, mincl = mincl)
     n1 <- chd.result$n1
     classeuce1 <- chd.result$cuce1
-    """ % (DicoPath['Act01'], DicoPath['listeuce1'], DicoPath['uce'])
+    """ % (DicoPath['mat01'], DicoPath['listeuce1'], DicoPath['uce'])
     
     txt += """
     tree_tot1 <- make_tree_tot(chd.result$chd)

@@ -7,8 +7,10 @@
 import os
 import wx
 import wx.lib.hyperlink as hl
-#import agw.aui as aui
-import wx.lib.agw.aui as aui
+if wx.__version__ >= '2.11' :
+    import wx.lib.agw.aui as aui
+else :
+    import aui
 from chemins import ConstructPathOut, ChdTxtPathOut, FFF, ffr, PathOut, StatTxtPathOut, simipath
 from ConfigParser import ConfigParser
 from functions import ReadProfileAsDico, GetTxtProfile, read_list_file, ReadList, exec_rcode, print_liste, BugReport, DoConf, indices_simi, check_Rresult, progressbar
@@ -303,16 +305,16 @@ class OpenCHDS():
 
        Profile = DictPathOut['PROFILE_OUT']
        AntiProfile = DictPathOut['ANTIPRO_OUT']
+       self.encoding = self.corpus.parametres['syscoding']
        if isinstance(self.corpus, Corpus) :
-            self.encoding = self.corpus.parametres['syscoding']
             self.corpus.make_ucecl_from_R(self.pathout['uce'])
-       elif 'tableau' in dir(gparent) :
-            self.encoding = gparent.tableau.parametres['syscoding']
+            corpname = self.corpus.parametres['corpus_name']
+       else :
+           corpname = self.corpus.parametres['name']
 
        clnb = parametres['clnb']
        dlg = progressbar(self, maxi = 4 + clnb) 
        self.clnb = clnb 
-       corpname = self.corpus.parametres['corpus_name']
        print 'lecture des profils'
        dlg.Update(2, u'lecture des profils')
  
@@ -336,12 +338,14 @@ class OpenCHDS():
 
        if isinstance(self.corpus, Corpus) :
            panel.corpus = self.corpus
-           panel.dictpathout = self.DictPathOut
-           panel.pathout = self.DictPathOut
-           panel.parent = self.parent
-           panel.DictProfile = self.DictProfile
-           panel.cluster_size = self.cluster_size
-           panel.debtext = self.debtext
+       else :
+           panel.tableau = self.corpus
+       panel.dictpathout = self.DictPathOut
+       panel.pathout = self.DictPathOut
+       panel.parent = self.parent
+       panel.DictProfile = self.DictProfile
+       panel.cluster_size = self.cluster_size
+       panel.debtext = self.debtext
 
 #       self.ID_rapport = wx.NewId()
 #       #rap_img = wx.Image(os.path.join(self.parent.images_path,'icone_rap_16.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
@@ -365,8 +369,11 @@ class OpenCHDS():
        if isinstance(self.corpus, Corpus) :
            panel.TabChdSim.corpus = corpus
            panel.TabChdSim.corpus.dictpathout = self.DictPathOut
-           panel.parametres = self.parametres
-           self.panel = panel
+       else :
+           panel.TabChdSim.tableau = corpus
+           panel.TabChdSim.tableau.dictpathout = self.DictPathOut
+       panel.parametres = self.parametres
+       self.panel = panel
 
        self.notenb = self.parent.nb.GetPageCount()
 
@@ -542,7 +549,7 @@ class OpenCHDS():
     
         
 
-def PrintRapport(self, corpus, parametres, txt = True):
+def PrintRapport(self, corpus, parametres, istxt = True):
     #if sys.platform == 'win32':
     #    sep = '\r\n'
     #else:
@@ -554,8 +561,9 @@ def PrintRapport(self, corpus, parametres, txt = True):
 
 
 """ % datetime.datetime.now().ctime()
-    totocc = corpus.gettotocc()
-    if txt :
+    print istxt
+    if istxt :
+        totocc = corpus.gettotocc()
         txt += u'nombre d\'uci: %i%s' % (corpus.getucinb(), sep)
         txt += u'nombre d\'uce: %i%s' % (corpus.getucenb(), sep)
         txt += u'nombre de formes: %i%s' % (len(corpus.formes), sep)
@@ -571,24 +579,24 @@ def PrintRapport(self, corpus, parametres, txt = True):
                 txt += u'taille uc1 : %i\n' % parametres['tailleuc1']
             else:
                 txt += u'taille uc1 / uc2: %i / %i - %i / %i%s' % (parametres['tailleuc1'], parametres['tailleuc2'], parametres['lenuc1'], parametres['lenuc2'], sep)
-    elif not txt :
+    else :
         self.Ucenb = self.nbind
         txt += u'nombre d\'individus : %i%s' % (self.nbind, sep)
         txt += u'nombre de classes : %i%s' % (self.clnb, sep)
-    if txt :
+    if istxt :
         txt += u'nombre de classes : %i%s' % (parametres['clnb'], sep)
         if parametres['classif_mode'] == 0 or parametres['classif_mode'] == 1 :
             txt += u'%i uce classées sur %i (%.2f%%)%s' % (sum([len(cl) for cl in corpus.lc]), corpus.getucenb(), (float(sum([len(cl) for cl in corpus.lc])) / float(corpus.getucenb())) * 100, sep)
         elif self.parametres['classif_mode'] == 2 :
             txt += u'%i uci classées sur %i (%.2f%%)%s' % (sum([len(cl) for cl in corpus.lc]), corpus.getucinb(), (float(sum([len(cl) for cl in corpus.lc]))) / float(corpus.getucinb()) * 100, sep)
-    elif analyse == 'quest' :
+    else :
         txt += u'%i uce classées sur %i (%.2f%%)%s' % (self.ucecla, self.Ucenb, (float(self.ucecla) / float(self.Ucenb)) * 100, sep)
  
     txt += """
 ###########################
 temps d'analyse : %s
 ###########################
-""" % parametres['time']
+""" % parametres.get('time', '')
     with open(self.pathout['pre_rapport'], 'w') as f :
         f.write(txt)
 

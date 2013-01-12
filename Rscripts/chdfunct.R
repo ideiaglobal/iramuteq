@@ -293,95 +293,12 @@ AsLexico2<- function(mat, chip = FALSE) {
     out
 }
 
-
-##from textometrieR
-##http://txm.sourceforge.net/doc/R/textometrieR-package.html
-##Sylvain Loiseau
-#specificites.probabilities <- function (lexicaltable, types = NULL, parts = NULL) 
-#{
-#    rowMargin <- rowSums(lexicaltable)
-#    colMargin <- colSums(lexicaltable)
-#    F <- sum(lexicaltable)
-#    if (!is.null(types)) {
-#        if (is.character(types)) {
-#            if (is.null(rownames(lexicaltable))) 
-#                stop("The lexical table has no row names and the \"types\" argument is a character vector.")
-#            if (!all(types %in% rownames(lexicaltable))) 
-#                stop(paste("Some requested types are not known in the lexical table: ", 
-#                  paste(types[!(types %in% rownames(lexicaltable))], 
-#                    collapse = " ")))
-#        }
-#        else {
-#            if (any(types < 1)) 
-#                stop("The row index must be greater than 0.")
-#            if (max(types) > nrow(lexicaltable)) 
-#                stop("Row index must be smaller than the number of rows.")
-#        }
-#        lexicaltable <- lexicaltable[types, , drop = FALSE]
-#        rowMargin <- rowMargin[types]
-#    }
-#    if (!is.null(parts)) {
-#        if (is.character(parts)) {
-#            if (is.null(colnames(lexicaltable))) 
-#                stop("The lexical table has no col names and the \"parts\" argument is a character vector.")
-#            if (!all(parts %in% colnames(lexicaltable))) 
-#                stop(paste("Some requested parts are not known in the lexical table: ", 
-#                  paste(parts[!(parts %in% colnames(lexicaltable))], 
-#                    collapse = " ")))
-#        }
-#        else {
-#            if (max(parts) > ncol(lexicaltable)) 
-#                stop("Column index must be smaller than the number of cols.")
-#            if (any(parts < 1)) 
-#                stop("The col index must be greater than 0.")
-#        }
-#        lexicaltable <- lexicaltable[, parts, drop = FALSE]
-#        colMargin <- colMargin[parts]
-#    }
-#    if (nrow(lexicaltable) == 0 | ncol(lexicaltable) == 0) {
-#        stop("The lexical table must contains at least one row and one column.")
-#    }
-#    specif <- matrix(0, nrow = nrow(lexicaltable), ncol = ncol(lexicaltable))
-#    for (i in 1:ncol(lexicaltable)) {
-#        whiteDrawn <- lexicaltable[, i]
-#        white <- rowMargin
-#        black <- F - white
-#        drawn <- colMargin[i]
-#        independance <- (white * drawn)/F
-#        specif_negative <- whiteDrawn < independance
-#        specif_positive <- whiteDrawn >= independance
-#        specif[specif_negative, i] <- phyper(whiteDrawn[specif_negative], 
-#            white[specif_negative], black[specif_negative], drawn)
-#        specif[specif_positive, i] <- phyper(whiteDrawn[specif_positive] - 
-#            1, white[specif_positive], black[specif_positive], 
-#            drawn)
-#    }
-#    dimnames(specif) <- dimnames(lexicaltable)
-#    return(specif)
-#}
-#
-##from textometrieR
-##http://txm.sourceforge.net/doc/R/textometrieR-package.html
-##Sylvain Loiseau
-#specificites <- function (lexicaltable, types = NULL, parts = NULL) 
-#{
-#    spe <- specificites.probabilities(lexicaltable, types, parts)
-#    spelog <- matrix(0, nrow = nrow(spe), ncol = ncol(spe))
-#    spelog[spe < 0.5] <- log10(spe[spe < 0.5])
-#    spelog[spe > 0.5] <- abs(log10(1 - spe[spe > 0.5]))
-#    spelog[spe == 0.5] <- 0
-#    spelog[is.infinite(spe)] <- 0
-#    spelog <- round(spelog, digits = 4)
-#    rownames(spelog) <- rownames(spe)
-#    colnames(spelog) <- colnames(spe)
-#    return(spelog)
-#}
-
 make.spec.hypergeo <- function(mat) {
     library(textometrieR)
     spec <- specificites(mat)
 	sumcol<-colSums(mat)
     eff_relatif<-round(t(apply(mat,1,function(x) {(x/t(as.matrix(sumcol))*1000)})),2)
+    colnames(eff_relatif) <- colnames(mat)
     out <-list()
     out[[1]]<-spec
     out[[3]]<-eff_relatif

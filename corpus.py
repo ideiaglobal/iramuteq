@@ -11,7 +11,6 @@ from time import time
 from functions import decoupercharact, ReadDicoAsDico, DoConf
 import re
 import sqlite3
-import numpy
 import itertools
 import logging
 from operator import itemgetter

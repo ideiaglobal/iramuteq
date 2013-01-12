@@ -10,8 +10,10 @@ from dialog import SelectColDial, OptLexi
 from guifunct import PrefSimi
 from listlex import *
 import wx
-import wx.lib.agw.aui as aui
-from numpy import *
+if wx.__version__ >= '2.11' :
+    import wx.lib.agw.aui as aui
+else :
+    import aui
 import os
 import tempfile
 import datetime

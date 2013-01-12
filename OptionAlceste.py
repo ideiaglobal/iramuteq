@@ -21,8 +21,8 @@ class OptionAlc(wx.Dialog):
         self.AlcesteConf = parametres
         self.choose = False
         
-        self.label_1 = wx.StaticText(self, -1, u"Lemmatisation")
-        self.radio_1 = wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
+        #self.label_1 = wx.StaticText(self, -1, u"Lemmatisation")
+        #self.radio_1 = wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
 
         self.label_12 = wx.StaticText(self, -1, u"Classification")
         self.radio_box_2 = wx.RadioBox(self, -1, u"", choices=[u"double sur UC", u"simple sur UCE", u"simple sur UCI"], majorDimension=0, style=wx.RA_SPECIFY_ROWS) #, u"simple sur UCE (non implemente)"
@@ -42,8 +42,8 @@ analysée (2 = automatique)"""
         self.spin_ctrl_5 = wx.SpinCtrl(self, -1, "",size = (100,30), min=2, max=1000)
         self.label_max_actives =  wx.StaticText(self, -1, u"Nombre maximum de formes analysées")
         self.spin_max_actives = wx.SpinCtrl(self, -1, "",size = (100,30), min=20, max=10000)
-        self.label_4 = wx.StaticText(self, -1, u"Configuration \ndes clés d'analyse")
-        self.button_5 = wx.Button(self, wx.ID_PREFERENCES, "")
+        #self.label_4 = wx.StaticText(self, -1, u"Configuration \ndes clés d'analyse")
+        #self.button_5 = wx.Button(self, wx.ID_PREFERENCES, "")
         self.button_1 = wx.Button(self, wx.ID_CANCEL, "")
         self.button_2 = wx.Button(self, wx.ID_DEFAULT, u"Valeurs par défaut")
         self.button_4 = wx.Button(self, wx.ID_OK, "")
@@ -52,18 +52,18 @@ analysée (2 = automatique)"""
         self.__set_properties()
         self.__do_layout()
 
-        self.Bind(wx.EVT_BUTTON, self.OnKeyPref, self.button_5)
+        #self.Bind(wx.EVT_BUTTON, self.OnKeyPref, self.button_5)
         self.Bind(wx.EVT_BUTTON, self.OnDef, self.button_2)
         
     def __set_properties(self):
         self.SetTitle("Options")
         #lang = self.AlcesteConf.get('ALCESTE', 'lang')
         #self.choice_dict.SetSelection(self.langues.index(lang))
-        DefaultLem = self.parametres['lem']
-        if DefaultLem :
-            self.radio_1.SetSelection(0)
-        else:
-            self.radio_1.SetSelection(1)
+        #DefaultLem = self.parametres['lem']
+        #if DefaultLem :
+        #    self.radio_1.SetSelection(0)
+        #else:
+        #    self.radio_1.SetSelection(1)
         self.radio_box_2.SetSelection(int(self.parametres['classif_mode']))
         self.spin_ctrl_1.SetValue(int(self.parametres['tailleuc1']))
         self.spin_ctrl_2.SetValue(int(self.parametres['tailleuc2']))
@@ -82,10 +82,10 @@ analysée (2 = automatique)"""
         #grid_sizer2.Add(self.label_dict, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         #grid_sizer2.Add(self.choice_dict, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
 
-        grid_sizer2.Add(self.label_1, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
-        grid_sizer2.Add(self.radio_1, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
-        grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
-        grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
+        #grid_sizer2.Add(self.label_1, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
+        #grid_sizer2.Add(self.radio_1, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
+        #grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
+        #grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
 
         grid_sizer2.Add(self.label_12, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.radio_box_2, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
@@ -122,10 +122,10 @@ analysée (2 = automatique)"""
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
        
-        grid_sizer2.Add(self.label_4, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
-        grid_sizer2.Add(self.button_5, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
-        grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
-        grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
+        #grid_sizer2.Add(self.label_4, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
+        #grid_sizer2.Add(self.button_5, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
+        #grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
+        #grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
         
         grid_button.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
         grid_button.Add(self.button_2, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)

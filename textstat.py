@@ -31,20 +31,7 @@ class Stat(AnalyseText) :
         self.make_stats()
 
     def preferences(self) :
-        dial = StatDialog(self, self.parent)
-        dial.CenterOnParent()
-        val = dial.ShowModal()
-        if val == 5100 :
-            if dial.radio_lem.GetSelection() == 0 :
-                lem = 1
-            else :
-                lem = 0            
-            self.parametres['lem'] = lem
-            dial.Destroy()
-            return self.parametres
-        else :
-            dial.Destroy()
-            return None
+        return self.parametres
 
     def make_stats(self):
         if self.dlg :

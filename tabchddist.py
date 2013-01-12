@@ -13,7 +13,6 @@ from ConfigParser import ConfigParser
 from functions import CreateIraFile, print_liste, exec_rcode, check_Rresult
 from dialog import CHDDialog, PrefQuestAlc, ClusterNbDialog
 import tempfile
-from numpy import *
 import time
 
 

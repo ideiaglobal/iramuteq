@@ -4,7 +4,6 @@
 
 #a simple treetagger parser
 import codecs
-import numpy
 import time
 import re
 from functions import ReadDicoAsDico

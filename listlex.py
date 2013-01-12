@@ -67,7 +67,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         self.SetColumnWidth(0, 180)
 
         for i in range(1,len(first)-1):
-            self.SetColumnWidth(i, len(first[i]) * 10)
+            self.SetColumnWidth(i, self.checkcolumnwidth(len(first[i]) * 10))
         
         self.itemDataMap = dlist
         self.itemIndexMap = dlist.keys()
@@ -88,6 +88,12 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
 
 #-----------------------------------------------------------------------------------------    
         
+    def checkcolumnwidth(self, width) :
+        if width < 80 :
+            return 80
+        else :
+            return width
+
     def OnGetItemText(self, item, col):
         index=self.itemIndexMap[item]
         s = self.itemDataMap[index][col]

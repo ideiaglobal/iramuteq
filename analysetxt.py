@@ -13,6 +13,7 @@ from PrintRScript import RchdTxt, AlcesteTxtProf
 from OptionAlceste import OptionAlc 
 from layout import PrintRapport
 from openanalyse import OpenAnalyse
+from dialog import StatDialog
 from time import time
 
 log = logging.getLogger('iramuteq.analyse')
@@ -30,15 +31,14 @@ class AnalyseText :
             self.pathout = PathOut(corpus.parametres['originalpath'], analyse_type = parametres['type'], dirout = corpus.parametres['pathout'])
         else :
             self.pathout = PathOut(filename = corpus.parametres['originalpath'], dirout = self.parametres['pathout'], analyse_type = self.parametres['name'])
-        self.parametres = self.make_config(parametres)
+        self.parametres = self.lemparam()
+        if self.parametres is not None :
+            self.parametres = self.make_config(parametres)
         log.info(self.pathout.dirout)
         if self.parametres is not None :
             self.keys = DoConf(self.ira.ConfigPath['key']).getoptions()
             gramact = [k for k in keys if keys[k] == 1]
             gramsup = [k for k in keys if keys[k] == 2]
-            #FIXME
-            if not 'lem' in self.parametres :
-                self.parametres['lem'] = 1
             self.parametres['pathout'] = self.pathout.mkdirout()
             self.pathout = PathOut(dirout = self.parametres['pathout'])
             self.pathout.createdir(self.parametres['pathout'])
@@ -76,18 +76,39 @@ class AnalyseText :
     def doanalyse(self) :
         pass
 
+    def lemparam(self) :
+        if self.dlg :
+            dial = StatDialog(self, self.parent)
+            dial.CenterOnParent()
+            val = dial.ShowModal()
+            if val == 5100 :
+                if dial.radio_lem.GetSelection() == 0 :
+                    lem = 1
+                else :
+                    lem = 0            
+                self.parametres['lem'] = lem
+                dial.Destroy()
+                return self.parametres
+            else :
+                dial.Destroy()
+                return None        
+        else :
+            return self.parametres
+
     def make_config(self, config) :
         if config is not None :
             if not self.dlg : 
                 return config
             else :
                 return self.preferences()
+        else :
+            return None
 
     def readconfig(self, config) :
         return config
 
     def preferences(self) :
-        return {}
+        return self.parametres
 
     def printRscript(self) :
         pass
@@ -159,8 +180,6 @@ class Alceste(AnalyseText) :
             parametres['max_actives'] = self.dial.spin_max_actives.GetValue()
             parametres['corpus'] = ''
             parametres['pathout'] = self.pathout.dirout
-            for val in parametres :
-                print val, parametres[val]
             DoConf(self.parent.ConfigPath['alceste']).makeoptions(['ALCESTE'], [parametres])
             self.dial.Destroy()
             return parametres

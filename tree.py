@@ -114,7 +114,7 @@ class LeftTree(CT.CustomTreeCtrl):
         self.history = parent.history
         self.h = self.history.history
         self.root = self.AddRoot("Iramuteq")
-
+        
         if not(self.GetAGWWindowStyleFlag() & CT.TR_HIDE_ROOT):
             self.SetPyData(self.root, None)
             self.SetItemImage(self.root, 24, CT.TreeItemIcon_Normal)
@@ -129,11 +129,17 @@ class LeftTree(CT.CustomTreeCtrl):
             if 'analyses' in corpus :
                 for y in corpus['analyses'] :
                     last = self.AppendItem(child, y['name'], ct_type=0)
-                        
                     self.SetPyData(last, y)
                     self.SetItemImage(last, 24, CT.TreeItemIcon_Normal)
                     self.SetItemImage(last, 13, CT.TreeItemIcon_Expanded)
-    
+
+        for matrix in self.history.matrix :
+            last = self.AppendItem(self.root, matrix['name'])
+            self.SetPyData(last, matrix)
+            self.SetItemImage(last, 24, CT.TreeItemIcon_Normal)
+            self.SetItemImage(last, 13, CT.TreeItemIcon_Expanded)
+
+
         self.Bind(wx.EVT_LEFT_DCLICK, self.OnLeftDClick)
         #self.Bind(wx.EVT_IDLE, self.OnIdle)
 
@@ -257,6 +263,19 @@ class LeftTree(CT.CustomTreeCtrl):
                 return
             self.GiveFocus(child, uuid, bold)
             child, cookie = self.GetNextChild(itemParent, cookie)
+
+    def IsInTree(self, itemParent = None, uuid = None) :
+        if itemParent is None :
+            itemParent = self.root
+        child, cookie = self.GetFirstChild(itemParent)
+        while child :
+            pydata = self.GetPyData(child)
+            if pydata['uuid'] == uuid :
+                return True
+            self.GiveFocus(child, uuid)
+            child, cookie = self.GetNextChild(itemParent, cookie)
+        return False
+
 
     def OnRightDown(self, event):
         
@@ -656,21 +675,24 @@ class LeftTree(CT.CustomTreeCtrl):
         dlg.Destroy()
 
     def AddAnalyse(self, parametres, itemParent = None, bold = True) :
-        uuid = parametres['corpus']
-        if itemParent is None :
-            itemParent = self.root
-        child, cookie = self.GetFirstChild(itemParent)
-        corpus = None
-        while child :
-            pydata = self.GetPyData(child)
-            if pydata['uuid'] == uuid :
-                corpus = child
-                break
-            self.GiveFocus(child, uuid)
-            child, cookie = self.GetNextChild(itemParent, cookie)
-        #item = self.AppendItem(child, parametres['name'])
-        if corpus is not None : 
-            item = self.AppendItem(corpus, parametres['name'])
+        uuid = parametres.get('corpus', None)
+        if uuid is not None :
+            if itemParent is None :
+                itemParent = self.root
+            child, cookie = self.GetFirstChild(itemParent)
+            corpus = None
+            while child :
+                pydata = self.GetPyData(child)
+                if pydata['uuid'] == uuid :
+                    corpus = child
+                    break
+                self.GiveFocus(child, uuid)
+                child, cookie = self.GetNextChild(itemParent, cookie)
+            #item = self.AppendItem(child, parametres['name'])
+            if corpus is not None : 
+                item = self.AppendItem(corpus, parametres['name'])
+            else :
+                item = self.AppendItem(self.root, parametres['name'])
         else :
             item = self.AppendItem(self.root, parametres['name'])
         self.SetPyData(item, parametres)

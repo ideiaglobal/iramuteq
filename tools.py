@@ -1,0 +1,156 @@
+#!/bin/env python
+# -*- coding: utf-8 -*-
+#Author: Pierre Ratinaud
+#Copyright (c) 2008-2013, Pierre Ratinaud
+#Lisense: GNU GPL
+
+import codecs
+import os
+from dialog import ExtractDialog
+from corpus import Corpus, copycorpus
+import wx
+
+
+parametres = {'filein' : 'corpus/lru2.txt',
+              'encodein' : 'utf8',
+              'encodeout' : 'utf8',
+              'mods' : [u'*annee_2010', u'*annee_2011']}
+
+def istext(line) :
+    if line.startswith(u'**** ') :
+        return True
+    else :
+        return False
+
+def testvar(line, variable) :
+    line = line.split()
+    varmod = [val.split('_') for val in line[1:]]
+    vars = [var[0] for var in varmod]
+    if variable in vars :
+        return '_'.join([variable, varmod[vars.index(variable)][1]]).replace(u'*','')
+    else :
+        return False
+
+def testmod(line, mods) :
+    line = line.split()
+    for mod in mods :
+        if mod in line[1:] :
+            return mod.replace(u'*','')
+    return False
+
+
+class Extract :
+    def __init__(self, parent, option) :
+        dial = ExtractDialog(parent, option)
+        dial.CenterOnParent()
+        res = dial.ShowModal()
+        if res == wx.ID_OK :
+            parametres = dial.make_param()
+            if option == 'splitvar' :
+                SplitFromVar(parametres)
+            else :
+                ExtractMods(parametres)
+
+class SplitFromVar :
+    def __init__(self, parametres) :
+        self.filein = parametres['filein']
+        self.var = parametres['var']
+        self.encodein = parametres['encodein']
+        self.encodeout = parametres['encodeout']
+        self.basepath = os.path.dirname(self.filein)
+        self.doparse()
+
+    def doparse(self) :
+        keepline = False
+        filedict = {}
+        with codecs.open(self.filein, 'r', self.encodein) as fin :
+             for line in fin :
+                 if istext(line) :
+                     varmod = testvar(line, self.var)
+                     if varmod :
+                         keepline = True
+                         if varmod not in filedict :
+                             filename = os.path.join(self.basepath, varmod + '.txt')
+                             filedict[varmod] = open(filename, 'w')
+                         fileout = filedict[varmod]
+                     else : 
+                         keepline = False
+                 if keepline :
+                     fileout.write(line.encode(self.encodeout))
+        for f in filedict :
+            filedict[f].close()
+
+class ExtractMods :
+    def __init__(self, parametres) :
+        self.onefile = parametres.get('onefile', False)
+        self.filein = parametres['filein']
+        self.mods = parametres['mods']
+        self.encodein = parametres['encodein']
+        self.encodeout = parametres['encodeout']
+        self.basepath = os.path.dirname(self.filein)
+        if self.onefile :
+            filename = os.path.join(self.basepath, '_'.join([mod.replace(u'*','') for mod in self.mods])+'.txt')
+            self.fileout = open(filename, 'w')
+        self.doparse()
+
+    def doparse(self) :
+        keepline = False
+        filedict = {}
+        with codecs.open(self.filein, 'r', self.encodein) as fin :
+             for line in fin :
+                 if istext(line) :
+                     modinline = testmod(line, self.mods)
+                     if modinline :
+                         keepline = True
+                         if not self.onefile :
+                            if modinline not in filedict :
+                                filename = os.path.join(self.basepath, modinline + '.txt')
+                                filedict[modinline] = open(filename, 'w')
+                            fileout = filedict[modinline]
+                         else :
+                             fileout = self.fileout
+                     else : 
+                         keepline = False
+                 if keepline :
+                     fileout.write(line.encode(self.encodeout))
+        if not self.onefile :
+            for f in filedict :
+                filedict[f].close()
+        else :
+            self.fileout.close()
+
+
+class SubCorpus(Corpus) :
+    def __init__(self, parent, corpus, sgts) :
+        Corpus.__init__(self, parent, corpus.parametres)
+        self.sgts = sgts
+        self.corpus = copycorpus(corpus)
+        self.corpus.make_lems(self.parametres['lem'])
+        textes = list(set([corpus.getucefromid(sgt).uci for sgt in sgts]))
+        self.ucis = [corpus.ucis[i] for i in textes]
+        for texte in self.ucis :
+            texte.uces = [uce for uce in texte.uces if uce.ident in self.sgts] 
+        self.make_formes(corpus)
+        self.pathout = corpus.pathout 
+        self.parametres['sub'] = self.sgts
+
+    def make_formes(self, corpus) :
+        self.formes = {}
+        for forme in self.corpus.formes :
+            sgtseff = self.corpus.getformeuceseff(forme)
+            sgts = set(self.sgts).intersection(sgtseff.keys())
+            if len(sgts) :
+                self.formes[forme] = self.corpus.formes[forme]
+                self.formes[forme].freq = sum([sgtseff[sgt] for sgt in sgts])
+
+    def getlemuces(self, lem) :
+        return list(set(self.sgts).intersection(self.corpus.getlemuces(lem)))
+
+
+
+
+
+
+if __name__ == '__main__' :
+    #SplitFromVar(parametres)
+    ExtractMods(parametres, True)

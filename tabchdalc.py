@@ -4,15 +4,15 @@
 #Copyright (c) 2008-2009 Pierre Ratinaud
 #Lisense: GNU/GPL
 
-from chemins import ConstructPathOut, ChdTxtPathOut, ConstructAfcUciPath, ffr
+from chemins import ConstructPathOut, ChdTxtPathOut, ConstructAfcUciPath, ffr, PathOut
 from functions import sortedby, CreateIraFile, print_liste, exec_rcode, check_Rresult
 from PrintRScript import RchdQuest
 from layout import OpenCHDS, PrintRapport
 from dialog import PrefQuestAlc
+from analysematrix import AnalyseMatrix
 import os
 import sys
 import wx
-from numpy import *
 import tempfile
 import time
 
@@ -22,52 +22,63 @@ class AnalyseQuest():
         dlg = PrefQuestAlc(parent)
         dlg.CenterOnParent()
         self.val = dlg.ShowModal()
+        parametres = parent.tableau.parametre
         if self.val == wx.ID_OK :
+            parametres['nbcl_p1'] = dlg.spin_nbcl.GetValue()
+            parametres['mincl'] = dlg.spin_mincl.GetValue()
             if dlg.m_radioBox1.GetSelection() == 1 :
-                ListAct = dlg.nactives
-                ListSup = dlg.varsup
-                nbcl_p1 = dlg.spin_nbcl.GetValue()
-                mincl = dlg.spin_mincl.GetValue()
-                DoQuestAlceste(parent, ListAct, ListSup, nbcl = nbcl_p1, mincl = mincl)
-            else:
-                nbcl_p1 = dlg.spin_nbcl.GetValue()
-                mincl = dlg.spin_mincl.GetValue()
-                DoQuestAlceste(parent, nbcl = nbcl_p1, mincl = mincl) 
+                parametres['listact'] = dlg.nactives
+                parametres['listsup'] = dlg.varsup
+            else :
+                parametres['formatted'] = 1
+            DoQuestAlceste(parent, parametres)
 
-class DoQuestAlceste:
-    def __init__(self, parent, ListAct=False, ListSup=False, nbcl = 10, mincl = 10):
-        self.t1 = time.time()
-#-------------------------------------------------------------------               
-        dlg = wx.ProgressDialog("Traitements",
-                               "Veuillez patienter...",
-                               maximum=5,
-                               parent=parent,
-                               style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME
-                                )
-        dlg.Center()
-        count = 1
-        keepGoing = dlg.Update(count)
-#-------------------------------------------------------------------
-        self.pathout = ConstructPathOut(parent.tableau.parametre['filename'], 'AlcesteQuest')
+class DoQuestAlceste(AnalyseMatrix):
+    def __init__(self, parent, parametres):
+        parametres['pathout'] = ConstructPathOut(parent.tableau.parametre['filename'], 'gnepaMatrix')
+        self.parametres = parametres
+        self.parametres['type'] = 'gnepamatrix'
         self.DictForme = {}
         self.DictFormeSup = {}
         self.Min = 10
         self.Linecontent = []
         self.parent = parent
         self.RPath = self.parent.PathPath.get('PATHS', 'rpath')
-        self.dictpathout = ChdTxtPathOut(self.pathout)
-        self.parent.tableau.dictpathout = self.dictpathout
+        #self.dictpathout = PathOut(dirout = self.pathout)
+        #self.dictpathout = self.pathout
+        #self.dictpathout.basefiles(ChdTxtPathOut)
+        #self.pathout = self.dictpathout
         self.clnb = ''
-        self.ListAct = ListAct
+        self.ListAct = parametres.get('listact', False)
         self.ucecla = ''
-        self.parent = parent
+        dlg = wx.ProgressDialog("Traitements",
+                               "Veuillez patienter...",
+                               maximum=5,
+                               parent=self.parent,
+                               style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME
+                                )
+
+        AnalyseMatrix.__init__(self, parent, parent.tableau, self.parametres, dlg = dlg)
+ 
+
+
 #-----------------------------------------------------------
+    def doanalyse(self) :
+#-------------------------------------------------------------------               
+        self.dictpathout = self.pathout
+        self.dictpathout.basefiles(ChdTxtPathOut)
+        self.parent.tableau.dictpathout = self.dictpathout
+
+        self.dlg.Center()
+        count = 1
+        keepGoing = self.dlg.Update(count)
+#-------------------------------------------------------------------
         count += 1
-        dlg.Update(count, u"passage en O/1")
-        if not ListAct:
-            self.parent.tableau.make_01_alc_format(self.dictpathout['Act01'])
+        self.dlg.Update(count, u"passage en O/1")
+        if 'formatted' in self.parametres:
+            self.parent.tableau.make_01_alc_format(self.dictpathout['mat01'])
         else:
-            self.parent.tableau.make_01_from_selection(ListAct, ListSup)
+            self.parent.tableau.make_01_from_selection(self.parametres['listact'], self.parametres['listsup'])
         file = open(self.dictpathout['listeuce1'], 'w')
         file.write('num uce;num uc\n')
         for i in range(0, len(self.parent.tableau.linecontent)):
@@ -75,27 +86,28 @@ class DoQuestAlceste:
         file.close()
         self.nbind = len(self.parent.tableau.linecontent)
 #------------------------------------------------------------
-        RchdQuest(self.dictpathout, parent.RscriptsPath, nbcl, mincl)
+        RchdQuest(self.dictpathout, self.parent.RscriptsPath, self.parametres['nbcl_p1'], self.parametres['mincl'])
 #------------------------------------------------------------
         count += 1
-        dlg.Update(count, u"Analyse (patientez...)")
+        self.dlg.Update(count, u"Analyse (patientez...)")
         
         pid = exec_rcode(self.RPath, self.dictpathout['Rchdquest'], wait = False)
         while pid.poll() == None :
-            dlg.Pulse(u"Analyse (patientez...)")
+            self.dlg.Pulse(u"Analyse (patientez...)")
             time.sleep(0.2)
         check_Rresult(self.parent, pid)
 #------------------------------------------------------------
         count += 1
-        dlg.Update(count, u"Ecriture des résultats")
+        self.dlg.Update(count, u"Ecriture des résultats")
         self.parent.tableau.buildprofil()
         self.clnb = self.parent.tableau.clnb
+        self.parametres['clnb'] = self.clnb
         self.ucecla = self.parent.tableau.ucecla
         self.BuildProfile()
         temps = time.time() - self.t1
-        PrintRapport(self, 'quest')
+        PrintRapport(self, self, {}, istxt = False)
         self.parent.tableau.save_tableau(self.dictpathout['db'])
-        CreateIraFile(self.dictpathout, self.clnb, corpname = os.path.basename(parent.filename), section = 'questionnaire')
+        #CreateIraFile(self.dictpathout, self.clnb, corpname = os.path.basename(self.parent.filename), section = 'questionnaire')
         afc_graph_list = [[os.path.basename(self.dictpathout['AFC2DL_OUT']), u'Variables actives - coordonnées - facteurs 1 / 2'],
                          [os.path.basename(self.dictpathout['AFC2DSL_OUT']), u'variables illustratives - coordonnées - facteurs 1 / 2'],
                          [os.path.basename(self.dictpathout['AFC2DCL_OUT']), u'Classes - Coordonnées - facteur 1 / 2'],
@@ -108,11 +120,11 @@ class DoQuestAlceste:
         print_liste(self.dictpathout['liste_graph_chd'], chd_graph_list)
 
         self.tableau = self.parent.tableau
-        OpenCHDS(self.parent, self, self.dictpathout['ira'], False)
+        #OpenCHDS(self.parent, self, self.dictpathout['ira'], False)
 #------------------------------------------------------------
         print 'fini', time.time() - self.t1
         count += 1
-        dlg.Update(count, "Fini")
+        self.dlg.Update(count, "Fini")
     
     def BuildProfile(self):
         print 'build profile'

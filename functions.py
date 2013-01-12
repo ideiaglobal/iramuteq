@@ -45,14 +45,17 @@ class History :
     def read(self) :
         d = shelve.open(self.filein)
         self.history = d.get('history', [])
+        self.matrix = d.get('matrix', [])
         self.ordercorpus = dict([[corpus['uuid'], i] for i, corpus in enumerate(self.history)])
-        self.corpus = dict([[corpus['uuid'], corpus] for i, corpus in enumerate(self.history)])
+        self.corpus = dict([[corpus['uuid'], corpus] for corpus in self.history])
         self.analyses = dict([[analyse['uuid'], analyse] for corpus in self.history for analyse in corpus.get('analyses', [])])
+        self.matrixanalyse = dict([[mat['uuid'], mat] for mat in self.matrix])
         d.close()
 
     def write(self) :
         d = shelve.open(self.filein)
         d['history'] = self.history
+        d['matrix'] = self.matrix
         d.close()
     
     def add(self, analyse) :
@@ -77,6 +80,13 @@ class History :
         self.write()
         self.read()
 
+    def addMatrix(self, analyse) :
+        tosave = {'uuid' : analyse['uuid'], 'ira': analyse['ira'], 'type' : analyse['type']}
+        tosave['name'] = analyse['name']
+        self.matrix.append(tosave)
+        self.write()
+        self.read()
+
     def addmultiple(self, analyses) :
         for analyse in analyses :
             tosave = {'uuid' : analyse['uuid'], 'ira': analyse['ira'], 'type' : analyse['type']}
@@ -96,9 +106,11 @@ class History :
             self.history.pop(self.ordercorpus[analyse['uuid']])
             if analyse['uuid'] in self.openedcorpus :
                 del self.openedcorpus[analyse['uuid']]
-        else :
+        elif analyse['uuid'] in self.analyses :
             todel = [i for i, ana in enumerate(self.corpus[analyse['corpus']]['analyses']) if ana['uuid'] == analyse['uuid']][0]
             self.history[self.ordercorpus[analyse['corpus']]]['analyses'].pop(todel)
+        elif analyse['uuid'] in self.matrixanalyse :
+            self.matrix = [mat for mat in self.matrix if mat['uuid'] != analyse['uuid']]
         self.write()
         self.read()
 
