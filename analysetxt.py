@@ -166,11 +166,6 @@ class Alceste(AnalyseText) :
         self.dial.CenterOnParent()
         self.dialok = self.dial.ShowModal()
         if self.dialok == 5100 :
-            if self.dial.radio_1.GetSelection() == 0 :
-                lem = 1
-            else :
-                lem = 0
-            parametres['lem'] = lem
             parametres['classif_mode'] = self.dial.radio_box_2.GetSelection()
             parametres['tailleuc1'] = self.dial.spin_ctrl_1.GetValue()
             parametres['tailleuc2'] = self.dial.spin_ctrl_2.GetValue()
