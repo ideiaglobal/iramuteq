@@ -128,16 +128,25 @@ ch = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 fh.setFormatter(formatter)
-log.addHandler(ch)
 log.addHandler(fh)
+if sys.platform != 'win32' or sys.platform != 'darwin':
+    log.addHandler(ch)
 log.setLevel(logging.INFO)
 
 
 class writer(object):
     def write(self, data):
         if data.strip() != '' :
-            log.info('BUG : %s' % data)
+            log.info('ERROR : %s' % data)
+
+class printer(object) :
+    def write(self, data) :
+        if data.strip() != '' :
+            log.info('Print : %s' % data)
+
 sys.stderr = writer()
+sys.stdout = printer()
+
 ConfigPath = ConstructConfigPath(UserConfigPath)
 #####################################################################
 
