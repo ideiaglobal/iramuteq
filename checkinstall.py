@@ -50,6 +50,11 @@ def UpgradeConf(self) :
     for item,filein in dictuser.iteritems():
         if not item == u'global' and not item == u'history':
             shutil.copyfile(dictappli[item], filein)
+    dicoUser = self.DictPath
+    dicoAppli = ConstructDicoPath(self.AppliPath)
+    for fi in dicoUser :
+        if not os.path.exists(dicoUser[fi]) and os.path.exists(dicoAppli[fi]):
+            shutil.copyfile(dicoAppli[fi], dicoUser[fi])
 
 def CreateIraDirectory(UserConfigPath,AppliPath):
     if not os.path.exists(UserConfigPath):
@@ -58,7 +63,6 @@ def CreateIraDirectory(UserConfigPath,AppliPath):
         os.mkdir(os.path.join(UserConfigPath, 'dictionnaires'))
 
 def CopyConf(self) :
-    log.info('Copy conf')
     DictUser = self.ConfigPath
     DictAppli = ConstructConfigPath(self.AppliPath,user=False)
     for item, filein in DictUser.iteritems():
@@ -72,7 +76,6 @@ def CopyConf(self) :
                 shutil.copyfile(DictAppli[item],filein)
     dicoUser = self.DictPath
     dicoAppli = ConstructDicoPath(self.AppliPath)
-    log.info(dicoAppli)
     for fi in dicoUser :
         if not os.path.exists(dicoUser[fi]) and os.path.exists(dicoAppli[fi]):
             shutil.copyfile(dicoAppli[fi], dicoUser[fi])
