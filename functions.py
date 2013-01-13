@@ -335,7 +335,10 @@ def GetTxtProfile(dictprofile, cluster_size) :
 
 def formatExceptionInfo(maxTBlevel=5):
          cla, exc, trbk = sys.exc_info()
-         excName = cla.__name__
+         try :
+            excName = cla.__name__
+         except :
+            excName = 'None'
          try:
              excArgs = exc.args[0]
          except :
@@ -539,13 +542,13 @@ def check_Rresult(parent, pid) :
     if isinstance(pid, Popen) :
         if pid.returncode != 0 :
             error = pid.communicate()
-            print error
             error = [str(error[0]), error[1]]
             if error[1] is None :
                 error[1] = 'None'
             parent.Rerror = '\n'.join([str(pid.returncode), '\n'.join(error)])
             #try :
-            raise Exception('\n'.join([u'Erreur R', '\n'.join(error[1:])]))
+            #raise Exception('\n'.join([u'Erreur R', '\n'.join(error[1:])]))
+            BugReport(parent)
             return False
             #except :
             #    BugReport(parent)
@@ -553,9 +556,11 @@ def check_Rresult(parent, pid) :
             return True
     else :
         if pid != 0 :
-            #try :
-            raise Exception(u'Erreur R')
+            BugReport(parent)
             return False
+            #try :
+            #raise Exception(u'Erreur R')
+            #return False
             #except :
             #    BugReport(parent)
         else :
