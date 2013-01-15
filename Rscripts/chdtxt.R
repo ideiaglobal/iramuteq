@@ -80,7 +80,8 @@ Rchdtxt<-function(uceout,mincl=0,classif_mode=0, nbt = 9) {
 	} else {
 		poids2<-poids1
 	}
-
+    
+    print('croisement classif')
 	croise=matrix(ncol=tcl,nrow=tcl)
 	#production du tableau de contingence
 	for (i in 1:ncol(classeuce1)) {
@@ -91,18 +92,18 @@ Rchdtxt<-function(uceout,mincl=0,classif_mode=0, nbt = 9) {
 		#tabcolnames<-c(tabcolnames[(length(tabcolnames)-1)],tabcolnames[length(tabcolnames)])
 		tabrownames<-as.numeric(rownames(tablecroise))
 		#tabrownames<-c(tabrownames[(length(tabrownames)-1)],tabrownames[length(tabrownames)])
-		for (k in (ncol(tablecroise)-1):ncol(tablecroise)) {
-		    for (l in (nrow(tablecroise)-1):nrow(tablecroise)) {
-		        croise[(tabrownames[l]-1),(tabcolnames[k]-1)]<-tablecroise[l,k]
+		    for (k in (ncol(tablecroise)-1):ncol(tablecroise)) {
+		        for (l in (nrow(tablecroise)-1):nrow(tablecroise)) {
+		            croise[(tabrownames[l]-1),(tabcolnames[k]-1)]<-tablecroise[l,k]
+		        }
 		    }
-		}
 	    }
 	    tablecroise
 	}
     if (classif_mode == 0) {ind <- (nbcl * 2)} else {ind <- nbcl}
 	if (mincl==0){
 		mincl<-round(nrow(classeuce1)/ind)
-	}#valeur a calculer nbuce/20
+	}
 	if (mincl<3){
 		mincl<-3
 	}
@@ -113,24 +114,24 @@ Rchdtxt<-function(uceout,mincl=0,classif_mode=0, nbt = 9) {
 	chicroise<-croise
 	for (i in 1:nrow(croise)) {
 	    for (j in 1:ncol(croise)) {
-		if (croise[i,j]==0) {
-		    chicroise[i,j]<-0
-		} else if (croise[i,j]<mincl) { 
-		    chicroise[i,j]<-0
-		} else {
-		chitable<-matrix(ncol=2,nrow=2)
-		chitable[1,1]<-croise[i,j]
-		chitable[1,2]<-poids1[i]-chitable[1,1]
-		chitable[2,1]<-poids2[j]-chitable[1,1]
-		chitable[2,2]<-nrow(classeuce1)-poids2[j]-chitable[1,2]
-		chitest<-chisq.test(chitable,correct=FALSE)
-		if ((chitable[1,1]-chitest$expected)<0) {
-		    chicroise[i,j]<--round(chitest$statistic,digits=7)
-		} else {
-		    chicroise[i,j]<-round(chitest$statistic,digits=7)
+		    if (croise[i,j]==0) {
+		        chicroise[i,j]<-0
+		    } else if (croise[i,j]<mincl) { 
+		        chicroise[i,j]<-0
+		    } else {
+		        chitable<-matrix(ncol=2,nrow=2)
+		        chitable[1,1]<-croise[i,j]
+		        chitable[1,2]<-poids1[i]-chitable[1,1]
+		        chitable[2,1]<-poids2[j]-chitable[1,1]
+		        chitable[2,2]<-nrow(classeuce1)-poids2[j]-chitable[1,2]
+		        chitest<-chisq.test(chitable,correct=FALSE)
+		        if ((chitable[1,1]-chitest$expected)<0) {
+		            chicroise[i,j]<--round(chitest$statistic,digits=7)
+		        } else {
+		            chicroise[i,j]<-round(chitest$statistic,digits=7)
 		#print(chitest)
-		}
-		}
+		        }
+		    }
 	    }   
 	}
 	#print(chicroise)
@@ -145,11 +146,11 @@ Rchdtxt<-function(uceout,mincl=0,classif_mode=0, nbt = 9) {
 	}
 	testpres<-function(x,listcoord) {
 	    for (i in 1:length(listcoord)) {
-		if (x==listcoord[i]) {
-		    return(-1)
-		} else {
-		    a<-1
-		}
+		    if (x==listcoord[i]) {
+		        return(-1)
+		    } else {
+		        a<-1
+		    }
 	    }
 	    a
 	}
@@ -203,17 +204,15 @@ Rchdtxt<-function(uceout,mincl=0,classif_mode=0, nbt = 9) {
 	    listyp<-listy
 	    listxp<-listx[first:length(listx)]
 	    listxp<-c(listxp,listx[1:(first-1)])
-	#    listxp<-listxp[-first]
 	    listyp<-listy[first:length(listy)]
 	    listyp<-c(listyp,listy[1:(first-1)])
-	#    listyp<-listyp[-first]
 	    for (i in 1:length(listxp)) {
-	       if (!(listxp[i]+1)%in%fillemere1) {
-		  if (!(listyp[i]+1)%in%fillemere2) {
-		  coordok<-rbind(coordok,c(listyp[i]+1,listxp[i]+1))
-		  fillemere1<-c(fillemere1,trouvefillemere(listxp[i]+1,chd2$n1))
-		  fillemere2<-c(fillemere2,trouvefillemere(listyp[i]+1,chd1$n1))
-		  }
+	        if (!(listxp[i]+1)%in%fillemere1) {
+		        if (!(listyp[i]+1)%in%fillemere2) {
+		            coordok<-rbind(coordok,c(listyp[i]+1,listxp[i]+1))
+		            fillemere1<-c(fillemere1,trouvefillemere(listxp[i]+1,chd2$n1))
+		            fillemere2<-c(fillemere2,trouvefillemere(listyp[i]+1,chd1$n1))
+		        }
 	       }
 	    }
 	    coordok
@@ -235,23 +234,23 @@ Rchdtxt<-function(uceout,mincl=0,classif_mode=0, nbt = 9) {
 		#si plusieurs ensemble avec le meme nombre de classe, on conserve
 		#la liste avec le plus fort chi2
 	    if (length(listcoordok)>1) {
-		maxchi<-0
-		best<-NULL
-		for (i in 1:length(listcoordok)) {
-		    chi<-NULL
-		    uce<-NULL
-		    if (nrow(listcoordok[[i]])==maxcl) {
-		        for (j in 1:nrow(listcoordok[[i]])) {
-		            chi<-c(chi,croise[(listcoordok[[i]][j,1]-1),(listcoordok[[i]][j,2]-1)])
-		            uce<-c(uce,chicroiseori[(listcoordok[[i]][j,1]-1),(listcoordok[[i]][j,2]-1)])
+		    maxchi<-0
+		    best<-NULL
+		    for (i in 1:length(listcoordok)) {
+		        chi<-NULL
+		        uce<-NULL
+		        if (nrow(listcoordok[[i]])==maxcl) {
+		            for (j in 1:nrow(listcoordok[[i]])) {
+		                chi<-c(chi,croise[(listcoordok[[i]][j,1]-1),(listcoordok[[i]][j,2]-1)])
+		                uce<-c(uce,chicroiseori[(listcoordok[[i]][j,1]-1),(listcoordok[[i]][j,2]-1)])
+		            }
+		            if (maxchi < sum(chi)) {
+		                maxchi <- sum(chi)
+		                suce <- sum(uce)
+		                best <- i
+		            } 
 		        }
-		        if (maxchi < sum(chi)) {
-		            maxchi<-sum(chi)
-		            suce<-sum(uce)
-		            best<-i
-		        } 
 		    }
-		}
 	    }
 	    print((suce/nrow(classeuce1)*100))
 	    listcoordok[[best]]
@@ -294,17 +293,6 @@ Rchdtxt<-function(uceout,mincl=0,classif_mode=0, nbt = 9) {
     nchd2[which(nchd1[,ncol(nchd1)]!=nchd2[,ncol(nchd2)]),] <- 0
     nchd1[which(nchd2[,ncol(nchd2)]==0),] <- 0
 
-#	for (i in 1:nrow(nchd1)) {
-#	    if (nchd1[i,ncol(nchd1)]==0) {
-#		nchd2[i,]<-nchd2[i,]*0
-#	    }
-#	    if (nchd1[i,ncol(nchd1)]!=nchd2[i,ncol(nchd2)]) {
-#		nchd2[i,]<-nchd2[i,]*0
-#	    }
-#	    if (nchd2[i,ncol(nchd2)]==0) {
-#		nchd1[i,]<-nchd1[i,]*0
-#	    }
-#	}
 	print('fini croise')
 	elim<-which(nchd1[,ncol(nchd1)]==0)
 	keep<-which(nchd1[,ncol(nchd1)]!=0)

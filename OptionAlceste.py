@@ -20,7 +20,9 @@ class OptionAlc(wx.Dialog):
         self.DictPath = parametres['pathout']
         self.AlcesteConf = parametres
         self.choose = False
-        
+        self.svdmethod = ['svdR', 'irlba']
+        if self.parent.pref.getboolean('iramuteq','libsvdc') :
+            self.svdmethod.append('svdlibc')
         #self.label_1 = wx.StaticText(self, -1, u"Lemmatisation")
         #self.radio_1 = wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
 
@@ -42,6 +44,10 @@ analysée (2 = automatique)"""
         self.spin_ctrl_5 = wx.SpinCtrl(self, -1, "",size = (100,30), min=2, max=1000)
         self.label_max_actives =  wx.StaticText(self, -1, u"Nombre maximum de formes analysées")
         self.spin_max_actives = wx.SpinCtrl(self, -1, "",size = (100,30), min=20, max=10000)
+        self.label_svd = wx.StaticText(self, -1, u"Méthode pour svd")
+        self.choicesvd = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, self.svdmethod, 0 )
+        self.label_patate =  wx.StaticText(self, -1, u"Mode patate (+ rapide, - précis)")
+        self.check_patate = wx.CheckBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         #self.label_4 = wx.StaticText(self, -1, u"Configuration \ndes clés d'analyse")
         #self.button_5 = wx.Button(self, wx.ID_PREFERENCES, "")
         self.button_1 = wx.Button(self, wx.ID_CANCEL, "")
@@ -72,6 +78,15 @@ analysée (2 = automatique)"""
         self.spin_ctrl_5.Disable()
         self.spin_max_actives.SetValue(int(self.parametres['max_actives']))
         self.spin_nbcl.SetValue(int(self.parametres['nbcl_p1']))
+        if 'svdmethod' in self.parametres :
+            self.choicesvd.SetSelection(self.svdmethod.index(self.parametres['svdmethod']))
+        else :
+            self.choicesvd.SetSelection(1)
+        if 'mode.patate' in self.parametres :
+            self.check_patate.SetValue(self.parametres['mode.patate'])
+        else :
+             self.check_patate.SetValue(False)
+
 
     def __do_layout(self):
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
@@ -122,10 +137,15 @@ analysée (2 = automatique)"""
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
        
-        #grid_sizer2.Add(self.label_4, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
-        #grid_sizer2.Add(self.button_5, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
-        #grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
-        #grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
+        grid_sizer2.Add(self.label_svd, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
+        grid_sizer2.Add(self.choicesvd, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
+        grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
+        grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
+
+        grid_sizer2.Add(self.label_patate, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
+        grid_sizer2.Add(self.check_patate, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
+        grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
+        grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
         
         grid_button.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
         grid_button.Add(self.button_2, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)

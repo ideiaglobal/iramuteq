@@ -422,6 +422,22 @@ class IraFrame(wx.Frame):
         if self.SysEncoding == 'mac-roman' : self.SysEncoding = 'MacRoman'
         self.type = ''
 
+##############################################################@
+        self.DisEnSaveTabAs(False)
+        self.ShowMenu(_("View"), False)
+        self.ShowMenu(_("Spreadsheet analysis"), False)
+        self.ShowMenu(_("Text analysis"), False)
+   
+        self._mgr.Update()
+
+        self.DataPop = False
+        self.DataTxt = False
+        self.Text = ''
+
+        self.lexique = None
+        self.corpus = None
+
+    def finish_init(self) :
         try :
             self.pref.read(self.ConfigPath['preferences'])
             if IsNew(self) :
@@ -434,6 +450,9 @@ class IraFrame(wx.Frame):
             UpgradeConf(self)
             self.pref.read(self.ConfigPath['preferences'])
             New = True
+        self.sound = self.pref.getboolean('iramuteq', 'sound')
+        self.check_update = self.pref.getboolean('iramuteq', 'checkupdate')
+        self.version = ConfigGlob.get('DEFAULT', 'version')
         #configuration des chemins de R
         self.PathPath = ConfigParser()
         self.PathPath.read(ConfigPath['path'])
@@ -467,21 +486,7 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
             if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
                  evt.Veto()
             dlg.Destroy()
-        self.DataPop = False
-        self.DataTxt = False
-        self.Text = ''
-        self.sound = self.pref.getboolean('iramuteq', 'sound')
-        self.check_update = self.pref.getboolean('iramuteq', 'checkupdate')
-        self.version = ConfigGlob.get('DEFAULT', 'version')
-        self.lexique = None
-        self.corpus = None
-##############################################################@
-        self.DisEnSaveTabAs(False)
-        self.ShowMenu(_("View"), False)
-        self.ShowMenu(_("Spreadsheet analysis"), False)
-        self.ShowMenu(_("Text analysis"), False)
-   
-        self._mgr.Update()
+
 
     def OnVerif(self, evt) :
         pack = CheckRPackages(self)
@@ -1148,6 +1153,7 @@ class MySplashScreen(wx.SplashScreen):
     def ShowMain(self):
         frame = IraFrame(None, -1, "IRaMuTeQ " + ConfigGlob.get('DEFAULT', 'version'), size=(1100, 800))
         frame.Show()
+        frame.finish_init()
         frame.Upgrade()
         frame.OnOpenFromCmdl()
 #        if self.fc.IsRunning():

@@ -137,7 +137,7 @@ def install_textometrieR(self) :
     dlg.Destroy()
 
 def CheckRPackages(self):
-    listdep = ['ca', 'gee', 'ape', 'igraph','proxy', 'wordcloud', 'textometrieR']
+    listdep = ['ca', 'gee', 'ape', 'igraph','proxy', 'wordcloud', 'irlba', 'textometrieR']
     nolib = []
     i=0
     dlg = wx.ProgressDialog("Test des librairies de R", "test en cours...", maximum = len(listdep), parent=self, style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT)

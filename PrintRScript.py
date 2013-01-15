@@ -109,7 +109,7 @@ class Alceste2(PrintRScript) :
 #
 
 
-def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, libsvdc = False, libsvdc_path = None, R_max_mem = False):
+def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'svdR', libsvdc = False, libsvdc_path = None, R_max_mem = False, mode_patate = False):
     txt = """
     source("%s")
     source("%s")
@@ -124,17 +124,30 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, libsvdc = False
     txt += """
     nbt <- %i
     """ % nbt
-    if libsvdc :
+    if svdmethod == 'svdlibc' and libsvdc :
         txt += """
-        libsvdc <- TRUE
+        svd.method <- 'svdlibc'
         libsvdc.path <- "%s"
         """ % ffr(libsvdc_path)
-    else :
+    elif svdmethod == 'irlba' :
         txt += """
-        libsvdc <- FALSE
+        library(irlba)
+        svd.method <- 'irlba'
         libsvdc.path <- NULL
         """
-
+    else :
+        txt += """
+        svd.method = 'svdR'
+        libsvdc.path <- NULL
+        """
+    if mode_patate :
+        txt += """
+        mode.patate = TRUE
+        """
+    else :
+        txt += """
+        mode.patate = FALSE
+        """
     txt +="""
     library(Matrix)
     data1 <- readMM("%s")
@@ -148,14 +161,13 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, libsvdc = False
         data2 <- as(data2, "dgCMatrix")
         row.names(data2) <- 1:nrow(data2)
         """ % DicoPath['TableUc2']
-    #log.info('ATTENTION ############# MODEPATATE ####################')
     txt += """
-    chd1<-CHD(data1, x = nbt, mode.patate = FALSE, libsvdc = libsvdc, libsvdc.path = libsvdc.path)
+    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)
     """
     
     if classif_mode == 0:
         txt += """
-    chd2<-CHD(data2, x = nbt, libsvdc = libsvdc, libsvdc.path = libsvdc.path)
+    chd2<-CHD(data2, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)
     """
     else:
         txt += """
@@ -694,7 +706,7 @@ class PrintSimiScript(PrintRScript) :
             """ % (self.pathout['mat01.csv'], self.pathout['actives.csv'], self.pathout['selected.csv'])
             txt += """
             dm <-readMM(dm.path)
-            cn <- read.table(cn.path, sep=';', quote='"')
+            cn <- read.table(cn.path, sep='\t', quote='"')
             colnames(dm) <- cn[,1]
             sel.col <- read.csv2(selected.col)
             dm <- dm[, sel.col[,1] + 1]

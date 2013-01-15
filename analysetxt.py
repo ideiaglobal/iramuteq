@@ -174,16 +174,19 @@ class Alceste(AnalyseText) :
             parametres['nbcl_p1'] = self.dial.spin_nbcl.GetValue()
             parametres['max_actives'] = self.dial.spin_max_actives.GetValue()
             parametres['corpus'] = ''
+            parametres['svdmethod'] = self.dial.svdmethod[self.dial.choicesvd.GetSelection()]
             parametres['pathout'] = self.pathout.dirout
+            parametres['mode.patate'] = self.dial.check_patate.GetValue()
             DoConf(self.parent.ConfigPath['alceste']).makeoptions(['ALCESTE'], [parametres])
             self.dial.Destroy()
+            print parametres
             return parametres
         else :
             self.dial.Destroy()
             return None
 
     def printRscript(self) :
-        RchdTxt(self.pathout, self.parent.RscriptsPath, self.parametres['mincl'], self.parametres['classif_mode'], nbt = self.parametres['nbcl_p1'] - 1, libsvdc = self.parent.pref.getboolean('iramuteq','libsvdc'), libsvdc_path = self.parent.pref.get('iramuteq','libsvdc_path'), R_max_mem = False)
+        RchdTxt(self.pathout, self.parent.RscriptsPath, self.parametres['mincl'], self.parametres['classif_mode'], nbt = self.parametres['nbcl_p1'] - 1, svdmethod = self.parametres['svdmethod'], libsvdc = self.parent.pref.getboolean('iramuteq','libsvdc'), libsvdc_path = self.parent.pref.get('iramuteq','libsvdc_path'), R_max_mem = False, mode_patate = self.parametres['mode.patate'])
         return self.pathout['Rchdtxt']
 
     def printRscript2(self) :

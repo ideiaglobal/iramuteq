@@ -343,7 +343,7 @@ class DoSimi():
             """
             if not self.paramsimi['keep_coord'] :
                 txt += """
-                cn <- read.table("%s", sep=';', quote='"')
+                cn <- read.csv("%s", sep='\t', quote='"', headers = FALSE)
                 colnames(dm) <- cn[,1]
                 #colnames(dml) <- cn[,1]
                 """ % ffr(active_file)
