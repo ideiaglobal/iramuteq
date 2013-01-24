@@ -210,6 +210,18 @@ class Corpus :
     def getucesfrometoile(self, etoile) :
         return [uce.ident for uci in self.ucis for uce in uci.uces if etoile in uci.etoiles]
 
+    def getetoileuces(self) :
+        log.info('get uces etoiles')
+        etoileuces = {}
+        for uci in self.ucis :
+            etoiles = uci.etoiles[1:] + uci.paras
+            for et in etoiles :
+                if et in etoileuces :
+                    etoileuces[et] += [uce.ident for uce in uci.uces]
+                else :
+                    etoileuces[et] = [uce.ident for uce in uci.uces]
+        return etoileuces
+
     def getucefromid(self, uceid) :
         if self.iduces is None : self.make_iduces()
         return self.iduces[uceid]
@@ -564,13 +576,16 @@ class Corpus :
             elif get != [] :
                 etuces[listet.index(get[0])] += [uce.ident for uce in uci.uces]
         return etuces
-            
 
     def make_and_write_profile_et(self, ucecl, fileout) :
         log.info('etoiles/classes')
-        etoiles = self.make_etoiles()
+        etoileuces = self.getetoileuces()
+        etoileuces = dict([[et, etoileuces[et]] for et in etoileuces if len(etoileuces[et]) > 1])
         with open(fileout, 'w') as f :
-            f.write('\n'.join([';'.join([etoile] + [`len(set(self.getucesfrometoile(etoile)).intersection(classe))` for classe in ucecl]) for etoile in etoiles]).encode(self.parametres['syscoding']))
+            f.write('\n'.join([';'.join([et] + [`len(set(etoileuces[et]).intersection(classe))` for classe in ucecl]) for et in etoileuces]).encode(self.parametres['syscoding']))
+        #etoiles = self.make_etoiles()
+        #with open(fileout, 'w') as f :
+        #    f.write('\n'.join([';'.join([etoile] + [`len(set(self.getucesfrometoile(etoile)).intersection(classe))` for classe in ucecl]) for etoile in etoiles]).encode(self.parametres['syscoding']))
 
     def make_colored_corpus(self) :
         ucecl = {}
