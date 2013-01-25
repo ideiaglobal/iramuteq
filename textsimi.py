@@ -121,14 +121,12 @@ class SimiTxt(AnalyseText):
         with open(self.pathout['actives.csv'], 'w') as f :
             f.write('\n'.join(self.actives).encode(self.ira.syscoding))
 
-
-
 class SimiFromCluster(SimiTxt) :
     def __init__(self, ira, corpus, actives, numcluster, parametres = None, dlg = False) :
         self.actives = actives
         self.numcluster = numcluster
         parametres['name'] = 'simi_classe_%i' % (numcluster + 1)
-        SimiTxt.__init__(self, ira, corpus, parametres, dlg)
+        SimiTxt.__init__(self, ira, corpus, parametres, dlg, lemdial = False)
     
     def preferences(self) :
         return self.parametres

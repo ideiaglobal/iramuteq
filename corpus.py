@@ -213,13 +213,23 @@ class Corpus :
     def getetoileuces(self) :
         log.info('get uces etoiles')
         etoileuces = {}
+        idpara = 0
         for uci in self.ucis :
-            etoiles = uci.etoiles[1:] + uci.paras
+            etoiles = uci.etoiles[1:]
             for et in etoiles :
                 if et in etoileuces :
                     etoileuces[et] += [uce.ident for uce in uci.uces]
                 else :
                     etoileuces[et] = [uce.ident for uce in uci.uces]
+            if uci.paras != [] :
+                for et in uci.paras :
+                    if et in etoileuces :
+                        etoileuces[et] += [uce.ident for uce in uci.uces if uce.para == idpara]
+                    else :
+                        etoileuces[et] = [uce.ident for uce in uci.uces if uce.para == idpara]
+                    idpara += 1
+            else :
+                idpara += 1
         return etoileuces
 
     def getucefromid(self, uceid) :
@@ -542,7 +552,7 @@ class Corpus :
     def make_etoiles(self) :
         etoiles = set([])
         for uci in self.ucis :
-            etoiles.update(uci.etoiles[1:] + uci.paras)
+            etoiles.update(uci.etoiles[1:])
         return list(etoiles)
 
     def make_etoiles_dict(self) :

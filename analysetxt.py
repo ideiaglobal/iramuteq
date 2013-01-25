@@ -19,18 +19,19 @@ from time import time
 log = logging.getLogger('iramuteq.analyse')
 
 class AnalyseText :
-    def __init__(self, ira, corpus, parametres = None, dlg = False) :
+    def __init__(self, ira, corpus, parametres = None, dlg = False, lemdial = True) :
         self.corpus = corpus
         self.ira = ira
         self.parent = ira
         self.dlg = dlg
         self.dialok = True
         self.parametres = parametres
+        self.lemdial = lemdial
         self.val = False
         if not 'pathout' in self.parametres :
             self.pathout = PathOut(corpus.parametres['originalpath'], analyse_type = parametres['type'], dirout = corpus.parametres['pathout'])
         else :
-            self.pathout = PathOut(filename = corpus.parametres['originalpath'], dirout = self.parametres['pathout'], analyse_type = self.parametres['name'])
+            self.pathout = PathOut(filename = corpus.parametres['originalpath'], dirout = self.parametres['pathout'], analyse_type = self.parametres['type'])
         self.parametres = self.lemparam()
         if self.parametres is not None :
             self.parametres = self.make_config(parametres)
@@ -77,7 +78,7 @@ class AnalyseText :
         pass
 
     def lemparam(self) :
-        if self.dlg :
+        if self.dlg and self.lemdial:
             dial = StatDialog(self, self.parent)
             dial.CenterOnParent()
             val = dial.ShowModal()
@@ -117,7 +118,7 @@ class AnalyseText :
         log.info('R code...')
         pid = exec_rcode(self.ira.RPath, Rscript, wait = wait)
         while pid.poll() is None :
-            if dlg is not None :
+            if dlg :
                 self.dlg.Pulse(message)
                 sleep(0.2)
             else :
@@ -143,6 +144,7 @@ class Alceste(AnalyseText) :
             self.corpus.make_and_write_sparse_matrix_from_uci(self.actives, self.pathout['TableUc1'], self.pathout['listeuce1'])
         Rscript = self.printRscript()
         self.doR(Rscript, dlg = self.dlg, message = 'CHD...')
+
         self.corpus.make_ucecl_from_R(self.pathout['uce'])
         self.corpus.make_and_write_profile(self.actives, self.corpus.lc, self.pathout['Contout'])
         self.sup, lim = self.corpus.make_actives_nb(self.parametres['max_actives'], 2)

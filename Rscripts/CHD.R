@@ -41,6 +41,10 @@ find.max <- function(dtable, chitable, compte, rmax, maxinter, sc, TT) {
     res
 }  
 
+
+
+
+
 CHD<-function(data.in, x=9, mode.patate = FALSE, svd.method, libsvdc.path=NULL){
 #	sink('/home/pierre/workspace/iramuteq/dev/findchi2.txt')
 	dataori <- data.in
@@ -103,7 +107,7 @@ CHD<-function(data.in, x=9, mode.patate = FALSE, svd.method, libsvdc.path=NULL){
         rmax <- NULL
 
         inert <- find.max(dtable, chitable, compte, rmax, maxinter, sc, TT)
-		print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+        print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
 		pp('max inter phase 1', inert$maxinter/TT)#max(listinter))
 		print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
         ordert <- ordert[order(ordert[,3]),]

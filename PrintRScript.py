@@ -193,11 +193,18 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         rm(data2)
         """
     txt += """
-    chd.result <- Rchdtxt("%s",mincl=%i,classif_mode=%i, nbt = nbt)
+    classif_mode <- %i
+    mincl <- %i
+    uceout <- "%s"
+    if (classif_mode == 0) {
+        chd.result <- Rchdtxt(uceout, chd1, chd2 = chd2, mincl = mincl,classif_mode = classif_mode, nbt = nbt)
+    } else {
+        chd.result <- Rchdtxt(uceout, chd1, chd2 = chd1, mincl = mincl,classif_mode = classif_mode, nbt = nbt)
+    }
     n1 <- chd.result$n1
     classeuce1 <- chd.result$cuce1
     classeuce2 <- chd.result$cuce2
-    """ % (DicoPath['uce'], mincl, classif_mode)
+    """ % (classif_mode, mincl, DicoPath['uce'])
     
     txt += """
     tree.tot1 <- make_tree_tot(chd1)
@@ -704,13 +711,33 @@ class PrintSimiScript(PrintRScript) :
             cn.path <- "%s"
             selected.col <- "%s"
             """ % (self.pathout['mat01.csv'], self.pathout['actives.csv'], self.pathout['selected.csv'])
+            if 'word' in self.parametres :
+                txt += """
+                word <- TRUE
+                index <- %i + 1
+                """ % self.parametres['word']
+            else :
+                txt += """
+                word <- FALSE
+                """
             txt += """
             dm <-readMM(dm.path)
             cn <- read.table(cn.path, sep='\t', quote='"')
             colnames(dm) <- cn[,1]
-            sel.col <- read.csv2(selected.col)
-            dm <- dm[, sel.col[,1] + 1]
+            sel.col <- read.csv2(selected.col, header = FALSE)
+            sel.col <- sel.col[,1] + 1
+            if (!word) {
+                dm <- dm[, sel.col]
+            } else {
+                forme <- colnames(dm)[index]
+                if (!index %in% sel.col) {
+                    sel.col <- append(sel.col, index)
+                }
+                dm <- dm[, sel.col]
+                index <- which(colnames(dm) == forme)
+            }
             """
+
         else :
             txt += """
             load("%s")
@@ -754,6 +781,16 @@ class PrintSimiScript(PrintRScript) :
             mat[is.na(mat)] <- 0
             mat[is.infinite(mat)] <- 0
             """
+        if 'word' in self.parametres and not self.parametres['keep_coord'] :
+            txt += """
+            mat <- graph.word(mat, index)
+            cs <- colSums(mat)
+            if (length(cs)) mat <- mat[,-which(cs==0)]
+            rs <- rowSums(mat)
+            if (length(rs)) mat <- mat[-which(rs==0),]
+            if (length(cs)) dm <- dm[, -which(cs==0)]
+            """
+
         if self.parametres['layout'] == 0 : layout = 'random'
         if self.parametres['layout'] == 1 : layout = 'circle'
         if self.parametres['layout'] == 2 : layout = 'frutch'
@@ -943,18 +980,15 @@ class PrintSimiScript(PrintRScript) :
                 vertex.size <- NULL
                 """
         else :
-            #FIXME
-            tmpchi = False
-            if tmpchi :
+            if self.parametres['type'] == 'clustersimitxt' : 
                 txt += """
                 lchi <- read.table("%s")
                 lchi <- lchi[,1]
-                """ % ffr(tmpchi)
-                if 'selected_col' in dir(self.tableau) :
-                    txt += """
-                    lchi <- lchi[c%s+1]
-                    """ % datas
-            if tmpchi and self.parametres.get('cexfromchi', False) :
+                """ % ffr(self.parametres['tmpchi'])
+                txt += """
+                    lchi <- lchi[sel.col]
+                    """
+            if self.parametres['type'] == 'clustersimitxt' and self.parametres.get('cexfromchi', False) :
                 txt += """ 
                 label.cex <- norm.vec(lchi, vcexminmax[1], vcexminmax[2])
                 """
@@ -966,7 +1000,7 @@ class PrintSimiScript(PrintRScript) :
                 label.cex <- graph.simi$label.cex
             }
             """
-            if tmpchi and self.parametres.get('sfromchi', False) :
+            if self.parametres['type'] == 'clustersimitxt' and self.parametres.get('sfromchi', False) :
                 txt += """ 
                 vertex.size <- norm.vec(lchi, minmaxeff[1], minmaxeff[2])
                 """

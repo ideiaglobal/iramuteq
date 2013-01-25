@@ -297,4 +297,9 @@ graph.word <- function(mat.simi, index) {
     nm[,index] <- mat.simi[,index]
     nm[index,] <- mat.simi[index,]
     nm
+#    cs <- colSums(nm)
+#    if (cs) nm <- nm[,-which(cs==0)]
+#    rs <- rowSums(nm)
+#    if (rs) nm <- nm[-which(rs==0),]
+#    nm
 }

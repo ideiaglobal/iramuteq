@@ -81,12 +81,17 @@ class Stat(AnalyseText) :
         txt = """
         source("%s")
         tot <- read.csv2("%s", header = FALSE, row.names = 1)
-        hapax <- read.csv2("%s", header = FALSE, row.names = 1)
-        tot <- rbind(tot, hapax)
+        """ % (self.parent.RscriptsPath['Rgraph'], self.pathout['total.csv'])
+        if len(hapax) :
+            txt += """
+            hapax <- read.csv2("%s", header = FALSE, row.names = 1)
+            tot <- rbind(tot, hapax)
+            """ % self.pathout['hapax.csv']
+        txt += """
         open_file_graph("%s", width = 400, height = 400)
         plot(log(tot[,1]), log = 'x', xlab='log(rangs)', ylab = 'log(frequences)', col = 'red', pch=16)
         dev.off()
-        """ % (self.parent.RscriptsPath['Rgraph'], self.pathout['total.csv'], self.pathout['hapax.csv'], self.pathout['zipf.png'])
+        """ % (self.pathout['zipf.png'])
         tmpscript = tempfile.mktemp(dir=self.parent.TEMPDIR)
         with open(tmpscript, 'w') as f :
             f.write(txt)

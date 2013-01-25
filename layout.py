@@ -250,7 +250,7 @@ class GraphPanel(wx.ScrolledWindow):
         self.Dict = dico
         self.txt = txt
         self.parent = parent
-        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "courier"))
+        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.FONTWEIGHT_BOLD, 0, "courier"))
         self.labels = []
         self.listimg = []
         self.dirout = os.path.dirname(self.Dict['ira'])
@@ -561,11 +561,10 @@ def PrintRapport(self, corpus, parametres, istxt = True):
 
 
 """ % datetime.datetime.now().ctime()
-    print istxt
     if istxt :
         totocc = corpus.gettotocc()
-        txt += u'nombre d\'uci: %i%s' % (corpus.getucinb(), sep)
-        txt += u'nombre d\'uce: %i%s' % (corpus.getucenb(), sep)
+        txt += u'nombre de textes: %i%s' % (corpus.getucinb(), sep)
+        txt += u'nombre de segments de textes: %i%s' % (corpus.getucenb(), sep)
         txt += u'nombre de formes: %i%s' % (len(corpus.formes), sep)
         txt += u'nombre d\'occurrences: %i%s' % (totocc, sep)
         txt += u'moyenne d\'occurrences par forme: %f%s' % (float(totocc) / float(len(self.corpus.formes)), sep)
@@ -575,10 +574,8 @@ def PrintRapport(self, corpus, parametres, istxt = True):
         txt += u'nombre de formes actives de fréquence >= %i: %i%s' % (parametres['eff_min_forme'], parametres['nbactives'], sep)
         txt += u'moyenne d\'occurrences par uce :%f%s' % (float(totocc) / float(corpus.getucenb()), sep)
         if 'tailleuc1' in parametres :
-            if parametres['classif_mode'] != 0 :
-                txt += u'taille uc1 : %i\n' % parametres['tailleuc1']
-            else:
-                txt += u'taille uc1 / uc2: %i / %i - %i / %i%s' % (parametres['tailleuc1'], parametres['tailleuc2'], parametres['lenuc1'], parametres['lenuc2'], sep)
+            if parametres['classif_mode'] == 0 :
+                txt += u'taille rst1 / rst2: %i / %i - %i / %i%s' % (parametres['tailleuc1'], parametres['tailleuc2'], parametres['lenuc1'], parametres['lenuc2'], sep)
     else :
         self.Ucenb = self.nbind
         txt += u'nombre d\'individus : %i%s' % (self.nbind, sep)
@@ -586,9 +583,9 @@ def PrintRapport(self, corpus, parametres, istxt = True):
     if istxt :
         txt += u'nombre de classes : %i%s' % (parametres['clnb'], sep)
         if parametres['classif_mode'] == 0 or parametres['classif_mode'] == 1 :
-            txt += u'%i uce classées sur %i (%.2f%%)%s' % (sum([len(cl) for cl in corpus.lc]), corpus.getucenb(), (float(sum([len(cl) for cl in corpus.lc])) / float(corpus.getucenb())) * 100, sep)
+            txt += u'%i segments classés sur %i (%.2f%%)%s' % (sum([len(cl) for cl in corpus.lc]), corpus.getucenb(), (float(sum([len(cl) for cl in corpus.lc])) / float(corpus.getucenb())) * 100, sep)
         elif self.parametres['classif_mode'] == 2 :
-            txt += u'%i uci classées sur %i (%.2f%%)%s' % (sum([len(cl) for cl in corpus.lc]), corpus.getucinb(), (float(sum([len(cl) for cl in corpus.lc]))) / float(corpus.getucinb()) * 100, sep)
+            txt += u'%i textes classés sur %i (%.2f%%)%s' % (sum([len(cl) for cl in corpus.lc]), corpus.getucinb(), (float(sum([len(cl) for cl in corpus.lc]))) / float(corpus.getucinb()) * 100, sep)
     else :
         txt += u'%i uce classées sur %i (%.2f%%)%s' % (self.ucecla, self.Ucenb, (float(self.ucecla) / float(self.Ucenb)) * 100, sep)
  
@@ -692,12 +689,13 @@ class GraphPanelDendro(wx.Panel):
         self.dirout = os.path.dirname(self.dictpathout['ira'])
         self.list_graph = list_graph
         self.parent = self.GetParent()#parent
-        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "courier"))
+        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "Arial"))
         self.labels = []
         self.listimg = []
         self.tabchd = self.parent.GetParent()
         self.ira = self.tabchd.GetParent()
         self.panel_1 = wx.ScrolledWindow(self, -1, style=wx.TAB_TRAVERSAL)
+        self.panel_1.SetBackgroundColour('white')
         self.deb = wx.StaticText(self.panel_1, -1, txt)
         dendro_img = wx.Image(os.path.join(self.ira.images_path,'but_dendro.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.butdendro = wx.BitmapButton(self, -1, dendro_img)

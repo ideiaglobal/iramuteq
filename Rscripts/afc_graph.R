@@ -132,7 +132,11 @@ if ( qui == 3 ) {
     infp <-  which(is.infinite(maxchi) & maxchi > 0)
     if (length(infp)) {
         maxchi[infp] <- NA
-        valmax <- max(maxchi, na.rm = TRUE)
+        if (!length(infp) == length(maxchi)) {
+            valmax <- max(maxchi, na.rm = TRUE)
+        } else {
+            valmax <- 8
+        }
         maxchi[infp] <- valmax + 2
     } 
     if (cex.txt) {
