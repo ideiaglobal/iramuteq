@@ -32,88 +32,6 @@ class Lexico(AnalyseText) :
                 self.dlg.Destroy()
             except :
                 pass
-#    def __init__(self, parent, cmd = False):
-#        self.parent = parent
-#        self.cmd = False
-#        self.ConfigPath = parent.ConfigPath
-#        self.DictPath = parent.DictPath
-#        self.KeyConf = RawConfigParser()
-#        self.KeyConf.read(self.ConfigPath['key'])
-#
-#        page = getPage(self.parent)
-#        if page is not None :
-#            self.corpus = getCorpus(page)
-#            if self.corpus is not None :
-#                pathout = ConstructPathOut(self.corpus.parametre['openpath'], 'lexico')
-#                self.dictpathout = StatTxtPathOut(pathout)
-#                self.val = wx.ID_OK
-#                #print self.corpus.lems
-#                self.make_lexico()
-#
-#        else :
-#            self.corpus = Corpus(parent)
-#            self.corpus.content = self.parent.content
-#            self.corpus.parametre['encodage'] = parent.corpus_encodage
-#            self.corpus.parametre['lang'] = parent.corpus_lang
-#            self.corpus.parametre['filename'] = parent.filename
-#            dial = StatDialog(self, self.parent)
-#            dial.check_uce.SetValue(True)
-#            dial.check_uce.Enable(False)
-#            dial.OnCheckUce(wx.EVT_MENU)
-#            self.val = dial.ShowModal()           
-##            dial = LexDialog(self.parent)
-##            dial.CenterOnParent()
-##            res = dial.ShowModal()
-#            if self.val == wx.ID_OK : 
-#                #if dial.m_radioBox2.GetSelection() == 0 : self.corpus.parametre['lem'] = True
-#                if dial.radio_lem.GetSelection() == 0 : self.corpus.parametre['lem'] = True
-#                else : self.corpus.parametre['lem'] = False
-#                #if dial.m_radioBox21.GetSelection() == 0 : self.corpus.parametre['expressions'] = True
-#                if dial.exp.GetSelection() == 0 : self.corpus.parametre['expressions'] = True
-#                else : self.corpus.parametre['expressions'] = False
-#                self.make_uce = dial.check_uce.GetValue()
-#                self.corpus.parametre['nbforme_uce'] = dial.spin_ctrl_4.GetValue()
-#                self.corpus.parametre['max_actives'] = dial.spin_max_actives.GetValue()
-#                self.corpus.parametre['eff_min_uce'] = self.corpus.parametre['nbforme_uce']
-#                dial.Destroy()
-#                pathout = ConstructPathOut(self.corpus.parametre['filename'], 'lexico')
-#                self.dictpathout = StatTxtPathOut(pathout)
-#                self.make_corpus()
-#                #print self.corpus.ucis
-#                self.make_lexico()
-#
-#    def make_corpus(self) :
-#        print 'make corpus'
-#        if not self.cmd :
-#            dlg = progressbar(self, maxi = 6)
-#        self.corpus.supplementaires = [option for option in self.KeyConf.options('KEYS') if self.KeyConf.get('KEYS', option) == "2"]
-#        self.corpus.typeactive = [option for option in self.KeyConf.options('KEYS') if self.KeyConf.get('KEYS', option) == "1"]
-#        ucis_txt, ucis_paras_txt = self.corpus.start_analyse(self.parent, dlg = dlg, cmd = self.cmd)
-#        del ucis_txt
-#    
-#        if not self.cmd :
-#            dlg.Update(5, '%i ucis - Construction des uces' % len(ucis_paras_txt))
-#        self.corpus.make_ucis_paras_uces(ucis_paras_txt, make_uce = self.make_uce)
-#        del ucis_paras_txt
-#
-#        if self.corpus.para_coords != [[] for val in self.corpus.para_coords] :
-#            self.corpus.parametre['para'] = True
-#        else :
-#            self.corpus.parametre['para'] = False
-#        self.corpus.make_etoiles(self.corpus.para_coords)
-#
-#        print 'len(ucis_paras_uces)', len(self.corpus.ucis_paras_uces)
-#    
-#        if not self.cmd :
-#            dlg.Update(6, u'Dictionnaires')
-#        uces, orderuces = self.corpus.make_forms_and_uces()
-#        self.corpus.make_lems(self.parent.lexique)
-##        if not self.corpus.parametre['lem'] :
-##            formes = self.corpus.formes
-##        else :
-##            formes = self.corpus.make_lem_eff()
-#        if not self.cmd :
-#            dlg.Destroy()
    
     def DoR(self):
         nbligne = 5
@@ -209,10 +127,6 @@ class Lexico(AnalyseText) :
         tmpscript.write(txt)
         tmpscript.close()
         self.doR(tmpfile, dlg = self.dlg, message = 'R...')
-        #pid = exec_rcode(self.parent.RPath, tmpfile, wait = False)
-        #while pid.poll() == None :
-        #    sleep(0.2)
-        #check_Rresult(self.parent, pid)
 
     def preferences(self) :
         listet = self.corpus.make_etoiles()
@@ -238,10 +152,6 @@ class Lexico(AnalyseText) :
             else :
                 self.parametres['indice'] = 'chi2'
             self.parametres['clnb'] = len(ListEt)
-            #if dial.checklem.GetValue() :
-            #    self.parametres['lem'] = 1 
-            #else :
-            #    self.parametres['lem'] = 0
             dial.Destroy()
             return self.parametres
         else :
@@ -249,33 +159,6 @@ class Lexico(AnalyseText) :
             return None
 
     def make_lexico(self) :
-#        listet = self.corpus.make_etoiles()
-#        listet.sort()
-#        variables = treat_var_mod(listet)
-#        var = [v for v in variables]
-#        if self.dlg :
-#            dial = OptLexi(self.parent)
-#            dial.listet = listet
-#            dial.variables = var
-#            for et in var :
-#                dial.list_box_1.Append(et)
-#            dial.CenterOnParent()
-#            val = dial.ShowModal()
-#            if val == wx.ID_OK :
-#                if dial.choice.GetSelection() == 1 :
-#                    ListEt = [listet[i] for i in dial.list_box_1.GetSelections()]
-#                else :
-#                    ListEt = variables[var[dial.list_box_1.GetSelections()[0]]]
-#                mineff = dial.spin.GetValue()
-#                if dial.choice_indice.GetSelection() == 0 :
-#                    indice = 'hypergeo'
-#                else :
-#                    indice = 'chi2'
-#                self.parametres = {'indice' : indice}
-#                dial.Destroy()
-#            else :
-#                dial.Destroy()
-#        else :
         mineff = self.parametres['mineff']
         #dlg = progressbar(self, maxi = 3)
         tabout = self.corpus.make_lexitable(mineff, self.listet)
@@ -306,8 +189,4 @@ class Lexico(AnalyseText) :
                             [os.path.basename(self.dictpathout['afct_col']), u'colonnes']]
         print_liste(self.dictpathout['liste_graph_afcf'],afcf_graph_list)
         print_liste(self.dictpathout['liste_graph_afct'],afct_graph_list)
-        #CreateIraFile(self.dictpathout, 0, corpname = os.path.basename(self.corpus.parametre['filename']), section = 'lexico')
         DoConf().makeoptions(['spec'],[self.parametres], self.dictpathout['ira'])
-            #OpenAnalyse(self.parent, self.dictpathout['ira']) 
-            #dolayout(self)
-            #dlg.Destroy()

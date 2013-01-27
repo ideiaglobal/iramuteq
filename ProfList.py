@@ -17,7 +17,7 @@ import os
 import sys
 import  wx
 import  wx.lib.mixins.listctrl  as  listmix
-from tabsimi import DoSimi
+#from tabsimi import DoSimi
 from listlex import ListForSpec
 from chemins import ConstructPathOut, ffr
 from dialog import PrefExport, PrefUCECarac, SearchDial, message
@@ -376,17 +376,21 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         vchistable = [line[1:] for line in chistable]
         fchistable = [line[0] for line in chistable]
         word = self.getselectedwords()[0]
+        print self.var_mod
         if len(word.split('_')) > 1 :
             var = word.split('_')
-            words = ['_'.join([var[0],word]) for word in self.var_mod[var[0]]]
+            #words = ['_'.join([var[0],word]) for word in self.var_mod[var[0]]]
+            words = [word for word in self.var_mod[var[0]]]
             words.sort()
             tableout = []
             kwords = []
             for word in words :
+                print word
                 if word in fchistable :
                     tableout.append(vchistable[fchistable.index(word)])
                     kwords.append(word)
             tmpgraph = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
+            print tableout
             txt = barplot(tableout, kwords, title, self.Source.parent.RscriptsPath['Rgraph'], tmpgraph)
             tmpscript = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
             file = open(tmpscript,'w')

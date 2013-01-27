@@ -110,10 +110,7 @@ class DoQuestAlceste(AnalyseMatrix):
         #CreateIraFile(self.dictpathout, self.clnb, corpname = os.path.basename(self.parent.filename), section = 'questionnaire')
         afc_graph_list = [[os.path.basename(self.dictpathout['AFC2DL_OUT']), u'Variables actives - coordonnées - facteurs 1 / 2'],
                          [os.path.basename(self.dictpathout['AFC2DSL_OUT']), u'variables illustratives - coordonnées - facteurs 1 / 2'],
-                         [os.path.basename(self.dictpathout['AFC2DCL_OUT']), u'Classes - Coordonnées - facteur 1 / 2'],
-                         [os.path.basename(self.dictpathout['AFC2DCoul']), u'Variables actives - Corrélation - facteur 1/2'],
-                         [os.path.basename(self.dictpathout['AFC2DCoulSup']), u'Variables illustratives - Corrélation - facteur 1 / 2'],
-                         [os.path.basename(self.dictpathout['AFC2DCoulCl']), u'Classes - Corrélations - facteurs 1 / 2'], ]
+                         [os.path.basename(self.dictpathout['AFC2DCL_OUT']), u'Classes - Coordonnées - facteur 1 / 2'],]
         chd_graph_list = [[os.path.basename(self.dictpathout['dendro1']), u'dendrogramme à partir de chd1']]
         chd_graph_list.append([os.path.basename(self.dictpathout['arbre1']), u'chd1'])
         print_liste(self.dictpathout['liste_graph_afc'], afc_graph_list)
@@ -198,23 +195,14 @@ class DoQuestAlceste(AnalyseMatrix):
             PARCEX<-%s
             """ % "0.9"
             txt += """
-            PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=1, fin=(debet-1), xlab = xlab, ylab = ylab)
+            xyminmax <- PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=1, fin=(debet-1), xlab = xlab, ylab = ylab)
             """ % (self.dictpathout['AFC2DL_OUT'])
             txt += """
-            PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debet, fin=fin, xlab = xlab, ylab = ylab)
+            PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debet, fin=fin, xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2])
             """ % (self.dictpathout['AFC2DSL_OUT'])
             txt += """
-            PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col = TRUE, what='coord', xlab = xlab, ylab = ylab)
+            PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col = TRUE, what='coord', xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2])
             """ % (self.dictpathout['AFC2DCL_OUT'])
-            txt += """
-            PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='crl', deb=1, fin=(debet-1), xlab = xlab, ylab = ylab)
-            """ % (self.dictpathout['AFC2DCoul'])
-            txt += """
-            PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='crl', deb=debet, fin=fin, xlab = xlab, ylab = ylab)
-            """ % (self.dictpathout['AFC2DCoulSup'])
-            txt += """
-            PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col = TRUE, what='crl', xlab = xlab, ylab = ylab)
-            """ % (self.dictpathout['AFC2DCoulCl'])
         txt += """
         save.image(file="%s")
         """ % self.dictpathout['RData']

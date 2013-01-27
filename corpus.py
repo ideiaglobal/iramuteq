@@ -563,16 +563,16 @@ class Corpus :
             if et[0] in det :
                 try :
                     endet = '_'.join(et[1:])
-                    if endet in det[et[0]] :
-                        det[et[0]][endet] += 1
+                    if etoile in det[et[0]] :
+                        det[et[0]][etoile] += 1
                     else :
-                        det[et[0]][endet] = 1
+                        det[et[0]][etoile] = 1
                 except IndexError :
                     det[et[0]] += 1
             else :
                 try :
                     endet = '_'.join(et[1:])
-                    det[et[0]] = {endet :1}
+                    det[et[0]] = {etoile :1}
                 except IndexError :
                     det[et[0]] = 1
         return det

@@ -83,6 +83,15 @@ PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axeto
         classes <- 1:clnb
         cex.par <- rep(1,clnb)
     }
+    if (is.null(xmin)) {
+        table.in <- rowcoord
+        xminmax <- c(min(table.in[,1], na.rm = TRUE) + ((max(cex.par)/10) * min(table.in[,1], na.rm = TRUE)), max(table.in[,1], na.rm = TRUE) + ((max(cex.par)/10) * max(table.in[,1], na.rm = TRUE)))
+        xmin <- xminmax[1]
+        xmax <- xminmax[2]
+        yminmax <- c(min(table.in[,2], na.rm = TRUE) + ((max(cex.par)/10) * min(table.in[,2], na.rm = TRUE)), max(table.in[,2], na.rm = TRUE) + ((max(cex.par)/10) * max(table.in[,2], na.rm = TRUE)))
+        ymin <- yminmax[1]
+        ymax <- yminmax[2]
+     }
 	#ntabtot <- cbind(rowcoord, classes)
 	#if (!col) ntabtot <- ntabtot[row_keep,]
     xlab <- paste('facteur ', x, ' -')
@@ -101,7 +110,8 @@ PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axeto
     classes <- classes[table.in[,4]]
     cex.par <- cex.par[table.in[,4]]
     make_afc_graph(table.in, classes, clnb, xlab, ylab, cex.txt = cex.par, xminmax=c(xmin,xmax), yminmax=c(ymin,ymax))
-    
+    xyminmax <- list(yminmax = c(ymin,ymax), xminmax = c(xmin,xmax))
+    xyminmax 
 	#plot(rowcoord[,x],rowcoord[,y], pch='', xlab = xlab, ylab = ylab)
 	#abline(h=0,v=0)
 	#for (i in 1:clnb) {

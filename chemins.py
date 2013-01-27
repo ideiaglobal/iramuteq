@@ -271,18 +271,16 @@ def StatTxtPathOut(pathout):
     }
     return d
 
-def construct_simipath(pathout):
-    d = {'mat01' : ffr(os.path.join(pathout, 'mat01.csv')),
-          'matsimi' : ffr(os.path.join(pathout, 'matsimi.csv')),
-          'eff' : ffr(os.path.join(pathout, 'eff.csv')),
-          'RData' : ffr(os.path.join(pathout, 'RData.RData')),
-          'liste_graph' : os.path.join(pathout, 'liste_graph.txt'),
-          'ira' : os.path.join(pathout, 'Analyse.ira'),
-          'film' : ffr(pathout),
-          'db' : os.path.join(pathout, 'analyse.db'),
-          'corpus' : os.path.join(pathout, 'corpus.db'),
-        }
-    return d
+#def construct_simipath(pathout):
+#    d = {'mat01' : 'mat01.csv',
+#          'matsimi' : 'matsimi.csv',
+#          'eff' : 'eff.csv',
+#          'RData' : 'RData.RData',
+#          'liste_graph' : 'liste_graph.txt',
+#          'ira' : 'Analyse.ira',
+#          'film' : '',
+#          'db' : 'analyse.db',
+#        }
 
 simipath = {'mat01' :  'mat01.csv',
           'matsimi' : 'matsimi.csv',

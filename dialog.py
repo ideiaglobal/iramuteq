@@ -604,7 +604,7 @@ par le chi2 de liaison aux classes"""
         self.label_6 = wx.StaticText(self, -1, u'Eliminer les recouvrements')
         self.check3 = wx.CheckBox(self, -1)
         txt = u"""Taille du texte proportionnel
-à la masse de la forme"""
+à l'effectif de la forme"""
         self.label_7 = wx.StaticText(self, -1, txt)
         self.check4 = wx.CheckBox(self, -1)
         self.label_min = wx.StaticText(self, -1, 'min')
@@ -904,7 +904,7 @@ au chi2 d'association de la forme"""
             self.slider_sphere.Enable(False)
     
     def OnPass(self,evt) :
-        if evt.GetString() != u'actives' :
+        if evt.GetString() == u'classes' :
             self.check4.SetValue(False)
             self.check4.Enable(False)
             self.OnNorm(wx.EVT_CHECKBOX)
@@ -2608,3 +2608,43 @@ class ExtractDialog ( wx.Dialog ):
     
     def __del__( self ):
         pass
+
+class FreqDialog(wx.Dialog):
+    def __init__(self, parent, ID, listcol, title, size) :
+        wx.Dialog.__init__(self, parent, ID, title, size=size, pos=wx.DefaultPosition,style=wx.DEFAULT_DIALOG_STYLE | wx.CANCEL | wx.OK )
+        pre = wx.PreDialog()
+        pre.SetExtraStyle(wx.DIALOG_EX_CONTEXTHELP)
+        pre.Create(parent, ID, title, wx.DefaultPosition, size, wx.DEFAULT_DIALOG_STYLE | wx.CANCEL | wx.OK)
+        self.PostCreate(pre)
+        self.parent = parent 
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        #self.content = parent.content
+        self.header = listcol
+        #LABELLIST = []
+        #for i in self.header:
+        #    forme = i
+        #    if len(forme) > 60 :
+        #        LABELLIST.append(i[0:60])
+        #    else:
+        #        LABELLIST.append(i)
+        self.list_box_1 = wx.ListBox(self, -1, choices=self.header, style=wx.LB_EXTENDED | wx.LB_HSCROLL)
+        sizer.Add(self.list_box_1, 0, 5)
+        
+        btnsizer = wx.BoxSizer(wx.HORIZONTAL)
+        
+        btn = wx.Button(self, wx.ID_CANCEL)
+        btn.SetHelpText("Annuler")
+        btnsizer.Add(btn)
+        
+        btn = wx.Button(self, wx.ID_OK)
+        btn.SetHelpText("Valider")
+        btn.SetDefault()
+        btnsizer.Add(btn)
+        
+        sizer.Add(btnsizer, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_HORIZONTAL, 5)
+        self.SetSizer(sizer)
+        sizer.Fit(self)
+        self.SetTitle(u"Sélection")
+  
+        # end wxGlade
+

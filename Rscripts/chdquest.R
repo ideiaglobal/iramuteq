@@ -9,12 +9,36 @@ fille<-function(classe,classeuce) {
 	listf
 }
 
+
+croiseeff <- function(croise, classeuce1, classeuce2) {
+    cl1 <- 0
+    cl2 <- 1
+    for (i in 1:ncol(classeuce1)) {
+        cl1 <- cl1 + 2
+        cl2 <- cl2 + 2
+        clj1 <- 0
+        clj2 <- 1
+        for (j in 1:ncol(classeuce2)) {
+            clj1 <- clj1 + 2
+            clj2 <- clj2 + 2
+            croise[cl1 - 1, clj1 -1] <- length(which(classeuce1[,i] == cl1 & classeuce2[,j] == clj1))
+            croise[cl1 - 1, clj2 -1] <- length(which(classeuce1[,i] == cl1 & classeuce2[,j] == clj2))
+            croise[cl2 - 1, clj1 -1] <- length(which(classeuce1[,i] == cl2 & classeuce2[,j] == clj1))
+            croise[cl2 - 1, clj2 -1] <- length(which(classeuce1[,i] == cl2 & classeuce2[,j] == clj2))
+        }
+    }
+    croise
+}
+
+
 #fonction pour la double classification
 #cette fonction doit etre splitter en 4 ou 5 fonctions
 
-Rchdquest<-function(tableuc1,listeuce1,uceout ,nbt = 9, mincl = 2) {
+Rchdquest<-function(tableuc1,listeuce1,uceout ,nbt = 9, mincl = 2, mode.patate = FALSE, svd.method = 'irlba') {
 	#source('/home/pierre/workspace/iramuteq/Rscripts/CHD.R')
-
+    if (svd.method == 'irlba') {
+        library(irlba)
+    }
 	#lecture des tableaux
 	data1<-read.csv2(tableuc1)#,row.names=1)
     cn.data1 <- colnames(data1)
@@ -28,7 +52,7 @@ Rchdquest<-function(tableuc1,listeuce1,uceout ,nbt = 9, mincl = 2) {
 		sc<-sc[-which(sc<=4)]
 	}
 	#analyse des tableaux avec la fonction CHD qui doit etre sourcee avant
-	chd1<-CHD(data1, x = nbt)
+	chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method)
 	chd2<-chd1
 
 	#FIXME: le nombre de classe peut etre inferieur
@@ -40,53 +64,70 @@ Rchdquest<-function(tableuc1,listeuce1,uceout ,nbt = 9, mincl = 2) {
 	listuce2<-listuce1
 
 	#Une fonction pour assigner une classe a chaque UCE
-	AssignClasseToUce<-function(listuce,chd) {
-	    out<-matrix(nrow=nrow(listuce),ncol=ncol(chd))
-	    for (i in 1:nrow(listuce)) {
-			for (j in 1:ncol(chd)) {
-			    out[i,j]<-chd[(listuce[i,2]+1),j]
-			}
-	    }
-	    out
-	}
+#	AssignClasseToUce<-function(listuce,chd) {
+#	    out<-matrix(nrow=nrow(listuce),ncol=ncol(chd))
+#	    for (i in 1:nrow(listuce)) {
+#			for (j in 1:ncol(chd)) {
+#			    out[i,j]<-chd[(listuce[i,2]+1),j]
+#			}
+#	    }
+#	    out
+#	}
 
+    AssignClasseToUce <- function(listuce, chd) {
+        print('assigne classe -> uce')
+        chd[listuce[,2]+1,]
+    }
 	#Assignation des classes
 	classeuce1<-AssignClasseToUce(listuce1,chd1$n1)
 	classeuce2<-classeuce1
 	
 	#calcul des poids (effectifs)
 	poids1<-vector(mode='integer',length=tcl)
-	makepoids<-function(classeuce,poids) {
-	    for (classes in 2:(tcl + 1)){
-		for (i in 1:ncol(classeuce)) {
-		    if (poids[(classes-1)]<length(classeuce[,i][classeuce[,i]==classes])) {
-		        poids[(classes-1)]<-length(classeuce[,i][classeuce[,i]==classes])
-		    }
-		}
-	    }
-	    poids
-	}
+#	makepoids<-function(classeuce,poids) {
+#	    for (classes in 2:(tcl + 1)){
+#		for (i in 1:ncol(classeuce)) {
+#		    if (poids[(classes-1)]<length(classeuce[,i][classeuce[,i]==classes])) {
+#		        poids[(classes-1)]<-length(classeuce[,i][classeuce[,i]==classes])
+#		    }
+#		}
+#	    }
+#	    poids
+#	}
+    makepoids <- function(classeuce, poids) {
+        cl1 <- 0
+        cl2 <- 1
+        for (i in 1:nbt) {
+            cl1 <- cl1 + 2
+            cl2 <- cl2 + 2
+            poids[cl1 - 1] <- length(which(classeuce[,i] == cl1))
+            poids[cl2 - 1] <- length(which(classeuce[,i] == cl2))
+        }
+        poids
+    }
+    
 	poids1<-makepoids(classeuce1,poids1)
 	poids2<-poids1
 
-	croise=matrix(ncol=tcl,nrow=tcl)
-	#production du tableau de contingence
-	for (i in 1:ncol(classeuce1)) {
-	    #poids[i]<-length(classeuce1[,i][x==classes])
-	    for (j in 1:ncol(classeuce2)) {
-		tablecroise<-table(classeuce1[,i],classeuce2[,j])
-		tabcolnames<-as.numeric(colnames(tablecroise))
-		#tabcolnames<-c(tabcolnames[(length(tabcolnames)-1)],tabcolnames[length(tabcolnames)])
-		tabrownames<-as.numeric(rownames(tablecroise))
-		#tabrownames<-c(tabrownames[(length(tabrownames)-1)],tabrownames[length(tabrownames)])
-		for (k in (ncol(tablecroise)-1):ncol(tablecroise)) {
-		    for (l in (nrow(tablecroise)-1):nrow(tablecroise)) {
-		        croise[(tabrownames[l]-1),(tabcolnames[k]-1)]<-tablecroise[l,k]
-		    }
-		}
-	    }
-	    tablecroise
-	}
+#	croise=matrix(ncol=tcl,nrow=tcl)
+#	#production du tableau de contingence
+#	for (i in 1:ncol(classeuce1)) {
+#	    #poids[i]<-length(classeuce1[,i][x==classes])
+#	    for (j in 1:ncol(classeuce2)) {
+#		tablecroise<-table(classeuce1[,i],classeuce2[,j])
+#		tabcolnames<-as.numeric(colnames(tablecroise))
+#		#tabcolnames<-c(tabcolnames[(length(tabcolnames)-1)],tabcolnames[length(tabcolnames)])
+#		tabrownames<-as.numeric(rownames(tablecroise))
+#		#tabrownames<-c(tabrownames[(length(tabrownames)-1)],tabrownames[length(tabrownames)])
+#		for (k in (ncol(tablecroise)-1):ncol(tablecroise)) {
+#		    for (l in (nrow(tablecroise)-1):nrow(tablecroise)) {
+#		        croise[(tabrownames[l]-1),(tabcolnames[k]-1)]<-tablecroise[l,k]
+#		    }
+#		}
+#	    }
+#	    tablecroise
+#	}
+    croise <- croiseeff( matrix(ncol=tcl,nrow=tcl), classeuce1, classeuce2)
     if (mincl == 2) {
 	    mincl<-round(nrow(classeuce1)/(nbt+1)) #valeur a calculer nbuce/nbt
     }
@@ -128,47 +169,69 @@ Rchdquest<-function(tableuc1,listeuce1,uceout ,nbt = 9, mincl = 2) {
 	print(chicroise)
 	#determination des chi2 les plus fort
 	chicroiseori<-chicroise
-	maxi<-vector()
-	chimax<-vector()
-	for (i in 1:tcl) {
-	    maxi[i]<-which.max(chicroise)
-	    chimax[i]<-chicroise[maxi[i]]
-	    chicroise[maxi[i]]<-0
-	}
-	testpres<-function(x,listcoord) {
-	    for (i in 1:length(listcoord)) {
-		if (x==listcoord[i]) {
-		    return(-1)
-		} else {
-		    a<-1
-		}
-	    }
-	    a
-	}
-	c.len=nrow(chicroise)
-	r.len=ncol(chicroise)
-	listx<-c(0)
-	listy<-c(0)
-	rang<-0
-	cons<-list()
-	#on garde une valeur par ligne / colonne
-	for (i in 1:length(maxi)) {
-	#coordonnées de chi2 max
-	    x.co<-ceiling(maxi[i]/c.len)
-	    y.co<-maxi[i]-(x.co-1)*c.len
-	    a<-testpres(x.co,listx)
-	    b<-testpres(y.co,listy)
-	    
-	    if (a==1) {
-		if (b==1) {
-		    rang<-rang+1
-		    listx[rang]<-x.co
-		    listy[rang]<-y.co
-		}
-	    }
-	    cons[[1]]<-listx
-	    cons[[2]]<-listy
-	}
+    doxy <- function(chicroise) {
+        listx <- NULL
+        listy <- NULL
+        listxy <- which(chicroise > 3.84, arr.ind = TRUE)
+        #print(listxy)
+        val <- chicroise[which(chicroise > 3.84)]
+        ord <- order(val, decreasing = TRUE)
+        listxy <- listxy[ord,]
+        #for (i in 1:nrow(listxy)) {
+        #    if ((!listxy[,2][i] %in% listx) & (!listxy[,1][i] %in% listy)) {
+        #        listx <- c(listx, listxy[,2][i])
+        #        listy <- c(listy, listxy[,1][i])
+        #    }
+        #}
+        xy <- list(x = listxy[,2], y = listxy[,1])
+        xy
+    }
+    xy <- doxy(chicroise)
+    print(xy)
+    listx <- xy$x
+    listy <- xy$y
+    
+#	maxi<-vector()
+#	chimax<-vector()
+#	for (i in 1:tcl) {
+#	    maxi[i]<-which.max(chicroise)
+#	    chimax[i]<-chicroise[maxi[i]]
+#	    chicroise[maxi[i]]<-0
+#	}
+#	testpres<-function(x,listcoord) {
+#	    for (i in 1:length(listcoord)) {
+#		if (x==listcoord[i]) {
+#		    return(-1)
+#		} else {
+#		    a<-1
+#		}
+#	    }
+#	    a
+#	}
+#	c.len=nrow(chicroise)
+#	r.len=ncol(chicroise)
+#	listx<-c(0)
+#	listy<-c(0)
+#	rang<-0
+#	cons<-list()
+#	#on garde une valeur par ligne / colonne
+#	for (i in 1:length(maxi)) {
+#	#coordonnées de chi2 max
+#	    x.co<-ceiling(maxi[i]/c.len)
+#	    y.co<-maxi[i]-(x.co-1)*c.len
+#	    a<-testpres(x.co,listx)
+#	    b<-testpres(y.co,listy)
+#	    
+#	    if (a==1) {
+#		if (b==1) {
+#		    rang<-rang+1
+#		    listx[rang]<-x.co
+#		    listy[rang]<-y.co
+#		}
+#	    }
+#	    cons[[1]]<-listx
+#	    cons[[2]]<-listy
+#	}
 	#pour ecrire les resultats
 	for (i in 1:length(listx)) {
 	    txt<-paste(listx[i]+1,listy[i]+1,sep=' ')

@@ -19,7 +19,7 @@ class PrintRScript :
         self.analyse = analyse
         self.parametres = analyse.parametres
         self.scriptout = self.pathout['temp']
-        self.script =  u"#Script genere par IRaMuTeQ - %s" % datetime.now().ctime()
+        self.script =  u"#Script genere par IRaMuTeQ - %s\n" % datetime.now().ctime()
     
     def add(self, txt) :
         self.script = '\n'.join([self.script, txt])
@@ -251,8 +251,8 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     fileout.close()
 
 def RPamTxt(corpus, RscriptPath):
-    DicoPath = corpus.dictpathout
-    param = corpus.parametre
+    DicoPath = corpus.pathout
+    param = corpus.parametres
     print param
     txt = """
     source("%s")
@@ -309,7 +309,7 @@ def RchdQuest(DicoPath, RscriptPath, nbcl = 10, mincl = 10):
     save(tree.cut1, file="%s")
     open_file_graph("%s", width = 600, height=400)
     classes<-n1[,ncol(n1)]
-    plot.dendropr(tree_cut1$tree.cl,classes)
+    plot.dendropr(tree_cut1$tree.cl,classes, histo = TRUE)
     """ % (DicoPath['Rdendro'],DicoPath['dendro1'])
     
     txt += """
@@ -385,34 +385,19 @@ write.csv2(gbcluster,file="%s")
         """ % (DictChdTxtOut['afc_facteur'], DictChdTxtOut['afc_col'], DictChdTxtOut['afc_row'])
     
         txt += """
-        #xlab <- paste('facteur 1 - ', round(afc$facteur[1,2],2), sep = '')
-        #ylab <- paste('facteur 2 - ', round(afc$facteur[2,2],2), sep = '')
-        #xlab <- paste(xlab, ' %', sep = '')
-        #ylab <- paste(ylab, ' %', sep = '')
-        """
-    
-        txt += """
     PARCEX<-%s
-    xmin <- min(afc$rowcoord[,1], na.rm = TRUE) + (0.1 * min(afc$rowcoord[,1], na.rm = TRUE))
-    xmax <- max(afc$rowcoord[,1], na.rm = TRUE) + (0.1 * max(afc$rowcoord[,1], na.rm = TRUE))
-    ymin <- min(afc$rowcoord[,2], na.rm = TRUE) + (0.1 * min(afc$rowcoord[,2], na.rm = TRUE))
-    ymax <- max(afc$rowcoord[,2], na.rm = TRUE) + (0.1 * max(afc$rowcoord[,2], na.rm = TRUE))
-    print(xmin)
-    print(xmax)
-    print(ymin)
-    print(ymax)
     """ % taillecar
         txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab, xmin=xmin, xmax=xmax, ymin = ymin, ymax=ymax)
+    xyminmax <- PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab)
     """ % (DictChdTxtOut['AFC2DL_OUT'])
         txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debsup, fin=(debet-1), xlab = xlab, ylab = ylab, xmin=xmin, xmax=xmax, ymin = ymin, ymax=ymax)
+    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debsup, fin=(debet-1), xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2])
     """ % (DictChdTxtOut['AFC2DSL_OUT'])
         txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debet, fin=fin, xlab = xlab, ylab = ylab, xmin=xmin, xmax=xmax, ymin = ymin, ymax=ymax)
+    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debet, fin=fin, xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2])
     """ % (DictChdTxtOut['AFC2DEL_OUT'])
         txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col=TRUE, what='coord', xlab = xlab, ylab = ylab, xmin=xmin, xmax=xmax, ymin = ymin, ymax=ymax)
+    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col=TRUE, what='coord', xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2])
     """ % (DictChdTxtOut['AFC2DCL_OUT'])
 #        txt += """
  #   PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='crl', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab)
@@ -705,7 +690,7 @@ class PrintSimiScript(PrintRScript) :
         self.packages(['igraph', 'proxy', 'Matrix'])
         self.sources([self.analyse.parent.RscriptsPath['simi'], self.analyse.parent.RscriptsPath['Rgraph']])
         txt = ''
-        if not self.parametres['keep_coord'] :
+        if not self.parametres['keep_coord'] and not self.parametres['type'] == 'simimatrix':
             txt += """
             dm.path <- "%s"
             cn.path <- "%s"
@@ -737,7 +722,36 @@ class PrintSimiScript(PrintRScript) :
                 index <- which(colnames(dm) == forme)
             }
             """
-
+        elif not self.parametres['keep_coord'] and self.parametres['type'] == 'simimatrix' :
+            txt += """
+            dm.path <- "%s"
+            selected.col <- "%s"
+            """ % (self.pathout['mat01.csv'], self.pathout['selected.csv'])
+            if 'word' in self.parametres :
+                txt += """
+                word <- TRUE
+                index <- %i + 1
+                """ % self.parametres['word']
+            else :
+                txt += """
+                word <- FALSE
+                """
+            txt += """
+            dm <-read.csv2(dm.path)
+            dm <- as.matrix(dm)
+            sel.col <- read.csv2(selected.col, header = FALSE)
+            sel.col <- sel.col[,1] + 1
+            if (!word) {
+                dm <- dm[, sel.col]
+            } else {
+                forme <- colnames(dm)[index]
+                if (!index %in% sel.col) {
+                    sel.col <- append(sel.col, index)
+                }
+                dm <- dm[, sel.col]
+                index <- which(colnames(dm) == forme)
+            }
+            """
         else :
             txt += """
             load("%s")
@@ -956,10 +970,22 @@ class PrintSimiScript(PrintRScript) :
 #            g.toplot <- g.ori
 #        }
 #        """
+        if self.parametres['com'] :
+            com = `self.parametres['communities']`
+        else :
+            com = 'NULL'
+        if self.parametres['halo'] :
+            halo = 'TRUE'
+        else :
+            halo = 'FALSE'
+        txt += """
+        communities <- %s
+        halo <- %s
+        """ % (com, halo)
         txt += """
         eff <- colSums(dm)
         x <- list(mat = mat, eff = eff)
-        graph.simi <- do.simi(x, method='%s', seuil = seuil, p.type = '%s', layout.type = '%s', max.tree = %s, coeff.vertex=%s, coeff.edge = %s, minmaxeff = minmaxeff, vcexminmax = vcexminmax, cex = cex, coords = coords)
+        graph.simi <- do.simi(x, method='%s', seuil = seuil, p.type = '%s', layout.type = '%s', max.tree = %s, coeff.vertex=%s, coeff.edge = %s, minmaxeff = minmaxeff, vcexminmax = vcexminmax, cex = cex, coords = coords, communities = communities, halo = halo)
         """ % (method, type, layout, arbremax, coeff_tv, coeff_te)
             
         if self.parametres.get('bystar',False) :
@@ -1013,8 +1039,13 @@ class PrintSimiScript(PrintRScript) :
             }
             """
         txt += """ vertex.size <- NULL """
+        if self.parametres['svg'] : svg = 'TRUE'
+        else : svg = 'FALSE'
         txt += """
-        coords <- plot.simi(graph.simi, p.type='%s',filename="%s", vertex.label = label.v, edge.label = label.e, vertex.col = cols, vertex.label.color = vertex.label.color, vertex.label.cex=label.cex, vertex.size = vertex.size, edge.col = cola, leg=leg, width = width, height = height, alpha = alpha, movie = film)
+        svg <- %s
+        """ % svg
+        txt += """
+        coords <- plot.simi(graph.simi, p.type='%s',filename="%s", vertex.label = label.v, edge.label = label.e, vertex.col = cols, vertex.label.color = vertex.label.color, vertex.label.cex=label.cex, vertex.size = vertex.size, edge.col = cola, leg=leg, width = width, height = height, alpha = alpha, movie = film, svg = svg)
         save.image(file="%s")
         """ % (type, self.filename, self.pathout['RData'])
         

@@ -53,13 +53,13 @@ from tabverges import Verges
 #from textafcuci import AfcUci
 #from textchdalc import AnalyseAlceste
 from analysetxt import Alceste
-from textdist import PamTxt
+from textdist import AnalysePam
 from textstat import Stat
 from textaslexico import Lexico
 from textsimi import SimiTxt, SimiFromCluster
 from textwordcloud import WordCloud
 from profile_segment import ProfileSegment
-from textcheckcorpus import checkcorpus
+#from textcheckcorpus import checkcorpus
 from openanalyse import OpenAnalyse
 from corpus import BuildFromAlceste, Builder
 from sheet import MySheet
@@ -240,7 +240,7 @@ class IraFrame(wx.Frame):
         analyse_menu.Append(ID_Chi2, u"Chi2")
         #analyse_menu.Append(ID_Student, u"t de Student")
         menu_classif = wx.Menu()
-        menu_classif.Append(ID_CHDAlceste, u"Méthode Alceste")
+        menu_classif.Append(ID_CHDAlceste, u"Méthode GNEPA")
         menu_classif.Append(ID_CHDSIM, u"Par matrice des distances")
         analyse_menu.AppendMenu(-1, u"Classification", menu_classif)
         analyse_menu.Append(ID_AFCM, u"AFCM")
@@ -249,12 +249,12 @@ class IraFrame(wx.Frame):
         analyse_menu.Append(ID_RCODE, u"Code R...")
 
         text_menu = wx.Menu()
-        text_menu.Append(ID_CHECKCORPUS, u"Vérifier le corpus")
+        #text_menu.Append(ID_CHECKCORPUS, u"Vérifier le corpus")
         text_menu.Append(ID_TEXTSTAT, u"Statistiques textuelles")
         text_menu.Append(ID_ASLEX, u"Spécificités et AFC")
         #text_menu.Append(ID_TEXTAFCM, u"AFC sur UCI / Vocabulaire")
         menu_classiftxt = wx.Menu()
-        menu_classiftxt.Append(ID_TEXTALCESTE, u"Méthode Alceste")
+        menu_classiftxt.Append(ID_TEXTALCESTE, u"Méthode GNEPA")
         menu_classiftxt.Append(ID_TEXTPAM, u"Par matrice des distances")
         text_menu.AppendMenu(-1, u"Classification", menu_classiftxt)
         text_menu.Append(ID_SimiTxt, u'Analyse de similitude') 
@@ -371,7 +371,7 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnCHDAlceste, id=ID_CHDAlceste)
         self.Bind(wx.EVT_MENU, self.OnAFCM, id=ID_AFCM)
         self.Bind(wx.EVT_MENU, self.OnRCode, id=ID_RCODE)
-        self.Bind(wx.EVT_MENU, self.OnCheckcorpus, id = ID_CHECKCORPUS)
+        #self.Bind(wx.EVT_MENU, self.OnCheckcorpus, id = ID_CHECKCORPUS)
         self.Bind(wx.EVT_MENU, self.OnTextStat, id=ID_TEXTSTAT)
         self.Bind(wx.EVT_MENU, self.OnTextSpec, id=ID_ASLEX)
         self.Bind(wx.EVT_MENU, self.OnTextAfcm, id=ID_TEXTAFCM)
@@ -887,11 +887,11 @@ Voulez-vous fermer quand même ?"""
         except:
             BugReport(self)
 
-    def OnCheckcorpus(self, evt):
-        try :
-            checkcorpus(self)
-        except :
-            BugReport(self)
+#    def OnCheckcorpus(self, evt):
+#        try :
+#            checkcorpus(self)
+#        except :
+#            BugReport(self)
 
     def OnTextStat(self, event, corpus = None):
             print 'PAS DE BUG SUR TEXT STAT'
@@ -961,23 +961,26 @@ Voulez-vous fermer quand même ?"""
         except:
             BugReport(self)
 
-    def OnPamSimple(self, event):
+    def OnPamSimple(self, event, corpus = None):
         try:
-            self.Text = PamTxt(self)
+            if corpus is None :
+                corpus = self.tree.getcorpus()
+            self.Text = AnalysePam(self, corpus, parametres = {'type' : 'pamtxt'}, dlg = progressbar(self,6))
             if self.Text.val == wx.ID_OK:
                 PlaySound(self)
         except:
             BugReport(self)
     
     def OnSimi(self,evt):
-        try :
+        #try :
             #print 'ATTENTION !!!! VERGES'
+            print 'PLUS DE BUG SUR SIMI'
             self.res = DoSimi(self, param = None)
             #self.res = Verges(self)
             if self.res.val == wx.ID_OK :
                  PlaySound(self)
-        except :
-            BugReport(self)
+        #except :
+        #    BugReport(self)
 #################################################################
 
     def OnHelp(self, event):

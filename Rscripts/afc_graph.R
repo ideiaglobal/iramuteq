@@ -76,21 +76,22 @@ if ( qui == 3 ) {
         ry <- range(table.in[,2], na.rm = TRUE)
         rz <- range(table.in[,3], na.rm = TRUE)
     }
+    eff <- rowSums(afctable)
     if (!is.null(debsup)) {
         if ( qui == 0 ) {
            table.in <- table.in[1:(debsup-1),]
            tablechi <- tablechi[1:(debsup-1),]
-           cex.par <- afc$rowmass[1:(debsup-1)]
+           cex.par <- eff[1:(debsup-1)]
         }
         if ( qui == 1 ) {
            table.in <- table.in[debsup:(debet-1),] 
            tablechi <- tablechi[debsup:(debet-1),]
-           #cex.par <- afc$rowmass[debsup:(debet-1)]
+           cex.par <- eff[debsup:(debet-1)]
         }
         if ( qui == 2 ) {
            table.in <- table.in[debet:nrow(table.in),] 
            tablechi <- tablechi[debet:nrow(tablechi),]
-           #cex.par <- afc$rowmass[debet:nrow(tablechi)]
+           cex.par <- eff[debet:nrow(afctable)]
         }
     }
     
@@ -99,14 +100,14 @@ if ( qui == 3 ) {
             if (!is.null(debet)) {
                 table.in <- table.in[1:(debet-1),] 
                 tablechi <- tablechi[1:(debet-1),]
-                cex.par <- afc$rowmass[1:(debet-1)]
+                cex.par <- eff[1:(debet-1)]
             } else {
-                cex.par <- afc$rowmass
+                cex.par <- eff
             }
         } else {
             table.in <- table.in[debet:nrow(table.in),]
             tablechi <- tablechi[debet:nrow(tablechi),]
-            #cex.par <- afc$rowmass[debet:nrow(tablechi)]
+            cex.par <- eff[debet:nrow(afctable)]
         }
     }
         

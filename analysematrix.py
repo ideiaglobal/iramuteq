@@ -57,4 +57,15 @@ class AnalyseMatrix :
  
     def doanalyse(self) :
         pass
-        
+    
+    def doR(self, Rscript, wait = False, dlg = None, message = '') :
+        log.info('R code...')
+        pid = exec_rcode(self.ira.RPath, Rscript, wait = wait)
+        while pid.poll() is None :
+            if dlg :
+                self.dlg.Pulse(message)
+                sleep(0.2)
+            else :
+                sleep(0.2)
+        return check_Rresult(self.ira, pid)
+    

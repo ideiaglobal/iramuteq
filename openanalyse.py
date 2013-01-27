@@ -4,13 +4,13 @@
 #Copyright (c) 2008-2012, Pierre Ratinaud
 #Lisense: GNU/GPL
 
-from chemins import ChdTxtPathOut, StatTxtPathOut, construct_simipath, PathOut
-from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout
+from chemins import ChdTxtPathOut, StatTxtPathOut, PathOut
+from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout, SimiMatLayout
 from corpus import Corpus, copycorpus
 from tableau import Tableau
 import os
 import shelve
-from tabsimi import DoSimi
+#from tabsimi import DoSimi
 from functions import BugReport, DoConf
 from tableau import Tableau
 import logging
@@ -131,6 +131,9 @@ class OpenAnalyse():
             self.parent.ShowMenu(_("Text analysis"))
             WordCloudLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'gnepamatrix' :
-            self.parent.ShowMenu(_("Spreadsheet analysis"))
+            #self.parent.ShowMenu(_("Spreadsheet analysis"))
             OpenCHDS(self.parent,  corpus, self.conf, Alceste = False)
+        elif self.conf['type'] == 'simimatrix' :
+            #self.parent.ShowMenu(_("Spreadsheet analysis"))
+            SimiMatLayout(self.parent, corpus, self.conf)
         

@@ -27,14 +27,14 @@ class OptionAlc(wx.Dialog):
         #self.radio_1 = wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
 
         self.label_12 = wx.StaticText(self, -1, u"Classification")
-        self.radio_box_2 = wx.RadioBox(self, -1, u"", choices=[u"double sur UC", u"simple sur UCE", u"simple sur UCI"], majorDimension=0, style=wx.RA_SPECIFY_ROWS) #, u"simple sur UCE (non implemente)"
-        self.label_2 = wx.StaticText(self, -1, u"taille uc 1")
+        self.radio_box_2 = wx.RadioBox(self, -1, u"", choices=[u"double sur RST", u"simple sur segments de texte", u"simple sur textes"], majorDimension=0, style=wx.RA_SPECIFY_ROWS) #, u"simple sur UCE (non implemente)"
+        self.label_2 = wx.StaticText(self, -1, u"taille rst 1")
         self.spin_ctrl_1 = wx.SpinCtrl(self, -1, "formes actives",size = (100,30), min=0, max=100)
-        self.label_3 = wx.StaticText(self, -1, u"taille uc 2")
+        self.label_3 = wx.StaticText(self, -1, u"taille rst 2")
         self.spin_ctrl_2 = wx.SpinCtrl(self, -1, "",size = (100,30), min=0, max=100)
         self.lab_nbcl = wx.StaticText(self, -1, u"nombre de classes terminales de la phase 1")
         self.spin_nbcl = wx.SpinCtrl(self, -1, "",size = (100,30), min=2, max=100)
-        txt = """Nombre minimum d'uce par classe
+        txt = """Nombre minimum de segments de texte par classe
 (0 = automatique)"""
         self.label_7 = wx.StaticText(self, -1, txt)
         self.spin_ctrl_4 = wx.SpinCtrl(self, -1, "",size = (100,30), min=0, max=1000)       
