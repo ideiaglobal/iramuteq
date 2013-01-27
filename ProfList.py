@@ -411,13 +411,13 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
     def quest_simi(self, evt) :
         tableau = self.Source.tableau
         tab = tableau.make_table_from_classe(self.cl, self.la)
-        pathout = ConstructPathOut(os.path.join(self.Source.pathout, 'simi_classe_%i' %self.cl))
+        pathout = ConstructPathOut(os.path.join(self.Source.pathout.dirout, 'simi_classe_%i' %self.cl), 'simi_classe_%i' %self.cl)
         self.filename = os.path.join(pathout,'mat01.csv')
         tableau.printtable(self.filename, tab)
         del tab
         paramsimi = {'coeff' : 0,
                           'layout' : 2,
-                          'type' : 1,
+                          'type_graph' : 1,
                           'arbremax' : 1,
                           'coeff_tv' : 1,
                           'coeff_tv_nb' : 0,
@@ -445,6 +445,9 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                           'keep_coord' : True,
                           'alpha' : 20,
                           'film': False,
+                          'com' : 0,
+                          'communities' : 0,
+                          'halo' : 0
                           }
 #        self.tableau.actives = {}
 #        self.tableau.lchi = self.lchi
@@ -454,13 +457,13 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 #            self.tableau.chi[val] = [self.lchi[i]]
                           
         act = {}
-        self.tableau.chi = {}
-        self.tableau.lchi = self.lchi
-        self.tableau.parametre['fromprof'] = True
+        tableau.chi = {}
+        tableau.lchi = self.lchi
+        tableau.parametre['fromprof'] = True
         for i, val in enumerate(self.la) :
             act[val] = [self.lfreq[i]]
-            self.tableau.chi[val] = [self.lchi[i]]
-        DoSimi(self, param = paramsimi, fromprof = ffr(self.filename), pathout = pathout, listactives = self.la, actives = act)
+            tableau.chi[val] = [self.lchi[i]]
+        self.parent.SimiCluster(parametres = paramsimi, fromprof = ffr(self.filename), pathout = pathout, listactives = self.la, actives = act, tableau = tableau)
 
     def onwordgraph(self, evt):
         word = self.getColumnText(self.GetFirstSelected(), 6)

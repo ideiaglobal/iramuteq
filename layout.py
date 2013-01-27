@@ -990,7 +990,7 @@ class SimiLayout(DefaultTextLayout) :
         V(graph)$x <- graph.simi$layout[,1]
         V(graph)$y <- graph.simi$layout[,2]
         V(graph)$weight <- graph.simi$label.cex
-        V(graph)$colors <- cols
+        V(graph)$colors <- vertex.label.color
         E(graph)$weigth <- graph.simi$we.width
         write.graph(graph, fileout, format = 'graphml')
         """ % (self.pathout['RData.RData'], fileout)
@@ -1029,7 +1029,7 @@ class SimiMatLayout(DefaultMatLayout) :
         self.tabsimi.SetArtProvider(aui.ChromeTabArt())
         self.graphpan = GraphPanelSimi(self.tabsimi, self.pathout, list_graph)
         self.graphpan.Bind(wx.EVT_BUTTON, self.redosimi, self.graphpan.butafc)
-        #self.graphpan.Bind(wx.EVT_BUTTON, self.export, self.graphpan.butexport)
+        self.graphpan.Bind(wx.EVT_BUTTON, self.export, self.graphpan.butexport)
         self.tabsimi.AddPage(self.graphpan, 'Graph')
         self.tabsimi.parametres = self.parametres
         self.parent.nb.AddPage(self.tabsimi, 'Analyse de graph')
@@ -1162,53 +1162,31 @@ class SimiMatLayout(DefaultMatLayout) :
                 sleep(0.2)
             check_Rresult(self.parent, pid)
     
-        #return paramsimi
-
-#        if self.openfromprof :
-#            if 'cexfromchi' not in self.paramsimi:
-#                self.paramsimi['cexfromchi'] = False
-#                self.paramsimi['sfromchi'] = False
-#        self.dial = PrefSimi(self.parent, -1, self.paramsimi, self.types)
-#        self.dial.CenterOnParent()
-#        val = self.dial.ShowModal()
-#        if val == wx.ID_OK :
-#            self.paramsimi = self.make_param()
-#            self.dial.Destroy()
-#            if self.paramsimi.get('bystar',False) :
-#                variables = treat_var_mod(self.paramsimi['stars'])
-#                dial = OptLexi(self.parent)
-#                dial.listet = self.paramsimi['stars']
-#                var = [v for v in variables]
-#                dial.variables = var
-#                for et in var :
-#                    dial.list_box_1.Append(et)
-#                dial.CenterOnParent()
-#                val = dial.ShowModal()
-#                if val == wx.ID_OK :
-#                    if dial.choice.GetSelection() == 1 :
-#                        listet = [dial.listet[i] for i in dial.list_box_1.GetSelections()]
-#                    else :
-#                        listet = variables[var[dial.list_box_1.GetSelections()[0]]]
-#                    self.tableau.etline = self.Source.corpus.make_etline(listet)
-#
-#            dlg = wx.ProgressDialog("Traitements",
-#                                    "Veuillez patienter...",
-#                                     maximum=2,
-#                                     parent=self.parent,
-#                                     style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT)
-#            dlg.Center()
-#            self.PrintScript()
-#            self.DoR(dlg)
-#            dlg.Destroy()
-#            self.make_ira()
-#            if self.paramsimi['type'] == 1:
-#                self.graphpan.sizer_3.Add(wx.StaticBitmap(self.graphpan.panel_1, -1, wx.Bitmap(self.filename, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-#                self.graphpan.sizer_3.Add(wx.StaticText(self.graphpan.panel_1,-1,self.txtgraph), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-#                self.graphpan.sizer_3.Fit(self.graphpan.panel_1)
-#                self.graphpan.Layout()
-#                self.graphpan.panel_1.Scroll(0,self.graphpan.panel_1.GetScrollRange(wx.VERTICAL))
-#        else :
-#            self.dial.Destroy()
+    def export(self, evt) : 
+        nb = 1
+        while os.path.exists(os.path.join(self.pathout.dirout,'graph_'+str(nb)+'.graphml')):
+            nb +=1
+        fileout = ffr(os.path.join(self.pathout.dirout,'graph_'+str(nb)+'.graphml'))
+        txt = """
+        library(igraph)
+        load("%s")
+        fileout <- "%s"
+        graph <- graph.simi$graph
+        V(graph)$x <- graph.simi$layout[,1]
+        V(graph)$y <- graph.simi$layout[,2]
+        V(graph)$weight <- graph.simi$label.cex
+        V(graph)$colors <- vertex.label.color
+        E(graph)$weigth <- graph.simi$we.width
+        write.graph(graph, fileout, format = 'graphml')
+        """ % (self.pathout['RData.RData'], fileout)
+        filetmp = tempfile.mktemp()
+        with open(filetmp, 'w') as f :
+            f.write(txt)
+        exec_rcode(self.ira.RPath, filetmp)
+        mss = wx.MessageDialog(self.ira, fileout, u'Fichier exporté', wx.OK)
+        mss.CenterOnParent()
+        mss.ShowModal()
+        mss.Destroy()
 
         
 class GraphPanelSimi(wx.Panel):

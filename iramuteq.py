@@ -970,6 +970,9 @@ Voulez-vous fermer quand même ?"""
                 PlaySound(self)
         except:
             BugReport(self)
+
+    def SimiCluster(self, parametres = {}, fromprof = False, pathout = '', listactives = [], actives = [], tableau = None) :
+        DoSimi(self, param = parametres, fromprof =  fromprof, pathout = pathout, listactives = listactives, actives = actives, tableau = tableau)
     
     def OnSimi(self,evt):
         #try :

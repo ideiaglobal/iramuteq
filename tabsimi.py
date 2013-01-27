@@ -25,7 +25,7 @@ from uuid import uuid4
 
 
 class DoSimi(AnalyseMatrix):
-    def __init__(self, parent, param = None, isopen = False, fromprof = False, pathout = False, filename ='', gparent = False, wordgraph = False, listactives = False, actives = False, cmd = False, openfromprof=False):
+    def __init__(self, parent, param = None, isopen = False, fromprof = False, pathout = False, filename ='', gparent = False, wordgraph = False, listactives = False, actives = False, cmd = False, openfromprof=False, tableau = None):
 #------------------------------------------------------------------- 
         self.fromprof = fromprof
         self.wordgraph = wordgraph
@@ -70,26 +70,36 @@ class DoSimi(AnalyseMatrix):
                           'communities' : 0,
                           }
         self.indices = indices_simi
-        if fromprof :
-            self.parent = parent.parent
-            self.Source = parent
-        else :
-            self.parent = parent   
-            self.Source = None
+        #if fromprof :
+        #    self.parent = parent.parent
+        #    self.Source = parent
+        #else :
+        self.parent = parent   
+        self.Source = None
            
         self.RPath = self.parent.PathPath.get('PATHS', 'rpath')
         if not isopen :
-            if not fromprof :
-                self.tableau = self.parent.tableau
-            else :
+            #if not fromprof :
+            #    self.tableau = self.parent.tableau
+            #else :
+            #    self.tableau = parent.tableau
+            if tableau is not None :
+                self.tableau = tableau
+            else : 
                 self.tableau = parent.tableau
             self.tableau.parametre['mineff'] = 0
-            dialcol = FreqDialog(self.parent, -1, self.tableau.get_colnames(), u"Sélectionnez les colonnes", size=(600, 250))
-            dialcol.CenterOnParent()            
-            res = dialcol.ShowModal()
+            if not fromprof :
+                dialcol = FreqDialog(self.parent, -1, self.tableau.get_colnames(), u"Sélectionnez les colonnes", size=(600, 250))
+                dialcol.CenterOnParent()            
+                res = dialcol.ShowModal()
+            else :
+                res = wx.ID_OK
             if res == wx.ID_OK :
-                self.tableau.selected_col = dialcol.list_box_1.GetSelections()
-                actives = self.tableau.getactlistfromselection(self.tableau.selected_col)
+                if not self.actives :
+                    self.tableau.selected_col = dialcol.list_box_1.GetSelections()
+                    actives = self.tableau.getactlistfromselection(self.tableau.selected_col)
+                else :
+                    actives = self.actives
                 self.tableau.make_listactives()
                 actives = dict([[i, val] for i, val in enumerate(actives)])
                 self.dial = PrefSimi(parent, -1, self.paramsimi, self.indices, wordlist = actives)
