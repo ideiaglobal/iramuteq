@@ -52,11 +52,16 @@ class SimiTxt(AnalyseText):
                 log.info('Problem')
                 return False
             if self.parametres['type_graph'] == 1:
+                if self.parametres['svg'] :
+                    filename, ext = os.path.splitext(script.filename)
+                    fileout = filename + '.svg'                    
+                else :
+                    fileout = script.filename
                 if os.path.exists(self.pathout['liste_graph']):
                     graph_simi = read_list_file(self.pathout['liste_graph'])
-                    graph_simi.append([os.path.basename(script.filename), script.txtgraph])
+                    graph_simi.append([os.path.basename(fileout), script.txtgraph])
                 else :
-                    graph_simi = [[os.path.basename(script.filename), script.txtgraph]]
+                    graph_simi = [[os.path.basename(fileout), script.txtgraph]]
                 print_liste(self.pathout['liste_graph'], graph_simi)
         else : 
             return False
@@ -167,7 +172,7 @@ class SimiFromCluster(SimiTxt) :
                     filename, ext = os.path.splitext(script.filename)
                     fileout = filename + '.svg'                    
                 else :
-                    fileout = self.script.filename
+                    fileout = script.filename
                 if os.path.exists(self.pathout['liste_graph']):
                     graph_simi = read_list_file(self.pathout['liste_graph'])
                     graph_simi.append([os.path.basename(fileout), script.txtgraph])
