@@ -793,7 +793,28 @@ class PrintSimiScript(PrintRScript) :
             txt += """
             mat <- as.matrix(stats::as.dist(mat,diag=TRUE,upper=TRUE))
             mat[is.na(mat)] <- 0
-            mat[is.infinite(mat)] <- 0
+            if (length(which(mat == Inf))) {
+                infp <- which(mat == Inf)
+                mat[infp] <- NA
+                maxmat <- max(mat, na.rm = TRUE)
+                if (maxmat > 0) {
+                maxmat <- maxmat + 1
+                } else {
+                    maxmat <- 0
+                }
+                mat[infp] <- maxmat
+            }
+            if (length(which(mat == -Inf))) {
+                infm <- which(mat == -Inf)
+                mat[infm] <- NA
+                minmat <- min(mat, na.rm = TRUE)
+                if (maxmat < 0) {
+                minmat <- minmat - 1
+                } else {
+                    minmat <- 0
+                }
+                mat[infm] <- minmat
+            }
             """
         if 'word' in self.parametres and not self.parametres['keep_coord'] :
             txt += """
@@ -1029,23 +1050,35 @@ class PrintSimiScript(PrintRScript) :
             if self.parametres['type'] == 'clustersimitxt' and self.parametres.get('sfromchi', False) :
                 txt += """ 
                 vertex.size <- norm.vec(lchi, minmaxeff[1], minmaxeff[2])
+                if (!length(vertex.size)) vertex.size <- 0
                 """
             else :
                 txt += """
             if (is.null(minmaxeff[1])) {
-                vertex.size <- NULL
+                vertex.size <- 0
             } else {
                 vertex.size <- graph.simi$eff
             }
             """
-        txt += """ vertex.size <- NULL """
+        #txt += """ vertex.size <- NULL """
         if self.parametres['svg'] : svg = 'TRUE'
         else : svg = 'FALSE'
         txt += """
         svg <- %s
         """ % svg
         txt += """
-        coords <- plot.simi(graph.simi, p.type='%s',filename="%s", vertex.label = label.v, edge.label = label.e, vertex.col = cols, vertex.label.color = vertex.label.color, vertex.label.cex=label.cex, vertex.size = vertex.size, edge.col = cola, leg=leg, width = width, height = height, alpha = alpha, movie = film, svg = svg)
+        vertex.col <- cols
+        if (!is.null(graph.simi$com)) {
+            com <- graph.simi$com
+            colm <- rainbow(length(com))
+            if (vertex.size != 0 || graph.simi$halo) {
+                vertex.label.color <- 'black'
+                vertex.col <- colm[membership(com)]
+            } else {
+                vertex.label.color <- colm[membership(com)]
+            }
+        }
+        coords <- plot.simi(graph.simi, p.type='%s',filename="%s", vertex.label = label.v, edge.label = label.e, vertex.col = vertex.col, vertex.label.color = vertex.label.color, vertex.label.cex=label.cex, vertex.size = vertex.size, edge.col = cola, leg=leg, width = width, height = height, alpha = alpha, movie = film, svg = svg)
         save.image(file="%s")
         """ % (type, self.filename, self.pathout['RData'])
         

@@ -212,7 +212,9 @@ class BugDialog(wx.Dialog):
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE
         kwds["size"] = wx.Size(500, 200)
         wx.Dialog.__init__(self, *args, **kwds)
+        self.SetTitle(kwds['title'])
         self.text_ctrl_1 = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE)
+        self.text_ctrl_1.SetBackgroundColour('#DDE8EB')
         self.button_1 = wx.Button(self, wx.ID_OK, "")
 
         self.__set_properties()
@@ -221,7 +223,6 @@ class BugDialog(wx.Dialog):
 
     def __set_properties(self):
         # begin wxGlade: MyDialog.__set_properties
-        self.SetTitle("Bug")
         self.SetMinSize(wx.Size(500, 200))
         self.text_ctrl_1.SetMinSize(wx.Size(500, 200))
         
@@ -404,21 +405,41 @@ def decoupercharact(chaine, longueur, longueurOptimale, separateurs = None) :
     # si on a rien trouvé
     return False, chaine.split(), ''
 
+
+exceptions = {'paragrapheOT' : u"Un problème de formatage (présence d'un marqueur de paragraphe (-*) en dehors d'un texte) est survenu à la ligne ",
+              'EmptyText' : u"Texte vide (probablement un problème de formatage du corpus). Le problème est apparu à la ligne ",
+              'CorpusEncoding' : u"Problème d'encodage.",
+              'TextBeforeTextMark' : u"Problème de formatage : du texte avant le premier marqueur de texte (****). Le problème est survenu à la ligne ",
+}
+
 def BugReport(parent, error = None):
     for ch in parent.GetChildren():
         if "<class 'wx._windows.ProgressDialog'>" == str(type(ch)):
             ch.Destroy()   
     excName, exc, excTb = formatExceptionInfo()
     if excName == 'Exception' :
-        txt = 'Message :\n'
+        print exc
+        if len(exc.split()) == 2 :
+            mss, linenb = exc.split()
+            if mss in exceptions :
+                txt = exceptions[mss] + linenb
+            else :
+                txt = exc
+        else :
+            if exc in exceptions :
+                txt = exceptions[mss]
+            else :
+                txt = exc
+        title = "Information"
     else :
         txt = u'            !== BUG ==!       \n'
         txt += u'*************************************\n'
         txt += '\n'.join(excTb).replace('    ', ' ')
         txt += excName + '\n'
-    txt += exc
+        txt += exc
+        title = "Bug"
 
-    dial = BugDialog(parent)
+    dial = BugDialog(parent, **{'title' : title})
     if 'Rerror' in dir(parent) :
         txt += parent.Rerror
         parent.Rerror = ''

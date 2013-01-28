@@ -123,13 +123,17 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
 	weori<-get.edge.attribute(g1,'weight')
 	if (max.tree) {
         if (method == 'cooc') {
-		    invw<-1/weori
+		    invw <- 1 / weori
         } else {
-            
+            invw <- 1 - weori
         }
 		E(g1)$weight<-invw
 		g.max<-minimum.spanning.tree(g1)
-		E(g.max)$weight<-1/E(g.max)$weight
+        if (method == 'cooc') {
+		    E(g.max)$weight<-1 / E(g.max)$weight
+        } else {
+            E(g.max)$weight<-1 - E(g.max)$weight
+        }
 		g.toplot<-g.max
 	}
 
@@ -269,16 +273,8 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
         if (is.null(graph.simi$com)) {
             plot(g.toplot,vertex.label='', edge.width=we.width, vertex.size=vertex.size, vertex.color=vertex.col, vertex.label.color='white', edge.label=we.label, edge.label.cex=cex, edge.color=edge.col, vertex.label.cex = 0, layout=lo)#, rescale = FALSE)
         } else {
-            com <- graph.simi$com
-            colm <- rainbow(length(com))
-            if (vertex.size != 0 || graph.simi$halo) {
-                vertex.label.color <- 'black'
-                vertex.col <- colm[membership(com)]
-            } else {
-                vertex.label.color <- colm[membership(com)]
-            }
             if (graph.simi$halo) {
-                mark.groups <- communities(com)
+                mark.groups <- communities(graph.simi$com)
             } else {
                 mark.groups <- NULL
             }
@@ -315,10 +311,12 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
 		library('rgl')
         #rgl.open()
         #par3d(cex=0.8)
-		rglplot(g.toplot,vertex.label= vire.nonascii(v.label), edge.width=we.width/10, vertex.size=0.01, vertex.color=vertex.col, vertex.label.color="black", edge.color = edge.col, layout=lo)
-        los <- layout.norm(lo, -1, 1, -1, 1, -1, 1)
-        rgl.spheres(los, col = vertex.col, radius = vertex.size/100, alpha = alpha)
-		rgl.bg(color = c('white','black'))
+        lo <- layout.norm(lo, -10, 10, -10, 10, -10, 10)
+		rglplot(g.toplot,vertex.label='', edge.width=we.width/10, vertex.size=0.01, vertex.color=vertex.col, vertex.label.color="black", edge.color = edge.col, layout=lo, rescale = FALSE)
+        #los <- layout.norm(lo, -1, 1, -1, 1, -1, 1)
+		text3d(lo[,1], lo[,2], lo[,3], vire.nonascii(v.label), col = vertex.label.color, alpha = 1, cex = vertex.label.cex)
+        rgl.spheres(lo, col = vertex.col, radius = vertex.size/100, alpha = alpha)
+        rgl.bg(color = c('white','black'))
         if (!is.null(movie)) {
             require(tcltk)
             ReturnVal <- tkmessageBox(title="RGL 3 D",message="Cliquez pour commencer le film",icon="info",type="ok")

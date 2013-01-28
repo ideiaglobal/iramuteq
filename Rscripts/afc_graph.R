@@ -51,6 +51,7 @@ if ( qui == 3 ) {
     if ( what == 0 ) table.in <- afc$colcoord
     if ( what == 1 ) table.in <- afc$colcrl
     rownames(table.in) <- afc$colnames
+    eff <- afc$colmass
     if (typegraph == 0) {
         table.in<-table.in[,c(x,y)]
     } else {
@@ -76,7 +77,12 @@ if ( qui == 3 ) {
         ry <- range(table.in[,2], na.rm = TRUE)
         rz <- range(table.in[,3], na.rm = TRUE)
     }
-    eff <- rowSums(afctable)
+    if (exists(afctable)) {
+        eff <- rowSums(afctable)
+    } else {
+        eff <- afctable$rowmass
+    }
+
     if (!is.null(debsup)) {
         if ( qui == 0 ) {
            table.in <- table.in[1:(debsup-1),]

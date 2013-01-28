@@ -281,8 +281,8 @@ class Corpus :
         for uci in self.ucis :
             get = list(set(uci.etoiles).intersection(etoiles))
             if len(get) > 1 :
-                return '2 variables sur la meme ligne'
-            elif get != [] :
+                log.info('2 variables sur une ligne')
+            if get != [] :
                 etuces[etoiles.index(get[0])] += [uce.ident for uce in uci.uces]
         etuces = [set(val) for val in etuces]
         tab = []
@@ -1116,7 +1116,6 @@ class BuildFromAlceste(BuildCorpus) :
                                     log.info(u'Empty text : %i' % linenb)
                                     iduci -= 1
                                     self.corpus.ucis.pop()
-                                    #raise Exception("EmptyText %i" % linenb)
                             self.corpus.ucis.append(Uci(iduci, line))
                         if self.dlg is not None :
                             if not (iduci + 1) % 10 :
@@ -1129,19 +1128,24 @@ class BuildFromAlceste(BuildCorpus) :
                             idpara += 1
                             self.corpus.ucis[-1].paras.append(line.split()[0])
                         else :
-                            raise Exception('paragrapheOT')
+                            raise Exception('paragrapheOT %i' % linenb)
                     elif line.strip() != '' and iduci != -1 :
                         txt.append(line)
             if txt != [] and iduci != -1 :
                 iduce, idpara = self.treattxt(txt, iduce, idpara, iduci)
                 del(txt)
             else :
-                raise Exception("EmptyText")
+                if iduci != -1 :
+                    iduci -= 1
+                    self.corpus.ucis.pop()
+                    log.info(Exception("Empty text %i" % linenb))
+                else :
+                    raise Exception('EmptyText %i' % linenb)
             if iduci != -1  and iduce != -1:
                 self.backup_uce()
             else : 
                 log.info(_(u"No Text in corpora. Are you sure of the formatting ?"))
-                raise Exception('TextBeforeTextMark')
+                raise Exception('TextBeforeTextMark %i' % linenb)
         except UnicodeDecodeError :
             raise Exception("CorpusEncoding")
 
