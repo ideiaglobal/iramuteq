@@ -546,9 +546,10 @@ def check_Rresult(parent, pid) :
             if error[1] is None :
                 error[1] = 'None'
             parent.Rerror = '\n'.join([str(pid.returncode), '\n'.join(error)])
-            #try :
-            #raise Exception('\n'.join([u'Erreur R', '\n'.join(error[1:])]))
-            BugReport(parent)
+            try :
+                raise Exception('\n'.join([u'Erreur R', '\n'.join(error[1:])]))
+            except :
+                BugReport(parent)
             return False
             #except :
             #    BugReport(parent)
