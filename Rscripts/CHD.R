@@ -41,7 +41,11 @@ find.max <- function(dtable, chitable, compte, rmax, maxinter, sc, TT) {
     res
 }  
 
-CHD<-function(data.in, x=9, mode.patate = FALSE, libsvdc=FALSE, libsvdc.path=NULL){
+
+
+
+
+CHD<-function(data.in, x=9, mode.patate = FALSE, svd.method, libsvdc.path=NULL){
 #	sink('/home/pierre/workspace/iramuteq/dev/findchi2.txt')
 	dataori <- data.in
     row.names(dataori) <- rownames(data.in)
@@ -78,7 +82,7 @@ CHD<-function(data.in, x=9, mode.patate = FALSE, libsvdc=FALSE, libsvdc.path=NUL
 		#extraction du premier facteur de l'afc
 		print('afc')
 		pp('taille dtable dans boucle (col/row)',c(ncol(dtable),nrow(dtable)))
-		afc<-boostana(dtable, nd=1, libsvdc=libsvdc, libsvdc.path=libsvdc.path)
+		afc<-boostana(dtable, nd=1, svd.method = svd.method, libsvdc.path=libsvdc.path)
 		pp('SV',afc$singular.values)
 		pp('V.P.', afc$eigen.values)
 		coordrow <- as.matrix(afc$row.scores[,1])
@@ -103,7 +107,7 @@ CHD<-function(data.in, x=9, mode.patate = FALSE, libsvdc=FALSE, libsvdc.path=NUL
         rmax <- NULL
 
         inert <- find.max(dtable, chitable, compte, rmax, maxinter, sc, TT)
-		print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+        print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
 		pp('max inter phase 1', inert$maxinter/TT)#max(listinter))
 		print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
         ordert <- ordert[order(ordert[,3]),]

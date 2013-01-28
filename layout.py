@@ -23,11 +23,12 @@ from listlex import *
 from Liste import *
 from search_tools import SearchFrame
 from dialog import PrefGraph, PrefExport, PrefSimpleFile, PrefDendro
-from guifunct import SelectColumn, PrepSimi
+from guifunct import SelectColumn, PrepSimi, PrefSimi
 from corpus import Corpus
 import datetime
 import sys
 import tempfile
+from time import sleep
 import shutil
 import codecs
 import logging
@@ -250,7 +251,7 @@ class GraphPanel(wx.ScrolledWindow):
         self.Dict = dico
         self.txt = txt
         self.parent = parent
-        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "courier"))
+        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.FONTWEIGHT_BOLD, 0, "courier"))
         self.labels = []
         self.listimg = []
         self.dirout = os.path.dirname(self.Dict['ira'])
@@ -561,11 +562,10 @@ def PrintRapport(self, corpus, parametres, istxt = True):
 
 
 """ % datetime.datetime.now().ctime()
-    print istxt
     if istxt :
         totocc = corpus.gettotocc()
-        txt += u'nombre d\'uci: %i%s' % (corpus.getucinb(), sep)
-        txt += u'nombre d\'uce: %i%s' % (corpus.getucenb(), sep)
+        txt += u'nombre de textes: %i%s' % (corpus.getucinb(), sep)
+        txt += u'nombre de segments de textes: %i%s' % (corpus.getucenb(), sep)
         txt += u'nombre de formes: %i%s' % (len(corpus.formes), sep)
         txt += u'nombre d\'occurrences: %i%s' % (totocc, sep)
         txt += u'moyenne d\'occurrences par forme: %f%s' % (float(totocc) / float(len(self.corpus.formes)), sep)
@@ -575,10 +575,8 @@ def PrintRapport(self, corpus, parametres, istxt = True):
         txt += u'nombre de formes actives de fréquence >= %i: %i%s' % (parametres['eff_min_forme'], parametres['nbactives'], sep)
         txt += u'moyenne d\'occurrences par uce :%f%s' % (float(totocc) / float(corpus.getucenb()), sep)
         if 'tailleuc1' in parametres :
-            if parametres['classif_mode'] != 0 :
-                txt += u'taille uc1 : %i\n' % parametres['tailleuc1']
-            else:
-                txt += u'taille uc1 / uc2: %i / %i - %i / %i%s' % (parametres['tailleuc1'], parametres['tailleuc2'], parametres['lenuc1'], parametres['lenuc2'], sep)
+            if parametres['classif_mode'] == 0 :
+                txt += u'taille rst1 / rst2: %i / %i - %i / %i%s' % (parametres['tailleuc1'], parametres['tailleuc2'], parametres['lenuc1'], parametres['lenuc2'], sep)
     else :
         self.Ucenb = self.nbind
         txt += u'nombre d\'individus : %i%s' % (self.nbind, sep)
@@ -586,9 +584,9 @@ def PrintRapport(self, corpus, parametres, istxt = True):
     if istxt :
         txt += u'nombre de classes : %i%s' % (parametres['clnb'], sep)
         if parametres['classif_mode'] == 0 or parametres['classif_mode'] == 1 :
-            txt += u'%i uce classées sur %i (%.2f%%)%s' % (sum([len(cl) for cl in corpus.lc]), corpus.getucenb(), (float(sum([len(cl) for cl in corpus.lc])) / float(corpus.getucenb())) * 100, sep)
+            txt += u'%i segments classés sur %i (%.2f%%)%s' % (sum([len(cl) for cl in corpus.lc]), corpus.getucenb(), (float(sum([len(cl) for cl in corpus.lc])) / float(corpus.getucenb())) * 100, sep)
         elif self.parametres['classif_mode'] == 2 :
-            txt += u'%i uci classées sur %i (%.2f%%)%s' % (sum([len(cl) for cl in corpus.lc]), corpus.getucinb(), (float(sum([len(cl) for cl in corpus.lc]))) / float(corpus.getucinb()) * 100, sep)
+            txt += u'%i textes classés sur %i (%.2f%%)%s' % (sum([len(cl) for cl in corpus.lc]), corpus.getucinb(), (float(sum([len(cl) for cl in corpus.lc]))) / float(corpus.getucinb()) * 100, sep)
     else :
         txt += u'%i uce classées sur %i (%.2f%%)%s' % (self.ucecla, self.Ucenb, (float(self.ucecla) / float(self.Ucenb)) * 100, sep)
  
@@ -692,12 +690,13 @@ class GraphPanelDendro(wx.Panel):
         self.dirout = os.path.dirname(self.dictpathout['ira'])
         self.list_graph = list_graph
         self.parent = self.GetParent()#parent
-        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "courier"))
+        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "Arial"))
         self.labels = []
         self.listimg = []
         self.tabchd = self.parent.GetParent()
         self.ira = self.tabchd.GetParent()
         self.panel_1 = wx.ScrolledWindow(self, -1, style=wx.TAB_TRAVERSAL)
+        self.panel_1.SetBackgroundColour('white')
         self.deb = wx.StaticText(self.panel_1, -1, txt)
         dendro_img = wx.Image(os.path.join(self.ira.images_path,'but_dendro.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.butdendro = wx.BitmapButton(self, -1, dendro_img)
@@ -879,51 +878,6 @@ class CopusPanel(wx.Panel) :
             text.Wrap( -1 )
             self.fgSizer5.Add( text, 0, wx.ALL, 5 )
 
-class GraphPanelSimi(wx.Panel):
-    def __init__(self, parent, dico, list_graph):
-        wx.Panel.__init__(self,parent)
-        self.afcnb = 1
-        self.Dict = dico
-        self.dirout = os.path.dirname(self.Dict['ira'])
-        self.parent = self.GetParent()#parent
-        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "courier"))
-        self.labels = []
-        self.listimg = []
-        self.tabsimi = self.parent.GetParent()
-        self.ira = self.tabsimi.GetParent()
-        self.panel_1 = wx.ScrolledWindow(self, -1, style=wx.TAB_TRAVERSAL)
-        afc_img = wx.Image(os.path.join(self.ira.images_path,'button_simi.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.butafc = wx.BitmapButton(self, -1, afc_img)
-        export_img = wx.Image(os.path.join(self.ira.images_path,'button_export.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.butexport = wx.BitmapButton(self, -1, export_img)
-        
-        for i in range(0,len(list_graph)):
-            if os.path.exists(os.path.join(self.dirout,list_graph[i][0])) and list_graph[i][0] != '' :
-                self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
-                self.labels.append(wx.StaticText(self.panel_1, -1, list_graph[i][1]))
-                
-        self.__set_properties()
-        self.__do_layout()
-
-    def __set_properties(self):
-        self.panel_1.EnableScrolling(True,True)
-        #self.panel_1.SetSize((1000,1000))
-        self.panel_1.SetScrollRate(20, 20)
-
-    def __do_layout(self):    
-        self.sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
-        self.sizer_2 = wx.BoxSizer(wx.VERTICAL)
-        self.sizer_3 = wx.BoxSizer(wx.VERTICAL)
-        self.sizer_2.Add(self.butafc, 0, 0, 0)
-        self.sizer_2.Add(self.butexport, 0, 0, 0)
-        for i in range(0, len(self.listimg)):
-            self.sizer_3.Add(self.listimg[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-            self.sizer_3.Add(self.labels[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-        self.panel_1.SetSizer(self.sizer_3)
-        self.sizer_1.Add(self.sizer_2, 0, wx.EXPAND, 0)
-        self.sizer_1.Add(self.panel_1, 1, wx.EXPAND, 0)
-        self.SetSizer(self.sizer_1)
-
 class DefaultTextLayout :
     def __init__(self, ira, corpus, parametres) :
         self.pathout = PathOut(dirout = parametres['pathout'])
@@ -1001,26 +955,284 @@ class SimiLayout(DefaultTextLayout) :
             pid = exec_rcode(self.ira.RPath, script.scriptout, wait = True)
             check_Rresult(self.ira, pid)
             if self.parametres['type_graph'] == 1:
+                if self.parametres['svg'] :
+                    filename, ext = os.path.splitext(script.filename)
+                    fileout = filename + '.svg'
+                else :
+                    fileout = script.filename
                 if os.path.exists(self.pathout['liste_graph']):
                     graph_simi = read_list_file(self.pathout['liste_graph'])
-                    graph_simi.append([os.path.basename(script.filename), script.txtgraph])
+                    graph_simi.append([os.path.basename(fileout), script.txtgraph])
                 else :
-                    graph_simi = [[os.path.basename(script.filename), script.txtgraph]]
+                    graph_simi = [[os.path.basename(fileout), script.txtgraph]]
                 print_liste(self.pathout['liste_graph'], graph_simi)
             DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
             if self.parametres['type_graph'] == 1:
-                self.graphpan.sizer_3.Add(wx.StaticBitmap(self.graphpan.panel_1, -1, wx.Bitmap(script.filename, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+                if self.parametres['svg'] :
+                    self.graphpan.sizer_3.Add(hl.HyperLinkCtrl(self.graphpan.panel_1, -1, fileout, URL = fileout), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+                else :
+                    self.graphpan.sizer_3.Add(wx.StaticBitmap(self.graphpan.panel_1, -1, wx.Bitmap(fileout, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
                 self.graphpan.sizer_3.Add(wx.StaticText(self.graphpan.panel_1,-1, script.txtgraph), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
                 self.graphpan.sizer_3.Fit(self.graphpan.panel_1)
                 self.graphpan.Layout()
                 self.graphpan.panel_1.Scroll(0,self.graphpan.panel_1.GetScrollRange(wx.VERTICAL))
 
     def export(self, evt) :
-        pass
-   # def read_result(self) :
-   #     #self.corpus.read_corpus_from_shelves(self.corpus.dictpathout['db'])
-   #     #self.corpus.make_et_table()
-   #     self.result = {}
-   #     with open(os.path.join(self.pathout,'glob.txt'), 'r') as f :
-   #         self.result['glob'] = f.read()
+        nb = 1
+        while os.path.exists(os.path.join(self.pathout.dirout,'graph_'+str(nb)+'.graphml')):
+            nb +=1
+        fileout = ffr(os.path.join(self.pathout.dirout,'graph_'+str(nb)+'.graphml'))
+        txt = """
+        library(igraph)
+        load("%s")
+        fileout <- "%s"
+        graph <- graph.simi$graph
+        V(graph)$x <- graph.simi$layout[,1]
+        V(graph)$y <- graph.simi$layout[,2]
+        V(graph)$weight <- graph.simi$label.cex
+        V(graph)$colors <- vertex.label.color
+        E(graph)$weigth <- graph.simi$we.width
+        write.graph(graph, fileout, format = 'graphml')
+        """ % (self.pathout['RData.RData'], fileout)
+        filetmp = tempfile.mktemp()
+        with open(filetmp, 'w') as f :
+            f.write(txt)
+        exec_rcode(self.ira.RPath, filetmp)
+        mss = wx.MessageDialog(self.ira, fileout, u'Fichier exporté', wx.OK)
+        mss.CenterOnParent()
+        mss.ShowModal()
+        mss.Destroy()
 
+class DefaultMatLayout :
+    def __init__(self, parent, tableau, parametres) :
+        self.pathout = PathOut(dirout = parametres['pathout'])
+        self.ira = parent
+        self.parent = parent
+        self.tableau = tableau
+        self.parametres = parametres
+        self.dolayout()
+
+    def dolayout(self) :
+        pass
+
+class SimiMatLayout(DefaultMatLayout) :
+    def dolayout(self):
+        self.pathout.basefiles(simipath)
+        self.indices = indices_simi
+        if os.path.exists(self.pathout['liste_graph']) :
+            list_graph = read_list_file(self.pathout['liste_graph'])
+        else : 
+            list_graph = [['','']]
+        notebook_flags =  aui.AUI_NB_DEFAULT_STYLE | aui.AUI_NB_TAB_EXTERNAL_MOVE | aui.AUI_NB_TAB_MOVE | aui.AUI_NB_TAB_FLOAT
+        self.tabsimi = aui.AuiNotebook(self.parent.nb, -1, wx.DefaultPosition)
+        self.tabsimi.SetAGWWindowStyleFlag(notebook_flags)
+        self.tabsimi.SetArtProvider(aui.ChromeTabArt())
+        self.graphpan = GraphPanelSimi(self.tabsimi, self.pathout, list_graph)
+        self.graphpan.Bind(wx.EVT_BUTTON, self.redosimi, self.graphpan.butafc)
+        self.graphpan.Bind(wx.EVT_BUTTON, self.export, self.graphpan.butexport)
+        self.tabsimi.AddPage(self.graphpan, 'Graph')
+        self.tabsimi.parametres = self.parametres
+        self.parent.nb.AddPage(self.tabsimi, 'Analyse de graph')
+        self.parent.ShowTab(True)
+        self.parent.nb.SetSelection(self.parent.nb.GetPageCount() - 1)
+
+    def redosimi(self,evt) :
+        with open(self.pathout['selected.csv'],'r') as f :
+            selected = f.read()
+        selected = [int(val) for val in selected.splitlines()]
+        #if self.actives is None :
+        #    with codecs.open(self.pathout['actives.csv'], 'r', self.parametres['encoding']) as f :
+        #        self.actives = f.read()
+        #    self.actives = self.actives.splitlines()#[act for act in self.actives.splitlines()]
+        actives = [[val, self.tableau.actives[val][0]] for val in self.tableau.actives]
+        #self.tableau.make_listactives()
+        actives = dict([[i, val] for i, val in enumerate(actives)])
+        #dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
+        self.dial = PrefSimi(self.parent, -1, self.parametres, self.indices, wordlist = actives, selected = selected, actives = self.tableau.listactives)
+        self.dial.CenterOnParent()
+        self.val = self.dial.ShowModal()
+        if self.val == wx.ID_OK :
+            last = self.dial.listcol.GetFirstSelected()
+            lastl = [self.dial.listcol.GetFirstSelected()]
+            indexes = [self.dial.listcol.getColumnText(self.dial.listcol.GetFirstSelected(),0)]
+            while self.dial.listcol.GetNextSelected(last) != -1:
+                last = self.dial.listcol.GetNextSelected(last)
+                lastl.append(last)
+                indexes.append(self.dial.listcol.getColumnText(last,0))
+            self.column = [self.tableau.listactives.index(val) for val in indexes]
+            self.column.sort()
+            with open(self.pathout['selected.csv'], 'w') as f :
+                f.write('\n'.join([`val` for val in self.column]))
+            self.make_param()
+            self.dial.Destroy()
+            self.script = PrintSimiScript(self)
+            self.script.make_script()
+            self.tmpfile = self.script.scriptout
+            dlg = progressbar(self, maxi = 2)
+            self.DoR(dlg)
+            dlg.Destroy()
+            if self.parametres['type_graph'] == 1:
+                if self.parametres['svg'] :
+                    filename, ext = os.path.splitext(self.script.filename)
+                    fileout = filename + '.svg'
+                else :
+                    fileout = self.script.filename
+                if os.path.exists(self.pathout['liste_graph']):
+                    graph_simi = read_list_file(self.pathout['liste_graph'])
+                    graph_simi.append([os.path.basename(fileout), self.script.txtgraph])
+                else :
+                    graph_simi = [[os.path.basename(fileout), self.script.txtgraph]]
+                print_liste(self.pathout['liste_graph'], graph_simi)            
+            DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
+            if self.parametres['type_graph'] == 1:
+                if self.parametres['svg'] :
+                    self.graphpan.sizer_3.Add(hl.HyperLinkCtrl(self.graphpan.panel_1, -1, fileout, URL = fileout), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+                else :
+                    self.graphpan.sizer_3.Add(wx.StaticBitmap(self.graphpan.panel_1, -1, wx.Bitmap(self.script.filename, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+                self.graphpan.sizer_3.Add(wx.StaticText(self.graphpan.panel_1,-1, self.script.txtgraph), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+                self.graphpan.sizer_3.Fit(self.graphpan.panel_1)
+                self.graphpan.Layout()
+                self.graphpan.panel_1.Scroll(0,self.graphpan.panel_1.GetScrollRange(wx.VERTICAL))
+        else :
+            self.dial.Destroy()
+               
+
+    def make_param(self) :
+        if self.parametres['first'] :
+            keep_coord = False
+        else :
+            keep_coord = self.dial.check_coord.GetValue()
+        #self.select = self.dial.check_colch.GetValue()
+
+        paramsimi = {'coeff' : self.dial.choice1.GetSelection(),
+                          'layout' : self.dial.choice2.GetSelection(),
+                          'type_graph' : self.dial.choice3.GetSelection(),
+                          'arbremax' : self.dial.check1.GetValue(),
+                          'coeff_tv' : self.dial.check_s_size.GetValue(),
+                          'coeff_tv_nb' : self.dial.spin_tv.GetValue(),
+                          'tvprop' : self.dial.check2.GetValue(),
+                          'tvmin' : self.dial.spin_tvmin.GetValue(),
+                          'tvmax' : self.dial.spin_tvmax.GetValue(),
+                          'coeff_te' : self.dial.check3.GetValue(),
+                          'coeff_temin' : self.dial.spin_temin.GetValue(),
+                          'coeff_temax' : self.dial.spin_temax.GetValue(),
+                          'label_e' : self.dial.check_elab.GetValue(),
+                          'label_v' : self.dial.check_vlab.GetValue(),
+                          'vcex' : self.dial.check_vcex.GetValue(),
+                          'vcexmin' : self.dial.spin_vcexmin.GetValue(),
+                          'vcexmax' : self.dial.spin_vcexmax.GetValue(),
+                          'cex' : self.dial.spin_cex.GetValue(),
+                          'seuil_ok' : self.dial.check_seuil.GetValue(),
+                          'seuil' : self.dial.spin_seuil.GetValue(),
+                          'cols' : self.dial.cols.GetColour(),
+                          'cola' : self.dial.cola.GetColour(),
+                          'width' : self.dial.spin_width.GetValue(),
+                          'height' : self.dial.spin_height.GetValue(),
+                          'first' : False,
+                          'keep_coord' : keep_coord,
+                          'alpha' : self.dial.slider_sphere.GetValue(),
+                          'film' : self.dial.film.GetValue(),
+                          'svg' : self.dial.choix_format.GetSelection(),
+                          'halo' : self.dial.halo.GetValue(),
+                          'com' : self.dial.comcheck.GetValue(),
+                          'communities' : self.dial.choix_com.GetSelection(),
+                          }        
+        if 'cexfromchi' in self.parametres :
+            paramsimi['cexfromchi'] = self.dial.checkit.GetValue()
+        if 'sfromchi' in self.parametres :
+            paramsimi['sfromchi'] = self.dial.checki.GetValue()
+        if 'vlabcolor' in self.parametres :
+           paramsimi['vlabcolor'] = self.parametres['vlabcolor']
+        if 'check_bystar' in dir(self.dial) :
+            paramsimi['bystar'] = self.dial.check_bystar.GetValue()
+            paramsimi['stars'] = self.parametres['stars']
+        self.parametres.update(paramsimi)
+
+    def DoR(self, dlg):
+        if self.parametres['type_graph'] == 1 :
+            graph = False
+            wait = False
+        else : 
+            graph = True
+            wait = True
+        pid = exec_rcode(self.parent.RPath, self.tmpfile, wait = wait, graph = graph)
+        if self.parametres['type_graph'] == 1 :
+            while pid.poll() == None :
+                dlg.Pulse(u'R ...')
+                sleep(0.2)
+            check_Rresult(self.parent, pid)
+    
+    def export(self, evt) : 
+        nb = 1
+        while os.path.exists(os.path.join(self.pathout.dirout,'graph_'+str(nb)+'.graphml')):
+            nb +=1
+        fileout = ffr(os.path.join(self.pathout.dirout,'graph_'+str(nb)+'.graphml'))
+        txt = """
+        library(igraph)
+        load("%s")
+        fileout <- "%s"
+        graph <- graph.simi$graph
+        V(graph)$x <- graph.simi$layout[,1]
+        V(graph)$y <- graph.simi$layout[,2]
+        V(graph)$weight <- graph.simi$label.cex
+        V(graph)$colors <- vertex.label.color
+        E(graph)$weigth <- graph.simi$we.width
+        write.graph(graph, fileout, format = 'graphml')
+        """ % (self.pathout['RData.RData'], fileout)
+        filetmp = tempfile.mktemp()
+        with open(filetmp, 'w') as f :
+            f.write(txt)
+        exec_rcode(self.ira.RPath, filetmp)
+        mss = wx.MessageDialog(self.ira, fileout, u'Fichier exporté', wx.OK)
+        mss.CenterOnParent()
+        mss.ShowModal()
+        mss.Destroy()
+
+        
+class GraphPanelSimi(wx.Panel):
+    def __init__(self,parent, dico, list_graph):
+        wx.Panel.__init__(self,parent)
+        self.afcnb = 1
+        self.Dict = dico
+        self.dirout = os.path.dirname(self.Dict['ira'])
+        self.parent = self.GetParent()#parent
+        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "courier"))
+        self.labels = []
+        self.listimg = []
+        self.tabsimi = self.parent.GetParent()
+        self.ira = self.tabsimi.GetParent()
+        self.panel_1 = wx.ScrolledWindow(self, -1, style=wx.TAB_TRAVERSAL)
+        afc_img = wx.Image(os.path.join(self.ira.images_path,'button_simi.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.butafc = wx.BitmapButton(self, -1, afc_img)
+        export_img = wx.Image(os.path.join(self.ira.images_path,'button_export.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.butexport = wx.BitmapButton(self, -1, export_img)
+        for i in range(0,len(list_graph)):
+            if os.path.exists(os.path.join(self.dirout,list_graph[i][0])) :
+                filename, ext = os.path.splitext(list_graph[i][0])
+                if ext == '.svg' :
+                    self.listimg.append(hl.HyperLinkCtrl(self.panel_1, -1, os.path.join(self.dirout,list_graph[i][0]), URL=os.path.join(self.dirout,list_graph[i][0])))
+                else :
+                    self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
+                self.labels.append(wx.StaticText(self.panel_1, -1, list_graph[i][1]))
+                
+        self.__set_properties()
+        self.__do_layout()
+
+    def __set_properties(self):
+        self.panel_1.EnableScrolling(True,True)
+        #self.panel_1.SetSize((1000,1000))
+        self.panel_1.SetScrollRate(20, 20)
+
+    def __do_layout(self):    
+        self.sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
+        self.sizer_2 = wx.BoxSizer(wx.VERTICAL)
+        self.sizer_3 = wx.BoxSizer(wx.VERTICAL)
+        self.sizer_2.Add(self.butafc, 0, 0, 0)
+        self.sizer_2.Add(self.butexport, 0, 0, 0)
+        for i in range(0, len(self.listimg)):
+            self.sizer_3.Add(self.listimg[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+            self.sizer_3.Add(self.labels[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+        self.panel_1.SetSizer(self.sizer_3)
+        self.sizer_1.Add(self.sizer_2, 0, wx.EXPAND, 0)
+        self.sizer_1.Add(self.panel_1, 1, wx.EXPAND, 0)
+        self.SetSizer(self.sizer_1) 

@@ -17,7 +17,7 @@ import os
 import sys
 import  wx
 import  wx.lib.mixins.listctrl  as  listmix
-from tabsimi import DoSimi
+#from tabsimi import DoSimi
 from listlex import ListForSpec
 from chemins import ConstructPathOut, ffr
 from dialog import PrefExport, PrefUCECarac, SearchDial, message
@@ -74,6 +74,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             self.la = []
             self.lchi = []
             self.lfreq = []
+        self.tmpchi = None
             
         #adding some art
         self.il = wx.ImageList(16, 16)
@@ -375,17 +376,21 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         vchistable = [line[1:] for line in chistable]
         fchistable = [line[0] for line in chistable]
         word = self.getselectedwords()[0]
+        print self.var_mod
         if len(word.split('_')) > 1 :
             var = word.split('_')
-            words = ['_'.join([var[0],word]) for word in self.var_mod[var[0]]]
+            #words = ['_'.join([var[0],word]) for word in self.var_mod[var[0]]]
+            words = [word for word in self.var_mod[var[0]]]
             words.sort()
             tableout = []
             kwords = []
             for word in words :
+                print word
                 if word in fchistable :
                     tableout.append(vchistable[fchistable.index(word)])
                     kwords.append(word)
             tmpgraph = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
+            print tableout
             txt = barplot(tableout, kwords, title, self.Source.parent.RscriptsPath['Rgraph'], tmpgraph)
             tmpscript = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
             file = open(tmpscript,'w')
@@ -406,13 +411,13 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
     def quest_simi(self, evt) :
         tableau = self.Source.tableau
         tab = tableau.make_table_from_classe(self.cl, self.la)
-        pathout = ConstructPathOut(self.Source.pathout+'/', 'simi_classe_%i' %self.cl)
+        pathout = ConstructPathOut(os.path.join(self.Source.pathout.dirout, 'simi_classe_%i' %self.cl), 'simi_classe_%i' %self.cl)
         self.filename = os.path.join(pathout,'mat01.csv')
         tableau.printtable(self.filename, tab)
         del tab
         paramsimi = {'coeff' : 0,
                           'layout' : 2,
-                          'type' : 1,
+                          'type_graph' : 1,
                           'arbremax' : 1,
                           'coeff_tv' : 1,
                           'coeff_tv_nb' : 0,
@@ -440,6 +445,9 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                           'keep_coord' : True,
                           'alpha' : 20,
                           'film': False,
+                          'com' : 0,
+                          'communities' : 0,
+                          'halo' : 0
                           }
 #        self.tableau.actives = {}
 #        self.tableau.lchi = self.lchi
@@ -449,66 +457,42 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 #            self.tableau.chi[val] = [self.lchi[i]]
                           
         act = {}
-        self.tableau.chi = {}
-        self.tableau.lchi = self.lchi
-        self.tableau.parametre['fromprof'] = True
+        tableau.chi = {}
+        tableau.lchi = self.lchi
+        tableau.parametre['fromprof'] = True
         for i, val in enumerate(self.la) :
             act[val] = [self.lfreq[i]]
-            self.tableau.chi[val] = [self.lchi[i]]
-        DoSimi(self, param = paramsimi, fromprof = ffr(self.filename), pathout = pathout, listactives = self.la, actives = act)
+            tableau.chi[val] = [self.lchi[i]]
+        self.parent.SimiCluster(parametres = paramsimi, fromprof = ffr(self.filename), pathout = pathout, listactives = self.la, actives = act, tableau = tableau)
 
     def onwordgraph(self, evt):
         word = self.getColumnText(self.GetFirstSelected(), 6)
-        dlg = progressbar(self, 2)
-        corpus = self.Source.corpus
-        uces = corpus.lc[self.cl-1]
-        dlg.Update(1, u'Tableau...')
-        #tab = corpus.make_table_with_classe(uces, self.la)
-        pathout = ConstructPathOut(self.Source.pathout.dirout + '/' , 'simi_%s' % word)
-        self.filename = os.path.join(pathout,'mat01.csv')
-        dlg.Update(2, u'Ecriture...')
-        #corpus.write_tab(tab, self.filename)
-        #del tab
-        corpus.make_and_write_sparse_matrix_from_classe(self.la, uces, self.filename)
-        dlg.Destroy()
-        paramsimi = {'coeff' : 0,
-                          'layout' : 2,
-                          'type' : 1,
-                          'arbremax' : 0,
-                          'coeff_tv' : 1,
-                          'coeff_tv_nb' : 0,
-                          'tvprop' : 0,
-                          'tvmin' : 5,
-                          'tvmax' : 30,
-                          'coeff_te' : 1,
-                          'coeff_temin' : 1,
-                          'coeff_temax' : 10,
-                          'label_v': 1,
-                          'label_e': 0,
-                          'vcex' : 1,
-                          'vcexmin' : 10,
-                          'vcexmax' : 25, 
-                          'cex' : 10,
-                          'seuil_ok' : 1,
-                          'seuil' : 1,
-                          'cols' : (255,0,0),
-                          'cola' : (200,200,200),
-                          'width' : 600,
-                          'height' : 600,
-                          'first' : True,
-                          'keep_coord' : True,
-                          'alpha' : 20,
-                          'film': False,
-                          }
-        self.tableau = Tableau(self.parent, '')
-        self.tableau.listactives = self.la
-        self.tableau.actives = {}
-        for i, val in enumerate(self.la) :
-            self.tableau.actives[val] = [self.lfreq[i]]
-        DoSimi(self, param = paramsimi, fromprof = ffr(self.filename), pathout = pathout, wordgraph = word)
+        if self.tmpchi is None :
+            self.tmpchi = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
+            with open(self.tmpchi, 'w') as f:
+                f.write('\n'.join([str(val) for val in self.lchi]))
+        index = self.la.index(word)
+        parametres = {'type' : 'clustersimitxt', 
+                        'pathout' : self.Source.parametres['pathout'],
+                        'word' : index ,
+                        'lem' : self.Source.parametres['lem'],
+                        'tmpchi' : self.tmpchi}
+        #try :
+        self.parent.SimiFromCluster(self.parent, self.Source.corpus, self.la, self.cl - 1, parametres = parametres, dlg = progressbar(self, 4))
+        #except :
+        #    print 'not acitve'
 
     def on_graph(self, evt):
-        self.parent.SimiFromCluster(self.parent, self.Source.corpus, self.la, self.cl - 1, parametres = {'type' : 'clustersimitxt', 'pathout' : self.Source.parametres['pathout']}, dlg = progressbar(self, 4))
+        if self.tmpchi is None :
+            self.tmpchi = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
+            with open(self.tmpchi, 'w') as f:
+                f.write('\n'.join([str(val) for val in self.lchi]))
+        parametres = {'type' : 'clustersimitxt', 
+                        'pathout' : self.Source.parametres['pathout'],
+                        'lem' : self.Source.parametres['lem'],
+                        'tmpchi' : self.tmpchi}
+
+        self.parent.SimiFromCluster(self.parent, self.Source.corpus, self.la, self.cl - 1, parametres = parametres, dlg = progressbar(self, 4))
         #dlg = progressbar(self, 2)
         #corpus = self.Source.corpus
         #uces = corpus.lc[self.cl-1]

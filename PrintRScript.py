@@ -19,7 +19,7 @@ class PrintRScript :
         self.analyse = analyse
         self.parametres = analyse.parametres
         self.scriptout = self.pathout['temp']
-        self.script =  u"#Script genere par IRaMuTeQ - %s" % datetime.now().ctime()
+        self.script =  u"#Script genere par IRaMuTeQ - %s\n" % datetime.now().ctime()
     
     def add(self, txt) :
         self.script = '\n'.join([self.script, txt])
@@ -109,7 +109,7 @@ class Alceste2(PrintRScript) :
 #
 
 
-def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, libsvdc = False, libsvdc_path = None, R_max_mem = False):
+def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'svdR', libsvdc = False, libsvdc_path = None, R_max_mem = False, mode_patate = False):
     txt = """
     source("%s")
     source("%s")
@@ -124,17 +124,30 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, libsvdc = False
     txt += """
     nbt <- %i
     """ % nbt
-    if libsvdc :
+    if svdmethod == 'svdlibc' and libsvdc :
         txt += """
-        libsvdc <- TRUE
+        svd.method <- 'svdlibc'
         libsvdc.path <- "%s"
         """ % ffr(libsvdc_path)
-    else :
+    elif svdmethod == 'irlba' :
         txt += """
-        libsvdc <- FALSE
+        library(irlba)
+        svd.method <- 'irlba'
         libsvdc.path <- NULL
         """
-
+    else :
+        txt += """
+        svd.method = 'svdR'
+        libsvdc.path <- NULL
+        """
+    if mode_patate :
+        txt += """
+        mode.patate = TRUE
+        """
+    else :
+        txt += """
+        mode.patate = FALSE
+        """
     txt +="""
     library(Matrix)
     data1 <- readMM("%s")
@@ -148,14 +161,13 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, libsvdc = False
         data2 <- as(data2, "dgCMatrix")
         row.names(data2) <- 1:nrow(data2)
         """ % DicoPath['TableUc2']
-    #log.info('ATTENTION ############# MODEPATATE ####################')
     txt += """
-    chd1<-CHD(data1, x = nbt, mode.patate = FALSE, libsvdc = libsvdc, libsvdc.path = libsvdc.path)
+    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)
     """
     
     if classif_mode == 0:
         txt += """
-    chd2<-CHD(data2, x = nbt, libsvdc = libsvdc, libsvdc.path = libsvdc.path)
+    chd2<-CHD(data2, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)
     """
     else:
         txt += """
@@ -181,11 +193,18 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, libsvdc = False
         rm(data2)
         """
     txt += """
-    chd.result <- Rchdtxt("%s",mincl=%i,classif_mode=%i, nbt = nbt)
+    classif_mode <- %i
+    mincl <- %i
+    uceout <- "%s"
+    if (classif_mode == 0) {
+        chd.result <- Rchdtxt(uceout, chd1, chd2 = chd2, mincl = mincl,classif_mode = classif_mode, nbt = nbt)
+    } else {
+        chd.result <- Rchdtxt(uceout, chd1, chd2 = chd1, mincl = mincl,classif_mode = classif_mode, nbt = nbt)
+    }
     n1 <- chd.result$n1
     classeuce1 <- chd.result$cuce1
     classeuce2 <- chd.result$cuce2
-    """ % (DicoPath['uce'], mincl, classif_mode)
+    """ % (classif_mode, mincl, DicoPath['uce'])
     
     txt += """
     tree.tot1 <- make_tree_tot(chd1)
@@ -232,8 +251,8 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, libsvdc = False
     fileout.close()
 
 def RPamTxt(corpus, RscriptPath):
-    DicoPath = corpus.dictpathout
-    param = corpus.parametre
+    DicoPath = corpus.pathout
+    param = corpus.parametres
     print param
     txt = """
     source("%s")
@@ -290,7 +309,7 @@ def RchdQuest(DicoPath, RscriptPath, nbcl = 10, mincl = 10):
     save(tree.cut1, file="%s")
     open_file_graph("%s", width = 600, height=400)
     classes<-n1[,ncol(n1)]
-    plot.dendropr(tree_cut1$tree.cl,classes)
+    plot.dendropr(tree_cut1$tree.cl,classes, histo = TRUE)
     """ % (DicoPath['Rdendro'],DicoPath['dendro1'])
     
     txt += """
@@ -366,34 +385,19 @@ write.csv2(gbcluster,file="%s")
         """ % (DictChdTxtOut['afc_facteur'], DictChdTxtOut['afc_col'], DictChdTxtOut['afc_row'])
     
         txt += """
-        #xlab <- paste('facteur 1 - ', round(afc$facteur[1,2],2), sep = '')
-        #ylab <- paste('facteur 2 - ', round(afc$facteur[2,2],2), sep = '')
-        #xlab <- paste(xlab, ' %', sep = '')
-        #ylab <- paste(ylab, ' %', sep = '')
-        """
-    
-        txt += """
     PARCEX<-%s
-    xmin <- min(afc$rowcoord[,1], na.rm = TRUE) + (0.1 * min(afc$rowcoord[,1], na.rm = TRUE))
-    xmax <- max(afc$rowcoord[,1], na.rm = TRUE) + (0.1 * max(afc$rowcoord[,1], na.rm = TRUE))
-    ymin <- min(afc$rowcoord[,2], na.rm = TRUE) + (0.1 * min(afc$rowcoord[,2], na.rm = TRUE))
-    ymax <- max(afc$rowcoord[,2], na.rm = TRUE) + (0.1 * max(afc$rowcoord[,2], na.rm = TRUE))
-    print(xmin)
-    print(xmax)
-    print(ymin)
-    print(ymax)
     """ % taillecar
         txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab, xmin=xmin, xmax=xmax, ymin = ymin, ymax=ymax)
+    xyminmax <- PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab)
     """ % (DictChdTxtOut['AFC2DL_OUT'])
         txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debsup, fin=(debet-1), xlab = xlab, ylab = ylab, xmin=xmin, xmax=xmax, ymin = ymin, ymax=ymax)
+    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debsup, fin=(debet-1), xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2])
     """ % (DictChdTxtOut['AFC2DSL_OUT'])
         txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debet, fin=fin, xlab = xlab, ylab = ylab, xmin=xmin, xmax=xmax, ymin = ymin, ymax=ymax)
+    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debet, fin=fin, xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2])
     """ % (DictChdTxtOut['AFC2DEL_OUT'])
         txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col=TRUE, what='coord', xlab = xlab, ylab = ylab, xmin=xmin, xmax=xmax, ymin = ymin, ymax=ymax)
+    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col=TRUE, what='coord', xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2])
     """ % (DictChdTxtOut['AFC2DCL_OUT'])
 #        txt += """
  #   PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='crl', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab)
@@ -686,18 +690,67 @@ class PrintSimiScript(PrintRScript) :
         self.packages(['igraph', 'proxy', 'Matrix'])
         self.sources([self.analyse.parent.RscriptsPath['simi'], self.analyse.parent.RscriptsPath['Rgraph']])
         txt = ''
-        if not self.parametres['keep_coord'] :
+        if not self.parametres['keep_coord'] and not self.parametres['type'] == 'simimatrix':
             txt += """
             dm.path <- "%s"
             cn.path <- "%s"
             selected.col <- "%s"
             """ % (self.pathout['mat01.csv'], self.pathout['actives.csv'], self.pathout['selected.csv'])
+            if 'word' in self.parametres :
+                txt += """
+                word <- TRUE
+                index <- %i + 1
+                """ % self.parametres['word']
+            else :
+                txt += """
+                word <- FALSE
+                """
             txt += """
             dm <-readMM(dm.path)
-            cn <- read.table(cn.path, sep=';', quote='"')
+            cn <- read.table(cn.path, sep='\t', quote='"')
             colnames(dm) <- cn[,1]
-            sel.col <- read.csv2(selected.col)
-            dm <- dm[, sel.col[,1] + 1]
+            sel.col <- read.csv2(selected.col, header = FALSE)
+            sel.col <- sel.col[,1] + 1
+            if (!word) {
+                dm <- dm[, sel.col]
+            } else {
+                forme <- colnames(dm)[index]
+                if (!index %in% sel.col) {
+                    sel.col <- append(sel.col, index)
+                }
+                dm <- dm[, sel.col]
+                index <- which(colnames(dm) == forme)
+            }
+            """
+        elif not self.parametres['keep_coord'] and self.parametres['type'] == 'simimatrix' :
+            txt += """
+            dm.path <- "%s"
+            selected.col <- "%s"
+            """ % (self.pathout['mat01.csv'], self.pathout['selected.csv'])
+            if 'word' in self.parametres :
+                txt += """
+                word <- TRUE
+                index <- %i + 1
+                """ % self.parametres['word']
+            else :
+                txt += """
+                word <- FALSE
+                """
+            txt += """
+            dm <-read.csv2(dm.path)
+            dm <- as.matrix(dm)
+            sel.col <- read.csv2(selected.col, header = FALSE)
+            sel.col <- sel.col[,1] + 1
+            if (!word) {
+                dm <- dm[, sel.col]
+            } else {
+                forme <- colnames(dm)[index]
+                if (!index %in% sel.col) {
+                    sel.col <- append(sel.col, index)
+                }
+                dm <- dm[, sel.col]
+                index <- which(colnames(dm) == forme)
+            }
             """
         else :
             txt += """
@@ -740,8 +793,39 @@ class PrintSimiScript(PrintRScript) :
             txt += """
             mat <- as.matrix(stats::as.dist(mat,diag=TRUE,upper=TRUE))
             mat[is.na(mat)] <- 0
-            mat[is.infinite(mat)] <- 0
+            if (length(which(mat == Inf))) {
+                infp <- which(mat == Inf)
+                mat[infp] <- NA
+                maxmat <- max(mat, na.rm = TRUE)
+                if (maxmat > 0) {
+                maxmat <- maxmat + 1
+                } else {
+                    maxmat <- 0
+                }
+                mat[infp] <- maxmat
+            }
+            if (length(which(mat == -Inf))) {
+                infm <- which(mat == -Inf)
+                mat[infm] <- NA
+                minmat <- min(mat, na.rm = TRUE)
+                if (maxmat < 0) {
+                minmat <- minmat - 1
+                } else {
+                    minmat <- 0
+                }
+                mat[infm] <- minmat
+            }
             """
+        if 'word' in self.parametres and not self.parametres['keep_coord'] :
+            txt += """
+            mat <- graph.word(mat, index)
+            cs <- colSums(mat)
+            if (length(cs)) mat <- mat[,-which(cs==0)]
+            rs <- rowSums(mat)
+            if (length(rs)) mat <- mat[-which(rs==0),]
+            if (length(cs)) dm <- dm[, -which(cs==0)]
+            """
+
         if self.parametres['layout'] == 0 : layout = 'random'
         if self.parametres['layout'] == 1 : layout = 'circle'
         if self.parametres['layout'] == 2 : layout = 'frutch'
@@ -907,10 +991,22 @@ class PrintSimiScript(PrintRScript) :
 #            g.toplot <- g.ori
 #        }
 #        """
+        if self.parametres['com'] :
+            com = `self.parametres['communities']`
+        else :
+            com = 'NULL'
+        if self.parametres['halo'] :
+            halo = 'TRUE'
+        else :
+            halo = 'FALSE'
+        txt += """
+        communities <- %s
+        halo <- %s
+        """ % (com, halo)
         txt += """
         eff <- colSums(dm)
         x <- list(mat = mat, eff = eff)
-        graph.simi <- do.simi(x, method='%s', seuil = seuil, p.type = '%s', layout.type = '%s', max.tree = %s, coeff.vertex=%s, coeff.edge = %s, minmaxeff = minmaxeff, vcexminmax = vcexminmax, cex = cex, coords = coords)
+        graph.simi <- do.simi(x, method='%s', seuil = seuil, p.type = '%s', layout.type = '%s', max.tree = %s, coeff.vertex=%s, coeff.edge = %s, minmaxeff = minmaxeff, vcexminmax = vcexminmax, cex = cex, coords = coords, communities = communities, halo = halo)
         """ % (method, type, layout, arbremax, coeff_tv, coeff_te)
             
         if self.parametres.get('bystar',False) :
@@ -931,18 +1027,15 @@ class PrintSimiScript(PrintRScript) :
                 vertex.size <- NULL
                 """
         else :
-            #FIXME
-            tmpchi = False
-            if tmpchi :
+            if self.parametres['type'] == 'clustersimitxt' : 
                 txt += """
                 lchi <- read.table("%s")
                 lchi <- lchi[,1]
-                """ % ffr(tmpchi)
-                if 'selected_col' in dir(self.tableau) :
-                    txt += """
-                    lchi <- lchi[c%s+1]
-                    """ % datas
-            if tmpchi and self.parametres.get('cexfromchi', False) :
+                """ % ffr(self.parametres['tmpchi'])
+                txt += """
+                    lchi <- lchi[sel.col]
+                    """
+            if self.parametres['type'] == 'clustersimitxt' and self.parametres.get('cexfromchi', False) :
                 txt += """ 
                 label.cex <- norm.vec(lchi, vcexminmax[1], vcexminmax[2])
                 """
@@ -954,21 +1047,38 @@ class PrintSimiScript(PrintRScript) :
                 label.cex <- graph.simi$label.cex
             }
             """
-            if tmpchi and self.parametres.get('sfromchi', False) :
+            if self.parametres['type'] == 'clustersimitxt' and self.parametres.get('sfromchi', False) :
                 txt += """ 
                 vertex.size <- norm.vec(lchi, minmaxeff[1], minmaxeff[2])
+                if (!length(vertex.size)) vertex.size <- 0
                 """
             else :
                 txt += """
             if (is.null(minmaxeff[1])) {
-                vertex.size <- NULL
+                vertex.size <- 0
             } else {
                 vertex.size <- graph.simi$eff
             }
             """
-        txt += """ vertex.size <- NULL """
+        #txt += """ vertex.size <- NULL """
+        if self.parametres['svg'] : svg = 'TRUE'
+        else : svg = 'FALSE'
         txt += """
-        coords <- plot.simi(graph.simi, p.type='%s',filename="%s", vertex.label = label.v, edge.label = label.e, vertex.col = cols, vertex.label.color = vertex.label.color, vertex.label.cex=label.cex, vertex.size = vertex.size, edge.col = cola, leg=leg, width = width, height = height, alpha = alpha, movie = film)
+        svg <- %s
+        """ % svg
+        txt += """
+        vertex.col <- cols
+        if (!is.null(graph.simi$com)) {
+            com <- graph.simi$com
+            colm <- rainbow(length(com))
+            if (vertex.size != 0 || graph.simi$halo) {
+                vertex.label.color <- 'black'
+                vertex.col <- colm[membership(com)]
+            } else {
+                vertex.label.color <- colm[membership(com)]
+            }
+        }
+        coords <- plot.simi(graph.simi, p.type='%s',filename="%s", vertex.label = label.v, edge.label = label.e, vertex.col = vertex.col, vertex.label.color = vertex.label.color, vertex.label.cex=label.cex, vertex.size = vertex.size, edge.col = cola, leg=leg, width = width, height = height, alpha = alpha, movie = film, svg = svg)
         save.image(file="%s")
         """ % (type, self.filename, self.pathout['RData'])
         

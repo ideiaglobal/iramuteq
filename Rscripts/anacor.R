@@ -1,4 +1,3 @@
-print('NEW SVD')
 #################################################################################
 #http://www.mail-archive.com/rcpp-devel@lists.r-forge.r-project.org/msg01513.html
 
@@ -53,7 +52,7 @@ my.svd <- function(x, nu, nv, libsvdc.path=NULL, sparse.path=NULL) {
 ###################################################################################
 
 #from anacor package
-boostana<-function (tab, ndim = 2, libsvdc = FALSE, libsvdc.path=NULL) 
+boostana<-function (tab, ndim = 2, svd.method = 'svdR', libsvdc.path=NULL) 
 {
     #tab <- as.matrix(tab)
     if (ndim > min(dim(tab)) - 1) 
@@ -76,7 +75,7 @@ boostana<-function (tab, ndim = 2, libsvdc = FALSE, libsvdc.path=NULL)
     z1 <- t(tab)/sqrt(c)
     z2 <- tab/sqrt(r)
     z <- t(z1) * z2
-    if (libsvdc) {
+    if (svd.method == 'svdlibc') {
         #START NEW SVD
         z <- as(z, "dgCMatrix")
         tmpmat <- tempfile(pattern='sparse')
@@ -85,10 +84,14 @@ boostana<-function (tab, ndim = 2, libsvdc = FALSE, libsvdc.path=NULL)
         print('do svd')
         sv <- my.svd(z, qdim, qdim, libsvdc.path=libsvdc.path, sparse.path=tmpmat)
         #END NEW SVD
-    } else {
+    } else if (svd.method == 'svdR') {
         print('start R svd')
         sv <- svd(z, nu = qdim, nv = qdim) 
         print('end svd')
+    } else if (svd.method == 'irlba') {
+        print('irlba')
+        sv <- irlba(z, qdim, qdim)
+        print('end irlba')
     }
     sigmavec <- (sv$d)[2:qdim]
 	x <- ((sv$u)/sqrt(r))[, -1]

@@ -340,7 +340,7 @@ class LeftTree(CT.CustomTreeCtrl):
             stat = menu.Append(wx.ID_ANY, u"Statistiques")
             spec = menu.Append(wx.ID_ANY, u"Spécificté et AFC")
             classification = wx.Menu()
-            alceste = classification.Append(wx.ID_ANY, u"Méthode ALCESTE")
+            alceste = classification.Append(wx.ID_ANY, u"Méthode GNEPA")
             pam = classification.Append(wx.ID_ANY, u"Par matrice des distances")
             menu.AppendMenu(-1, u"Classification", classification)
             simi = menu.Append(wx.ID_ANY, u"Analyse de similitude")
@@ -422,7 +422,7 @@ class LeftTree(CT.CustomTreeCtrl):
         self.parent.OnTextAlceste(evt, self.getcorpus())
 
     def OnPam(self, evt) :
-        print 'rien'
+        self.parent.OnPamSimple(evt, self.getcorpus())
 
     def OnSimiTxt(self, evt) :
         self.parent.OnSimiTxt(evt, self.getcorpus())

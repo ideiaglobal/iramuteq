@@ -114,7 +114,7 @@ BuildProf01<-function(x,classes) {
 	mat
 }
 
-do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.type = 'frutch', max.tree = TRUE, coeff.vertex=NULL, coeff.edge = NULL, minmaxeff=c(NULL,NULL), vcexminmax= c(NULL,NULL), cex = 1, coords = NULL) {
+do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.type = 'frutch', max.tree = TRUE, coeff.vertex=NULL, coeff.edge = NULL, minmaxeff=c(NULL,NULL), vcexminmax= c(NULL,NULL), cex = 1, coords = NULL, communities = NULL, halo = FALSE) {
 	mat.simi <- x$mat
     mat.eff <- x$eff
     v.label <- colnames(mat.simi)
@@ -122,27 +122,36 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
 	g.toplot<-g1
 	weori<-get.edge.attribute(g1,'weight')
 	if (max.tree) {
-		invw<-1/weori
+        if (method == 'cooc') {
+		    invw <- 1 / weori
+        } else {
+            invw <- 1 - weori
+        }
 		E(g1)$weight<-invw
 		g.max<-minimum.spanning.tree(g1)
-		E(g.max)$weight<-1/E(g.max)$weight
+        if (method == 'cooc') {
+		    E(g.max)$weight<-1 / E(g.max)$weight
+        } else {
+            E(g.max)$weight<-1 - E(g.max)$weight
+        }
 		g.toplot<-g.max
 	}
 
     if (!is.null(seuil)) {
-        if (seuil >= max(mat.simi)) seuil <- max(mat.simi)-1
+        print(seuil)
+        if (seuil >= max(mat.simi)) seuil <- 0
         vec<-vector()
         w<-E(g.toplot)$weight
         tovire <- which(w<=seuil)
-        g.toplot <- delete.edges(g.toplot,(tovire-1))
-        for (i in 0:(length(V(g.toplot))-1)) {
+        g.toplot <- delete.edges(g.toplot,(tovire))
+        for (i in 0:(length(V(g.toplot)))) {
             if (length(neighbors(g.toplot,i))==0) {
                 vec<-append(vec,i)
             }
         }
         g.toplot <- delete.vertices(g.toplot,vec)
         v.label <- V(g.toplot)$name
-        if (!is.logical(vec)) mat.eff <- mat.eff[-(vec+1)]
+        if (!is.logical(vec)) mat.eff <- mat.eff[-(vec)]
     }
 
 	if (!is.null(minmaxeff[1])) {
@@ -187,10 +196,32 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
     } else {
         lo <- coords
     }
-	out <- list(graph = g.toplot, mat.eff = mat.eff, eff = eff, mat = mat.simi, v.label = v.label, we.width = we.width, we.label=we.label, label.cex = label.cex, layout = lo)
+    if (!is.null(communities)) {
+        if (communities == 0 ){ #'edge.betweenness.community') {
+            com <- edge.betweenness.community(g.toplot)
+        } else if (communities == 1) {
+            com <- fastgreedy.community(g.toplot)
+        } else if (communities == 2) {
+            com <- label.propagation.community(g.toplot)
+        } else if (communities == 3) {
+            com <- leading.eigenvector.community(g.toplot)
+        } else if (communities == 4) {
+            com <- multilevel.community(g.toplot)
+        } else if (communities == 5) {
+            com <- optimal.community(g.toplot)
+        } else if (communities == 6) {
+            com <- spinglass.community(g.toplot)
+        } else if (communities == 7) {
+            com <- walktrap.community(g.toplot)
+        } 
+    } else {
+        com <- NULL
+    }
+    
+	out <- list(graph = g.toplot, mat.eff = mat.eff, eff = eff, mat = mat.simi, v.label = v.label, we.width = we.width, we.label=we.label, label.cex = label.cex, layout = lo, communities = com, halo = halo)
 }
 	
-plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, vertex.col = 'red', edge.col = 'black', edge.label = TRUE, vertex.label=TRUE, vertex.label.color = 'black', vertex.label.cex= NULL, vertex.size=NULL, leg=NULL, width = 800, height = 800, alpha = 0.1, cexalpha = FALSE, movie = NULL) {
+plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities = NULL, vertex.col = 'red', edge.col = 'black', edge.label = TRUE, vertex.label=TRUE, vertex.label.color = 'black', vertex.label.cex= NULL, vertex.size=NULL, leg=NULL, width = 800, height = 800, alpha = 0.1, cexalpha = FALSE, movie = NULL, svg = FALSE) {
 	mat.simi <- graph.simi$mat
 	g.toplot <- graph.simi$graph
     if (is.null(vertex.size)) {
@@ -232,14 +263,23 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, vertex.col = 
     }
     if (p.type=='nplot') {
         #print('ATTENTION - PAS OPEN FILE')
-        open_file_graph(filename, width = width, height = height)
+        open_file_graph(filename, width = width, height = height, svg = svg)
         par(mar=c(2,2,2,2))
         if (!is.null(leg)) {
             layout(matrix(c(1,2),1,2, byrow=TRUE),widths=c(3,lcm(7)))
             par(mar=c(2,2,1,0))
         }
         par(pch=' ')
-        plot(g.toplot,vertex.label='', edge.width=we.width, vertex.size=vertex.size, vertex.color=vertex.col, vertex.label.color='white', edge.label=we.label, edge.label.cex=cex, edge.color=edge.col, vertex.label.cex = 0, layout=lo)#, rescale = FALSE)
+        if (is.null(graph.simi$com)) {
+            plot(g.toplot,vertex.label='', edge.width=we.width, vertex.size=vertex.size, vertex.color=vertex.col, vertex.label.color='white', edge.label=we.label, edge.label.cex=cex, edge.color=edge.col, vertex.label.cex = 0, layout=lo)#, rescale = FALSE)
+        } else {
+            if (graph.simi$halo) {
+                mark.groups <- communities(graph.simi$com)
+            } else {
+                mark.groups <- NULL
+            }
+            plot(com, g.toplot,vertex.label='', edge.width=we.width, vertex.size=vertex.size, vertex.color=vertex.col, vertex.label.color='white', edge.label=we.label, edge.label.cex=cex, edge.color=edge.col, vertex.label.cex = 0, layout=lo, mark.groups = mark.groups)
+        }
         #txt.layout <- lo
         txt.layout <- layout.norm(lo, -1, 1, -1, 1, -1, 1)
         #txt.layout <- txt.layout[order(label.cex),]
@@ -271,10 +311,12 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, vertex.col = 
 		library('rgl')
         #rgl.open()
         #par3d(cex=0.8)
-		rglplot(g.toplot,vertex.label= vire.nonascii(v.label), edge.width=we.width/10, vertex.size=0.01, vertex.color=vertex.col, vertex.label.color="black", edge.color = edge.col, layout=lo)
-        los <- layout.norm(lo, -1, 1, -1, 1, -1, 1)
-        rgl.spheres(los, col = vertex.col, radius = vertex.size/100, alpha = alpha)
-		rgl.bg(color = c('white','black'))
+        lo <- layout.norm(lo, -10, 10, -10, 10, -10, 10)
+		rglplot(g.toplot,vertex.label='', edge.width=we.width/10, vertex.size=0.01, vertex.color=vertex.col, vertex.label.color="black", edge.color = edge.col, layout=lo, rescale = FALSE)
+        #los <- layout.norm(lo, -1, 1, -1, 1, -1, 1)
+		text3d(lo[,1], lo[,2], lo[,3], vire.nonascii(v.label), col = vertex.label.color, alpha = 1, cex = vertex.label.cex)
+        rgl.spheres(lo, col = vertex.col, radius = vertex.size/100, alpha = alpha)
+        rgl.bg(color = c('white','black'))
         if (!is.null(movie)) {
             require(tcltk)
             ReturnVal <- tkmessageBox(title="RGL 3 D",message="Cliquez pour commencer le film",icon="info",type="ok")
@@ -297,4 +339,9 @@ graph.word <- function(mat.simi, index) {
     nm[,index] <- mat.simi[,index]
     nm[index,] <- mat.simi[index,]
     nm
+#    cs <- colSums(nm)
+#    if (cs) nm <- nm[,-which(cs==0)]
+#    rs <- rowSums(nm)
+#    if (rs) nm <- nm[-which(rs==0),]
+#    nm
 }

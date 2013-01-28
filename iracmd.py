@@ -12,7 +12,7 @@ import locale
 import codecs
 sys.setdefaultencoding(locale.getpreferredencoding())
 from chemins import ConstructConfigPath, ConstructDicoPath, ConstructRscriptsPath
-from functions import ReadLexique, DoConf, History
+from functions import ReadLexique, DoConf, History, ReadDicoAsDico
 from ConfigParser import *
 #######################################
 #from textchdalc import AnalyseAlceste

@@ -4,13 +4,13 @@
 #Copyright (c) 2008-2012, Pierre Ratinaud
 #Lisense: GNU/GPL
 
-from chemins import ChdTxtPathOut, StatTxtPathOut, construct_simipath, PathOut
-from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout
+from chemins import ChdTxtPathOut, StatTxtPathOut, PathOut
+from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout, SimiMatLayout
 from corpus import Corpus, copycorpus
 from tableau import Tableau
 import os
 import shelve
-from tabsimi import DoSimi
+#from tabsimi import DoSimi
 from functions import BugReport, DoConf
 from tableau import Tableau
 import logging
@@ -103,7 +103,7 @@ class OpenAnalyse():
     def openanalyse(self) :
         if self.conf['corpus'] in self.parent.history.openedcorpus :
             log.info('corpus is already opened 2')
-            corpus = self.parent.history.openedcorpus[self.conf['corpus']]
+            corpus = copycorpus(self.parent.history.openedcorpus[self.conf['corpus']])
         else :
             if os.path.exists(self.parent.history.history[self.parent.history.ordercorpus[self.conf['corpus']]]['ira']) :
                 corpus = Corpus(self, parametres = DoConf(self.parent.history.history[self.parent.history.ordercorpus[self.conf['corpus']]]['ira']).getoptions('corpus'), read = self.parent.history.history[self.parent.history.ordercorpus[self.conf['corpus']]]['ira'])
@@ -131,6 +131,9 @@ class OpenAnalyse():
             self.parent.ShowMenu(_("Text analysis"))
             WordCloudLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'gnepamatrix' :
-            self.parent.ShowMenu(_("Spreadsheet analysis"))
+            #self.parent.ShowMenu(_("Spreadsheet analysis"))
             OpenCHDS(self.parent,  corpus, self.conf, Alceste = False)
+        elif self.conf['type'] == 'simimatrix' :
+            #self.parent.ShowMenu(_("Spreadsheet analysis"))
+            SimiMatLayout(self.parent, corpus, self.conf)
         

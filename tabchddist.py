@@ -8,7 +8,7 @@ import os
 #from rchdng import RchdFunct
 from chemins import ffr, ConstructPathOut,ChdTxtPathOut
 #from layout import PrintRapport
-from openanalyse import OpenAnalyse
+#from openanalyse import OpenAnalyse
 from ConfigParser import ConfigParser
 from functions import CreateIraFile, print_liste, exec_rcode, check_Rresult
 from dialog import CHDDialog, PrefQuestAlc, ClusterNbDialog

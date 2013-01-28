@@ -210,6 +210,28 @@ class Corpus :
     def getucesfrometoile(self, etoile) :
         return [uce.ident for uci in self.ucis for uce in uci.uces if etoile in uci.etoiles]
 
+    def getetoileuces(self) :
+        log.info('get uces etoiles')
+        etoileuces = {}
+        idpara = 0
+        for uci in self.ucis :
+            etoiles = uci.etoiles[1:]
+            for et in etoiles :
+                if et in etoileuces :
+                    etoileuces[et] += [uce.ident for uce in uci.uces]
+                else :
+                    etoileuces[et] = [uce.ident for uce in uci.uces]
+            if uci.paras != [] :
+                for et in uci.paras :
+                    if et in etoileuces :
+                        etoileuces[et] += [uce.ident for uce in uci.uces if uce.para == idpara]
+                    else :
+                        etoileuces[et] = [uce.ident for uce in uci.uces if uce.para == idpara]
+                    idpara += 1
+            else :
+                idpara += 1
+        return etoileuces
+
     def getucefromid(self, uceid) :
         if self.iduces is None : self.make_iduces()
         return self.iduces[uceid]
@@ -259,8 +281,8 @@ class Corpus :
         for uci in self.ucis :
             get = list(set(uci.etoiles).intersection(etoiles))
             if len(get) > 1 :
-                return '2 variables sur la meme ligne'
-            elif get != [] :
+                log.info('2 variables sur une ligne')
+            if get != [] :
                 etuces[etoiles.index(get[0])] += [uce.ident for uce in uci.uces]
         etuces = [set(val) for val in etuces]
         tab = []
@@ -530,7 +552,7 @@ class Corpus :
     def make_etoiles(self) :
         etoiles = set([])
         for uci in self.ucis :
-            etoiles.update(uci.etoiles[1:] + uci.paras)
+            etoiles.update(uci.etoiles[1:])
         return list(etoiles)
 
     def make_etoiles_dict(self) :
@@ -541,16 +563,16 @@ class Corpus :
             if et[0] in det :
                 try :
                     endet = '_'.join(et[1:])
-                    if endet in det[et[0]] :
-                        det[et[0]][endet] += 1
+                    if etoile in det[et[0]] :
+                        det[et[0]][etoile] += 1
                     else :
-                        det[et[0]][endet] = 1
+                        det[et[0]][etoile] = 1
                 except IndexError :
                     det[et[0]] += 1
             else :
                 try :
                     endet = '_'.join(et[1:])
-                    det[et[0]] = {endet :1}
+                    det[et[0]] = {etoile :1}
                 except IndexError :
                     det[et[0]] = 1
         return det
@@ -564,13 +586,16 @@ class Corpus :
             elif get != [] :
                 etuces[listet.index(get[0])] += [uce.ident for uce in uci.uces]
         return etuces
-            
 
     def make_and_write_profile_et(self, ucecl, fileout) :
         log.info('etoiles/classes')
-        etoiles = self.make_etoiles()
+        etoileuces = self.getetoileuces()
+        etoileuces = dict([[et, etoileuces[et]] for et in etoileuces if len(etoileuces[et]) > 1])
         with open(fileout, 'w') as f :
-            f.write('\n'.join([';'.join([etoile] + [`len(set(self.getucesfrometoile(etoile)).intersection(classe))` for classe in ucecl]) for etoile in etoiles]).encode(self.parametres['syscoding']))
+            f.write('\n'.join([';'.join([et] + [`len(set(etoileuces[et]).intersection(classe))` for classe in ucecl]) for et in etoileuces]).encode(self.parametres['syscoding']))
+        #etoiles = self.make_etoiles()
+        #with open(fileout, 'w') as f :
+        #    f.write('\n'.join([';'.join([etoile] + [`len(set(self.getucesfrometoile(etoile)).intersection(classe))` for classe in ucecl]) for etoile in etoiles]).encode(self.parametres['syscoding']))
 
     def make_colored_corpus(self) :
         ucecl = {}
@@ -1091,7 +1116,6 @@ class BuildFromAlceste(BuildCorpus) :
                                     log.info(u'Empty text : %i' % linenb)
                                     iduci -= 1
                                     self.corpus.ucis.pop()
-                                    #raise Exception("EmptyText %i" % linenb)
                             self.corpus.ucis.append(Uci(iduci, line))
                         if self.dlg is not None :
                             if not (iduci + 1) % 10 :
@@ -1104,19 +1128,24 @@ class BuildFromAlceste(BuildCorpus) :
                             idpara += 1
                             self.corpus.ucis[-1].paras.append(line.split()[0])
                         else :
-                            raise Exception('paragrapheOT')
+                            raise Exception('paragrapheOT %i' % linenb)
                     elif line.strip() != '' and iduci != -1 :
                         txt.append(line)
             if txt != [] and iduci != -1 :
                 iduce, idpara = self.treattxt(txt, iduce, idpara, iduci)
                 del(txt)
             else :
-                raise Exception("EmptyText")
+                if iduci != -1 :
+                    iduci -= 1
+                    self.corpus.ucis.pop()
+                    log.info(Exception("Empty text %i" % linenb))
+                else :
+                    raise Exception('EmptyText %i' % linenb)
             if iduci != -1  and iduce != -1:
                 self.backup_uce()
             else : 
                 log.info(_(u"No Text in corpora. Are you sure of the formatting ?"))
-                raise Exception('TextBeforeTextMark')
+                raise Exception('TextBeforeTextMark %i' % linenb)
         except UnicodeDecodeError :
             raise Exception("CorpusEncoding")
 

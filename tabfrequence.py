@@ -13,47 +13,8 @@ from chemins import ffr, FFF
 import tempfile
 from time import sleep
 from functions import exec_rcode, check_Rresult
+from dialog import FreqDialog
 
-class FreqDialog(wx.Dialog):
-    def __init__(
-            self, parent, ID, title, size=wx.DefaultSize, pos=wx.DefaultPosition,
-            style=wx.DEFAULT_DIALOG_STYLE | wx.CANCEL | wx.OK
-            ):
-        pre = wx.PreDialog()
-        pre.SetExtraStyle(wx.DIALOG_EX_CONTEXTHELP)
-        pre.Create(parent, ID, title, pos, size, style)
-        self.PostCreate(pre)
-        self.parent = parent 
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        self.content = parent.content
-        self.header = parent.tableau.get_colnames()
-        LABELLIST = []
-        for i in self.header:
-            forme = i
-            if len(forme) > 60 :
-                LABELLIST.append(i[0:60])
-            else:
-                LABELLIST.append(i)
-        self.list_box_1 = wx.ListBox(self, -1, choices=LABELLIST, style=wx.LB_EXTENDED | wx.LB_HSCROLL)
-        sizer.Add(self.list_box_1, 0, 5)
-        
-        btnsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
-        btn = wx.Button(self, wx.ID_CANCEL)
-        btn.SetHelpText("Annuler")
-        btnsizer.Add(btn)
-        
-        btn = wx.Button(self, wx.ID_OK)
-        btn.SetHelpText("Valider")
-        btn.SetDefault()
-        btnsizer.Add(btn)
-        
-        sizer.Add(btnsizer, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_HORIZONTAL, 5)
-        self.SetSizer(sizer)
-        sizer.Fit(self)
-        self.SetTitle(u"Sélection")
-  
-        # end wxGlade
         
 class Frequences():
     def __init__(self, parent):
@@ -64,8 +25,8 @@ class Frequences():
         self.DICTFILE = {}
         self.RPath = parent.PathPath.get('PATHS', 'rpath')
         self.parent=parent
-        dlg = FreqDialog(parent, -1, u"Fréquences", size=(350, 200),
-                style=wx.DEFAULT_DIALOG_STYLE)
+        self.tableau = parent.tableau
+        dlg = FreqDialog(parent, -1, self.tableau.get_colnames(), u"Fréquences", size=(350, 200))
         dlg.CenterOnParent()
         val = dlg.ShowModal()
         if val == wx.ID_OK :

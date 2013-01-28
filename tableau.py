@@ -210,9 +210,18 @@ class Tableau() :
         dc = dict(zip(listcol, listcol))
         selcol = [[val for i, val in enumerate(row) if i in dc] for row in self.linecontent]
         return selcol
+
+    def getactlistfromselection(self, listact) :
+        selcol = self.select_col(listact)
+        self.actives = self.make_dico(selcol)
+        return [[val, self.actives[val][0]] for val in self.actives]       
+
+    def make_listactives(self) :
+        self.listactives = [val for val in self.actives if val != 'NA' and self.actives[val] >= self.parametre['mineff']]
     
     def write01(self, fileout, dico, linecontent) :
-        self.listactives = [val for val in dico if val != 'NA' and dico[val] >= self.parametre['mineff']]
+        if self.listactives is None :
+            self.listactives = [val for val in dico if val != 'NA' and dico[val] >= self.parametre['mineff']]
         out = [['0' for forme in self.listactives] for line in linecontent]
         for i, forme in enumerate(self.listactives) :
             for line in dico[forme][1] :
