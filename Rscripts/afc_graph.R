@@ -77,7 +77,7 @@ if ( qui == 3 ) {
         ry <- range(table.in[,2], na.rm = TRUE)
         rz <- range(table.in[,3], na.rm = TRUE)
     }
-    if (exists(afctable)) {
+    if (exists('afctable')) {
         eff <- rowSums(afctable)
     } else {
         eff <- afctable$rowmass
