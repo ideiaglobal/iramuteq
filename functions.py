@@ -88,9 +88,10 @@ class History :
         self.read()
 
     def addmultiple(self, analyses) :
+        log.info('add multiple')
         for analyse in analyses :
             tosave = {'uuid' : analyse['uuid'], 'ira': analyse['ira'], 'type' : analyse['type']}
-            corpus = analyse['uuid']
+            corpus = analyse['corpus']
             tosave['corpus'] = corpus
             tosave['name'] = analyse['name']
             if corpus in self.corpus :
@@ -102,6 +103,7 @@ class History :
         self.read()
 
     def delete(self, analyse, corpus = False) :
+        log.info('delete %s' % analyse.get('name', 'noname'))
         if corpus :
             self.history.pop(self.ordercorpus[analyse['uuid']])
             if analyse['uuid'] in self.openedcorpus :

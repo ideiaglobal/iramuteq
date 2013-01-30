@@ -73,10 +73,10 @@ class OpenAnalyse():
         log.info('open corpus')
         if self.conf['uuid'] not in self.parent.history.corpus :
             self.parent.history.add(self.conf) 
-            log.info('add to history')
+            log.info('add corpus to history')
             self.parent.tree.OnItemAppend(self.conf)
         if self.conf['uuid'] in self.parent.history.openedcorpus :
-            log.info('corpus is already opened 1')
+            log.info('corpus is already opened')
             self.doopen(self.parent.history.openedcorpus[self.conf['uuid']])
         else :
             corpus = Corpus(self, parametres = self.conf, read = self.parent.history.history[self.parent.history.ordercorpus[self.conf['uuid']]]['ira'])
@@ -102,7 +102,7 @@ class OpenAnalyse():
 
     def openanalyse(self) :
         if self.conf['corpus'] in self.parent.history.openedcorpus :
-            log.info('corpus is already opened 2')
+            log.info('corpus is already opened')
             corpus = copycorpus(self.parent.history.openedcorpus[self.conf['corpus']])
         else :
             if os.path.exists(self.parent.history.history[self.parent.history.ordercorpus[self.conf['corpus']]]['ira']) :
