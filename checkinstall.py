@@ -100,7 +100,7 @@ def FindRPAthWin32():
         for progpath in progpaths :
             rpath = os.path.join(progpath, "R")
         if os.path.exists(rpath) :
-            for i in range(7,20):
+            for i in range(13,20):
                 for j in range(0,15):
                     path=os.path.join(rpath,"R-2."+str(i)+"."+str(j),'bin','R.exe')
                     if os.path.exists(path):
