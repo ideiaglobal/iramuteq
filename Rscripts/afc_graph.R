@@ -187,11 +187,11 @@ if (typegraph == 0) {
     rain = rainbow(clnb)
     colors = rain[classes]
     #rn <- rownames(table.in)
-    open3d()
+    rgl.open()
     text3d(table.in[,1], table.in[,2], table.in[,3], rn, col = colors , cex = cex.par)
+    rgl.bg(col = c('white', "#99bb99"), front = "lines", box=FALSE, sphere = TRUE)
     par3d(cex=0.7)
     #par3d(windowRect = c(100,100,600,600))
-    rgl.bg(col = c('white', "#99bb99"), front = "lines", box=FALSE, sphere = FALSE)
     rgl.lines(c(rx), c(0, 0), c(0, 0), col = "#000000")
     rgl.lines(c(0,0),c(ry),c(0,0),col = "#000000")
     rgl.lines(c(0,0),c(0,0),c(rz),col = "#000000")
