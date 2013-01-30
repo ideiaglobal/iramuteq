@@ -188,9 +188,10 @@ if (typegraph == 0) {
     colors = rain[classes]
     #rn <- rownames(table.in)
     #rgl.open()
-    par3d('userMatrix' = matrix(c(1,0,0,0, 0,1,0,0,0,0,1,0,0,0,0,1), ncol=4, nrow = 4))
+    
     text3d(table.in[,1], table.in[,2], table.in[,3], rn, col = colors , cex = cex.par)
     rgl.bg(col = c('white', "#99bb99"), front = "lines", box=FALSE, sphere = TRUE)
+    par3d('userMatrix' = matrix(c(1,0,0,0, 0,1,0,0,0,0,1,0,0,0,0,1), ncol=4, nrow = 4))
     par3d(cex=0.7)
     #par3d(windowRect = c(100,100,600,600))
     rgl.lines(c(rx), c(0, 0), c(0, 0), col = "#000000")
