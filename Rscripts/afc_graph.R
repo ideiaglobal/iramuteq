@@ -184,7 +184,6 @@ if (typegraph == 0) {
 } else {
     library(rgl)
     rn <- vire.nonascii(rownames(table.in))
-    print(rn)
     rain = rainbow(clnb)
     colors = rain[classes]
     #rn <- rownames(table.in)
