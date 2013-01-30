@@ -4,7 +4,7 @@
 
 
 #fichier genere par IRaMuTeq
-source('%s')
+source('%s', encoding = 'utf8')
 typegraph <- %i
 what <- %i
 x <- %i
@@ -182,48 +182,24 @@ if (typegraph == 0) {
     make_afc_graph(table.in, classes, clnb, xlab, ylab, cex.txt = cex.par, xminmax = xminmax, yminmax = yminmax)
 
 } else {
-
-    vire.nonascii <- function(rnames) {
-        print('vire non ascii')
-        couple <- list(c('é','e'),
-                    c('è','e'),
-                    c('ê','e'),
-                    c('ë','e'),
-                    c('î','i'),
-                    c('ï','i'),
-                    c('ì','i'),
-                    c('à','a'),
-                    c('â','a'),
-                    c('ä','a'),
-                    c('á','a'),
-                    c('ù','u'),
-                    c('û','u'),
-                    c('ü','u'),
-                    c('ç','c'),
-                    c('ò','o'),
-                    c('ô','o'),
-                    c('ö','o'),
-                    c('ñ','n')
-                    )
-        for (c in couple) {
-            rnames<-gsub(c[1],c[2], rnames)
-        }
-        rnames
-    }
     library(rgl)
-    #rn <- vire.nonascii(rownames(table.in))
-    rn <- rownames(table.in)
-    rgl.open()
+    rn <- vire.nonascii(rownames(table.in))
+    print(rn)
+    rain = rainbow(clnb)
+    colors = rain[classes]
+    #rn <- rownames(table.in)
+    open3d()
+    text3d(table.in[,1], table.in[,2], table.in[,3], rn, col = colors , cex = cex.par)
     par3d(cex=0.7)
     #par3d(windowRect = c(100,100,600,600))
-    rgl.bg(col = c('white', "#99bb99"), front = "lines", box=FALSE, sphere = TRUE)
+    rgl.bg(col = c('white', "#99bb99"), front = "lines", box=FALSE, sphere = FALSE)
     rgl.lines(c(rx), c(0, 0), c(0, 0), col = "#000000")
     rgl.lines(c(0,0),c(ry),c(0,0),col = "#000000")
     rgl.lines(c(0,0),c(0,0),c(rz),col = "#000000")
     text3d(rx[2]+1,0,0, xlab)
     text3d(0,ry[2]+1,0, ylab)
     text3d(0,0,rz[2]+1, zlab)
-    rain = rainbow(clnb)
+    
      if (tchi) {
         maxchi <- norm.vec(maxchi, tchi.min/100, tchi.max/100)
     } else if (!is.null(cex.par)) {
@@ -231,8 +207,8 @@ if (typegraph == 0) {
     } else {
         maxchi <- 0.1
     }
-    colors = rain[classes]
-    text3d(table.in[,1], table.in[,2], table.in[,3], rn, col= colors , cex = cex.par)
+    
+    
     for (i in 1:clnb) {
         text3d(rx[2],(ry[2]+(0.2*i)),0,paste('classe',i),col=rain[i])
     }

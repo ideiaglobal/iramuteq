@@ -124,15 +124,14 @@ CreateIraDirectory(UserConfigPath, AppliPath)
 #fichiers log pour windows (py2exe)
 log = logging.getLogger('iramuteq')
 fh = logging.FileHandler(os.path.join(UserConfigPath,'stdout.log'))
-ch = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
 fh.setFormatter(formatter)
 log.addHandler(fh)
-if sys.platform != 'win32' or sys.platform != 'darwin':
+if sys.platform != 'win32' and sys.platform != 'darwin':
+    ch = logging.StreamHandler()
+    ch.setFormatter(formatter)
     log.addHandler(ch)
 log.setLevel(logging.INFO)
-
 
 class writer(object):
     def write(self, data):
