@@ -157,6 +157,7 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
 #        croise
 #    }
     croise <- croiseeff( matrix(ncol=tcl,nrow=tcl), classeuce1, classeuce2)
+    print(croise)
     if (classif_mode == 0) {ind <- (nbcl * 2)} else {ind <- nbcl}
 	if (mincl==0){
 		mincl<-round(nrow(classeuce1)/ind)
@@ -384,8 +385,8 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
                 chi <- NULL
                 uce <- NULL
                 for (j in 1:nrow(listcoordok[[i]])) {
-                    chi<-c(chi,croise[(listcoordok[[i]][j,1]-1),(listcoordok[[i]][j,2]-1)])
-                    uce<-c(uce,chicroiseori[(listcoordok[[i]][j,1]-1),(listcoordok[[i]][j,2]-1)])
+                    chi<-c(chi,chicroiseori[(listcoordok[[i]][j,1]-1),(listcoordok[[i]][j,2]-1)])
+                    uce<-c(uce,croise[(listcoordok[[i]][j,1]-1),(listcoordok[[i]][j,2]-1)])
                 }
             	if (maxchi < sum(chi)) {
             	    maxchi <- sum(chi)

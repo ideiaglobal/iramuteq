@@ -131,9 +131,11 @@ class SimiTxt(AnalyseText):
             f.write('\n'.join(self.actives).encode(self.ira.syscoding))
 
 class SimiFromCluster(SimiTxt) :
-    def __init__(self, ira, corpus, actives, numcluster, parametres = None, dlg = False) :
+    def __init__(self, ira, corpus, actives, lfreq, lchi, numcluster, parametres = None, dlg = False) :
         self.actives = actives
         self.numcluster = numcluster
+        self.lfreq = lfreq
+        self.lchi = lchi
         parametres['name'] = 'simi_classe_%i' % (numcluster + 1)
         SimiTxt.__init__(self, ira, corpus, parametres, dlg, lemdial = False)
     
@@ -189,3 +191,8 @@ class SimiFromCluster(SimiTxt) :
         self.corpus.make_and_write_sparse_matrix_from_classe(self.actives, self.corpus.lc[self.numcluster], self.pathout['mat01.csv'])
         with open(self.pathout['actives.csv'], 'w') as f :
             f.write('\n'.join(self.actives).encode(self.ira.syscoding))        
+        with open(self.pathout['actives_nb.csv'], 'w') as f :
+            f.write('\n'.join([`val` for val in self.lfreq]))
+        with open(self.pathout['actives_chi.csv'], 'w') as f :
+            f.write('\n'.join([`val` for val in self.lchi]))
+

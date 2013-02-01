@@ -1076,18 +1076,8 @@ class StatDialog(wx.Dialog):
         wx.Dialog.__init__(self, *args, **kwds)
         self.fileout = ""
         self.parent = parent
-        #box = wx.BoxSizer(wx.HORIZONTAL)
         self.label_lem = wx.StaticText(self, -1, u"Lemmatisation")
         self.radio_lem = wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
-        #sizer.Add(box, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5)
-        #box2 = wx.BoxSizer(wx.HORIZONTAL)
-        #self.txt_exp = wx.StaticText(self, -1, u"Utiliser le Dict. des expressions")
-        #self.exp = wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
-        #self.label_uce =  wx.StaticText(self, -1, u"Construire des UCE")
-        #self.check_uce = wx.CheckBox(self, -1)
-        #txt = """Nombre d'occurrences par uce"""
-        #self.label_occuce = wx.StaticText(self, -1, txt)
-        #self.spin_ctrl_4 = wx.SpinCtrl(self, -1, "",size = (100,30), min=10, max=1000, initial = 35)
         #txt = u"""Fréquence minimum d'une forme
 #analysée (0 = non utilisé)"""
         #self.label_8 = wx.StaticText(self, -1, txt)
@@ -1139,31 +1129,9 @@ class StatDialog(wx.Dialog):
 
     def __set_properties(self) :
         self.SetTitle(u'Préférences')
-        #self.spin_ctrl_4.Enable(False)
-        #self.spin_ctrl_5.Enable(False)
-        #self.spin_max_actives.Enable(False)
-
-#    def OnCheckUce(self, evt) :
-#        if self.check_uce.GetValue() :
-#            self.spin_ctrl_4.Enable(True)
-#            self.spin_ctrl_5.Enable(True)
-#            if self.spin_ctrl_5.GetValue() > 0 :
-#                self.spin_max_actives.Enable(False)
-#            else :
-#                self.spin_max_actives.Enable(True)
-#        else :
-#            self.spin_ctrl_4.Enable(False)
-#            self.spin_ctrl_5.Enable(False)
-#            self.spin_max_actives.Enable(False)
-
-#    def OnSpin(self, evt) :
-#        if self.spin_ctrl_5.GetValue() > 0 :
-#            self.spin_max_actives.Enable(False)
-#        else :
-#            self.spin_max_actives.Enable(True)
 
     def OnKeys(self, evt):
-        dial = AlcOptFrame(self.parent, self)
+        dial = AlcOptFrame(self, self.parent.parent)
         dial.CenterOnParent()
         val = dial.ShowModal()
 

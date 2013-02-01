@@ -1216,7 +1216,10 @@ class Builder :
             parametres['originalpath'] = parent.filename
             PathOut().createdir(parametres['pathout'])
             ReadLexique(self.parent, lang = parametres['lang'])
-            self.parent.expressions = ReadDicoAsDico(self.parent.DictPath.get(parametres['lang']+'_exp', 'french_exp'))
+            if parametres['lang'] != 'other' and  os.path.exists(self.parent.DictPath.get(parametres['lang']+'_exp', 'french_exp')):
+                self.parent.expressions = ReadDicoAsDico(self.parent.DictPath.get(parametres['lang']+'_exp', 'french_exp'))
+            else :
+                self.parent.expressions = {}
             self.parametres = parametres
         else :
             if self.dlg is not None :

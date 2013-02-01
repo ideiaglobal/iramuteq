@@ -314,6 +314,7 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
         lo <- layout.norm(lo, -10, 10, -10, 10, -10, 10)
 		rglplot(g.toplot,vertex.label='', edge.width=we.width/10, vertex.size=0.01, vertex.color=vertex.col, vertex.label.color="black", edge.color = edge.col, layout=lo, rescale = FALSE)
         #los <- layout.norm(lo, -1, 1, -1, 1, -1, 1)
+        print(v.label)
 		text3d(lo[,1], lo[,2], lo[,3], vire.nonascii(v.label), col = vertex.label.color, alpha = 1, cex = vertex.label.cex)
         rgl.spheres(lo, col = vertex.col, radius = vertex.size/100, alpha = alpha)
         rgl.bg(color = c('white','black'))
@@ -339,9 +340,4 @@ graph.word <- function(mat.simi, index) {
     nm[,index] <- mat.simi[,index]
     nm[index,] <- mat.simi[index,]
     nm
-#    cs <- colSums(nm)
-#    if (cs) nm <- nm[,-which(cs==0)]
-#    rs <- rowSums(nm)
-#    if (rs) nm <- nm[-which(rs==0),]
-#    nm
 }

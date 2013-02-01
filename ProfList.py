@@ -478,7 +478,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                         'lem' : self.Source.parametres['lem'],
                         'tmpchi' : self.tmpchi}
         #try :
-        self.parent.SimiFromCluster(self.parent, self.Source.corpus, self.la, self.cl - 1, parametres = parametres, dlg = progressbar(self, 4))
+        self.parent.SimiFromCluster(self.parent, self.Source.corpus, self.la, self.lfreq, self.lchi, self.cl - 1, parametres = parametres, dlg = progressbar(self, 4))
         #except :
         #    print 'not acitve'
 
@@ -492,7 +492,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                         'lem' : self.Source.parametres['lem'],
                         'tmpchi' : self.tmpchi}
 
-        self.parent.SimiFromCluster(self.parent, self.Source.corpus, self.la, self.cl - 1, parametres = parametres, dlg = progressbar(self, 4))
+        self.parent.SimiFromCluster(self.parent, self.Source.corpus, self.la, self.lfreq, self.lchi, self.cl - 1, parametres = parametres, dlg = progressbar(self, 4))
         #dlg = progressbar(self, 2)
         #corpus = self.Source.corpus
         #uces = corpus.lc[self.cl-1]

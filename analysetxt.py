@@ -28,6 +28,7 @@ class AnalyseText :
         self.parametres = parametres
         self.lemdial = lemdial
         self.val = False
+        self.keys = DoConf(self.ira.ConfigPath['key']).getoptions()
         if not 'pathout' in self.parametres :
             self.pathout = PathOut(corpus.parametres['originalpath'], analyse_type = parametres['type'], dirout = corpus.parametres['pathout'])
         else :
@@ -38,8 +39,8 @@ class AnalyseText :
         log.info(self.pathout.dirout)
         if self.parametres is not None :
             self.keys = DoConf(self.ira.ConfigPath['key']).getoptions()
-            gramact = [k for k in keys if keys[k] == 1]
-            gramsup = [k for k in keys if keys[k] == 2]
+            gramact = [k for k in self.keys if self.keys[k] == 1]
+            gramsup = [k for k in self.keys if self.keys[k] == 2]
             self.parametres['pathout'] = self.pathout.mkdirout()
             self.pathout = PathOut(dirout = self.parametres['pathout'])
             self.pathout.createdir(self.parametres['pathout'])
@@ -212,34 +213,34 @@ class Alceste(AnalyseText) :
         PrintRapport(self, self.corpus, self.parametres)
 
 
-keys = {'art_def' : 2,
-        'pre' : 2,
-        'adj_dem' : 2,
-        'ono' : 2,
-        'pro_per' : 2,
-        'ver_sup' : 2,
-        'adv' : 1,
-        'ver' : 1,
-        'adj_ind' : 2,
-        'adj_pos' : 2,
-        'aux' : 2,
-        'adj_int' : 2,
-        'pro_ind' : 2,
-        'adj' : 1,
-        'pro_dem' : 2,
-        'nom' : 1,
-        'art_ind' : 2,
-        'pro_pos' : 2,
-        'nom_sup' : 2,
-        'adv_sup' : 2,
-        'adj_sup' : 2,
-        'adj_num' : 2,
-        'pro_rel' : 2,
-        'con' : 2,
-        'num' : 2,
-        'nr' : 1,
-        'sw' : 2,
-}
-
-gramact = [k for k in keys if keys[k] == 1]
-gramsup = [k for k in keys if keys[k] == 2]
+#keys = {'art_def' : 2,
+#        'pre' : 2,
+#        'adj_dem' : 2,
+#        'ono' : 2,
+#        'pro_per' : 2,
+#        'ver_sup' : 2,
+#        'adv' : 1,
+#        'ver' : 1,
+#        'adj_ind' : 2,
+#        'adj_pos' : 2,
+#        'aux' : 2,
+#        'adj_int' : 2,
+#        'pro_ind' : 2,
+#        'adj' : 1,
+#        'pro_dem' : 2,
+#        'nom' : 1,
+#        'art_ind' : 2,
+#        'pro_pos' : 2,
+#        'nom_sup' : 2,
+#        'adv_sup' : 2,
+#        'adj_sup' : 2,
+#        'adj_num' : 2,
+#        'pro_rel' : 2,
+#        'con' : 2,
+#        'num' : 2,
+#        'nr' : 1,
+#        'sw' : 2,
+#}
+#
+#gramact = [k for k in keys if keys[k] == 1]
+#gramsup = [k for k in keys if keys[k] == 2]

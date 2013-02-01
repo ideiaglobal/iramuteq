@@ -943,7 +943,13 @@ class SimiLayout(DefaultTextLayout) :
             with codecs.open(self.pathout['actives.csv'], 'r', self.parametres['encoding']) as f :
                 self.actives = f.read()
             self.actives = self.actives.splitlines()#[act for act in self.actives.splitlines()]
-        dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
+        if os.path.exists(self.pathout['actives_nb.csv']) :
+            with open(self.pathout['actives_nb.csv'], 'r') as f :
+                act_nb = f.read()
+                act_nb = act_nb.splitlines()
+            dictcol = dict([[i, [self.actives[i], int(act_nb[i])]] for i, val in enumerate(self.actives)])
+        else :
+            dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
         #res = SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], selected = selected, dlg = True) 
         #if res.ok :
         prep = PrepSimi(self.ira, self, self.parametres,self.pathout['selected.csv'], self.actives, indices_simi, wordlist = dictcol, selected = selected)

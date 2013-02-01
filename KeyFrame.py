@@ -4,7 +4,7 @@
 #Lisense: GNU/GPL
 
 import wx
-from functions import sortedby
+from functions import sortedby, DoConf
 
 # begin wxGlade: extracode
 # end wxGlade
@@ -43,7 +43,7 @@ class AlcOptFrame(wx.Dialog):
         'nr' : [wx.NewId(),wx.NewId(),u"Formes non reconnues"],
         }
         self.parent=parent
-        self.KeyConf=self.parent.KeyConf
+        self.keys=self.parent.parent.keys
         self.listlabel=[]
         self.listspin=[]
         self.listbutton=[]
@@ -58,7 +58,7 @@ class AlcOptFrame(wx.Dialog):
         for line in self.listcleori:
             cle,ids,idb,label=line
             self.listlabel.append(wx.StaticText(self, -1, label))
-            self.listspin.append(wx.SpinCtrl(self, ids,self.KeyConf.get('KEYS',cle), min=0, max=2))
+            self.listspin.append(wx.SpinCtrl(self, ids,`self.keys[cle]`, min=0, max=2))
             #if cle != 'nr' and cle!= 'num' : 
             self.listbutton.append(wx.Button(self, idb, u"voir liste"))
             self.listids.append(ids)
@@ -73,7 +73,7 @@ class AlcOptFrame(wx.Dialog):
         
         self.Bind(wx.EVT_BUTTON, self.OnApply, self.button_val)
         
-        self.dico=self.parent.parent.lexique#'dictionnaires/lexique.txt')
+        self.dico=self.parent.parent.parent.lexique#'dictionnaires/lexique.txt')
 
         self.__set_properties()
         self.__do_layout()
@@ -133,7 +133,8 @@ class AlcOptFrame(wx.Dialog):
     
     def OnApply(self,evt):
         for i in range(0,len(self.listlabel)):
-            self.KeyConf.set('KEYS',self.listcle[i],`self.listspin[i].GetValue()`)
+            self.keys[self.listcle[i]] = self.listspin[i].GetValue()
+        DoConf().makeoptions(['KEY'], [self.keys], outfile = self.parent.parent.ira.ConfigPath['key'])
         self.Destroy()
 
 

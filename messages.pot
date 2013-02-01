@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-14 15:17+0100\n"
+"POT-Creation-Date: 2013-02-01 19:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,69 +17,97 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: iramuteq.py:244
+#: iramuteq.py:268
 msgid "Edition"
 msgstr ""
 
-#: iramuteq.py:202
+#: iramuteq.py:226
 msgid "Exit"
 msgstr ""
 
-#: iramuteq.py:243
+#: iramuteq.py:214
+msgid "Extract mods"
+msgstr ""
+
+#: iramuteq.py:267
 msgid "File"
 msgstr ""
 
-#: iramuteq.py:248
+#: iramuteq.py:272
 msgid "Help"
 msgstr ""
 
-#: iramuteq.py:208
+#: iramuteq.py:232
 msgid "Home page"
 msgstr ""
 
-#: iramuteq.py:192
-msgid "Import a factiva corpora..."
+#: iramuteq.py:210
+msgid "Import from factiva"
 msgstr ""
 
-#: iramuteq.py:180
+#: corpus.py:1147
+msgid "No Text in corpora. Are you sure of the formatting ?"
+msgstr ""
+
+#: iramuteq.py:190
 msgid "Open a matrix"
 msgstr ""
 
-#: iramuteq.py:184
+#: iramuteq.py:194
 msgid "Open a text corpora"
 msgstr ""
 
-#: iramuteq.py:188
+#: iramuteq.py:198
 msgid "Open an analysis"
 msgstr ""
 
-#: iramuteq.py:205
+#: iramuteq.py:229
 msgid "Preferences"
 msgstr ""
 
-#: iramuteq.py:197
+#: iramuteq.py:222
 msgid "Save tab as..."
 msgstr ""
 
-#: iramuteq.py:209
+#: iramuteq.py:233
 msgid "Show data"
 msgstr ""
 
-#: iramuteq.py:210
+#: iramuteq.py:234
 msgid "Show results"
 msgstr ""
 
-#: iramuteq.py:246 iramuteq.py:457 iramuteq.py:608 tableau.py:178
+#: iramuteq.py:213
+msgid "Split from variable"
+msgstr ""
+
+#: iramuteq.py:270 iramuteq.py:427 iramuteq.py:636 tableau.py:185
 msgid "Spreadsheet analysis"
 msgstr ""
 
-#: iramuteq.py:247 iramuteq.py:458 iramuteq.py:607 openanalyse.py:94
-#: openanalyse.py:97 openanalyse.py:100 openanalyse.py:103 openanalyse.py:106
-#: openanalyse.py:109 tableau.py:179
+#: iramuteq.py:271 iramuteq.py:428 iramuteq.py:635 openanalyse.py:116
+#: openanalyse.py:119 openanalyse.py:122 openanalyse.py:125 openanalyse.py:128
+#: openanalyse.py:131 tableau.py:186
 msgid "Text analysis"
 msgstr ""
 
-#: iramuteq.py:245 iramuteq.py:456 iramuteq.py:535 iramuteq.py:606
-#: tableau.py:177
+#: iramuteq.py:219
+msgid "Tools"
+msgstr ""
+
+#: iramuteq.py:269 iramuteq.py:426 iramuteq.py:564 iramuteq.py:634
+#: tableau.py:184
 msgid "View"
+msgstr ""
+
+#: iramuteq.py:206
+msgid "from copy/paste"
+msgstr ""
+
+#: iramuteq.py:205
+msgid "from mail"
+msgstr ""
+
+#: iramuteq.py:204
+msgid "from xml"
 msgstr ""
