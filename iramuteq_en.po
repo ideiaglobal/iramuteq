@@ -3,47 +3,126 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: iramuteq 0.6 alpha 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-09-16 16:27+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2013-02-01 19:26+0100\n"
+"PO-Revision-Date: 2013-02-02 09:23+0100\n"
+"Last-Translator: Pierre Ratinaud <ratinaud@univ-tlse2.fr>\n"
+"Language-Team: LANGUAGE <ratinaud@univ-tlse2.fr>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: English\n"
+"X-Poedit-Country: UNITED KINGDOM\n"
 
-#: iramuteq.py:134
-msgid "&Open a questionnaire\tCtrl+O"
-msgstr ""
-
-#: iramuteq.py:184
+#: iramuteq.py:268
 msgid "Edition"
-msgstr ""
+msgstr "Edition"
 
-#: iramuteq.py:183
+#: iramuteq.py:226
+msgid "Exit"
+msgstr "Exit"
+
+#: iramuteq.py:214
+msgid "Extract mods"
+msgstr "Extract mods"
+
+#: iramuteq.py:267
 msgid "File"
-msgstr ""
+msgstr "File"
 
-#: iramuteq.py:188
+#: iramuteq.py:272
 msgid "Help"
-msgstr ""
+msgstr "Help"
 
-#: iramuteq.py:134
-msgid "Open a questionnaire"
-msgstr ""
+#: iramuteq.py:232
+msgid "Home page"
+msgstr "Home page"
 
-#: iramuteq.py:186
+#: iramuteq.py:210
+msgid "Import from factiva"
+msgstr "Import from factiva"
+
+#: corpus.py:1147
+msgid "No Text in corpora. Are you sure of the formatting ?"
+msgstr "No Text in corpora. Are you sure of the formatting ?"
+
+#: iramuteq.py:190
+msgid "Open a matrix"
+msgstr "Open a matrix"
+
+#: iramuteq.py:194
+msgid "Open a text corpora"
+msgstr "Open a text corpora"
+
+#: iramuteq.py:198
+msgid "Open an analysis"
+msgstr "Open an analysis"
+
+#: iramuteq.py:229
+msgid "Preferences"
+msgstr "Preferences"
+
+#: iramuteq.py:222
+msgid "Save tab as..."
+msgstr "Save tab as..."
+
+#: iramuteq.py:233
+msgid "Show data"
+msgstr "Show data"
+
+#: iramuteq.py:234
+msgid "Show results"
+msgstr "Show results"
+
+#: iramuteq.py:213
+msgid "Split from variable"
+msgstr "Split from variable"
+
+#: iramuteq.py:270
+#: iramuteq.py:427
+#: iramuteq.py:636
+#: tableau.py:185
 msgid "Spreadsheet analysis"
-msgstr ""
+msgstr "Spreadsheet analysis"
 
-#: iramuteq.py:187
+#: iramuteq.py:271
+#: iramuteq.py:428
+#: iramuteq.py:635
+#: openanalyse.py:116
+#: openanalyse.py:119
+#: openanalyse.py:122
+#: openanalyse.py:125
+#: openanalyse.py:128
+#: openanalyse.py:131
+#: tableau.py:186
 msgid "Text analysis"
-msgstr ""
+msgstr "Text analysis"
 
-#: iramuteq.py:185
+#: iramuteq.py:219
+msgid "Tools"
+msgstr "Tools"
+
+#: iramuteq.py:269
+#: iramuteq.py:426
+#: iramuteq.py:564
+#: iramuteq.py:634
+#: tableau.py:184
 msgid "View"
-msgstr ""
+msgstr "View"
+
+#: iramuteq.py:206
+msgid "from copy/paste"
+msgstr "from copy/paste"
+
+#: iramuteq.py:205
+msgid "from mail"
+msgstr "from mail"
+
+#: iramuteq.py:204
+msgid "from xml"
+msgstr "from xml"
+

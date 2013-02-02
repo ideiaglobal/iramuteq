@@ -410,6 +410,20 @@ nouvelle version est disponible"""
         self.m_radioBox2 = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_radioBox2Choices, 1, wx.RA_SPECIFY_COLS )
         self.m_radioBox2.SetSelection( 0 )
         fgSizer1.Add( self.m_radioBox2, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
+
+        msg = u"""Langue de l'interface"""
+        self.m_staticText45 = wx.StaticText( self, wx.ID_ANY, msg, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText45.Wrap( -1 )
+        fgSizer1.Add( self.m_staticText45, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.m_staticText46 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText46.Wrap( -1 )
+        fgSizer1.Add( self.m_staticText46, 0, wx.ALL, 5 )
+        
+        self.listlangues = [ u"french", u"english" ]
+        self.langues = wx.Choice( self, wx.ID_ANY, (200, -1), choices = self.listlangues)
+        #self.langues.SetSelection( 0 )
+        fgSizer1.Add( self.langues, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
         
         msg = u"""Vérifier l'installation des
 bibliothèques de R"""
@@ -504,6 +518,7 @@ bibliothèques de R"""
         if self.parent.pref.getboolean('iramuteq', 'checkupdate') : val2 = 0
         else : val2 = 1
         self.m_radioBox2.SetSelection(val2)
+        self.langues.SetSelection(self.listlangues.index(self.parent.pref.get('iramuteq', 'guilanguage')))
         if sys.platform == 'win32' :
             if self.parent.pref.getboolean('iramuteq', 'R_mem') :
                 self.m_checkBox1.SetValue(True)
@@ -542,6 +557,7 @@ bibliothèques de R"""
         if self.m_radioBox2.GetSelection() == 0 : valcheck = 'true'
         else :  valcheck = 'false'
         parent.pref.set('iramuteq', 'checkupdate', valcheck)
+        parent.pref.set('iramuteq', 'guilanguage', self.listlangues[self.langues.GetSelection()])
         if sys.platform == 'win32' :
             if self.m_checkBox1.GetValue() :
                 parent.pref.set('iramuteq', 'R_mem', 'true')

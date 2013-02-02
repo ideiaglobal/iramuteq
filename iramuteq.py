@@ -147,6 +147,10 @@ sys.stderr = writer()
 sys.stdout = printer()
 
 ConfigPath = ConstructConfigPath(UserConfigPath)
+
+
+langues = {'french' : wx.LANGUAGE_FRENCH,
+            'english' : wx.LANGUAGE_ENGLISH,}
 #####################################################################
 
 class IraFrame(wx.Frame):
@@ -169,14 +173,10 @@ class IraFrame(wx.Frame):
         #workaround for import problem
         self.SimiFromCluster = SimiFromCluster
         #langues
-        mylocale = wx.Locale(wx.LANGUAGE_FRENCH)
-        mylocale.AddCatalogLookupPathPrefix(os.path.join(AppliPath,'locale'))
-        mylocale.AddCatalog('iramuteq')
-        presLan_en = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['en'])
-        presLan_fr = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['fr_FR'])
-        presLan_fr.install()
-
-
+        gettext.install('iramuteq',  os.path.join(AppliPath,'locale'), unicode=True)
+        self.presLan_fr = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['fr_FR'])
+        self.presLan_en = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['en'])
+        self.setlangue()
         # tell FrameManager to manage this frame        
         #self._mgr = wx.aui.AuiManager()
         self._mgr = aui.AuiManager()
@@ -487,6 +487,24 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
             dlg.Destroy()
 
 
+    def setlangue(self) :
+        try :
+            self.pref.read(self.ConfigPath['preferences'])
+            guilangue = self.pref.get('iramuteq', 'guilanguage')
+            if guilangue == 'french' :
+                self.presLan_fr.install()
+            else :
+                self.presLan_en.install()
+            mylocale = wx.Locale(langues[guilangue])
+            mylocale.AddCatalogLookupPathPrefix(os.path.join(AppliPath,'locale'))
+            mylocale.AddCatalog('iramuteq')
+        except :
+            self.presLan_fr.install()
+            mylocale = wx.Locale(langues['french'])
+            mylocale.AddCatalogLookupPathPrefix(os.path.join(AppliPath,'locale'))
+            mylocale.AddCatalog('iramuteq')
+
+
     def OnVerif(self, evt) :
         pack = CheckRPackages(self)
         if pack :
@@ -495,7 +513,6 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
             if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
                  evt.Veto()
 
-    #FIXME  marche pas sous mac ?
     def DisEnSaveTabAs(self, DISEN):
     #Disable SaveTabAs
         file_menu = self.mb.GetMenu(0)
