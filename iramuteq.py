@@ -187,31 +187,31 @@ class IraFrame(wx.Frame):
         self.mb = wx.MenuBar()
 
         file_menu = wx.Menu()
-        item = wx.MenuItem(file_menu, ID_OpenData, _(u"Open a matrix"), _(u"Open a matrix"))
+        item = wx.MenuItem(file_menu, ID_OpenData, _(u"Open a matrix").decode('utf8'), _(u"Open a matrix").decode('utf8'))
         item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
         file_menu.AppendItem(item)
         
-        item = wx.MenuItem(file_menu, ID_OpenText, _(u"Open a text corpora"), _(u"Open a text corpora"))
+        item = wx.MenuItem(file_menu, ID_OpenText, _(u"Open a text corpora").decode('utf8'), _(u"Open a text corpora").decode('utf8'))
         item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
         file_menu.AppendItem(item)
         
-        item = wx.MenuItem(file_menu, ID_OnOpenAnalyse, _(u"Open an analysis"), _("Open an analysis"))
+        item = wx.MenuItem(file_menu, ID_OnOpenAnalyse, _(u"Open an analysis").decode('utf8'), _(u"Open an analysis").decode('utf8'))
         item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
         file_menu.AppendItem(item)
 
         
         menuFactiva = wx.Menu()
-        fact_from_xml = wx.MenuItem(menuFactiva, wx.ID_ANY, _(u"from xml"))
-        fact_from_mail = wx.MenuItem(menuFactiva, wx.ID_ANY, _(u"from mail"))
-        fact_from_txt = wx.MenuItem(menuFactiva, wx.ID_ANY, _(u"from copy/paste"))
+        fact_from_xml = wx.MenuItem(menuFactiva, wx.ID_ANY, _(u"from xml").decode('utf8'))
+        fact_from_mail = wx.MenuItem(menuFactiva, wx.ID_ANY, _(u"from mail").decode('utf8'))
+        fact_from_txt = wx.MenuItem(menuFactiva, wx.ID_ANY, _(u"from copy/paste").decode('utf8'))
         menuFactiva.AppendItem(fact_from_xml)
         menuFactiva.AppendItem(fact_from_mail)
         menuFactiva.AppendItem(fact_from_txt)
         file_menu.AppendMenu(-1, _(u"Import from factiva"), menuFactiva)
 
         menuTools = wx.Menu()
-        splitvar = wx.MenuItem(menuTools, wx.ID_ANY, _(u"Split from variable"))
-        extractmod = wx.MenuItem(menuTools, wx.ID_ANY, _(u"Extract mods"))
+        splitvar = wx.MenuItem(menuTools, wx.ID_ANY, _(u"Split from variable").decode('utf8'))
+        extractmod = wx.MenuItem(menuTools, wx.ID_ANY, _(u"Extract mods").decode('utf8'))
         menuTools.AppendItem(splitvar)
         menuTools.AppendItem(extractmod)
         self.ID_splitvar = splitvar.GetId()
@@ -219,19 +219,19 @@ class IraFrame(wx.Frame):
         file_menu.AppendMenu(-1, _(u"Tools"), menuTools)
 
                
-        item = wx.MenuItem(file_menu, ID_SaveTab, _(u"Save tab as..."), _(u"Save tab as..."))
+        item = wx.MenuItem(file_menu, ID_SaveTab, _(u"Save tab as...").decode('utf8'), _(u"Save tab as...").decode('utf8'))
         item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_SAVE_AS))
         file_menu.AppendItem(item)
         
         file_menu.Append(wx.ID_EXIT, _(u"Exit"))
         
         edit_menu = wx.Menu()
-        edit_menu.Append(wx.ID_PREFERENCES, '', _(u'Preferences'))
+        edit_menu.Append(wx.ID_PREFERENCES, '', _(u'Preferences').decode('utf8'))
         
         view_menu = wx.Menu()
-        view_menu.Append(ID_ACCEUIL, _(u"Home page"))
-        view_menu.Append(ID_VIEWDATA, _(u"Show data"))
-        view_menu.Append(ID_RESULT, _(u'Show results'))
+        view_menu.Append(ID_ACCEUIL, _(u"Home page").decode('utf8'))
+        view_menu.Append(ID_VIEWDATA, _(u"Show data").decode('utf8'))
+        view_menu.Append(ID_RESULT, _(u'Show results').decode('utf8'))
         #view_menu.AppendSeparator()
 
         analyse_menu = wx.Menu()
@@ -264,12 +264,12 @@ class IraFrame(wx.Frame):
         help_menu.Append(wx.ID_ABOUT, u'À propos...')
         help_menu.Append(wx.ID_HELP, u'Aide en ligne')
         
-        self.mb.Append(file_menu, _(u"File"))
-        self.mb.Append(edit_menu, _(u"Edition"))
-        self.mb.Append(view_menu, _(u"View"))
-        self.mb.Append(analyse_menu, _("Spreadsheet analysis"))
-        self.mb.Append(text_menu, _(u"Text analysis"))
-        self.mb.Append(help_menu, _(u"Help"))
+        self.mb.Append(file_menu, _(u"File").decode('utf8'))
+        self.mb.Append(edit_menu, _(u"Edition").decode('utf8'))
+        self.mb.Append(view_menu, _(u"View").decode('utf8'))
+        self.mb.Append(analyse_menu, _("Spreadsheet analysis").decode('utf8'))
+        self.mb.Append(text_menu, _(u"Text analysis").decode('utf8'))
+        self.mb.Append(help_menu, _(u"Help").decode('utf8'))
         
         self.SetMenuBar(self.mb)
 #--------------------------------------------------------------------
