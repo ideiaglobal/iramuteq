@@ -786,6 +786,22 @@ class Corpus :
         with open('/tmp/testhapxuce.html','w') as f :
             f.write(txt)
 
+    def export_dictionary(self, fileout, syscoding) :
+        listformes = [[self.formes[forme].freq, forme, self.formes[forme].lem, self.formes[forme].gram] for forme in self.formes]
+        listformes.sort(reverse = True)
+        listformes = [forme[1:] + [`forme[0]`] for forme in listformes]
+        with open(fileout, 'w') as f :
+            f.write('\n'.join(['\t'.join(forme) for forme in listformes]).encode(syscoding))
+
+    def export_lems(self, fileout, syscoding) :
+        self.make_idformes()
+        listlem = [[lem, '\t'.join(['\t'.join([self.idformes[forme].forme, `self.lems[lem].formes[forme]`]) for forme in self.lems[lem].formes])] for lem in self.lems]
+        listlem.sort()
+        with open(fileout, 'w') as f :
+            f.write('\n'.join(['\t'.join(lem) for lem in listlem]).encode(syscoding))
+
+
+
 
 class MakeUciStat :
     def __init__(self, corpus) :

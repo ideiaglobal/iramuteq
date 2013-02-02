@@ -58,6 +58,7 @@ class WordCloud(AnalyseText):
             while os.path.exists(outgraph + str(nb) + '.png') :
                 nb += 1
             self.parametres['graphout'] = outgraph + str(nb) + '.png'
+        dial.Destroy()
 
 
     def make_wordcloud(self) :

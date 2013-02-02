@@ -45,7 +45,7 @@ class GraphPanelAfc(wx.Panel):
         self.coding = coding
         self.itempath = itempath
         self.parent = self.GetParent()#parent
-        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "courier"))
+        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "Arial"))
         self.labels = []
         self.listimg = []
         self.buts = []
@@ -251,7 +251,7 @@ class GraphPanel(wx.ScrolledWindow):
         self.Dict = dico
         self.txt = txt
         self.parent = parent
-        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.FONTWEIGHT_BOLD, 0, "courier"))
+        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "Arial"))
         self.labels = []
         self.listimg = []
         self.dirout = os.path.dirname(self.Dict['ira'])
@@ -655,20 +655,21 @@ class StatLayout:
         self.read_result()
         self.TabStat = aui.AuiNotebook(ira.nb, -1, wx.DefaultPosition)
         self.TabStat.parametres = parametres
+        self.TabStat.corpus = corpus
+        self.TabStat.pathout = self.pathout
 #        CHD = GraphPanel(panel.TabChdSim, DictPathOut, list_graph, txt = self.debtext)
          #      panel.TabChdSim.AddPage(CHD,'CHD')
 
         #self.TabStatTot = wx.TextCtrl(self.TabStat, -1, style=wx.NO_BORDER | wx.TE_MULTILINE | wx.TE_RICH2)
         list_graph = [['zipf.png', 'zipf']]
         self.TabStatTot = GraphPanel(ira.nb, self.pathout, list_graph, self.result['glob'])
-        #self.TabStatTot.write(self.result['glob'])
         self.TabStat.AddPage(self.TabStatTot, 'global')
         for item in self.result:
             if item != 'glob':
                 datam = [['forme', 'nb']]
                 self.ListPan = ListPanel(ira, self, self.result[item])
-                self.TabStat.AddPage(self.ListPan, item) 
-        ira.nb.AddPage(self.TabStat, 'Stat')
+                self.TabStat.AddPage(self.ListPan, ' '.join(item.split('_'))) 
+        ira.nb.AddPage(self.TabStat, '%s' % parametres['name'])
         ira.nb.SetSelection(ira.nb.GetPageCount() - 1)
         ira.ShowAPane("Tab_content")
 
@@ -908,7 +909,7 @@ class WordCloudLayout(DefaultTextLayout):
         self.Tab.AddPage(self.TabStatTot, 'Nuage')
         self.Tab.corpus = self.corpus
         self.Tab.parametres = self.parametres
-        self.ira.nb.AddPage(self.Tab, 'WordCloud %s' % self.parametres.get('corpus_name','corpus_name'))
+        self.ira.nb.AddPage(self.Tab, '%s' % self.parametres['name'])
         self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
         self.ira.ShowAPane("Tab_content")
 

@@ -364,9 +364,7 @@ class LeftTree(CT.CustomTreeCtrl):
             navig = menu.Append(wx.ID_ANY, u"Outil de navigation")
             statclasse = menu.Append(wx.ID_ANY, u"Statistiques par classe")
             rapport = menu.Append(wx.ID_ANY, u"Rapport")
-            
             menu.AppendSeparator()
-            
             self.Bind(wx.EVT_MENU, self.OpenAntipro, antipro)
             self.Bind(wx.EVT_MENU, self.OnProfSR, profsr)
             self.Bind(wx.EVT_MENU, self.OnProfGram, profgram)
@@ -375,7 +373,12 @@ class LeftTree(CT.CustomTreeCtrl):
             self.Bind(wx.EVT_MENU, self.OnNavig, navig)
             self.Bind(wx.EVT_MENU, self.StatClasse, statclasse)
             self.Bind(wx.EVT_MENU, self.OnRapport, rapport)
-
+        elif pydata.get('type', False) == 'stat'  and pydata['uuid'] in self.parent.history.opened :
+            export_dictionary =  menu.Append(wx.ID_ANY, u"Exporter le dictionnaire")
+            export_lems =  menu.Append(wx.ID_ANY, u"Exporter le dictionnaire des lems")
+            self.Bind(wx.EVT_MENU, self.OnExportDictionary, export_dictionary)
+            self.Bind(wx.EVT_MENU, self.OnExportLems, export_lems)
+            menu.AppendSeparator()
 
         itemdelete = menu.Append(wx.ID_ANY, "Supprimer de l'historique")
         if item == self.GetRootItem():
@@ -522,6 +525,22 @@ class LeftTree(CT.CustomTreeCtrl):
         else :
             dial.Destroy()
 
+    def OnExportDictionary(self, evt) :
+        corpus = self.page.corpus
+        corpus.export_dictionary(self.page.pathout['dictionary.csv'], self.parent.syscoding)
+        log.info('export dictionary %s' % self.page.pathout['dictionary.csv'])
+        dial = wx.MessageDialog(self.parent, self.page.pathout['dictionary.csv'], 'Export', wx.OK)
+        dial.ShowModal()
+        dial.Destroy()
+        
+    def OnExportLems(self, evt) :
+        corpus = self.page.corpus
+        corpus.export_lems(self.page.pathout['lemmes.csv'], self.parent.syscoding)
+        log.info('export lemmes %s' % self.page.pathout['lemmes.csv'])
+        dial = wx.MessageDialog(self.parent, self.page.pathout['lemmes.csv'], 'Export', wx.OK)
+        dial.ShowModal()
+        dial.Destroy()
+
     def OnItemBackground(self, event):
 
         colourdata = wx.ColourData()
@@ -644,7 +663,7 @@ class LeftTree(CT.CustomTreeCtrl):
     def OnItemDelete(self, event):
 
         strs = "Are You Sure You Want To Delete Item " + self.GetItemText(self.current) + "?"
-        dlg = wx.MessageDialog(None, strs, 'Deleting Item', wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_QUESTION)
+        dlg = wx.MessageDialog(None, strs, 'Deleting Item', wx.YES | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_QUESTION)
 
         if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
             dlg.Destroy()
