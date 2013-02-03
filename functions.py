@@ -429,7 +429,7 @@ def BugReport(parent, error = None):
                 txt = exc
         else :
             if exc in exceptions :
-                txt = exceptions[mss]
+                txt = exceptions[exc]
             else :
                 txt = exc
         title = "Information"
