@@ -84,7 +84,10 @@ class FileOptionDialog(wx.Dialog):
             if locale.getpreferredencoding().lower() == 'mac-roman' :
                 enc = self.le.index('macroman')
             else :
-                enc = self.le.index(locale.getpreferredencoding().lower())
+                try :
+                    enc = self.le.index(sys.getdefaultencoding().lower())
+                except ValueError:
+                    enc = self.le.index('utf-8')
             self.list_encodages.SetSelection(enc)
             grid_sizer.Add(self.list_encodages, 1, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
         elif sheet :
@@ -1148,7 +1151,9 @@ class StatDialog(wx.Dialog):
     def OnKeys(self, evt):
         dial = AlcOptFrame(self, self.parent.parent)
         dial.CenterOnParent()
-        val = dial.ShowModal()
+        dial.ShowModal()
+	dial.Destroy()
+        print 'zerazer'
 
 class LexDialog( wx.Dialog ):
     
@@ -1694,13 +1699,13 @@ def UnSelectList(liste) :
 
 
 class OptLexi(wx.Dialog):
-    def __init__(self, *args, **kwds):
+    def __init__(self, parent, force_chi = False):
         # begin wxGlade: MyDialog.__init__
-        kwds["style"] = wx.DEFAULT_DIALOG_STYLE
-        wx.Dialog.__init__(self, *args, **kwds)
-        self.param = kwds
+        #kwds["style"] = wx.DEFAULT_DIALOG_STYLE
+        wx.Dialog.__init__(self, parent, style = wx.DEFAULT_DIALOG_STYLE)
         self.listet = None
         self.variables = None
+        self.force_chi = force_chi
         #self.labellem =  wx.StaticText(self, -1, u"Lemmatisation : ")
         #self.checklem = wx.CheckBox(self, -1)
         self.label_var =  wx.StaticText(self, -1, u"Sélection par :")
@@ -1709,13 +1714,13 @@ class OptLexi(wx.Dialog):
         self.list_box_1 = wx.ListBox(self, -1, choices=[],  size = wx.Size( 150,200 ), style=wx.LB_EXTENDED | wx.LB_HSCROLL)
         self.button_2 = wx.Button(self, wx.ID_CANCEL, "")
         self.button_1 = wx.Button(self, wx.ID_OK, "")
-        if not kwds.get('force_chi', False) :
+        if not self.force_chi :
             indices = [u'loi hypergéométique', u'chi2']
         else :
             indices = [u'chi2']
         self.label_indice =  wx.StaticText(self, -1, u"indice")
         self.choice_indice =  wx.Choice(self, -1, (100,50), choices = indices)
-        if not kwds.get('force_chi', False) :
+        if not self.force_chi :
             self.label = wx.StaticText(self, -1, u"effectif minimum")
             self.spin = wx.SpinCtrl(self, -1, min = 1, max = 10000)
         self.Bind(wx.EVT_CHOICE, self.onselect, self.choice)
@@ -1726,7 +1731,8 @@ class OptLexi(wx.Dialog):
     def __set_properties(self):
         # begin wxGlade: MyDialog.__set_properties
         self.SetTitle("Choix des variables")
-        self.spin.SetValue(10)
+        if not self.force_chi :
+            self.spin.SetValue(10)
         self.choice.SetSelection(0)
         #self.SetMinSize(wx.Size(300, 400))
         # end wxGlade
@@ -1746,7 +1752,7 @@ class OptLexi(wx.Dialog):
         sizer_3.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 3)
         sizer_2.Add(self.label_indice, 0, wx.ALIGN_CENTER_VERTICAL, 3)
         sizer_2.Add(self.choice_indice, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 3)
-        if not self.param.get('force_chi', False) :
+        if not self.force_chi :
             sizer_2.Add(self.label, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 3)
             sizer_2.Add(self.spin, 0, wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL, 3)
         sizer_1.Add(sizer_2, 0, wx.ALIGN_CENTER_HORIZONTAL, 3)
@@ -2401,7 +2407,10 @@ class CorpusPref ( wx.Dialog ):
         if  locale.getpreferredencoding().lower() == 'mac-roman' :
             enc = self.encodages.index('macroman')
         else :
-            enc = self.encodages.index(locale.getpreferredencoding().lower())
+            try :
+                enc = self.encodages.index(locale.getpreferredencoding().lower())
+            except ValueError :
+                enc = self.encodages.index('utf-8')
         self.encodage_choices.SetSelection(enc)
         self.lang_choices.SetSelection(0)
         self.repout_choices.SetValue(parametres['pathout'])

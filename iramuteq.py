@@ -508,7 +508,7 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
     def OnVerif(self, evt) :
         pack = CheckRPackages(self)
         if pack :
-            dlg = wx.MessageDialog(self, u"Installation OK", u"Installation", wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+            dlg = wx.MessageDialog(self, u"Installation OK", u"Installation", wx.OK | wx.ICON_INFORMATION)
             dlg.CenterOnParent()
             if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
                  evt.Veto()

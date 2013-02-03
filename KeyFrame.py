@@ -66,7 +66,7 @@ class AlcOptFrame(wx.Dialog):
             self.listcle.append(cle)
             
 
-        self.button_val = wx.Button(self,wx.ID_APPLY)
+        self.button_val = wx.Button(self,wx.ID_OK)
         
         for button in self.listbutton :
             self.Bind(wx.EVT_BUTTON,self.OnShowList,button)
@@ -135,7 +135,8 @@ class AlcOptFrame(wx.Dialog):
         for i in range(0,len(self.listlabel)):
             self.keys[self.listcle[i]] = self.listspin[i].GetValue()
         DoConf().makeoptions(['KEY'], [self.keys], outfile = self.parent.parent.ira.ConfigPath['key'])
-        self.Destroy()
+        self.Disable()
+        return
 
 
 class ListView(wx.Dialog):

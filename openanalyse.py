@@ -79,11 +79,11 @@ class OpenAnalyse():
             log.info('corpus is already opened')
             self.doopen(self.parent.history.openedcorpus[self.conf['uuid']])
         else :
-            dial = progressbar(self, 2)
-            dial.Update(1, 'Ouverture du corpus')
+            #dial = progressbar(2)
+            #dial.Update(1, 'Ouverture du corpus')
             corpus = Corpus(self, parametres = self.conf, read = self.parent.history.history[self.parent.history.ordercorpus[self.conf['uuid']]]['ira'])
-            dial.Update(2, 'Fini')
-            dial.Destroy()
+            #dial.Update(2, 'Fini')
+            #dial.Destroy()
             self.parent.history.openedcorpus[self.conf['uuid']] = corpus
             self.opencorpus_analyses()
             self.doopen(corpus)

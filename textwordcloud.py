@@ -25,20 +25,23 @@ class WordCloud(AnalyseText):
         self.parametres['type'] = 'wordcloud'
         #FIXME
         limit = 3
-        self.make_option()
-        if self.parametres['mode'] == 2 :
-            self.actives = self.corpus.make_actives_limit(limit, 1)
-            self.actives += self.corpus.make_actives_limit(limit, 2)
-        elif self.parametres['mode'] == 0 :
-            self.actives = self.corpus.make_actives_limit(limit, 1)
-        elif self.parametres['mode'] == 1 :
-            self.actives = self.corpus.make_actives_limit(limit, 2)
-        dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)]) 
-        SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], dlg = True)
-        self.make_wordcloud()
-        script = WordCloudRScript(self)
-        script.make_script()
-        self.doR(script.scriptout, dlg = self.dlg, message = 'R...')
+        res = self.make_option()
+        if res == wx.ID_OK :
+            if self.parametres['mode'] == 2 :
+                self.actives = self.corpus.make_actives_limit(limit, 1)
+                self.actives += self.corpus.make_actives_limit(limit, 2)
+            elif self.parametres['mode'] == 0 :
+                self.actives = self.corpus.make_actives_limit(limit, 1)
+            elif self.parametres['mode'] == 1 :
+                self.actives = self.corpus.make_actives_limit(limit, 2)
+            dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)]) 
+            SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], dlg = True)
+            self.make_wordcloud()
+            script = WordCloudRScript(self)
+            script.make_script()
+            self.doR(script.scriptout, dlg = self.dlg, message = 'R...')
+        else :
+            return 'NOK'
     
     def make_option(self) :
         dial = PrefWordCloud(self.ira)
@@ -59,6 +62,7 @@ class WordCloud(AnalyseText):
                 nb += 1
             self.parametres['graphout'] = outgraph + str(nb) + '.png'
         dial.Destroy()
+        return res
 
 
     def make_wordcloud(self) :

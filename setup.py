@@ -7,7 +7,7 @@ Usage:
 
 from setuptools import setup
 import os
-DATA_FILES=['configuration','Rscripts','images','dictionnaires','locale', 'Rlib','son_fin.wav']
+DATA_FILES=['configuration','Rscripts','images','dictionnaires','locale', 'Rlib','son_fin.wav', 'gpl-2.0.txt', 'gpl-2.0-fr.txt']
 APP = ['iramuteq.py']
 OPTIONS = {'argv_emulation': True,
 	'iconfile':('images/iraicone.icns')}
