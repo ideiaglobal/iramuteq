@@ -4,7 +4,7 @@
 #Copyright (c) 2009-2010 Pierre Ratinaud
 #Lisense: GNU/GPL
 
-from chemins import ConstructPathOut, simipath, ffr
+from chemins import ConstructPathOut, simipath, ffr, PathOut
 from functions import print_liste, exec_rcode, read_list_file, check_Rresult, indices_simi, treat_var_mod
 from dialog import SelectColDial, FreqDialog
 from guifunct import PrefSimi
@@ -33,6 +33,7 @@ class DoSimi(AnalyseMatrix):
         self.actives = actives
         self.openfromprof = openfromprof
         self.cmd = cmd
+        self.dirout = pathout
         if param is not None and fromprof:
             self.paramsimi = param
         else :
@@ -76,7 +77,9 @@ class DoSimi(AnalyseMatrix):
         #else :
         self.parent = parent   
         self.Source = None
-           
+        if pathout :
+            self.pathout = PathOut(dirout = pathout)
+
         self.RPath = self.parent.PathPath.get('PATHS', 'rpath')
         if not isopen :
             #if not fromprof :
@@ -100,6 +103,9 @@ class DoSimi(AnalyseMatrix):
                     actives = self.tableau.getactlistfromselection(self.tableau.selected_col)
                 else :
                     actives = self.actives
+                if isinstance(actives, dict) :
+                    actives = [[val, actives[val][0]] for val in actives]
+                    self.tableau.actives = dict(actives)
                 self.tableau.make_listactives()
                 actives = dict([[i, val] for i, val in enumerate(actives)])
                 self.dial = PrefSimi(parent, -1, self.paramsimi, self.indices, wordlist = actives)
@@ -118,7 +124,10 @@ class DoSimi(AnalyseMatrix):
                     self.paramsimi = self.make_param()
                     self.parametres = self.paramsimi
                     self.parametres['type'] = 'simimatrix'
-                    self.parametres['pathout'] = ConstructPathOut(self.tableau.parametre['filename'], 'SimiMatrix')
+                    if not pathout : 
+                        self.parametres['pathout'] = ConstructPathOut(self.tableau.parametre['filename'], 'SimiMatrix')
+                    else :
+                        self.parametres['pathout'] = self.dirout
                     self.parametres['filename'] = self.tableau.parametres['filename']
                     self.dial.Destroy()
                     dlg = wx.ProgressDialog("Traitements",
@@ -135,7 +144,6 @@ class DoSimi(AnalyseMatrix):
                 dialcol.Destroy()
 
     def doanalyse(self) :
-
         self.pathout.basefiles(simipath)
         with open(self.pathout['selected.csv'], 'w') as f :
              f.write('\n'.join([`val` for val in self.column]))
@@ -151,9 +159,10 @@ class DoSimi(AnalyseMatrix):
         #if not self.fromprof :
             #self.pathout = ConstructPathOut(self.tableau.parametre['filename'], 'Simi')
             #self.DictPathOut = construct_simipath(self.pathout)
-        self.parent.tableau.dictpathout = self.pathout
+        self.tableau.dictpathout = self.pathout
         self.dlg.Update(count, u"passage en O/1")
-        self.parent.tableau.make_01_from_selection(self.tableau.selected_col)
+        if not self.fromprof :
+            self.tableau.make_01_from_selection(self.tableau.selected_col)
             #self.Linecontent = parent.table
             #self.ListTo01Form()
         #else :

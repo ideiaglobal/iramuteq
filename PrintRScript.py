@@ -253,7 +253,6 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
 def RPamTxt(corpus, RscriptPath):
     DicoPath = corpus.pathout
     param = corpus.parametres
-    print param
     txt = """
     source("%s")
     """ % (RscriptPath['pamtxt'])

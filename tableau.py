@@ -137,7 +137,6 @@ class Tableau() :
         doc = ooolib.Calc(opendoc=self.parametre['filename'])
         doc.set_sheet_index(0)
         (cols, rows) = doc.get_sheet_dimensions()
-        print cols, rows
         for row in range(1, rows + 1):
             ligne = []
             for col in range(1, cols + 1):
@@ -316,7 +315,6 @@ class Tableau() :
     def make_table_from_classe(self, cl, la) :
         ln = [line[0] for line in self.classes if line[1] == cl]
         out = [['0' for col in la] for line in ln]
-        print self.actives
         for i, act in enumerate(la) :
             for j, line in enumerate(ln) :
                 if line in self.actives[act][1] :

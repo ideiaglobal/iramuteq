@@ -341,6 +341,7 @@ class OpenCHDS():
            panel.corpus = self.corpus
        else :
            panel.tableau = self.corpus
+           #self.parent.tableau = panel.tableau
        panel.dictpathout = self.DictPathOut
        panel.pathout = self.DictPathOut
        panel.parent = self.parent
@@ -535,7 +536,6 @@ class OpenCHDS():
         if res == wx.ID_OK :
             fileout = dial.fbb.GetValue()
             dial.Destroy()
-            print fileout
             self.corpus.get_stat_by_cluster(fileout)
             msg = u"Fini !"
             dlg = wx.MessageDialog(self.parent, msg, u"Stat par classe", wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
@@ -1051,7 +1051,11 @@ class SimiMatLayout(DefaultMatLayout) :
         #    with codecs.open(self.pathout['actives.csv'], 'r', self.parametres['encoding']) as f :
         #        self.actives = f.read()
         #    self.actives = self.actives.splitlines()#[act for act in self.actives.splitlines()]
-        actives = [[val, self.tableau.actives[val][0]] for val in self.tableau.actives]
+        try :
+            actives = [[val, self.tableau.actives[val][0]] for val in self.tableau.actives]
+        except :
+            actives = [[val, self.tableau.actives[val]] for val in self.tableau.actives]
+
         #self.tableau.make_listactives()
         actives = dict([[i, val] for i, val in enumerate(actives)])
         #dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])

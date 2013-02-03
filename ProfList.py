@@ -411,7 +411,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
     def quest_simi(self, evt) :
         tableau = self.Source.tableau
         tab = tableau.make_table_from_classe(self.cl, self.la)
-        pathout = ConstructPathOut(os.path.join(self.Source.pathout.dirout, 'simi_classe_%i' %self.cl), 'simi_classe_%i' %self.cl)
+        pathout = ConstructPathOut(self.Source.pathout.dirout, 'simi_classe_%i' %self.cl)
         self.filename = os.path.join(pathout,'mat01.csv')
         tableau.printtable(self.filename, tab)
         del tab
