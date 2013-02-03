@@ -138,7 +138,6 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
 	}
 
     if (!is.null(seuil)) {
-        print(seuil)
         if (seuil >= max(mat.simi)) seuil <- 0
         vec<-vector()
         w<-E(g.toplot)$weight
@@ -314,7 +313,6 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
         lo <- layout.norm(lo, -10, 10, -10, 10, -10, 10)
 		rglplot(g.toplot,vertex.label='', edge.width=we.width/10, vertex.size=0.01, vertex.color=vertex.col, vertex.label.color="black", edge.color = edge.col, layout=lo, rescale = FALSE)
         #los <- layout.norm(lo, -1, 1, -1, 1, -1, 1)
-        print(v.label)
 		text3d(lo[,1], lo[,2], lo[,3], vire.nonascii(v.label), col = vertex.label.color, alpha = 1, cex = vertex.label.cex)
         rgl.spheres(lo, col = vertex.col, radius = vertex.size/100, alpha = alpha)
         rgl.bg(color = c('white','black'))

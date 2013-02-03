@@ -240,9 +240,9 @@ class IraFrame(wx.Frame):
         #analyse_menu.Append(ID_Student, u"t de Student")
         menu_classif = wx.Menu()
         menu_classif.Append(ID_CHDAlceste, u"Méthode GNEPA")
-        menu_classif.Append(ID_CHDSIM, u"Par matrice des distances")
+        #menu_classif.Append(ID_CHDSIM, u"Par matrice des distances")
         analyse_menu.AppendMenu(-1, u"Classification", menu_classif)
-        analyse_menu.Append(ID_AFCM, u"AFCM")
+        #analyse_menu.Append(ID_AFCM, u"AFCM")
         analyse_menu.Append(ID_SIMI, u"Analyse de similitudes")
         ID_RCODE = wx.NewId()
         analyse_menu.Append(ID_RCODE, u"Code R...")
@@ -254,7 +254,7 @@ class IraFrame(wx.Frame):
         #text_menu.Append(ID_TEXTAFCM, u"AFC sur UCI / Vocabulaire")
         menu_classiftxt = wx.Menu()
         menu_classiftxt.Append(ID_TEXTALCESTE, u"Méthode GNEPA")
-        menu_classiftxt.Append(ID_TEXTPAM, u"Par matrice des distances")
+        #menu_classiftxt.Append(ID_TEXTPAM, u"Par matrice des distances")
         text_menu.AppendMenu(-1, u"Classification", menu_classiftxt)
         text_menu.Append(ID_SimiTxt, u'Analyse de similitude') 
         ID_WC = wx.NewId()
@@ -708,7 +708,8 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         parent = nobject.GetParent()
         if isinstance(parent, IraFrame) :
             npage = self.nb.GetPage(new)
-            self.tree.GiveFocus(uuid=npage.parametres['uuid'])
+            if 'parametres' in dir(npage) :
+                self.tree.GiveFocus(uuid=npage.parametres['uuid'])
 
     def OnCloseTab(self, evt):
         #log.info('Closing tab %s' % str(evt.GetEventObject()))
@@ -910,28 +911,28 @@ Voulez-vous fermer quand même ?"""
 #            BugReport(self)
 
     def OnTextStat(self, event, corpus = None):
-            print 'PAS DE BUG SUR TEXT STAT'
-        #try:
+            #print 'PAS DE BUG SUR TEXT STAT'
+        try:
             if corpus is None :
                 corpus = self.tree.getcorpus()
             self.Text = Stat(self, corpus, parametres = {'type': 'stat'}, dlg = progressbar(self, 7))
             
             if self.Text.val == wx.ID_OK :
                 PlaySound(self)
-        #except:
-        #    BugReport(self)
+        except:
+            BugReport(self)
         
     def OnTextSpec(self, event, corpus = None):  
-        #try:
+        try:
             #self.Text = AsLexico(self)
-            print('ATTENTION : PLUS DE BUG SUR LEXICO')
+            #print('ATTENTION : PLUS DE BUG SUR LEXICO')
             if corpus is None :
                 corpus = self.tree.getcorpus()
             self.Text = Lexico(self, corpus, parametres = {'type' : 'spec'}, dlg = progressbar(self, 3))
             if self.Text.val == wx.ID_OK :
                 PlaySound(self)
-        #except:
-        #    BugReport(self)
+        except:
+            BugReport(self)
     
     def OnTextAfcm(self, event):
         try:
@@ -991,15 +992,15 @@ Voulez-vous fermer quand même ?"""
         DoSimi(self, param = parametres, fromprof =  fromprof, pathout = pathout, listactives = listactives, actives = actives, tableau = tableau)
     
     def OnSimi(self,evt):
-        #try :
+        try :
             #print 'ATTENTION !!!! VERGES'
-            print 'PLUS DE BUG SUR SIMI'
+            #print 'PLUS DE BUG SUR SIMI'
             self.res = DoSimi(self, param = None)
             #self.res = Verges(self)
             if self.res.val == wx.ID_OK :
                  PlaySound(self)
-        #except :
-        #    BugReport(self)
+        except :
+            BugReport(self)
 #################################################################
 
     def OnHelp(self, event):

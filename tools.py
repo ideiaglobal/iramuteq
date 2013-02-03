@@ -50,6 +50,10 @@ class Extract :
                 SplitFromVar(parametres)
             else :
                 ExtractMods(parametres)
+        dial.Destroy()
+        dial = wx.MessageDialog(parent, 'Done !', style = wx.OK)
+        dial.ShowModal()
+        dial.Destroy()
 
 class SplitFromVar :
     def __init__(self, parametres) :

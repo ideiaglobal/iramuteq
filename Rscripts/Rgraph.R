@@ -75,7 +75,7 @@ PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axeto
 	if (!col) {
         classes <- as.matrix(apply(chitable,1,which.max))
         cex.par <- norm.vec(apply(chitable,1,max), 0.8,3)
-        row.keep <- select.chi.classe(chitable, 60)
+        row.keep <- select.chi.classe(chitable, 80)
         rowcoord <- rowcoord[row.keep,]
         classes <- classes[row.keep]
         cex.par <- cex.par[row.keep]
@@ -106,7 +106,12 @@ PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axeto
     table.in <- rowcoord[order(cex.par, decreasing = TRUE),]
     classes <- classes[order(cex.par, decreasing = TRUE)]
     cex.par <- cex.par[order(cex.par, decreasing = TRUE)]
-    table.in <- stopoverlap(table.in, cex.par=cex.par, xlim = c(xmin,xmax), ylim = c(ymin,ymax))
+    table.out <- stopoverlap(table.in, cex.par=cex.par, xlim = c(xmin,xmax), ylim = c(ymin,ymax))
+    table.in <- table.out$toplot
+    notplot <- table.out$notplot
+    if (! is.null(notplot)) {
+        write.csv2(notplot, file = paste(filename, '_notplotted.csv', sep = ''))
+    }
     classes <- classes[table.in[,4]]
     cex.par <- cex.par[table.in[,4]]
     make_afc_graph(table.in, classes, clnb, xlab, ylab, cex.txt = cex.par, xminmax=c(xmin,xmax), yminmax=c(ymin,ymax))
@@ -191,6 +196,7 @@ stopoverlap <- function(x, cex.par = NULL, xlim = NULL, ylim = NULL) {
     thetaStep <- .1
     rStep <- .5
     toplot <- NULL
+    notplot <- NULL
 
 #    plot.new()
     plot(x[,1],x[,2], pch='', xlim = xlim, ylim = ylim)
@@ -222,6 +228,7 @@ stopoverlap <- function(x, cex.par = NULL, xlim = NULL, ylim = NULL) {
 			} else {
 				if(r>sqrt(.5)){
 					print(paste(words[i], "could not be fit on page. It will not be plotted."))
+                    notplot <- rbind(notplot,c(words[i], x[i,1], x[i,2]))
 					isOverlaped <- FALSE
 				}
 				theta <- theta+thetaStep
@@ -232,7 +239,7 @@ stopoverlap <- function(x, cex.par = NULL, xlim = NULL, ylim = NULL) {
 		}
     }
     row.names(toplot) <- words[toplot[,4]]
-    return(toplot)
+    return(list(toplot = toplot, notplot = notplot))
 }
 ###############################################################################
 

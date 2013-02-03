@@ -877,7 +877,7 @@ class PrepSimi :
             if 'bystar' in self.parametres :
                 if self.dial.check_bystar.GetValue() :
                     variables = treat_var_mod(self.parametres['stars'])
-                    vardial = dialog.OptLexi(parent) 
+                    vardial = dialog.OptLexi(parent, **{'force_chi' : True}) 
                     vardial.listet = self.parametres['stars']
                     vardial.variables = [v for v in variables]
                     for et in vardial.variables :

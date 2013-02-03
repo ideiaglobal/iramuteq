@@ -67,7 +67,11 @@ class GraphPanelAfc(wx.Panel):
                     self.listimg.append(hl.HyperLinkCtrl(self.panel_1, -1, os.path.join(self.dirout,list_graph[i][0]), URL=os.path.join(self.dirout,list_graph[i][0])))
                 else :
                     self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
-                self.labels.append(wx.StaticText(self.panel_1, -1, list_graph[i][1]))
+                if os.path.exists(os.path.join(self.dirout,list_graph[i][0] + '_notplotted.csv')) :
+                   txt = u' - liste des points non représentés : %s' % os.path.join(self.dirout,list_graph[i][0] + '_notplotted.csv')
+                else :
+                    txt = ''
+                self.labels.append(wx.StaticText(self.panel_1, -1, list_graph[i][1] + txt))
                 self.buts.append(wx.Button(self.panel_1, wx.ID_DELETE, name = `i - b`))
             else :
                 todel.append(i)
@@ -290,6 +294,12 @@ def open_antiprofil(panel, AntiProfile, encoding) :
 
 
 
+def getlemgram(corpus, lem) :
+    if not lem[6] in corpus.lems :
+        return lem[5]
+    else :
+        return corpus.lems[lem[6]].gram
+
 class OpenCHDS():
     def __init__(self, parent, corpus, parametres, Alceste=False):
        #sep = u'\n ' 
@@ -393,7 +403,9 @@ class OpenCHDS():
             prof_seg = ReadProfileAsDico(DictPathOut['prof_seg'], False, self.encoding)
             self.prof_seg_nb = aui.AuiNotebook(panel, -1, wx.DefaultPosition)
        for i in range(0, clnb):
-            self.cluster_size.append(DictProfile[str(i + 1)][0][0:3]) 
+            self.cluster_size.append(DictProfile[str(i + 1)][0][0:3])
+            if isinstance(self.corpus, Corpus) :
+                DictProfile[str(i + 1)][1:] = [val[0:5] + [getlemgram(self.corpus, val)] + val[6:] for val in DictProfile[str(i + 1)][1:]]
             dlg.Update(3+i, 'Classe %i' %(i+1))
             ind = '/'.join(DictProfile[str(i + 1)][0][0:2])
             indpour = ' - '.join([ind, DictProfile[str(i + 1)][0][2]])
@@ -456,77 +468,6 @@ class OpenCHDS():
     def onsimi(self,event):
         outfile = print_simi3d(self)
         error = exec_rcode(self.parent.RPath, outfile, wait = True)
-
-#    def ongetrapport(self, event) :
-#        dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.txt', 'title': 'Rapport'})
-#        dial.fbb.SetValue(self.DictPathOut['rapport'])
-#        dial.CenterOnParent()
-#        res = dial.ShowModal()
-#        if res == wx.ID_OK :
-#            fileout = dial.fbb.GetValue()
-#            dial.Destroy()
-#            with open(fileout, 'w') as f :
-#                f.write(self.debtext + '\n' + GetTxtProfile(self.DictProfile, self.cluster_size))
-#            msg = u"Fini !"
-#            dlg = wx.MessageDialog(self.parent, msg, u"Rapport", wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
-#            dlg.CenterOnParent()
-#            dlg.ShowModal()
-#            dlg.Destroy()
-#        else :
-#            dial.Destroy()
-
-#    def on_export_classes(self, event) :
-#        corpus = self.parent.nb.GetPage(self.parent.nb.GetSelection()).corpus
-#        dial = PrefExport(self, self.parent)
-#        dial.fbb.SetValue(os.path.join(os.path.dirname(corpus.dictpathout['ira']), 'export_corpus.txt'))
-#        dial.CenterOnParent()
-#        res = dial.ShowModal()
-#        if res == wx.ID_OK :
-#            if dial.radio_type.GetSelection() == 0 : alc = True
-#            else : alc = False
-#            if dial.radio_lem.GetSelection() == 0 : lem = True
-#            else : lem = False
-#            self.corpus.export_corpus_classes(dial.fbb.GetValue(), alc = alc, lem = lem)
-#            msg = u"Fini !"
-#            dial.Destroy()
-#            dlg = wx.MessageDialog(self.parent, msg, u"Export", wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
-#            dlg.CenterOnParent()
-#            dlg.ShowModal()
-#            dlg.Destroy()
-
-#    def onprofseg(self, event):
-#        #try :
-#            print 'plus de bug profseg'
-#            print self.parametres
-#            corpus = self.parent.nb.GetPage(self.parent.nb.GetSelection()).corpus
-#            ProfileSegment(self.parent, self.dictpathout, self.parametres, corpus)
-#        #except :
-#        #    BugReport(self.parent)
-#
-#    def onproftype(self, event):
-#        try :
-#            corpus = self.parent.nb.GetPage(self.parent.nb.GetSelection()).corpus
-#            ProfilType(self.parent, corpus)
-#        except :
-#            BugReport(self.parent)
-#
-#    def oncolored(self,evt) :
-#        dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.html', 'title': 'Corpus en couleur'})
-#        dial.fbb.SetValue(os.path.join(os.path.dirname(self.corpus.dictpathout['ira']), 'corpus_couleur.html'))
-#        dial.CenterOnParent()
-#        res = dial.ShowModal()
-#        if res == wx.ID_OK :
-#            fileout = dial.fbb.GetValue()
-#            dial.Destroy()
-#            txt = self.corpus.make_colored_corpus()
-#            with open(fileout, 'w') as f :
-#                f.write(txt)
-#            msg = u"Fini !\nVoulez-vous ouvrir le corpus dans votre navigateur ?"
-#            dlg = wx.MessageDialog(self.parent, msg, u"Corpus en couleur", wx.NO | wx.YES | wx.NO_DEFAULT | wx.ICON_QUESTION)
-#            dlg.CenterOnParent()
-#            if dlg.ShowModal() == wx.ID_YES :
-#                webbrowser.open(fileout)
-#            dlg.Destroy()
 
     def onclusterstat(self, evt) :
         dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.csv', 'title': 'Stat par classe'})

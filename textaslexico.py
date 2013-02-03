@@ -189,4 +189,4 @@ class Lexico(AnalyseText) :
                             [os.path.basename(self.dictpathout['afct_col']), u'colonnes']]
         print_liste(self.dictpathout['liste_graph_afcf'],afcf_graph_list)
         print_liste(self.dictpathout['liste_graph_afct'],afct_graph_list)
-        DoConf().makeoptions(['spec'],[self.parametres], self.dictpathout['ira'])
+        #DoConf().makeoptions(['spec'],[self.parametres], self.dictpathout['ira'])

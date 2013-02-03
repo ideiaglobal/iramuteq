@@ -152,7 +152,6 @@ class ClusterNbDialog(wx.Dialog):
                 LIST_CLASSE_OK.append(str(i))
         else :
             LIST_CLASSE_OK.append(str(LIST_CLASSE))
-        print str(LIST_CLASSE_OK)
         self.list_box_1 = wx.ListBox(self, -1, choices=LIST_CLASSE_OK, style=wx.LB_SINGLE | wx.LB_HSCROLL)
         self.list_box_1.SetHelpText("Here's some help text for field #1")
         box.Add(self.list_box_1, 1, wx.ALIGN_CENTRE | wx.ALL, 5)
@@ -1686,7 +1685,6 @@ class SearchDial ( wx.Dialog ):
         self.search.Clear()
 
 def UnSelectList(liste) :
-    print liste
     if liste.GetFirstSelected() != -1 :
         last = liste.GetFirstSelected()
         liste.Select(liste.GetFirstSelected(), False)
@@ -1700,6 +1698,7 @@ class OptLexi(wx.Dialog):
         # begin wxGlade: MyDialog.__init__
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE
         wx.Dialog.__init__(self, *args, **kwds)
+        self.param = kwds
         self.listet = None
         self.variables = None
         #self.labellem =  wx.StaticText(self, -1, u"Lemmatisation : ")
@@ -1710,10 +1709,15 @@ class OptLexi(wx.Dialog):
         self.list_box_1 = wx.ListBox(self, -1, choices=[],  size = wx.Size( 150,200 ), style=wx.LB_EXTENDED | wx.LB_HSCROLL)
         self.button_2 = wx.Button(self, wx.ID_CANCEL, "")
         self.button_1 = wx.Button(self, wx.ID_OK, "")
+        if not kwds.get('force_chi', False) :
+            indices = [u'loi hypergéométique', u'chi2']
+        else :
+            indices = [u'chi2']
         self.label_indice =  wx.StaticText(self, -1, u"indice")
-        self.choice_indice =  wx.Choice(self, -1, (100,50), choices = [u'loi hypergéométique', u'chi2'])
-        self.label = wx.StaticText(self, -1, u"effectif minimum")
-        self.spin = wx.SpinCtrl(self, -1, min = 1, max = 10000)
+        self.choice_indice =  wx.Choice(self, -1, (100,50), choices = indices)
+        if not kwds.get('force_chi', False) :
+            self.label = wx.StaticText(self, -1, u"effectif minimum")
+            self.spin = wx.SpinCtrl(self, -1, min = 1, max = 10000)
         self.Bind(wx.EVT_CHOICE, self.onselect, self.choice)
         self.__set_properties()
         self.__do_layout()
@@ -1742,8 +1746,9 @@ class OptLexi(wx.Dialog):
         sizer_3.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 3)
         sizer_2.Add(self.label_indice, 0, wx.ALIGN_CENTER_VERTICAL, 3)
         sizer_2.Add(self.choice_indice, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 3)
-        sizer_2.Add(self.label, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 3)
-        sizer_2.Add(self.spin, 0, wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL, 3)
+        if not self.param.get('force_chi', False) :
+            sizer_2.Add(self.label, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 3)
+            sizer_2.Add(self.spin, 0, wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL, 3)
         sizer_1.Add(sizer_2, 0, wx.ALIGN_CENTER_HORIZONTAL, 3)
         sizer_1.Add(sizer_3, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_RIGHT, 3)
         self.SetSizer(sizer_1)
@@ -2188,12 +2193,12 @@ class CorpusPref ( wx.Dialog ):
     def __init__( self, parent, parametres ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Préférences", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         self.parent = parent 
-        langues_n = [u'français', u'english', u'german (expérimentale)', u'italian (expérimentale)', u'swedish (exp.)', u'portuguese (exp.)', 'greek', 'other...']
+        langues_n = [u'français', u'english', u'german (expérimentale)', u'italian', u'swedish (expérimentale)', u'portuguese (expérimentale)', u'greek (expériementale)', u'autre...']
         self.langues = [u'french', u'english', u'german', 'italian', 'swedish', u'portuguese', 'greek', 'other']
         self.encodages = [enc[0].lower() for enc in encodages]
 
         ucimark = [u'****', u'0000']
-        ucemethod = [u'charactères', u'occurrences', u'paragraphe']
+        ucemethod = [u'charactères', u'occurrences', u'paragraphes']
 
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
@@ -2587,7 +2592,6 @@ class ExtractDialog ( wx.Dialog ):
             else :
                 parametres['onefile'] = False
         parametres['encodeout'] = locale.getpreferredencoding()
-        print parametres
         return parametres
     
     def __del__( self ):

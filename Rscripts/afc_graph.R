@@ -80,7 +80,7 @@ if ( qui == 3 ) {
     if (exists('afctable')) {
         eff <- rowSums(afctable)
     } else {
-        eff <- afctable$rowmass
+        eff <- afc$rowmass
     }
 
     if (!is.null(debsup)) {
@@ -95,9 +95,10 @@ if ( qui == 3 ) {
            cex.par <- eff[debsup:(debet-1)]
         }
         if ( qui == 2 ) {
+           fin <- nrow(table.in)
            table.in <- table.in[debet:nrow(table.in),] 
            tablechi <- tablechi[debet:nrow(tablechi),]
-           cex.par <- eff[debet:nrow(afctable)]
+           cex.par <- eff[debet:fin]
         }
     }
     
@@ -111,9 +112,10 @@ if ( qui == 3 ) {
                 cex.par <- eff
             }
         } else {
+            fin <- nrow(table.in)
             table.in <- table.in[debet:nrow(table.in),]
             tablechi <- tablechi[debet:nrow(tablechi),]
-            cex.par <- eff[debet:nrow(afctable)]
+            cex.par <- eff[debet:fin]
         }
     }
         
@@ -175,7 +177,12 @@ if (typegraph == 0) {
     table.in <- table.in[order(cex.par, decreasing = TRUE),]
     classes <- classes[order(cex.par, decreasing = TRUE)]
     cex.par <- cex.par[order(cex.par, decreasing = TRUE)]
-    table.in <- stopoverlap(table.in, cex.par=cex.par, xlim = xminmax, ylim = yminmax)
+    table.out <- stopoverlap(table.in, cex.par=cex.par, xlim = xminmax, ylim = yminmax)
+    table.in <- table.out$toplot
+    notplot <- table.out$notplot
+    if (! is.null(notplot)) {
+        write.csv2(notplot, file = paste(fileout,'_notplotted.csv', sep=''))
+    }    
     classes <- classes[table.in[,4]]
     cex.par <- cex.par[table.in[,4]]
     }
