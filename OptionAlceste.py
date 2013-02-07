@@ -29,21 +29,21 @@ class OptionAlc(wx.Dialog):
         self.label_12 = wx.StaticText(self, -1, u"Classification")
         self.radio_box_2 = wx.RadioBox(self, -1, u"", choices=[u"double sur RST", u"simple sur segments de texte", u"simple sur textes"], majorDimension=0, style=wx.RA_SPECIFY_ROWS) #, u"simple sur UCE (non implemente)"
         self.label_2 = wx.StaticText(self, -1, u"taille rst 1")
-        self.spin_ctrl_1 = wx.SpinCtrl(self, -1, "formes actives",size = (100,30), min=0, max=100)
+        self.spin_ctrl_1 = wx.SpinCtrl(self, -1, "formes actives",size = (100,30), min=0, max=1000000)
         self.label_3 = wx.StaticText(self, -1, u"taille rst 2")
-        self.spin_ctrl_2 = wx.SpinCtrl(self, -1, "",size = (100,30), min=0, max=100)
+        self.spin_ctrl_2 = wx.SpinCtrl(self, -1, "",size = (100,30), min=0, max=1000000)
         self.lab_nbcl = wx.StaticText(self, -1, u"nombre de classes terminales de la phase 1")
-        self.spin_nbcl = wx.SpinCtrl(self, -1, "",size = (100,30), min=2, max=100)
+        self.spin_nbcl = wx.SpinCtrl(self, -1, "",size = (100,30), min=2, max=1000000)
         txt = """Nombre minimum de segments de texte par classe
 (0 = automatique)"""
         self.label_7 = wx.StaticText(self, -1, txt)
-        self.spin_ctrl_4 = wx.SpinCtrl(self, -1, "",size = (100,30), min=0, max=1000)       
+        self.spin_ctrl_4 = wx.SpinCtrl(self, -1, "",size = (100,30), min=0, max=1000000)       
         txt = u"""Fréquence minimum d'une forme
 analysée (2 = automatique)"""
         self.label_8 = wx.StaticText(self, -1, txt)
-        self.spin_ctrl_5 = wx.SpinCtrl(self, -1, "",size = (100,30), min=2, max=1000)
+        self.spin_ctrl_5 = wx.SpinCtrl(self, -1, "",size = (100,30), min=2, max=1000000)
         self.label_max_actives =  wx.StaticText(self, -1, u"Nombre maximum de formes analysées")
-        self.spin_max_actives = wx.SpinCtrl(self, -1, "",size = (100,30), min=20, max=10000)
+        self.spin_max_actives = wx.SpinCtrl(self, -1, "",size = (100,30), min=20, max=1000000)
         self.label_svd = wx.StaticText(self, -1, u"Méthode pour svd")
         self.choicesvd = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, self.svdmethod, 0 )
         self.label_patate =  wx.StaticText(self, -1, u"Mode patate (+ rapide, - précis)")

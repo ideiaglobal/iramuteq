@@ -19,7 +19,6 @@ from time import sleep
 import wx
 import os
 
-print 'TEST LOGGING'
 import logging
 
 logger = logging.getLogger('iramuteq.textstat')
