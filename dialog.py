@@ -1152,8 +1152,7 @@ class StatDialog(wx.Dialog):
         dial = AlcOptFrame(self, self.parent.parent)
         dial.CenterOnParent()
         dial.ShowModal()
-	dial.Destroy()
-        print 'zerazer'
+        #dial.Destroy()
 
 class LexDialog( wx.Dialog ):
     
@@ -1954,6 +1953,21 @@ class PrefWordCloud ( wx.Dialog ):
         self.m_staticline4 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline4, 0, wx.EXPAND |wx.ALL, 5 )
         
+        self.m_staticText11 = wx.StaticText( self, wx.ID_ANY, u"Format de l'image", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText11.Wrap( -1 )
+        fgSizer1.Add( self.m_staticText11, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        formatChoices = [ u"png", u"svg" ]
+        self.format = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, formatChoices, 0 )
+        self.format.SetSelection( 0 )
+        fgSizer1.Add( self.format, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.m_staticline13 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        fgSizer1.Add( self.m_staticline13, 0, wx.EXPAND |wx.ALL, 5 )
+        
+        self.m_staticline14 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        fgSizer1.Add( self.m_staticline14, 0, wx.EXPAND |wx.ALL, 5 )
+
         self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, u"Nombre maximum de formes", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText5.Wrap( -1 )
         fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )

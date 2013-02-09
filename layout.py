@@ -262,7 +262,11 @@ class GraphPanel(wx.ScrolledWindow):
         self.deb = wx.StaticText(self, -1, txt)
         for i in range(0,len(list_graph)):
             if os.path.exists(os.path.join(self.dirout,list_graph[i][0])) :
-                self.listimg.append(wx.StaticBitmap(self, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
+                filename, ext = os.path.splitext(list_graph[i][0])
+                if ext == '.svg' :
+                    self.listimg.append(hl.HyperLinkCtrl(self, -1, os.path.join(self.dirout,list_graph[i][0]), URL=os.path.join(self.dirout,list_graph[i][0])))
+                else :
+                    self.listimg.append(wx.StaticBitmap(self, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
                 self.labels.append(wx.StaticText(self, -1, list_graph[i][1]))
                 
         self.__set_properties()
@@ -834,19 +838,13 @@ class DefaultTextLayout :
 
 class WordCloudLayout(DefaultTextLayout):
     def dolayout(self):
-        #self.dictpathout = parent.corpus.dictpathout
-        #self.pathout = os.path.dirname(filename)
-        #self.corpus = parent.corpus
-    #    self.read_result()
         self.pathout.basefiles(simipath)
         self.Tab = aui.AuiNotebook(self.ira.nb, -1, wx.DefaultPosition)
-#        if os.path.exists(self.pathout['liste_graph']) :
-#            list_graph = read_list_file(self.pathout['liste_graph'])
-#        else : 
-#            list_graph = [['','']]
-        list_graph = [['nuage_1.png', 'Nuage']]
+        if self.parametres['svg'] :
+            list_graph = [['nuage_1.svg', 'Nuage']]
+        else :
+            list_graph = [['nuage_1.png', 'Nuage']]
         self.TabStatTot = GraphPanel(self.ira.nb, self.pathout, list_graph)
-        #self.TabStatTot.write(self.result['glob'])
         self.Tab.AddPage(self.TabStatTot, 'Nuage')
         self.Tab.corpus = self.corpus
         self.Tab.parametres = self.parametres

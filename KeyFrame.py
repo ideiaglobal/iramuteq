@@ -135,8 +135,9 @@ class AlcOptFrame(wx.Dialog):
         for i in range(0,len(self.listlabel)):
             self.keys[self.listcle[i]] = self.listspin[i].GetValue()
         DoConf().makeoptions(['KEY'], [self.keys], outfile = self.parent.parent.ira.ConfigPath['key'])
-        self.Disable()
-        return
+        #self.Disable()
+        self.Destroy()
+        #return
 
 
 class ListView(wx.Dialog):

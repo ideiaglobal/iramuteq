@@ -48,6 +48,10 @@ class WordCloud(AnalyseText):
         dial.CenterOnParent()
         res = dial.ShowModal()
         if res == wx.ID_OK :
+            if dial.format.GetSelection() == 0 :
+                svg = 0
+            else :
+                svg = 1
             self.parametres['width'] = dial.spin_L.GetValue()
             self.parametres['height'] = dial.spin_H.GetValue()
             self.parametres['maxword'] = dial.spin_maxword.GetValue()
@@ -56,14 +60,18 @@ class WordCloud(AnalyseText):
             self.parametres['col_text'] = dial.color_text.GetColour()
             self.parametres['col_bg'] = dial.color_bg.GetColour()
             self.parametres['mode'] = dial.typeformeschoice.GetSelection()
+            self.parametres['svg'] = svg
             outgraph = os.path.join(os.path.dirname(self.pathout['zipf.png']), 'nuage_')
             nb = 1
-            while os.path.exists(outgraph + str(nb) + '.png') :
+            if svg :
+                end = '.svg'
+            else :
+                end = '.png'
+            while os.path.exists(outgraph + str(nb) + end) :
                 nb += 1
-            self.parametres['graphout'] = outgraph + str(nb) + '.png'
+            self.parametres['graphout'] = outgraph + str(nb) + end
         dial.Destroy()
         return res
-
 
     def make_wordcloud(self) :
         act = ['\t'.join([act, `self.corpus.getlemeff(act)`]) for act in self.actives]

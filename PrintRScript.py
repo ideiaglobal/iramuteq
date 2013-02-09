@@ -1092,7 +1092,14 @@ class WordCloudRScript(PrintRScript) :
         self.packages(['wordcloud'])
         bg_col = Rcolor(self.parametres['col_bg'])
         txt_col = Rcolor(self.parametres['col_text'])
+        if self.parametres['svg'] :
+            svg = 'TRUE'
+        else :
+            svg = 'FALSE'
         txt = """
+        svg <- %s
+        """ % svg
+        txt += """
         act <- read.csv2("%s", header = FALSE, row.names=1, sep='\t')
         selected.col <- read.table("%s")
         toprint <- as.matrix(act[selected.col[,1] + 1,])
@@ -1102,7 +1109,7 @@ class WordCloudRScript(PrintRScript) :
             toprint <- as.matrix(toprint[order(toprint[,1], decreasing=TRUE),])
             toprint <- as.matrix(toprint[1:maxword,])
         }
-        open_file_graph("%s", width = %i, height = %i)
+        open_file_graph("%s", width = %i, height = %i , svg = svg)
         par(bg=rgb%s)
         wordcloud(row.names(toprint), toprint[,1], scale=c(%f,%f), random.order=FALSE, colors=rgb%s)
         dev.off()
