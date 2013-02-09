@@ -31,12 +31,13 @@ from dialog import SearchDial
 #        listmix.ListCtrlAutoWidthMixin.__init__(self)
 
 class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
-    def __init__(self, parent,gparent, dlist,first):
+    def __init__(self, parent,gparent, dlist, first, menu = True):
         wx.ListCtrl.__init__( self, parent, -1, style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_HRULES|wx.LC_VRULES)
         self.parent=parent
         self.gparent=gparent
         self.dlist=dlist
         self.first = first
+        self.menu = menu
 
         search_id = wx.NewId()
         self.parent.Bind(wx.EVT_MENU, self.onsearch, id = search_id)
@@ -151,28 +152,28 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         self.dial.Destroy()
     
     def OnRightClick(self, event):
+        if self.menu :
+            # only do this part the first time so the events are only bound once
+            if not hasattr(self, "popupID1"):
+                self.popupID1 = wx.NewId()
+                self.popupID2 = wx.NewId()
+                self.popupID3 = wx.NewId()
+                self.popup_Tgen_glob = wx.NewId()
 
-        # only do this part the first time so the events are only bound once
-        if not hasattr(self, "popupID1"):
-            self.popupID1 = wx.NewId()
-            self.popupID2 = wx.NewId()
-            self.popupID3 = wx.NewId()
-            self.popup_Tgen_glob = wx.NewId()
+                self.Bind(wx.EVT_MENU, self.OnPopupOne, id=self.popupID1)
+                self.Bind(wx.EVT_MENU, self.OnPopupTwo, id=self.popupID2)
+                self.Bind(wx.EVT_MENU, self.OnPopupThree, id=self.popupID3)
+                self.Bind(wx.EVT_MENU, self.OnTgen_glob, id=self.popup_Tgen_glob)
+            # make a menu
+            menu = wx.Menu()
+            # add some items
+            menu.Append(self.popupID1, u"Formes associées")
+            menu.Append(self.popupID2, u"Concordancier")
+            menu.Append(self.popupID3, "Graphique")
+            #menu.Append(self.popup_Tgen_glob, "Tgen global")
 
-            self.Bind(wx.EVT_MENU, self.OnPopupOne, id=self.popupID1)
-            self.Bind(wx.EVT_MENU, self.OnPopupTwo, id=self.popupID2)
-            self.Bind(wx.EVT_MENU, self.OnPopupThree, id=self.popupID3)
-            self.Bind(wx.EVT_MENU, self.OnTgen_glob, id=self.popup_Tgen_glob)
-        # make a menu
-        menu = wx.Menu()
-        # add some items
-        menu.Append(self.popupID1, u"Formes associées")
-        menu.Append(self.popupID2, u"Concordancier")
-        menu.Append(self.popupID3, "Graphique")
-        #menu.Append(self.popup_Tgen_glob, "Tgen global")
-
-        self.PopupMenu(menu)
-        menu.Destroy()
+            self.PopupMenu(menu)
+            menu.Destroy()
 
     def getselectedwords(self) :
         words = [self.getColumnText(self.GetFirstSelected(), 0)]

@@ -24,7 +24,7 @@ from dialog import PrefExport, PrefUCECarac, SearchDial, message
 from tableau import Tableau
 from search_tools import SearchFrame
 import webbrowser
-import cStringIO
+#import cStringIO
 import tempfile
 import codecs
 from functions import exec_rcode, MessageImage, progressbar, treat_var_mod
@@ -291,7 +291,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 self.Bind(wx.EVT_MENU, self.onwordgraph, id = self.idwordgraph)
                 self.Bind(wx.EVT_MENU, self.onproxe, id = self.popup_proxe)
                 self.Bind(wx.EVT_MENU, self.onlexdendro, id = self.idlexdendro)
-                self.Bind(wx.EVT_MENU, self.onexport, id = self.idexport)
+                #self.Bind(wx.EVT_MENU, self.onexport, id = self.idexport)
              #  self.Bind(wx.EVT_MENU, self.on_export_classes, id = self.export_classes)
    #            self.Bind(wx.EVT_MENU, self.OnPopupThree, id=self.popupID3)
     
@@ -323,7 +323,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             menu.Append(self.popupIDgraph, u"Graphe de la classe")
             menu.Append(self.idseg, u"Segments répétés")
             menu.Append(self.iducecarac, u"UCE caractéristiques")
-            menu.Append(self.idexport, 'Partitionner...')
+            #menu.Append(self.idexport, 'Partitionner...')
             #menu.Append(self.popupID2, u"Concordancier")
     #        menu.Append(self.popupID3, "recharger")
     
@@ -786,3 +786,29 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
         win.HtmlPage.SetPage(win.html)
         win.Show(True)
+
+
+class wliste(wx.Frame):
+    def __init__(self, parent, id, title, d, fline, size=(600, 500)):
+        wx.Frame.__init__(self, parent, id)
+        self.liste = ListForSpec(self, parent, d, fline, menu = False)
+        self.button_1 = wx.Button(self, -1, "Fermer")
+        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
+        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
+        self.__do_layout()
+
+    def __do_layout(self):
+        sizer_1 = wx.BoxSizer(wx.VERTICAL)
+        sizer_2 = wx.BoxSizer(wx.VERTICAL)
+        sizer_2.Add(self.liste, 1, wx.EXPAND | wx.ADJUST_MINSIZE, 0)
+        sizer_2.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ADJUST_MINSIZE, 0)
+        sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
+        self.SetAutoLayout(True)
+        self.SetSizer(sizer_1)
+        self.Layout()
+        
+    def OnCloseMe(self, event):
+        self.Close(True)
+
+    def OnCloseWindow(self, event):
+        self.Destroy()
