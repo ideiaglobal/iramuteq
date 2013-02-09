@@ -533,13 +533,13 @@ def exec_rcode(rpath, rcode, wait = True, graph = False):
             if sys.platform == 'win32':
                 error = call(["%s" % rpath, "--vanilla","--slave","-f", "%s" % rcode])
             else :
-                error = call([rpath, '--vanilla','--slave',"-f %s" % rcode])
+                error = call([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"])
             return error
         else :
             if sys.platform == 'win32':
                 pid = Popen(["%s" % rpath, '--vanilla','--slave','-f', "%s" % rcode])
             else :
-                pid = Popen([rpath, '--vanilla','--slave',"-f %s" % rcode], stderr = PIPE)
+                pid = Popen([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"], stderr = PIPE)
             return pid
     else :
         if wait :
@@ -547,18 +547,18 @@ def exec_rcode(rpath, rcode, wait = True, graph = False):
                 error = call(["%s" % rpath, '--vanilla','--slave','-f', "%s" % rcode])
             elif sys.platform == 'darwin' and needX11:
                 os.environ['DISPLAY'] = ':0.0'
-                error = call([rpath, '--vanilla','--slave',"-f %s" % rcode])
+                error = call([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"])
             else :
-                error = call([rpath, '--vanilla','--slave',"-f %s" % rcode])
+                error = call([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"])
             return error
         else :
             if sys.platform == 'win32':
                 pid = Popen(["%s" % rpath, '--vanilla','--slave','-f', "%s" % rcode])
             elif sys.platform == 'darwin' and needX11:
                 os.environ['DISPLAY'] = ':0.0'
-                pid = Popen([rpath, '--vanilla','--slave',"-f %s" % rcode], stderr = PIPE)
+                pid = Popen([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"], stderr = PIPE)
             else :
-                pid = Popen([rpath, '--vanilla','--slave',"-f %s" % rcode], stderr = PIPE)
+                pid = Popen([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"], stderr = PIPE)
             return pid
 
 def check_Rresult(parent, pid) :
