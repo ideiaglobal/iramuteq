@@ -65,13 +65,3 @@ class ParseFactivaMail :
                     content = infile.read() #lecture du fichier
                 ucis = parsetxtmail(content)
                 print_ucis(ucis, outf, encodage_out)
-
-#for dat in ['2001','2002','2003','2004', '2005','2006','2007','2008','2009','2010','2011'] :
-#    path = os.path.join(txtdir,dat)
-#    outfile = os.path.join(txtdir, 'corpus_' + dat + '.txt')
-#    doparse(path, outfile)
-
-
-if __name__ == '__main__' :
-    doparse(txtdir, fileout, encodage_in, encodage_out)
-    print 'fini'

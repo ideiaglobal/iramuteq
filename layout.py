@@ -514,7 +514,7 @@ def PrintRapport(self, corpus, parametres, istxt = True):
         txt += u'nombre de formes actives: %i%s' % (corpus.getactivesnb(1), sep)
         txt += u'nombre de formes supplémentaires: %i%s' % (corpus.getactivesnb(2), sep)
         txt += u'nombre de formes actives de fréquence >= %i: %i%s' % (parametres['eff_min_forme'], parametres['nbactives'], sep)
-        txt += u'moyenne d\'occurrences par uce :%f%s' % (float(totocc) / float(corpus.getucenb()), sep)
+        txt += u'moyenne d\'occurrences par segments :%f%s' % (float(totocc) / float(corpus.getucenb()), sep)
         if 'tailleuc1' in parametres :
             if parametres['classif_mode'] == 0 :
                 txt += u'taille rst1 / rst2: %i / %i - %i / %i%s' % (parametres['tailleuc1'], parametres['tailleuc2'], parametres['lenuc1'], parametres['lenuc2'], sep)
@@ -529,7 +529,7 @@ def PrintRapport(self, corpus, parametres, istxt = True):
         elif self.parametres['classif_mode'] == 2 :
             txt += u'%i textes classés sur %i (%.2f%%)%s' % (sum([len(cl) for cl in corpus.lc]), corpus.getucinb(), (float(sum([len(cl) for cl in corpus.lc]))) / float(corpus.getucinb()) * 100, sep)
     else :
-        txt += u'%i uce classées sur %i (%.2f%%)%s' % (self.ucecla, self.Ucenb, (float(self.ucecla) / float(self.Ucenb)) * 100, sep)
+        txt += u'%i segments classées sur %i (%.2f%%)%s' % (self.ucecla, self.Ucenb, (float(self.ucecla) / float(self.Ucenb)) * 100, sep)
  
     txt += """
 ###########################
