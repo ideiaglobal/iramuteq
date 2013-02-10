@@ -1153,7 +1153,6 @@ class StatDialog(wx.Dialog):
         dial.ShowModal()
         for i in range(0,len(dial.listlabel)):
             dial.keys[dial.listcle[i]] = dial.listspin[i].GetValue()
-        print dial.keys
         DoConf().makeoptions(['KEY'], [dial.keys], outfile = self.parent.parent.ConfigPath['key'])
         dial.Destroy()
 
