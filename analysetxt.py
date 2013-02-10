@@ -51,7 +51,7 @@ class AnalyseText :
             self.parametres['encoding'] = self.ira.syscoding
             self.t1 = time()
             self.corpus.make_lems(lem = self.parametres['lem'])
-            corpus.parse_active(gramact, gramsup)
+            self.corpus.parse_active(gramact, gramsup)
             result_analyse = self.doanalyse()
             if result_analyse is None :
                  self.time = time() - self.t1

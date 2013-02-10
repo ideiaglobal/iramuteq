@@ -514,7 +514,7 @@ class Corpus :
                 self.lems[lem].act = 2
             elif self.lems[lem].gram in gramact :
                 self.lems[lem].act = 1
-            elif gramsup is not None :
+            elif gramsup is not None and self.lems[lem].gram not in gramact:
                 if self.lems[lem].gram in gramsup :
                     self.lems[lem].act = 2
                 else :
