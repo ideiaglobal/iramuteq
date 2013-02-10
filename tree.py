@@ -352,7 +352,7 @@ class LeftTree(CT.CustomTreeCtrl):
             self.Bind(wx.EVT_MENU, self.OnSpec, spec)
             self.Bind(wx.EVT_MENU, self.OnSimiTxt, simi)
             self.Bind(wx.EVT_MENU, self.OnWordCloud, wdc)
-        elif pydata.get('type', False) == 'alceste'  and pydata['uuid'] in self.parent.history.opened :
+        elif pydata.get('type', False) == 'alceste' and pydata['uuid'] in self.parent.history.opened :
             openmenu = wx.Menu()
             antipro = openmenu.Append(wx.ID_ANY, u"antiprofils")
             menu.AppendMenu(wx.ID_ANY, u"Ouvrir...", openmenu)
@@ -379,6 +379,12 @@ class LeftTree(CT.CustomTreeCtrl):
             self.Bind(wx.EVT_MENU, self.OnExportDictionary, export_dictionary)
             self.Bind(wx.EVT_MENU, self.OnExportLems, export_lems)
             menu.AppendSeparator()
+        elif pydata.get('type', False) == 'gnepamatrix' and pydata['uuid'] in self.parent.history.opened :
+            openmenu = wx.Menu()
+            antipro = openmenu.Append(wx.ID_ANY, u"antiprofils")
+            menu.AppendMenu(wx.ID_ANY, u"Ouvrir...", openmenu)
+            self.Bind(wx.EVT_MENU, self.OpenAntipro, antipro)
+
 
         itemdelete = menu.Append(wx.ID_ANY, "Supprimer de l'historique")
         if item == self.GetRootItem():

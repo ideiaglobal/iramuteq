@@ -291,7 +291,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 self.Bind(wx.EVT_MENU, self.onwordgraph, id = self.idwordgraph)
                 self.Bind(wx.EVT_MENU, self.onproxe, id = self.popup_proxe)
                 self.Bind(wx.EVT_MENU, self.onlexdendro, id = self.idlexdendro)
-                #self.Bind(wx.EVT_MENU, self.onexport, id = self.idexport)
+                self.Bind(wx.EVT_MENU, self.onexport, id = self.idexport)
              #  self.Bind(wx.EVT_MENU, self.on_export_classes, id = self.export_classes)
    #            self.Bind(wx.EVT_MENU, self.OnPopupThree, id=self.popupID3)
     
@@ -323,7 +323,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             menu.Append(self.popupIDgraph, u"Graphe de la classe")
             menu.Append(self.idseg, u"Segments répétés")
             menu.Append(self.iducecarac, u"UCE caractéristiques")
-            #menu.Append(self.idexport, 'Partitionner...')
+            menu.Append(self.idexport, 'Exporter...')
             #menu.Append(self.popupID2, u"Concordancier")
     #        menu.Append(self.popupID3, "recharger")
     
@@ -349,7 +349,13 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
     def onexport(self, evt) :
         if 'corpus' in dir(self.Source):
             corpus = self.Source.corpus
-        ClasseCHD(self.parent, corpus, self.cl)
+            corpus.export_classe(self.Source.pathout['classe_%i_export.txt' % self.cl], self.cl)
+        dial = wx.MessageDialog(self, self.Source.pathout['classe_%i_export.txt' % self.cl], u"Export", wx.ID_OK|wx.ICON_INFORMATION)
+        dial.ShowModal()
+        dial.Destroy()
+        #if 'corpus' in dir(self.Source):
+        #    corpus = self.Source.corpus
+        #ClasseCHD(self.parent, corpus, self.cl)
 
     def getselectedwords(self) :
         words = [self.getColumnText(self.GetFirstSelected(), 6)]

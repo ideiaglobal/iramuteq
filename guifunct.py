@@ -14,7 +14,7 @@ from functions import treat_var_mod
 
 def OnOpen(self, type):
         if type == "Data":
-             wildcard = u"Fichiers supportés|*.ods;*.xls;*.csv;*.txt|Openoffice Clac|*.ods|Fichier excel|*.xls|Fichier csv|*.csv|Fichier texte|*.txt|Tous les fichiers|*"
+             wildcard = u"Fichiers supportés|*.ods;*.xls;*.csv;*.txt|Openoffice Calc|*.ods|Excel 97/2000/XP/2003|*.xls|Fichier csv|*.csv|Fichier texte|*.txt|Tous les fichiers|*"
         elif type == "Texte":
             wildcard = "Fichier texte|*.txt|Tous les fichiers|*"
         elif type == "Analyse":

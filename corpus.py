@@ -433,6 +433,18 @@ class Corpus :
                 f.write(etline.encode(self.parametres['syscoding']) + '\n')
                 f.write(guce.encode(self.parametres['syscoding']) + '\n\n')
 
+    def export_classe(self, outf, classe, lem = False) :
+        sts = self.lc[classe] 
+        res = self.getconcorde(sts)
+        self.make_iduces()
+        with open(outf, 'w') as f :
+            for uce in res :
+                guce = uce[1]
+                f.write(' '.join(self.ucis[self.iduces[uce[0]].uci].etoiles).encode(self.parametres['syscoding']) + '\n')
+                if lem :
+                    guce = ' '.join([self.formes[forme].lem for forme in guce.split()])
+                f.write(guce.encode(self.parametres['syscoding']) + '\n\n')
+
     def make_and_write_sparse_matrix_from_uces(self, actives, outfile, listuce = False) :
         log.info('make_and_write_sparse_matrix_from_uces %s' % outfile)
         nbl = 0
@@ -707,27 +719,37 @@ class Corpus :
         self.lc0 = self.lc.pop(0)
         #return ucecl
     
-    def get_stat_by_cluster(self, outf) :
+    def get_stat_by_cluster(self, outf, lclasses = None) :
         log.info('get_stat_by_cluster')
+        if lclasses is None :
+            lclasses = self.lc
         t1 = time()
-        occurrences = dict([[i + 1, 0] for i in range(len(self.lc))])
-        formescl = dict([[i + 1, 0] for i in range(len(self.lc))])
-        hapaxcl = dict([[i + 1, 0] for i in range(len(self.lc))])
-        lenclasses = dict([[i+1,len(cl)] for i, cl in enumerate(self.lc)])
-        sets = [set(cl) for cl in self.lc]
+        occurrences = dict([[i + 1, 0] for i in range(len(lclasses))])
+        formescl = dict([[i + 1, 0] for i in range(len(lclasses))])
+        hapaxcl = dict([[i + 1, 0] for i in range(len(lclasses))])
+        lenclasses = dict([[i+1,len(cl)] for i, cl in enumerate(lclasses)])
+        sets = [set(cl) for cl in lclasses]
         for forme in self.formes :
             formeuceeff = self.getformeuceseff(forme)
-            for i, classe in enumerate(self.lc) :
+            for i, classe in enumerate(lclasses) :
                 concern = sets[i].intersection(formeuceeff.keys())
                 if len(concern) :
                     occurrences[i+1] += sum([formeuceeff[uce] for uce in concern])
                     formescl[i+1] += 1
                     if self.formes[forme].freq == 1 :
                         hapaxcl[i+1] += 1
-        toprint = '\n'.join([';'.join([`i`, `occurrences[i]`, `formescl[i]`, `hapaxcl[i]`, `lenclasses[i]`, `float(hapaxcl[i])/float(formescl[i])`]) for i in occurrences])
-        with open(outf, 'w') as f :
-            f.write(toprint)
         log.info('%f' % (time() - t1))        
+        if outf is not None :
+            toprint = '\n'.join([';'.join([`i`, `occurrences[i]`, `formescl[i]`, `hapaxcl[i]`, `lenclasses[i]`, `float(hapaxcl[i])/float(formescl[i])`]) for i in occurrences])
+            with open(outf, 'w') as f :
+                f.write(toprint)
+        else :
+            return [[`occurrences[i]`, `formescl[i]`, `hapaxcl[i]`, `lenclasses[i]`, `float(hapaxcl[i])/float(formescl[i])`] for i in occurrences]
+
+    def get_stat_by_et(self, outf, etoiles) :
+        lclasses = [self.getucesfrometoile(etoile) for etoile in etoiles]
+        stats = self.get_stat_by_cluster(None, lclasses)
+        stats = [[etoiles[i]] + val for i, val in enumerate(stats)]
 
     def gethapaxbyet(self, etoiles) :
         hapaxuces = [self.getlemuces(forme)[0] for forme in self.lems if self.lems[forme].freq == 1]
