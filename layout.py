@@ -269,7 +269,7 @@ class GraphPanel(wx.ScrolledWindow):
                 else :
                     self.listimg.append(wx.StaticBitmap(self, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
                 self.labels.append(wx.StaticText(self, -1, list_graph[i][1]))
-                
+        self.Bind(wx.EVT_MOTION, self.onMouseMove) 
         self.__set_properties()
         self.__do_layout()
 
@@ -290,6 +290,9 @@ class GraphPanel(wx.ScrolledWindow):
         self.sizer_2.Add(self.sizer_1, 1, wx.EXPAND, 0)
         self.SetSizer(self.sizer_1)
         self.sizer_1.Fit(self)
+
+    def onMouseMove(self, event):
+        self.SetFocus()
        
 
 def open_antiprofil(panel, AntiProfile, encoding) :
@@ -1169,7 +1172,7 @@ class GraphPanelSimi(wx.Panel):
                 else :
                     self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
                 self.labels.append(wx.StaticText(self.panel_1, -1, list_graph[i][1]))
-                
+        self.panel_1.Bind(wx.EVT_MOTION, self.onMouseMove) 
         self.__set_properties()
         self.__do_layout()
 
@@ -1192,3 +1195,6 @@ class GraphPanelSimi(wx.Panel):
         self.sizer_1.Add(self.sizer_2, 0, wx.EXPAND, 0)
         self.sizer_1.Add(self.panel_1, 1, wx.EXPAND, 0)
         self.SetSizer(self.sizer_1) 
+
+    def onMouseMove(self, event):
+        self.panel_1.SetFocus()
