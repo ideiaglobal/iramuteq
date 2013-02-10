@@ -1721,7 +1721,7 @@ class OptLexi(wx.Dialog):
         self.choice_indice =  wx.Choice(self, -1, (100,50), choices = indices)
         if not self.force_chi :
             self.label = wx.StaticText(self, -1, u"effectif minimum")
-            self.spin = wx.SpinCtrl(self, -1, min = 1, max = 10000)
+            self.spin = wx.SpinCtrl(self, -1, min = 1, max = 10000, initial = 10)
         self.Bind(wx.EVT_CHOICE, self.onselect, self.choice)
         self.__set_properties()
         self.__do_layout()
@@ -1733,6 +1733,7 @@ class OptLexi(wx.Dialog):
         if not self.force_chi :
             self.spin.SetValue(10)
         self.choice.SetSelection(0)
+        self.choice_indice.SetSelection(0)
         #self.SetMinSize(wx.Size(300, 400))
         # end wxGlade
 
