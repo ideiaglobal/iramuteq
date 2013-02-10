@@ -1935,6 +1935,7 @@ class PrefWordCloud ( wx.Dialog ):
         bSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
         self.spin_H = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 100,30 ), wx.SP_ARROW_KEYS, 0, 10000, 600 )
+        self.spin_H.SetValue( 800 )
         bSizer1.Add( self.spin_H, 0, wx.ALL, 5 )
         
         fgSizer1.Add( bSizer1, 1, wx.EXPAND, 5 )
@@ -1946,6 +1947,7 @@ class PrefWordCloud ( wx.Dialog ):
         bSizer3.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
         self.spin_L = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 100,30 ), wx.SP_ARROW_KEYS, 0, 10000, 600 )
+        self.spin_L.SetValue( 800 )
         bSizer3.Add( self.spin_L, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         fgSizer1.Add( bSizer3, 1, wx.EXPAND, 5 )
@@ -1976,6 +1978,7 @@ class PrefWordCloud ( wx.Dialog ):
         fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
         self.spin_maxword = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10000, 600 )
+        self.spin_maxword.SetValue( 600 )
         fgSizer1.Add( self.spin_maxword, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         self.m_staticline5 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
@@ -2012,6 +2015,7 @@ class PrefWordCloud ( wx.Dialog ):
         bSizer5.Add( self.m_staticText7, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         self.spin_mincex = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 1000, 5 )
+        self.spin_mincex.SetValue( 5 )
         bSizer5.Add( self.spin_mincex, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
         
         bSizer4.Add( bSizer5, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
@@ -2023,6 +2027,7 @@ class PrefWordCloud ( wx.Dialog ):
         bSizer6.Add( self.m_staticText8, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         self.spin_maxcex = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 1000, 50 )
+        self.spin_maxcex.SetValue( 50 )
         bSizer6.Add( self.spin_maxcex, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
         bSizer4.Add( bSizer6, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
