@@ -66,12 +66,12 @@ class AlcOptFrame(wx.Dialog):
             self.listcle.append(cle)
             
 
-        self.button_val = wx.Button(self,wx.ID_OK)
+        self.button_val = wx.Button(self, wx.ID_OK)
         
         for button in self.listbutton :
             self.Bind(wx.EVT_BUTTON,self.OnShowList,button)
         
-        self.Bind(wx.EVT_BUTTON, self.OnApply, self.button_val)
+        #self.Bind(wx.EVT_BUTTON, self.OnApply, self.button_val)
         
         self.dico=self.parent.parent.parent.lexique#'dictionnaires/lexique.txt')
 
@@ -131,15 +131,6 @@ class AlcOptFrame(wx.Dialog):
         ListViewFrame.CenterOnParent()
         val=ListViewFrame.ShowModal()
     
-    def OnApply(self,evt):
-        for i in range(0,len(self.listlabel)):
-            self.keys[self.listcle[i]] = self.listspin[i].GetValue()
-        DoConf().makeoptions(['KEY'], [self.keys], outfile = self.parent.parent.ira.ConfigPath['key'])
-        #self.Disable()
-        self.Destroy()
-        #return
-
-
 class ListView(wx.Dialog):
     def __init__(self, parent):
         wx.Dialog.__init__(self, parent, size=wx.Size(200, 400),style=wx.DEFAULT_DIALOG_STYLE)

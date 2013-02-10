@@ -8,11 +8,10 @@ import  wx.lib.colourselect as  csel
 import wx.lib.sized_controls as sc
 import wx.lib.filebrowsebutton as filebrowse
 import locale
+from functions import DoConf
 import os
 import sys
-#from listlex import *
 from KeyFrame import AlcOptFrame
-#from listlex import ListForSpec
 #---------------------------------------------------------------------------
 provider = wx.SimpleHelpProvider()
 wx.HelpProvider_Set(provider)
@@ -1152,7 +1151,11 @@ class StatDialog(wx.Dialog):
         dial = AlcOptFrame(self, self.parent.parent)
         dial.CenterOnParent()
         dial.ShowModal()
-        #dial.Destroy()
+        for i in range(0,len(dial.listlabel)):
+            dial.keys[dial.listcle[i]] = dial.listspin[i].GetValue()
+        print dial.keys
+        DoConf().makeoptions(['KEY'], [dial.keys], outfile = self.parent.parent.ConfigPath['key'])
+        dial.Destroy()
 
 class LexDialog( wx.Dialog ):
     
