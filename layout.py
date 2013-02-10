@@ -110,6 +110,7 @@ class GraphPanelAfc(wx.Panel):
         self.panel_1.EnableScrolling(True,True)
         #self.panel_1.SetSize((1000,1000))
         self.panel_1.SetScrollRate(20, 20)
+        self.paenl_1.SetFocus()
 
     def __do_layout(self):    
         self.sizer_1 = wx.BoxSizer(wx.VERTICAL)

@@ -16,18 +16,11 @@
 import os
 import sys
 import  wx
-from dialog import SearchDial
+from dialog import SearchDial, message
 import wx.lib.mixins.listctrl as listmix 
-import cStringIO
+from operator import itemgetter
 
 #---------------------------------------------------------------------------
-
-#class List(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
-#    def __init__(self, parent, ID, pos=wx.DefaultPosition,
-#                 size=wx.DefaultSize, style=0):
-#        wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
-#        listmix.ListCtrlAutoWidthMixin.__init__(self)
-
 
 class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
     def __init__(self, parent, gparent, dlist):
@@ -59,24 +52,12 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
         self.attr2 = wx.ListItemAttr()
         self.attr2.SetBackgroundColour("light blue")
 
-    #def PopulateList(self, dlist):
         
-        #self.InsertColumn(0,'id', wx.LIST_FORMAT_LEFT)
-#        i=1
         self.InsertColumn(0, 'forme', wx.LIST_FORMAT_RIGHT)
         self.InsertColumn(1, 'nb', wx.LIST_FORMAT_RIGHT)
         self.InsertColumn(2, 'type', wx.LIST_FORMAT_RIGHT)
         #self.InsertColumn(3, '', wx.LIST_FORMAT_RIGHT)
 
-        #ct = 0
-#        for key, data in dlist.iteritems():
-#            ct += 1
-#            index = self.InsertStringItem(sys.maxint, data[0])
-#            self.SetStringItem(index, 1, `data[1]`)
-#            self.SetStringItem(index, 2, data[2])
-#            self.SetStringItem(index, 3, '')
-#            self.SetItemData(index, key)
-        
         self.SetColumnWidth(0, 150)   
         self.SetColumnWidth(1, 100)  
         self.SetColumnWidth(2, 100)
@@ -193,14 +174,15 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
         rep = []
         for forme in lems[word].formes :
              rep.append([corpus.getforme(forme).forme, corpus.getforme(forme).freq])
-        win = message(self, -1, u"Formes associées", size=(300, 200), style=wx.DEFAULT_FRAME_STYLE)
+        rep.sort(key = itemgetter(1), reverse = True)
+        win = message(self, u"Formes associées", (300, 200))
         win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
         win.HtmlPage.SetPage(win.html)
         win.Show(True)
 
     def OnPopupTwo(self, event):
         corpus = self.gparent.corpus
-        win = message(self, -1, u"Concordancier", size=(600, 200), style=wx.DEFAULT_FRAME_STYLE)
+        win = message(self, u"Concordancier", (750, 600))
         avap = 60
         item = self.getColumnText(self.GetFirstSelected(), 0)
         listmot = corpus.getlems()[item].formes
@@ -215,117 +197,5 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
                 forme = corpus.getforme(forme).forme
                 ucetxt = ucetxt.replace(' '+forme+' ', '<font color=red> ' + forme + ' </font>')
             txt += ucetxt + '<br><br>'
-#        for uce in uce_ok:
-#            content = ' '+' '.join(corpus.ucis_paras_uces[uce[0]][uce[1]][uce[2]])+' '
-#            for form in listmot :
-#                sp = ''
-#                i = 0
-#                forme = ' ' + form + ' '
-#                while i < len(content):
-#                    coordword = content[i:].find(forme)
-#                    if coordword != -1 and i == 0:
-#                        txt += '<br><b>' + ' '.join(corpus.ucis[uce[0]][0]) + '</b><br>'
-#                        if coordword < avap:
-#                            sp = '&nbsp;' * (avap - coordword)
-#                            deb = i
-#                        else:
-#                            deb = i + coordword - avap
-#                        if len(content) < i + coordword + avap:
-#                            fin = len(content) - 1
-#                        else:
-#                            fin = i + coordword + avap
-#                        txt += '<TT>' + sp + content[deb:fin].replace(forme, '<font color=red>' + forme + '</font>') + '</TT><br>'
-#                        i += coordword + len(forme)
-#                        sp = ''
-#                    elif coordword != -1 and i != 0 :
-#                        if coordword < avap:
-#                            sp = '&nbsp;' * (avap - coordword)
-#                            deb = i
-#                        else:
-#                            deb = i + coordword - avap
-#                        if len(content) < i + coordword + avap:
-#                            fin = len(content) - 1
-#                        else:
-#                            fin = i + coordword + avap
-#                        txt += '<TT>' + sp + content[deb:fin].replace(forme, '<font color=red>' + forme + '</font>') + '</TT><br>'
-#                        i += coordword + len(forme)
-#                        sp = ''                   
-#                    else:
-#                        i = len(content)
-#                        sp = ''
         win.HtmlPage.SetPage(txt) 
         win.Show(True)
-        
-#    def OnSize(self, event):
-#        w, h = self.GetClientSizeTuple()
-#        self.SetDimensions(0, 0, w, h)
-
-class message(wx.Frame):
-    def __init__(self, *args, **kwds):
-        # begin wxGlade: MyFrame.__init__
-        kwds["style"] = wx.DEFAULT_FRAME_STYLE
-        wx.Frame.__init__(self, *args, **kwds)
-        #self.text_ctrl_1 = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE)
-        self.HtmlPage = wx.html.HtmlWindow(self, -1)
-        if "gtk2" in wx.PlatformInfo:
-            self.HtmlPage.SetStandardFonts()
-        self.HtmlPage.SetFonts('Courier', 'Courier')
-        
-        
-        self.button_1 = wx.Button(self, -1, "Fermer")
-        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
-        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
-        self.__do_layout()
-        # end wxGlade
-
-    def __do_layout(self):
-        # begin wxGlade: MyFrame.__do_layout
-        sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2.Add(self.HtmlPage, 1, wx.EXPAND | wx.ADJUST_MINSIZE, 0)
-        sizer_2.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ADJUST_MINSIZE, 0)
-        sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
-        self.SetAutoLayout(True)
-        self.SetSizer(sizer_1)
-        self.Layout()
-        # end wxGlade
-        
-    def OnCloseMe(self, event):
-        self.Close(True)
-
-    def OnCloseWindow(self, event):
-        self.Destroy()
-
-
-def getSmallUpArrowData():
-    return \
-'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x10\x00\x00\x00\x10\x08\x06\
-\x00\x00\x00\x1f\xf3\xffa\x00\x00\x00\x04sBIT\x08\x08\x08\x08|\x08d\x88\x00\
-\x00\x00<IDAT8\x8dcddbf\xa0\x040Q\xa4{h\x18\xf0\xff\xdf\xdf\xffd\x1b\x00\xd3\
-\x8c\xcf\x10\x9c\x06\xa0k\xc2e\x08m\xc2\x00\x97m\xd8\xc41\x0c \x14h\xe8\xf2\
-\x8c\xa3)q\x10\x18\x00\x00R\xd8#\xec\xb2\xcd\xc1Y\x00\x00\x00\x00IEND\xaeB`\
-\x82' 
-
-def getSmallUpArrowBitmap():
-    return wx.BitmapFromImage(getSmallUpArrowImage())
-
-def getSmallUpArrowImage():
-    stream = cStringIO.StringIO(getSmallUpArrowData())
-    return wx.ImageFromStream(stream)
-
-#----------------------------------------------------------------------
-def getSmallDnArrowData():
-    return \
-"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x10\x00\x00\x00\x10\x08\x06\
-\x00\x00\x00\x1f\xf3\xffa\x00\x00\x00\x04sBIT\x08\x08\x08\x08|\x08d\x88\x00\
-\x00\x00HIDAT8\x8dcddbf\xa0\x040Q\xa4{\xd4\x00\x06\x06\x06\x06\x06\x16t\x81\
-\xff\xff\xfe\xfe'\xa4\x89\x91\x89\x99\x11\xa7\x0b\x90%\ti\xc6j\x00>C\xb0\x89\
-\xd3.\x10\xd1m\xc3\xe5*\xbc.\x80i\xc2\x17.\x8c\xa3y\x81\x01\x00\xa1\x0e\x04e\
-?\x84B\xef\x00\x00\x00\x00IEND\xaeB`\x82" 
-
-def getSmallDnArrowBitmap():
-    return wx.BitmapFromImage(getSmallDnArrowImage())
-
-def getSmallDnArrowImage():
-    stream = cStringIO.StringIO(getSmallDnArrowData())
-    return wx.ImageFromStream(stream)

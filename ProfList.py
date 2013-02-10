@@ -31,6 +31,7 @@ from functions import exec_rcode, MessageImage, progressbar, treat_var_mod
 from PrintRScript import barplot
 from textclassechd import ClasseCHD
 from shutil import copyfile
+from operator import itemgetter
 
 #---------------------------------------------------------------------------
 class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
@@ -452,13 +453,6 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                           'communities' : 0,
                           'halo' : 0
                           }
-#        self.tableau.actives = {}
-#        self.tableau.lchi = self.lchi
-#        self.tableau.chi = {}
-#        for i, val in enumerate(self.la) :
-#            self.tableau.actives[val] = [self.lfreq[i]]
-#            self.tableau.chi[val] = [self.lchi[i]]
-                          
         act = {}
         tableau.chi = {}
         tableau.lchi = self.lchi
@@ -496,59 +490,6 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                         'tmpchi' : self.tmpchi}
 
         self.parent.SimiFromCluster(self.parent, self.Source.corpus, self.la, self.lfreq, self.lchi, self.cl - 1, parametres = parametres, dlg = progressbar(self, 4))
-        #dlg = progressbar(self, 2)
-        #corpus = self.Source.corpus
-        #uces = corpus.lc[self.cl-1]
-        #dlg.Update(1, u'Tableau...')
-        ##tab = corpus.make_table_with_classe(uces, self.la)
-        #pathout = ConstructPathOut(self.Source.pathout.dirout+'/', 'simi_classe_%i' %self.cl)
-        #self.filename = os.path.join(pathout,'mat01.csv')
-        #dlg.Update(2, u'Ecriture...')
-        ##corpus.write_tab(tab, self.filename)
-        ##del tab
-        #corpus.make_and_write_sparse_matrix_from_classe(self.la, uces, self.filename)
-        #dlg.Destroy()
-        #paramsimi = {'coeff' : 0,
-        #                  'layout' : 2,
-        #                  'type' : 1,
-        #                  'arbremax' : 1,
-        #                  'coeff_tv' : 1,
-        #                  'coeff_tv_nb' : 0,
-        #                  'tvprop' : 0,
-        #                  'tvmin' : 5,
-        #                  'tvmax' : 30,
-        #                  'coeff_te' : 1,
-        #                  'coeff_temin' : 1,
-        #                  'coeff_temax' : 10,
-        #                  'label_v': 1,
-        #                  'label_e': 0,
-        #                  'vcex' : 0,
-        #                  'vcexmin' : 10,
-        #                  'vcexmax' : 25,
-        #                  'cex' : 10,
-        #                  'cexfromchi' : True,
-        #                  'sfromchi': False,
-        #                  'seuil_ok' : 0,
-        #                  'seuil' : 1,
-        #                  'cols' : (255,0,0),
-        #                  'cola' : (200,200,200),
-        #                  'width' : 1000,
-        #                  'height' : 1000,
-        #                  'first' : True,
-        #                  'keep_coord' : True,
-        #                  'alpha' : 20,
-        #                  'film': False,
-        #                  }
-        #self.tableau = Tableau(self.parent, '')
-        #self.tableau.listactives = self.la
-        #self.tableau.actives = {}
-        #self.tableau.lchi = self.lchi
-        #self.tableau.chi = {}
-        #self.tableau.parametre['fromprof'] = True
-        #for i, val in enumerate(self.la) :
-        #    self.tableau.actives[val] = [self.lfreq[i]]
-        #    self.tableau.chi[val] = [self.lchi[i]]
-        #DoSimi(self, param = paramsimi, fromprof = ffr(self.filename), pathout = pathout)
 
     def on_segments(self,evt) :
         dlg = progressbar(self, 2)
@@ -788,6 +729,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             if ucef != [] :
                 nb = len(ucef)
                 rep.append([corpus.getforme(forme).forme, nb])
+        rep.sort(key = itemgetter(1), reverse = True)
         win = message(self, u"Formes associées", wx.Size(300, 200))
         win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
         win.HtmlPage.SetPage(win.html)

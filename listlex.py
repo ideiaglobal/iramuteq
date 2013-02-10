@@ -22,13 +22,8 @@ from functions import exec_rcode, MessageImage
 from chemins import ffr
 from PrintRScript import barplot
 from dialog import SearchDial, message
+from operator import itemgetter
 #---------------------------------------------------------------------------
-
-#class List(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
-#    def __init__(self, parent, ID, pos=wx.DefaultPosition,
-#                 size=wx.DefaultSize, style=0):
-#        wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
-#        listmix.ListCtrlAutoWidthMixin.__init__(self)
 
 class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
     def __init__(self, parent,gparent, dlist, first, menu = True):
@@ -192,6 +187,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         rep = []
         for forme in lems[word].formes :
              rep.append([corpus.getforme(forme).forme, corpus.getforme(forme).freq])
+        rep.sort(key = itemgetter(1), reverse = True)
         win = message(self, u"Formes associées", (300, 200))
         win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
         win.HtmlPage.SetPage(win.html)
@@ -281,41 +277,3 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         txt = "<img src='%s'>" % tmpgraph
         win.HtmlPage.SetPage(txt)
         win.Show(True)
-
-
-
-#class message(wx.Frame):
-#    def __init__(self, *args, **kwds):
-#        # begin wxGlade: MyFrame.__init__
-#        kwds["style"] = wx.DEFAULT_FRAME_STYLE
-#        wx.Frame.__init__(self, *args, **kwds)
-#        #self.text_ctrl_1 = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE)
-#        self.HtmlPage=wx.html.HtmlWindow(self, -1)
-#        if "gtk2" in wx.PlatformInfo:
-#            self.HtmlPage.SetStandardFonts()
-#        self.HtmlPage.SetFonts('Courier','Courier')
-#        
-#        
-#        self.button_1 = wx.Button(self, -1, "Fermer")
-#        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
-#        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
-#        self.__do_layout()
-#        # end wxGlade
-#
-#    def __do_layout(self):
-#        # begin wxGlade: MyFrame.__do_layout
-#        sizer_1 = wx.BoxSizer(wx.VERTICAL)
-#        sizer_2 = wx.BoxSizer(wx.VERTICAL)
-#        sizer_2.Add(self.HtmlPage, 1, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
-#        sizer_2.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ADJUST_MINSIZE, 0)
-#        sizer_1.Add(sizer_2, 1, wx.EXPAND, 0)
-#        self.SetAutoLayout(True)
-#        self.SetSizer(sizer_1)
-#        self.Layout()
-#        # end wxGlade
-#        
-#    def OnCloseMe(self, event):
-#        self.Close(True)
-#
-#    def OnCloseWindow(self, event):
-#        self.Destroy()
