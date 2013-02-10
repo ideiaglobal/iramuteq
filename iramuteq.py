@@ -441,6 +441,7 @@ class IraFrame(wx.Frame):
             self.pref.read(self.ConfigPath['preferences'])
             if IsNew(self) :
                 UpgradeConf(self)
+                self.pref.read(self.ConfigPath['preferences'])
                 New = True
             else :
                 CopyConf(self)

@@ -45,6 +45,7 @@ def IsNew(self):
                 return True
 
 def UpgradeConf(self) :
+    log.info('upgrade conf')
     dictuser = self.ConfigPath
     dictappli = ConstructConfigPath(self.AppliPath, user = False)
     for item,filein in dictuser.iteritems():

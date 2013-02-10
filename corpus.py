@@ -77,10 +77,10 @@ class Corpus :
                 gramtype = self.parent.lexique[word][1]
                 lem = self.parent.lexique[word][0]
             elif word.isdigit() :
-                gramtype = 'num'
+                gramtype = u'num'
                 lem = word
             else :
-                gramtype = 'nr'
+                gramtype = u'nr'
                 lem = word
             self.formes[word] =  Word(word, gramtype, len(self.formes), lem)
             self.idformesuces[self.formes[word].ident] = {self.ucis[-1].uces[-1].ident : 1}
