@@ -274,7 +274,10 @@ class GraphPanel(wx.ScrolledWindow):
         self.__do_layout()
 
     def __set_properties(self):
+        self.EnableScrolling(True,True)
         self.SetScrollRate(20, 20)   
+        self.SetFocus()
+
 
     def __do_layout(self):
         self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
@@ -660,6 +663,7 @@ class GraphPanelDendro(wx.Panel):
         self.panel_1.EnableScrolling(True,True)
         #self.panel_1.SetSize((1000,1000))
         self.panel_1.SetScrollRate(20, 20)
+        self.panel_1.SetFocus()
         self.Bind(wx.EVT_BUTTON, self.ondendro, self.butdendro)
         self.param = {'width' : 700,
                        'height': 500,
@@ -1173,6 +1177,7 @@ class GraphPanelSimi(wx.Panel):
         self.panel_1.EnableScrolling(True,True)
         #self.panel_1.SetSize((1000,1000))
         self.panel_1.SetScrollRate(20, 20)
+        self.panel_1.SetFocus()
 
     def __do_layout(self):    
         self.sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
