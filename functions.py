@@ -468,7 +468,7 @@ def ReadDicoAsDico(dicopath):
     dico = {}
     for line in content :
         if line[0] != u'':
-            line = line.replace(u'\n', '').replace('"', '').split('\t')
+            line = line.rstrip('\n\r').replace(u'\n', '').replace('"', '').split('\t')
             dico[line[0]] = line[1:]
     return dico
 
