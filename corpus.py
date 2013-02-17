@@ -1081,7 +1081,7 @@ class BuildCorpus :
     def firstclean(self, txt) :
         txt = txt.replace(u'’',"'")
         txt = txt.replace(u'œ', u'oe')
-        return txt.replace('...',u' £$£ ').replace('?',' ? ').replace('.',' . ').replace('!', ' ! ').replace(',',' , ').replace(';', ' ; ').replace(':',' : ').replace(u'…', ' £$£ ')
+        return txt.replace('...',u' £$£ ').replace('?',' ? ').replace('.',' . ').replace('!', ' ! ').replace(',',' , ').replace(';', ' ; ').replace(':',' : ').replace(u'…', u' £$£ ')
 
     def make_cleans(self, txt) :
         for clean in self.cleans :
