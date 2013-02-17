@@ -143,8 +143,8 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
     def onsearch(self, evt) :
         self.dial = SearchDial(self, self, 0, True)
         self.dial.CenterOnParent()
-        self.dial.ShowModal()
-        self.dial.Destroy()
+        self.dial.Show()
+        #self.dial.Destroy()
     
     def OnRightClick(self, event):
         if self.menu :

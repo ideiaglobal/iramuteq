@@ -10,7 +10,8 @@ import os
 DATA_FILES=['configuration','Rscripts','images','dictionnaires','locale', 'Rlib','son_fin.wav', 'gpl-2.0.txt', 'gpl-2.0-fr.txt']
 APP = ['iramuteq.py']
 OPTIONS = {'argv_emulation': True,
-	'iconfile':('images/iraicone.icns')}
+	'iconfile':('images/iraicone.icns'),
+        'optimize': 1}
 
 setup(
     app=APP,

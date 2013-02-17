@@ -77,7 +77,7 @@ class SearchFrame(wx.Frame):
     def onsearch(self, evt) :
         if evt is not None :
             self.dial = SearchDial(self, self.liste, 1, True)
-            self.dial.ShowModal()
-            self.dial.Destroy()
+            self.dial.Show()
+            #self.dial.Destroy()
         else :
             self.dial = SearchDial(self, self.liste, 1, False)

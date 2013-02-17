@@ -1467,7 +1467,7 @@ class FindInCluster(wx.Frame):
         # begin wxGlade: MyFrame.__init__
         wx.Frame.__init__(self, parent, id)
         self.spanel =  wx.ScrolledWindow(self, -1, style=wx.TAB_TRAVERSAL)
-        self.sizer1 = wx.FlexGridSizer(len(result)+1,4,0,0)
+        self.sizer1 = wx.FlexGridSizer(0,4,0,0)
         self.parent = parent
         self.formes = {}
         txt =  [u'forme',u'classe',u'chi2',u'voir']
@@ -1553,10 +1553,10 @@ class FindInCluster(wx.Frame):
     def OnCloseWindow(self, evt):
         self.Destroy()
 
-class SearchDial ( wx.Dialog ):
+class SearchDial ( wx.Frame ):
     
     def __init__( self, parent, listctrl, col, shown):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE )
         self.parent = parent
         self.listctrl = listctrl
         self.col = col

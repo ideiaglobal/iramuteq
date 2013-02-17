@@ -106,7 +106,10 @@ if sys.platform == 'darwin' :
 else :
     sys.setdefaultencoding(locale.getpreferredencoding())
 #chemin de l'application
-AppliPath = os.path.abspath(os.path.dirname(os.path.realpath(sys.argv[0])))
+try :
+    AppliPath = sys._MEIPASS
+except :
+    AppliPath = os.path.abspath(os.path.dirname(os.path.realpath(sys.argv[0])))
 #chemin des images
 ImagePath = os.path.join(AppliPath, 'images')
 #configuration generale
@@ -147,7 +150,6 @@ sys.stderr = writer()
 sys.stdout = printer()
 
 ConfigPath = ConstructConfigPath(UserConfigPath)
-
 
 langues = {'french' : wx.LANGUAGE_FRENCH,
             'english' : wx.LANGUAGE_ENGLISH,}

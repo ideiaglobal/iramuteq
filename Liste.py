@@ -141,8 +141,8 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
     def onsearch(self, evt) :
         self.dial = SearchDial(self, self, 0, True)
         self.dial.CenterOnParent()
-        self.dial.ShowModal()
-        self.dial.Destroy()
+        self.dial.Show()
+        #self.dial.Destroy()
 
     def OnRightClick(self, event):
 

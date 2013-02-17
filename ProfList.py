@@ -237,16 +237,16 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
     def onsearch(self, evt) :
         self.dial = SearchDial(self, self, 6, True)
         self.dial.CenterOnParent()
-        self.dial.ShowModal()
-        self.dial.Destroy()
+        self.dial.Show()
+        #self.dial.Destroy()
 
     def onsearchall(self, evt) :
         if 'FrameSearch' not in dir(self.Source) :
             self.Source.FrameSearch = SearchFrame(self.parent, -1, u"Rechercher...", self.Source.corpus)
         self.dial = SearchDial(self, self.Source.FrameSearch.liste, 1, False)
         self.dial.CenterOnParent()
-        self.dial.ShowModal()
-        self.dial.Destroy()
+        self.dial.Show()
+        #self.dial.Destroy()
 
     def OnRightClick(self, event):
 
