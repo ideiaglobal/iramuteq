@@ -669,7 +669,7 @@ class LeftTree(CT.CustomTreeCtrl):
     def OnItemDelete(self, event):
 
         strs = "Are You Sure You Want To Delete Item " + self.GetItemText(self.current) + "?"
-        dlg = wx.MessageDialog(None, strs, 'Deleting Item', wx.YES | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_QUESTION)
+        dlg = wx.MessageDialog(None, strs, 'Deleting Item', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
 
         if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
             dlg.Destroy()
