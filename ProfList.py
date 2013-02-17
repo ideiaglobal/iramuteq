@@ -351,7 +351,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         if 'corpus' in dir(self.Source):
             corpus = self.Source.corpus
             corpus.export_classe(self.Source.pathout['classe_%i_export.txt' % self.cl], self.cl)
-        dial = wx.MessageDialog(self, self.Source.pathout['classe_%i_export.txt' % self.cl], u"Export", wx.ID_OK|wx.ICON_INFORMATION)
+        dial = wx.MessageDialog(self, self.Source.pathout['classe_%i_export.txt' % self.cl], u"Export", wx.OK|wx.ICON_INFORMATION)
         dial.ShowModal()
         dial.Destroy()
         #if 'corpus' in dir(self.Source):
