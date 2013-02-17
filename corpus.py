@@ -434,7 +434,7 @@ class Corpus :
                 f.write(guce.encode(self.parametres['syscoding']) + '\n\n')
 
     def export_classe(self, outf, classe, lem = False) :
-        sts = self.lc[classe] 
+        sts = self.lc[classe - 1] 
         res = self.getconcorde(sts)
         self.make_iduces()
         with open(outf, 'w') as f :
