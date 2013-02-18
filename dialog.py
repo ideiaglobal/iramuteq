@@ -2221,8 +2221,8 @@ class CorpusPref ( wx.Dialog ):
     def __init__( self, parent, parametres ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Préférences", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         self.parent = parent 
-        langues_n = [u'français', u'english', u'german (expérimentale)', u'italian', u'swedish (expérimentale)', u'portuguese (expérimentale)', u'greek (expériementale)', u'autre...']
-        self.langues = [u'french', u'english', u'german', 'italian', 'swedish', u'portuguese', 'greek', 'other']
+        langues_n = [u'français', u'english', u'german (expérimentale)', u'italian', u'swedish (expérimentale)', u'portuguese (expérimentale)', u'spanish (expérimentale)', u'greek (expériementale)', u'autre...']
+        self.langues = [u'french', u'english', u'german', u'italian', u'swedish', u'portuguese', u'spanish', u'greek', u'other']
         self.encodages = [enc[0].lower() for enc in encodages]
 
         ucimark = [u'****', u'0000']
