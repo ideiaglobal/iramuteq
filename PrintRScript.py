@@ -33,7 +33,7 @@ class PrintRScript :
 
     def sources(self, lsources) :
         for source in lsources :
-            self.add('source("%s")' % source)
+            self.add('source("%s", encoding = \'utf8\')' % source)
 
     def packages(self, lpks) :
         for pk in lpks :
