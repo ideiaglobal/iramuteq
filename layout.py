@@ -788,7 +788,12 @@ class CopusPanel(wx.Panel) :
         fgSizer5.Add( self.m_staticText21, 0, wx.ALL, 5 )
 
         description = {'lang' : u'langue',
-                        'encoding' : u'encodage'}
+                       'encoding' : u'encodage',
+                       'ucinb' : u'Nombre de textes',
+                       'ucenb' : u'Nombre de segments de texte',
+                       'formesnb' : u'Nombre de formes',
+                       'hapax' : u'Nombre d\'hapax'
+                      }
 
         keys = ['lang', 'encoding', 'originalpath', 'pathout', 'date', 'time']
 
@@ -821,7 +826,7 @@ class CopusPanel(wx.Panel) :
 
     def addkeys(self, keys, description) :
         for key in keys :
-            option = self.parametres.get(key,u'non défnini')
+            option = self.parametres.get(key,u'non défini')
             if isinstance(option, int) :
                 option = `option`
             text = wx.StaticText( self, wx.ID_ANY, description.get(key, key), wx.DefaultPosition, wx.DefaultSize, 0 )

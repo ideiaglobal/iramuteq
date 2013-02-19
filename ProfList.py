@@ -101,7 +101,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 
 
         self.InsertColumn(0, "num", wx.LIST_FORMAT_RIGHT)
-        self.InsertColumn(1, "eff. uce", wx.LIST_FORMAT_RIGHT)
+        self.InsertColumn(1, "eff. s.t.", wx.LIST_FORMAT_RIGHT)
         self.InsertColumn(2, "eff. total", wx.LIST_FORMAT_RIGHT)
         self.InsertColumn(3, "pourcentage", wx.LIST_FORMAT_RIGHT)
         self.InsertColumn(4, "chi2", wx.LIST_FORMAT_RIGHT)
@@ -308,9 +308,9 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             #menu.Append(self.popupID10, u"Spécificités")
 
             menu_conc = wx.Menu()
-            menu_conc.Append(self.popupID2, u"dans les uce de la classe")
-            menu_conc.Append(self.popupID3, u"dans les uce classées")
-            menu_conc.Append(self.popupID4, u"dans toutes les uce")
+            menu_conc.Append(self.popupID2, u"dans les segments de texte de la classe")
+            menu_conc.Append(self.popupID3, u"dans les segments de texte classés")
+            menu_conc.Append(self.popupID4, u"dans tous les segments de texte")
             menu.AppendMenu(-1, u"Concordancier", menu_conc) 
             menu_cnrtl = wx.Menu()      
             menu_cnrtl.Append(self.popupID5, u"Définition")
@@ -323,7 +323,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             menu.AppendSeparator()
             menu.Append(self.popupIDgraph, u"Graphe de la classe")
             menu.Append(self.idseg, u"Segments répétés")
-            menu.Append(self.iducecarac, u"UCE caractéristiques")
+            menu.Append(self.iducecarac, u"Segments de texte caractéristiques")
             menu.Append(self.idexport, 'Exporter...')
             #menu.Append(self.popupID2, u"Concordancier")
     #        menu.Append(self.popupID3, "recharger")
@@ -552,7 +552,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             #ucestxt = [corpus.make_concord(self.la, ' '.join(uce), 'red') for uce in ucestxt]
             dlg.Update(4, u'texte...')
             #ucis_txt = [' '.join(corpus.ucis[val[1][0]][0]) for val in ntab2]
-            win = message(self, u"UCE caractéristiques - Classe %i" % self.cl, (750, 600))
+            win = message(self, u"Segments de texte caractéristiques - Classe %i" % self.cl, (750, 600))
             win.html = '<html>\n' + '<br><br>'.join(['<br>'.join([ucis_txt[i], 'score : ' + str(ntab2[i][0]), ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
             win.HtmlPage.SetPage(win.html)
             dlg.Destroy()

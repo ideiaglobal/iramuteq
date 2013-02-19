@@ -2283,7 +2283,7 @@ class CorpusPref ( wx.Dialog ):
         
         fgSizer1.Add( fgSizer41, 1, wx.EXPAND, 5 )        
 
-        self.m_staticText12 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Marqueur d'UCI", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText12 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Marqueur de texte", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText12.Wrap( -1 )
         fgSizer1.Add( self.m_staticText12, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2300,7 +2300,7 @@ class CorpusPref ( wx.Dialog ):
         self.check_expressions.SetValue(True) 
         fgSizer1.Add( self.check_expressions, 0, wx.ALL, 5 )
         
-        self.m_staticText9 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Construire des UCE", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText9 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Construire des segments de texte", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText9.Wrap( -1 )
         fgSizer1.Add( self.m_staticText9, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2308,7 +2308,7 @@ class CorpusPref ( wx.Dialog ):
         self.check_makeuce.SetValue(True) 
         fgSizer1.Add( self.check_makeuce, 0, wx.ALL, 5 )
         
-        self.m_staticText10 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Mode de construction des UCE", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText10 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Mode de construction des segments de texte", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText10.Wrap( -1 )
         fgSizer1.Add( self.m_staticText10, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2317,7 +2317,7 @@ class CorpusPref ( wx.Dialog ):
         self.uce_mode.SetSelection( 0 )
         fgSizer1.Add( self.uce_mode, 0, wx.ALL, 5 )
         
-        self.m_staticText13 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Taille des UCE", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText13 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Taille des segments de texte", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText13.Wrap( -1 )
         fgSizer1.Add( self.m_staticText13, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
