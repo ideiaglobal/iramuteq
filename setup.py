@@ -12,7 +12,7 @@ APP = ['iramuteq.py']
 OPTIONS = {'argv_emulation': True,
          'emulate_shell_environment': True,
 	'iconfile':('images/iraicone.icns'),
-        'optimize': 1}
+        'optimize': 2}
 
 setup(
     app=APP,

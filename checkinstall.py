@@ -177,7 +177,7 @@ Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
 - ou laisser IRamuteq les installer automatiquement en cliquant sur VALIDER .
         Les bibliothèques seront téléchargées depuis le site miroir de R %s.
         """ % (txt, self.pref.get('iramuteq','rmirror'))
-        dial = wx.MessageDialog(self, msg, u"Installation incomplète", wx.OK | wx.CANCEL | wx.NO_DEFAULT | wx.ICON_WARNING)
+        dial = wx.MessageDialog(self, msg, u"Installation incomplète", wx.OK | wx.CANCEL | wx.ICON_WARNING)
         dial.CenterOnParent()
         val = dial.ShowModal()
         if val == wx.ID_OK :

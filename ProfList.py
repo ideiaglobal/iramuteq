@@ -576,6 +576,12 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         nbcl = len(title)
         nbwords = len(words)
         txt = barplot(tableout, words, title, self.Source.parent.RscriptsPath['Rgraph'], tmpgraph)
+        #print 'ATTENTION TEST R'
+        #txt = """
+        #sink('/Users/pierre/Desktop/qdfqsdfqsdfqsdf.txt')
+        #Sys.getlocale()
+        #sink()
+        #"""
         tmpscript = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
         file = open(tmpscript,'w')
         file.write(txt)

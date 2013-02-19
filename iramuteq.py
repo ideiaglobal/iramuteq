@@ -101,15 +101,13 @@ ID_SimiTxt = wx.NewId()
 ##########################################################
 #encodage
 if sys.platform == 'darwin' :
-    sys.setdefaultencoding('utf-8')
-    wx.SetDefaultPyEncoding('utf-8')
+    sys.setdefaultencoding('UTF-8')
+    wx.SetDefaultPyEncoding('UTF-8')
 else :
     sys.setdefaultencoding(locale.getpreferredencoding())
+
 #chemin de l'application
-try :
-    AppliPath = sys._MEIPASS
-except :
-    AppliPath = os.path.abspath(os.path.dirname(os.path.realpath(sys.argv[0])))
+AppliPath = os.path.abspath(os.path.dirname(os.path.realpath(sys.argv[0])))
 #chemin des images
 ImagePath = os.path.join(AppliPath, 'images')
 #configuration generale

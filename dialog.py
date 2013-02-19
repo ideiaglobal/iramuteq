@@ -1205,18 +1205,19 @@ class LexDialog( wx.Dialog ):
 class PrefUCECarac(wx.Dialog):
     def __init__(self, parent, *args, **kwds):
         kwds['style'] = wx.DEFAULT_DIALOG_STYLE 
-        kwds['title'] = u"UCE caractéristiques"
+        kwds['title'] = u"Segments de texte caractéristiques"
         wx.Dialog.__init__(self, *args, **kwds)
         self.parent = parent
         first = wx.BoxSizer(wx.VERTICAL)
         sizer = wx.FlexGridSizer(0,2,0,0)
         self.label_type = wx.StaticText(self, -1, u"Score de classement")
         sizer.Add(self.label_type, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT, 5)
-        self.radio_type = wx.RadioBox(self, -1, u"", choices=[u'absolu (somme des chi2 des formes marquées de l\'UCE)', u'relatif (moyenne des chi2 des formes marquées de l\'UCE)'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
+        self.radio_type = wx.RadioBox(self, -1, u"", choices=[u'absolu (somme des chi2 des formes marquées du segment)', u'relatif (moyenne des chi2 des formes marquées du segment)'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
         sizer.Add(self.radio_type, 0, wx.ALIGN_RIGHT, 5)
-        self.txt_eff = wx.StaticText(self, -1, u"Nombre d\'UCE maximum")
+        self.txt_eff = wx.StaticText(self, -1, u"Nombre maximum de segments de texte")
         sizer.Add(self.txt_eff, 0, wx.ALIGN_CENTRE, 5)
         self.spin_eff = wx.SpinCtrl(self, -1, '', size = (100, 30), min = 1, max = 100000, initial = 50)
+        self.spin_eff.SetValue(50)
         sizer.Add(self.spin_eff, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
         first.Add(sizer, 0, wx.ALL, 5)
         btnsizer = wx.StdDialogButtonSizer()

@@ -519,7 +519,6 @@ def exec_rcode(rpath, rcode, wait = True, graph = False):
     if sys.platform == 'darwin' :
         try :
             macversion = platform.mac_ver()[0].split('.')
-            print macversion
             if int(macversion[1]) < 5 :
                 needX11 = True
             else :
@@ -528,18 +527,21 @@ def exec_rcode(rpath, rcode, wait = True, graph = False):
             needX11 = False
 
     rpath = rpath.replace('\\','\\\\')
+    env = os.environ.copy()
+    if sys.platform == 'darwin' and 'LC_ALL' not in env:
+        env['LC_ALL'] = 'en_US.UTF-8'
     if not graph :
         if wait :
             if sys.platform == 'win32':
                 error = call(["%s" % rpath, "--vanilla","--slave","-f", "%s" % rcode])
             else :
-                error = call([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"])
+                error = call([rpath, '--slave', "--vanilla", "-f %s" % rcode, "--encoding=UTF-8"], env = env)
             return error
         else :
             if sys.platform == 'win32':
                 pid = Popen(["%s" % rpath, '--vanilla','--slave','-f', "%s" % rcode])
             else :
-                pid = Popen([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"], stderr = PIPE)
+                pid = Popen([rpath, '--slave', "--vanilla", "-f %s" % rcode, "--encoding=UTF-8"], stderr = PIPE, env = env)
             return pid
     else :
         if wait :
@@ -547,18 +549,18 @@ def exec_rcode(rpath, rcode, wait = True, graph = False):
                 error = call(["%s" % rpath, '--vanilla','--slave','-f', "%s" % rcode])
             elif sys.platform == 'darwin' and needX11:
                 os.environ['DISPLAY'] = ':0.0'
-                error = call([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"])
+                error = call([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"], env = env)
             else :
-                error = call([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"])
+                error = call([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"], env = env)
             return error
         else :
             if sys.platform == 'win32':
                 pid = Popen(["%s" % rpath, '--vanilla','--slave','-f', "%s" % rcode])
             elif sys.platform == 'darwin' and needX11:
                 os.environ['DISPLAY'] = ':0.0'
-                pid = Popen([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"], stderr = PIPE)
+                pid = Popen([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"], stderr = PIPE, env = env)
             else :
-                pid = Popen([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"], stderr = PIPE)
+                pid = Popen([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"], stderr = PIPE, env = env)
             return pid
 
 def check_Rresult(parent, pid) :

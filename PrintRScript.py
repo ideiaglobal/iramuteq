@@ -545,6 +545,7 @@ def barplot(table, rownames, colnames, rgraph, tmpgraph, intxt = False) :
     #    height = 400
     rownames = 'c("' + '","'.join(rownames) + '")'
     colnames = 'c("' + '","'.join(colnames) + '")'
+
     if not intxt :
         #FIXME
         txt = """
