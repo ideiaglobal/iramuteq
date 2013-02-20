@@ -57,7 +57,7 @@ from textdist import AnalysePam
 from textstat import Stat
 from textaslexico import Lexico
 from textsimi import SimiTxt, SimiFromCluster
-from textwordcloud import WordCloud
+from textwordcloud import WordCloud, ClusterCloud
 from profile_segment import ProfileSegment
 #from textcheckcorpus import checkcorpus
 from openanalyse import OpenAnalyse
@@ -898,6 +898,8 @@ Voulez-vous fermer quand même ?"""
         except :
             BugReport(self)
 
+    def OnClusterCloud(self, corpus, parametres = None) :
+        self.Text = ClusterCloud(self, corpus, parametres = parametres, dlg = progressbar(self, 3))
 
     def OnAFCM(self, event):
         try:

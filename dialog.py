@@ -1710,6 +1710,12 @@ class OptLexi(wx.Dialog):
         self.force_chi = force_chi
         #self.labellem =  wx.StaticText(self, -1, u"Lemmatisation : ")
         #self.checklem = wx.CheckBox(self, -1)
+        if not self.force_chi :
+            self.label_typeformes =  wx.StaticText(self, -1, u"Formes retenues")
+            typeformeschoiceChoices = [ u"actives et supplémentaires", u"actives", u"supplémentaires"]
+            self.typeformes = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, typeformeschoiceChoices, 0 )
+            self.typeformes.SetSelection( 0 )
+
         self.label_var =  wx.StaticText(self, -1, u"Sélection par :")
         self.choice = wx.Choice(self, -1, (100,50), choices = [u'variables', u'modalités'])
         self.label1 =  wx.StaticText(self, -1, u"Choix")
@@ -1747,6 +1753,9 @@ class OptLexi(wx.Dialog):
         sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
         #sizer_2.Add(self.labellem, 0, wx.ALIGN_CENTER_VERTICAL, 3)
         #sizer_2.Add(self.checklem, 0, wx.ALIGN_CENTER_VERTICAL, 3)
+        if not self.force_chi :
+            sizer_2.Add(self.label_typeformes, 0, wx.ALIGN_CENTER_VERTICAL, 3)
+            sizer_2.Add(self.typeformes, 0, wx.ALIGN_CENTER_VERTICAL, 3)
         sizer_2.Add(self.label_var, 0, wx.ALIGN_CENTER_VERTICAL, 3)
         sizer_2.Add(self.choice, 0, wx.ALIGN_CENTER_VERTICAL, 3)
         sizer_2.Add(self.label1, 0, wx.ALIGN_CENTER_VERTICAL, 3)

@@ -271,6 +271,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 self.idwordgraph = wx.NewId()
                 self.popup_proxe = wx.NewId()
                 self.idlexdendro = wx.NewId()
+                self.idcloud = wx.NewId()
                 self.idexport = wx.NewId()
             #    self.export_classes = wx.NewId()
    
@@ -292,6 +293,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 self.Bind(wx.EVT_MENU, self.onwordgraph, id = self.idwordgraph)
                 self.Bind(wx.EVT_MENU, self.onproxe, id = self.popup_proxe)
                 self.Bind(wx.EVT_MENU, self.onlexdendro, id = self.idlexdendro)
+                self.Bind(wx.EVT_MENU, self.oncloud, id = self.idcloud)
                 self.Bind(wx.EVT_MENU, self.onexport, id = self.idexport)
              #  self.Bind(wx.EVT_MENU, self.on_export_classes, id = self.export_classes)
    #            self.Bind(wx.EVT_MENU, self.OnPopupThree, id=self.popupID3)
@@ -324,7 +326,8 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             menu.Append(self.popupIDgraph, u"Graphe de la classe")
             menu.Append(self.idseg, u"Segments répétés")
             menu.Append(self.iducecarac, u"Segments de texte caractéristiques")
-            menu.Append(self.idexport, 'Exporter...')
+            menu.Append(self.idcloud, u"Nuage de la classe")
+            menu.Append(self.idexport, u'Exporter...')
             #menu.Append(self.popupID2, u"Concordancier")
     #        menu.Append(self.popupID3, "recharger")
     
@@ -347,10 +350,24 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             self.PopupMenu(menu)
             menu.Destroy()
 
+    def oncloud(self, evt) :
+        if 'corpus' in dir(self.Source):
+            corpus = self.Source.corpus
+        prof = [[self.la[i], self.lchi[i], self.lfreq[i]] for i, val in enumerate(self.la)]
+        parametres = self.Source.parametres
+        parametres['clusterprof'] = prof
+        parametres['type'] = 'clustercloud'
+        parametres['prof'] = self.Source.pathout['actprof_classe_%i.csv' % self.cl]
+        print parametres['prof']
+        #if not os.path.exists(self.Source.pathout['actprof_classe_%i.csv' % self.lc]) :
+        #    with open(self.Source.pathout['actprof_classe_%i.csv' % self.lc], 'w') as f :
+        #        f.write('\n'.join(prof).encode(self.parent.syscoding))
+        self.parent.OnClusterCloud(self.Source.corpus, parametres = parametres)
+
     def onexport(self, evt) :
         if 'corpus' in dir(self.Source):
             corpus = self.Source.corpus
-            corpus.export_classe(self.Source.pathout['classe_%i_export.txt' % self.cl], self.cl)
+        corpus.export_classe(self.Source.pathout['classe_%i_export.txt' % self.cl], self.cl)
         dial = wx.MessageDialog(self, self.Source.pathout['classe_%i_export.txt' % self.cl], u"Export", wx.OK|wx.ICON_INFORMATION)
         dial.ShowModal()
         dial.Destroy()

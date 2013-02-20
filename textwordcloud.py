@@ -77,3 +77,29 @@ class WordCloud(AnalyseText):
         act = ['\t'.join([act, `self.corpus.getlemeff(act)`]) for act in self.actives]
         with open(self.pathout['actives_eff.csv'], 'w') as f :
             f.write('\n'.join(act).encode(self.ira.syscoding))
+
+
+class ClusterCloud(WordCloud) :
+    def doanalyse(self) :
+        self.parametres['type'] = 'clustercloud'
+        #FIXME
+        limit = 2
+        res = self.make_option()
+        if res == wx.ID_OK :
+            prof = self.parametres['clusterprof']
+            del self.parametres['clusterprof']
+            if self.parametres.get('unit', 0) == 0 :
+                tokeep = 1
+            else : 
+                tokeep = 2
+            prof = [[val[0], int(round(val[tokeep]))] for val in prof]
+            with open(self.pathout['actives_eff.csv'], 'w') as f :
+                f.write('\n'.join(['\t'.join([val[0], `val[1]`]) for val in prof]).encode(self.ira.syscoding))
+            dictcol = dict([[i, val] for i, val in enumerate(prof)])
+            self.actives = [val[0] for val in prof]
+            SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], dlg = True)
+            script = WordCloudRScript(self)
+            script.make_script()
+            self.doR(script.scriptout, dlg = self.dlg, message = 'R...')
+        else :
+            return 'NOK'

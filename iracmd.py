@@ -18,7 +18,7 @@ from ConfigParser import *
 #from textchdalc import AnalyseAlceste
 #from textdist import PamTxt
 #from textafcuci import AfcUci
-from analysetxt import Alceste,  gramact, gramsup
+from analysetxt import Alceste
 from corpus import Corpus, copycorpus
 from textaslexico import Lexico
 from textstat import Stat
@@ -94,10 +94,14 @@ class CmdLine :
         if options.filename or options.read :
             self.corpus_encodage = options.encodage
             self.corpus_lang = options.language
-                
+            self.keys = DoConf(self.ConfigPath['key']).getoptions()
+ 
 
             ReadLexique(self, lang = options.language)
             self.expressions = ReadDicoAsDico(self.DictPath.get(options.language + '_exp', 'french_exp'))
+            gramact = [k for k in self.keys if self.keys[k] == 1]
+            gramsup = [k for k in self.keys if self.keys[k] == 2]
+
             if options.filename :
                 self.filename = os.path.abspath(options.filename)
                 if options.corpusconfigfile is not None :
@@ -130,6 +134,11 @@ class CmdLine :
                 #corpus.conn_all()
                 corpus.make_lems()
                 corpus.parse_active(gramact, gramsup)
+                for forme in corpus.formes :
+                    if corpus.formes[forme].gram == '' or corpus.formes[forme].gram == ' ' :
+                        print forme
+                        for val in dir(corpus.formes[forme]) :
+                            print getattr(corpus.formes[forme], val)
                 #print corpus.getlemconcorde('de').fetchall()
 #            log.warning('ATTENTION gethapaxuces')
 #            MakeUciStat(corpus)

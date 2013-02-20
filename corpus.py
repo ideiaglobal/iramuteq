@@ -275,8 +275,12 @@ class Corpus :
         if self.iduces is None :
             self.iduces = dict([[uce.ident, uce] for uci in self.ucis for uce in uci.uces])
 
-    def make_lexitable(self, mineff, etoiles) :
-        tokeep = [lem for lem in self.lems if self.lems[lem].freq >= mineff]
+    def make_lexitable(self, mineff, etoiles, gram = 0) :
+        if gram == 0 :
+            grams = {1:'', 2:''}
+        else :
+            grams = {gram :''}
+        tokeep = [lem for lem in self.lems if self.lems[lem].freq >= mineff and self.lems[lem].act in grams]
         etuces = [[] for et in etoiles]
         for uci in self.ucis :
             get = list(set(uci.etoiles).intersection(etoiles))

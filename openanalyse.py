@@ -131,7 +131,7 @@ class OpenAnalyse():
         elif self.conf['type'] == 'simitxt' or self.conf['type'] == 'clustersimitxt' :
             self.parent.ShowMenu(_("Text analysis"))
             SimiLayout(self.parent, corpus, self.conf)
-        elif self.conf['type'] == 'wordcloud' :
+        elif self.conf['type'] == 'wordcloud' or self.conf['type'] == 'clustercloud':
             self.parent.ShowMenu(_("Text analysis"))
             WordCloudLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'gnepamatrix' :

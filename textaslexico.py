@@ -151,6 +151,7 @@ class Lexico(AnalyseText) :
                 self.parametres['indice'] = 'hypergeo'
             else :
                 self.parametres['indice'] = 'chi2'
+            self.parametres['typeformes'] = dial.typeformes.GetSelection()
             self.parametres['clnb'] = len(ListEt)
             dial.Destroy()
             return self.parametres
@@ -161,10 +162,10 @@ class Lexico(AnalyseText) :
     def make_lexico(self) :
         mineff = self.parametres['mineff']
         #dlg = progressbar(self, maxi = 3)
-        tabout = self.corpus.make_lexitable(mineff, self.listet)
+        tabout = self.corpus.make_lexitable(mineff, self.listet, gram = self.parametres['typeformes'])
         #log.warning('Fmax a 200')
         #Fmax = [line for line in tabout[1:] if sum(line[1:]) > 199]
-        #formesmax = [line[0] for line in Fmax]
+        #formesmax = [line[0] for line in Fmax
         #Fmax = [line[1:] for line in Fmax]
         #summax = [sum(col) for col in zip(*Fmax)]
         #tabout.append(['Fmax'] + summax)
