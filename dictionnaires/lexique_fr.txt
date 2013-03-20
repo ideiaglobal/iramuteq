@@ -12298,7 +12298,7 @@ baume	baume	nom		s	1.94	3.65	1.79	2.91
 baumes	baume	nom		p	1.94	3.65	0.16	0.74	
 baumier	baumier	nom	m	s	0.01	0.07	0.01	0	
 baumiers	baumier	nom	m	p	0.01	0.07	0	0.07	
-baux	bail,bau	nom	m	p	0.19	0.34	0.19	0.34	
+baux	bail	nom	m	p	0.19	0.34	0.19	0.34	
 bauxite	bauxite	nom	f	s	0.18	0.41	0.18	0.41	
 bava	baver	ver			9.79	12.36	0.02	0.2	ind:pas:3s;
 bavaient	baver	ver			9.79	12.36	0.02	0.41	ind:imp:3p;
@@ -78490,9 +78490,9 @@ mollasses	mollasse	adj	m	p	0.25	0.95	0	0.14
 mollasson	mollasson	nom	m	s	0.4	0.2	0.38	0.2	
 mollassonne	mollasson	adj	f	s	0.3	0.27	0.04	0.07	
 mollassons	mollasson	adj	m	p	0.3	0.27	0.02	0.07	
-molle	mou,mol	adj	f	s	5.37	34.53	3.92	22.7	
+molle	mou	adj	f	s	5.37	34.53	3.92	22.7	
 mollement	mollement	adv			0.33	11.55	0.33	11.55	
-molles	mou,mol	adj	f	p	5.37	34.53	1.45	11.82	
+molles	mou adj	f	p	5.37	34.53	1.45	11.82	
 mollesse	mollesse	nom	f	s	0.44	6.42	0.44	6.28	
 mollesses	mollesse	nom	f	p	0.44	6.42	0	0.14	
 mollet	mollet	nom	m	s	1.77	14.93	0.67	5.27	

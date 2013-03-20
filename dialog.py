@@ -1916,7 +1916,7 @@ class PrefDendro ( wx.Dialog ):
 
 class PrefWordCloud ( wx.Dialog ):
     
-    def __init__( self, parent ):
+    def __init__( self, parent, fromcluster = False ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Préférences wordcloud", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
@@ -1976,7 +1976,17 @@ class PrefWordCloud ( wx.Dialog ):
         self.format = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, formatChoices, 0 )
         self.format.SetSelection( 0 )
         fgSizer1.Add( self.format, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+
+        if fromcluster :
+            self.m_staticText111 = wx.StaticText( self, wx.ID_ANY, u"Taille des mots en fonction de ...", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_staticText11.Wrap( -1 )
+            fgSizer1.Add( self.m_staticText111, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
+            IndiceChoices = [ u"chi2", u"fréquence" ]
+            self.indice = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, IndiceChoices, 0 )
+            self.indice.SetSelection( 0 )
+            fgSizer1.Add( self.indice, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+
         self.m_staticline13 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline13, 0, wx.EXPAND |wx.ALL, 5 )
         
