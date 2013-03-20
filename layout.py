@@ -327,7 +327,7 @@ class OpenCHDS():
 
        Profile = DictPathOut['PROFILE_OUT']
        AntiProfile = DictPathOut['ANTIPRO_OUT']
-       self.encoding = self.corpus.parametres['syscoding']
+       self.encoding = self.parametres['encoding']
        if isinstance(self.corpus, Corpus) :
             self.corpus.make_ucecl_from_R(self.pathout['uce'])
             corpname = self.corpus.parametres['corpus_name']
@@ -550,6 +550,63 @@ temps d'analyse : %s
     with open(self.pathout['pre_rapport'], 'w') as f :
         f.write(txt)
 
+
+class SashList(wx.Panel) :
+    def __init__(self, parent) :
+        wx.Panel.__init__(self, parent, -1)
+        self.parent=parent
+        winids = []
+        #self.gparent=gparent
+        #self.dlist=dlist
+        #self.first = first
+        #self.menu = menu        
+        # A window to the left of the client window
+        #self.listlex = listlex
+        self.leftwin1 =  wx.SashLayoutWindow(
+                self, -1, wx.DefaultPosition, (200, 300), 
+                wx.NO_BORDER|wx.SW_3D
+                )
+
+        self.leftwin1.SetDefaultSize((120, 1000))
+        self.leftwin1.SetOrientation(wx.LAYOUT_VERTICAL)
+        self.leftwin1.SetAlignment(wx.LAYOUT_LEFT)
+        self.leftwin1.SetBackgroundColour(wx.Colour(0, 255, 0))
+        self.leftwin1.SetSashVisible(wx.SASH_RIGHT, True)
+        self.leftwin1.SetExtraBorderSize(10)
+        
+        #textWindow = wx.TextCtrl(
+        #                leftwin1, -1, "", wx.DefaultPosition, wx.DefaultSize, 
+        #                wx.TE_MULTILINE|wx.SUNKEN_BORDER
+        #                )
+
+        #textWindow.SetValue("A sub window")
+
+        self.leftWindow1 = self.leftwin1
+        winids.append(self.leftwin1.GetId())
+        
+        rightwin1 =  wx.SashLayoutWindow(
+                self, -1, wx.DefaultPosition, (200, 300), 
+                wx.NO_BORDER|wx.SW_3D
+                )
+
+        rightwin1.SetDefaultSize((120, 1000))
+        rightwin1.SetOrientation(wx.LAYOUT_VERTICAL)
+        rightwin1.SetAlignment(wx.LAYOUT_LEFT)
+        rightwin1.SetBackgroundColour(wx.Colour(0, 255, 0))
+        rightwin1.SetSashVisible(wx.SASH_RIGHT, True)
+        rightwin1.SetExtraBorderSize(10)
+        #textWindow = wx.TextCtrl(
+        #                leftwin1, -1, "", wx.DefaultPosition, wx.DefaultSize, 
+        #                wx.TE_MULTILINE|wx.SUNKEN_BORDER
+        #                )
+
+        #textWindow.SetValue("A sub window")
+
+        self.rightwin1 = rightwin1
+        winids.append(rightwin1.GetId())
+
+
+
 class dolexlayout :
     def __init__(self, ira, corpus, parametres):
         self.pathout = PathOut(dirout = parametres['pathout'])
@@ -567,13 +624,17 @@ class dolexlayout :
         self.DictEffRelForme, firsteffrelf = ReadList(self.dictpathout['eff_relatif_forme'], self.corpus.parametres['syscoding']) 
         self.DictEffRelType, firsteffrelt = ReadList(self.dictpathout['eff_relatif_type'], self.corpus.parametres['syscoding'])    
         
+        #sash = SashList(ira.nb)
+        
+        
         self.TabStat = aui.AuiNotebook(ira.nb, -1, wx.DefaultPosition)
         self.TabStat.parametres = parametres
-        self.ListPan = ListForSpec(ira, self.parent, self.DictSpec, first)
-        self.ListPant = ListForSpec(ira, self.parent, self.DictType, firstt)
-        self.ListPanEff = ListForSpec(ira, self.parent, self.DictEff, firsteff)
-        self.ListPanEffType = ListForSpec(ira, self.parent, self.DictEffType, firstefft)
-        self.ListPanEffRelForme = ListForSpec(ira, self.parent, self.DictEffRelForme, firsteffrelf)
+        self.ListPan = ListForSpec(ira, self, self.DictSpec, first)
+        #self.ListPan2 = ListForSpec(sash.rightwin1, self, self.DictSpec, first)
+        self.ListPant = ListForSpec(ira, self, self.DictType, firstt)
+        self.ListPanEff = ListForSpec(ira, self, self.DictEff, firsteff)
+        self.ListPanEffType = ListForSpec(ira, self, self.DictEffType, firstefft)
+        self.ListPanEffRelForme = ListForSpec(ira, self, self.DictEffRelForme, firsteffrelf)
         self.ListPanEffRelType = ListForSpec(ira, self.parent, self.DictEffRelType, firsteffrelt)
         
         self.TabStat.AddPage(self.ListPan, u'formes') 
@@ -653,6 +714,8 @@ class GraphPanelDendro(wx.Panel):
         self.deb = wx.StaticText(self.panel_1, -1, txt)
         dendro_img = wx.Image(os.path.join(self.ira.images_path,'but_dendro.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.butdendro = wx.BitmapButton(self, -1, dendro_img)
+        self.butdendrotexte = wx.BitmapButton(self, -1, dendro_img)
+        self.butdendrocloud = wx.BitmapButton(self, -1, dendro_img)
         
         for i in range(0,len(list_graph)):
             if os.path.exists(os.path.join(self.dirout,list_graph[i][0])) :
@@ -668,6 +731,8 @@ class GraphPanelDendro(wx.Panel):
         self.panel_1.SetScrollRate(20, 20)
         self.panel_1.SetFocus()
         self.Bind(wx.EVT_BUTTON, self.ondendro, self.butdendro)
+        self.Bind(wx.EVT_BUTTON, self.ondendrotexte, self.butdendrotexte)
+        self.Bind(wx.EVT_BUTTON, self.ondendrocloud, self.butdendrocloud)
         self.param = {'width' : 700,
                        'height': 500,
                        'type_dendro': 0,
@@ -682,11 +747,15 @@ class GraphPanelDendro(wx.Panel):
         self.sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
         self.sizer_3 = wx.BoxSizer(wx.VERTICAL)
         self.sizer_3.Add(self.deb)
-        self.sizer_2.Add(self.butdendro, 0, 0, 0)
+        self.sizer_1.Add(self.butdendro, 0, 0, 0)
+        self.sizer_1.Add(self.butdendrotexte, 0, 0, 0)
+        self.sizer_1.Add(self.butdendrocloud, 0, 0, 0)
+
         for i in range(0, len(self.listimg)):
             self.sizer_3.Add(self.listimg[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
             self.sizer_3.Add(self.labels[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
         self.panel_1.SetSizer(self.sizer_3)
+        self.sizer_2.Add(self.sizer_1, 0, wx.EXPAND, 0)
         self.sizer_2.Add(self.panel_1, 1, wx.EXPAND, 0)
         self.SetSizer(self.sizer_2) 
 
@@ -698,7 +767,7 @@ class GraphPanelDendro(wx.Panel):
         self.param['taille_classe'] = dial.m_checkBox1.GetValue()
         self.param['type_tclasse'] = dial.m_radioBox2.GetSelection()
 
-    def make_dendro(self) :
+    def make_dendro(self, dendro = 'simple') :
         while os.path.exists(os.path.join(self.dirout, 'dendrogamme_' + str(self.graphnb)+'.png')) :
             self.graphnb += 1
         fileout = ffr(os.path.join(self.dirout,'dendrogamme_' + str(self.graphnb)+'.png'))
@@ -725,10 +794,30 @@ class GraphPanelDendro(wx.Panel):
         source("%s")
         classes <- read.csv2("%s", row.names=1)
         classes <- classes[,1]
-        open_file_graph("%s", width=%i, height=%i)
-        plot.dendropr(tree.cut1$tree.cl, classes, type.dendro="%s", histo=%s, bw=%s, lab=NULL, tclasse=%s)
-        """ % (ffr(dendro_path), ffr(self.ira.RscriptsPath['Rgraph']), ffr(classe_path), ffr(fileout), width, height, type_dendro, histo, bw, tclasse)
-        
+        """ % (ffr(dendro_path), ffr(self.ira.RscriptsPath['Rgraph']),  ffr(classe_path))
+        if dendro == 'simple' :
+            txt += """
+            open_file_graph("%s", width=%i, height=%i)
+            plot.dendropr(tree.cut1$tree.cl, classes, type.dendro="%s", histo=%s, bw=%s, lab=NULL, tclasse=%s)
+            """ % (ffr(fileout), width, height, type_dendro, histo, bw, tclasse)
+        elif dendro == 'texte' :
+            txt += """
+            load("%s")
+            source("%s")
+            chistable <- chistabletot[1:(debsup-1),]
+            open_file_graph("%s", width=%i, height=%i)
+            plot.dendro.prof(tree.cut1$tree.cl, classes, chistable, nbbycl = 60, type.dendro="%s", bw=%s, lab=NULL)
+            """ % (ffr(self.dictpathout['RData.RData']), ffr(self.ira.RscriptsPath['Rgraph']), ffr(fileout), width, height, type_dendro, bw)
+        elif dendro == 'cloud' :
+            txt += """
+            load("%s")
+            source("%s")
+            chistable <- chistabletot[1:(debsup-1),]
+            open_file_graph("%s", width=%i, height=%i)
+            plot.dendro.cloud(tree.cut1$tree.cl, classes, chistable, nbbycl = 300, type.dendro="%s", bw=%s, lab=NULL)
+            """ % (ffr(self.dictpathout['RData.RData']), ffr(self.ira.RscriptsPath['Rgraph']), ffr(fileout), width, height, type_dendro, bw)
+
+
         tmpfile = tempfile.mktemp()
         with open(tmpfile, 'w') as f :
             f.write(txt)
@@ -749,8 +838,20 @@ class GraphPanelDendro(wx.Panel):
         if val == wx.ID_OK :
             self.make_param(dial)
             self.make_dendro()
+    
+    def ondendrotexte(self, evt):
+        dial = PrefDendro(self.ira, self.param)
+        val = dial.ShowModal()
+        if val == wx.ID_OK :
+            self.make_param(dial)
+            self.make_dendro(dendro = 'texte')
 
-
+    def ondendrocloud(self, evt):
+        dial = PrefDendro(self.ira, self.param)
+        val = dial.ShowModal()
+        if val == wx.ID_OK :
+            self.make_param(dial)
+            self.make_dendro(dendro = 'cloud')
 
 class OpenCorpus :
     def __init__(self, ira, parametres) :
@@ -948,9 +1049,13 @@ class SimiLayout(DefaultTextLayout) :
         graph <- graph.simi$graph
         V(graph)$x <- graph.simi$layout[,1]
         V(graph)$y <- graph.simi$layout[,2]
-        V(graph)$weight <- graph.simi$label.cex
+        if (graph.simi$label.cex == 1) {
+            V(graph)$weight <- graph.simi$eff
+        } else {
+            V(graph)$weight <- graph.simi$label.cex
+        }
         V(graph)$colors <- vertex.label.color
-        E(graph)$weigth <- graph.simi$we.width
+        E(graph)$weight <- graph.simi$we.width
         write.graph(graph, fileout, format = 'graphml')
         """ % (self.pathout['RData.RData'], fileout)
         filetmp = tempfile.mktemp()
@@ -973,6 +1078,23 @@ class DefaultMatLayout :
 
     def dolayout(self) :
         pass
+
+class ProtoLayout(DefaultMatLayout) :
+    def dolayout(self) :
+        list_graph = [['proto.png', 'Analyse prototypique']]
+        #self.Tab = aui.AuiNotebook(self.ira.nb, -1, wx.DefaultPosition)
+        #if self.parametres['svg'] :
+        #    list_graph = [['nuage_1.svg', 'Nuage']]
+        #else :
+        #    list_graph = [['nuage_1.png', 'Nuage']]
+        self.TabProto = GraphPanel(self.ira.nb, self.pathout, list_graph)
+        #self.Tab.AddPage(self.TabProto, 'Analyse Prototypique')
+        #self.Tab.corpus = self.corpus
+        self.TabProto.parametres = self.parametres
+        self.ira.nb.AddPage(self.TabProto, 'Analyse Prototypique - %s' % self.parametres['name'])
+        self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
+        self.ira.ShowAPane("Tab_content")
+
 
 class SimiMatLayout(DefaultMatLayout) :
     def dolayout(self):
@@ -1137,7 +1259,11 @@ class SimiMatLayout(DefaultMatLayout) :
         graph <- graph.simi$graph
         V(graph)$x <- graph.simi$layout[,1]
         V(graph)$y <- graph.simi$layout[,2]
-        V(graph)$weight <- graph.simi$label.cex
+        if (graph.simi$label.cex == 1) {
+            V(graph)$weight <- graph.simi$eff
+        } else {
+            V(graph)$weight <- graph.simi$label.cex
+        }
         V(graph)$colors <- vertex.label.color
         E(graph)$weigth <- graph.simi$we.width
         write.graph(graph, fileout, format = 'graphml')
