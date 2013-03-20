@@ -675,3 +675,20 @@ def treat_var_mod(variables) :
                 if not mod in var_mod[var] :
                     var_mod[var].append(variable)
     return var_mod
+
+def doconcorde(corpus, uces, mots) :
+    ucestxt1 = [row for row in corpus.getconcorde(uces)]
+    ucestxt1 = dict(ucestxt1)
+    ucestxt = []
+    ucis_txt = []
+    listmot = [corpus.getlems()[lem].formes for lem in mots]
+    listmot = [corpus.getforme(fid).forme for lem in listmot for fid in lem]
+    mothtml = ['<font color=red><b>'+mot+'</b></font>' for mot in listmot]
+    dmots = dict(zip(listmot, mothtml))
+    for uce in uces :
+        ucetxt = ucestxt1[uce].split()
+        ucetxt = ' '.join([dmots.get(mot, mot) for mot in ucetxt])
+        ucis_txt.append('<p><b>' + ' '.join(corpus.ucis[corpus.getucefromid(uce).uci].etoiles) + '</b></p>')
+        ucestxt.append(ucetxt)        
+    return ucis_txt, ucestxt
+ 
