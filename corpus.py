@@ -510,6 +510,17 @@ class Corpus :
                 table_uce[uces[uce]][i] = 1
         table_uce.insert(0, list_act)
         return table_uce      
+    
+    def make_pondtable_with_classe(self, uces, list_act) :
+        table_uce = [[0 for val in list_act] for line in range(0,len(uces))]
+        uces = dict([[uce, i] for i, uce in enumerate(uces)])
+        for i, lem in enumerate(list_act) :
+            uceseff = self.getlemuceseff(lem)
+            lemuces = list(set(uceseff.keys()).intersection(uces))
+            for uce in lemuces :
+                table_uce[uces[uce]][i] = uceseff[uce]
+        table_uce.insert(0, list_act)
+        return table_uce 
 
     def parse_active(self, gramact, gramsup = None) :
         log.info('parse actives')
