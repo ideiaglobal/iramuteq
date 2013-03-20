@@ -19,7 +19,7 @@ import  wx
 from dialog import SearchDial, message
 import wx.lib.mixins.listctrl as listmix 
 from operator import itemgetter
-
+from functions import doconcorde
 #---------------------------------------------------------------------------
 
 class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
@@ -182,20 +182,10 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
 
     def OnPopupTwo(self, event):
         corpus = self.gparent.corpus
-        win = message(self, u"Concordancier", (750, 600))
-        avap = 60
         item = self.getColumnText(self.GetFirstSelected(), 0)
-        listmot = corpus.getlems()[item].formes
-        #uce_ok = [corpus.formes[corpus.idformes[forme].forme][1] for forme in listmot]
-        uce_ok = corpus.getlemuces(item)#list(set([tuple(val) for line in uce_ok for val in line]))
-        txt = '<h1>Concordancier</h1>'
-        res = corpus.getconcorde(uce_ok)
-        for uce in res :
-            ucetxt = ' '+uce[1]+' '
-            txt += ' '.join(corpus.ucis[corpus.getucefromid(uce[0]).uci].etoiles) + '<br>'
-            for forme in listmot :
-                forme = corpus.getforme(forme).forme
-                ucetxt = ucetxt.replace(' '+forme+' ', '<font color=red> ' + forme + ' </font>')
-            txt += ucetxt + '<br><br>'
-        win.HtmlPage.SetPage(txt) 
+        uce_ok = corpus.getlemuces(item)
+        ucis_txt, ucestxt = doconcorde(corpus, uce_ok, [item])
+        win = message(self, u"Concordancier", (750, 600))
+        win.html = ('<html>\n<h1>%s</h1>' % item) + '<br>'.join(['<br>'.join([ucis_txt[i], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
+        win.HtmlPage.SetPage(win.html)
         win.Show(True)

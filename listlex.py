@@ -18,7 +18,7 @@ import  wx
 import  wx.lib.mixins.listctrl  as  listmix
 import cStringIO
 import tempfile
-from functions import exec_rcode, MessageImage
+from functions import exec_rcode, MessageImage, doconcorde
 from chemins import ffr
 from PrintRScript import barplot
 from dialog import SearchDial, message
@@ -27,6 +27,7 @@ from operator import itemgetter
 
 class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
     def __init__(self, parent,gparent, dlist, first, menu = True):
+    #def  __init__(self, parent) :
         wx.ListCtrl.__init__( self, parent, -1, style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_HRULES|wx.LC_VRULES)
         self.parent=parent
         self.gparent=gparent
@@ -34,6 +35,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         self.first = first
         self.menu = menu
 
+    #def start(self) :
         search_id = wx.NewId()
         self.parent.Bind(wx.EVT_MENU, self.onsearch, id = search_id)
         self.accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('F'), search_id)])
@@ -53,24 +55,22 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         self.attr2 = wx.ListItemAttr()
         self.attr2.SetBackgroundColour("light blue")
         
-        self.dlist = dlist 
-
         i=0
-        for name in first :
+        for name in self.first :
             self.InsertColumn(i,name,wx.LIST_FORMAT_LEFT)
             i+=1
             
         self.SetColumnWidth(0, 180)
 
-        for i in range(1,len(first)-1):
-            self.SetColumnWidth(i, self.checkcolumnwidth(len(first[i]) * 10))
+        for i in range(1,len(self.first)-1):
+            self.SetColumnWidth(i, self.checkcolumnwidth(len(self.first[i]) * 10))
         
-        self.itemDataMap = dlist
-        self.itemIndexMap = dlist.keys()
-        self.SetItemCount(len(dlist))
+        self.itemDataMap = self.dlist
+        self.itemIndexMap = self.dlist.keys()
+        self.SetItemCount(len(self.dlist))
         
         #listmix.ListCtrlAutoWidthMixin.__init__(self)
-        listmix.ColumnSorterMixin.__init__(self, len(first))
+        listmix.ColumnSorterMixin.__init__(self, len(self.first))
         self.SortListItems(1, 0)
         
 #-----------------------------------------------------------------------------------------    
@@ -154,19 +154,28 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
                 self.popupID2 = wx.NewId()
                 self.popupID3 = wx.NewId()
                 self.popup_Tgen_glob = wx.NewId()
+                self.ID_stcaract = wx.NewId()
 
                 self.Bind(wx.EVT_MENU, self.OnPopupOne, id=self.popupID1)
                 self.Bind(wx.EVT_MENU, self.OnPopupTwo, id=self.popupID2)
                 self.Bind(wx.EVT_MENU, self.OnPopupThree, id=self.popupID3)
                 self.Bind(wx.EVT_MENU, self.OnTgen_glob, id=self.popup_Tgen_glob)
+                #self.Bind(wx.EVT_MENU, self.onstcaract, id = self.ID_stcaract)
             # make a menu
             menu = wx.Menu()
             # add some items
             menu.Append(self.popupID1, u"Formes associées")
             menu.Append(self.popupID2, u"Concordancier")
             menu.Append(self.popupID3, "Graphique")
+            menu_stcaract = wx.Menu()
+            self.menuid = {}
+            for i, et in enumerate(self.first[1:]) :
+                nid = wx.NewId()
+                self.menuid[nid] = i
+                menu_stcaract.Append(nid, et)
+                self.Bind(wx.EVT_MENU, self.onstcaract, id = nid)
+            menu.AppendMenu(-1, u"Segments de texte caractéristiques", menu_stcaract)
             #menu.Append(self.popup_Tgen_glob, "Tgen global")
-
             self.PopupMenu(menu)
             menu.Destroy()
 
@@ -192,26 +201,60 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
         win.HtmlPage.SetPage(win.html)
         win.Show(True)
-
+    
+    def onstcaract(self, evt) :
+        ind = self.menuid[evt.Id]
+        limite = 50
+        minind = 2
+        activenotebook = self.parent.nb.GetSelection()
+        page = self.parent.nb.GetPage(activenotebook)
+        item=self.getColumnText(self.GetFirstSelected(), 0)
+        corpus = page.corpus
+        parametres = page.parametres
+        paneff = self.gparent.ListPanEff
+        panchi = self.gparent.ListPan
+        et = self.first[ind+1]
+        if et.startswith(u'X.') :
+            et = et.replace(u'X.', u'*')
+        uces = corpus.getucesfrometoile(et)
+        self.la = [panchi.dlist[i][0] for i in range(0, len(panchi.dlist)) if panchi.dlist[i][ind+1] >= minind ]
+        self.lchi = [panchi.dlist[i][ind+1] for i in range(0, len(panchi.dlist)) if panchi.dlist[i][ind+1] >= minind ]
+        #lfreq = [paneff.dlist[i][ind+1] for i in range(0, len(panchi.dlist)) if panchi.dlist[i][ind+1] >= minind ]
+        if max(self.lchi) == float('inf') :
+            nchi = []
+            for val in self.lchi :
+                if val == float('inf') :
+                    nchi.append(0)
+                else :
+                    nchi.append(val)
+            nmax = max(nchi)
+            nchi = [val if val != float('inf') else nmax + 2 for val in self.lchi]
+            self.lchi = nchi
+        tab = corpus.make_pondtable_with_classe(uces, self.la)
+        tab.pop(0)
+        ntab = [round(sum([(self.lchi[i] * word) for i, word in enumerate(line) if word != 0]),2) for line in tab]
+        ntab2 = [[ntab[i], uces[i]] for i, val in enumerate(ntab) if ntab[i] != 0]
+        del ntab
+        ntab2.sort(reverse = True)
+        ntab2 = ntab2[:limite]
+        nuces = [val[1] for val in ntab2]
+        ucis_txt, ucestxt = doconcorde(corpus, nuces, self.la)
+        win = message(self, u"Segments de texte caractéristiques - %s" % self.first[ind], (750, 600))
+        win.html = '<html>\n' + '<br>'.join(['<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table>' % ntab2[i][0], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
+        win.HtmlPage.SetPage(win.html)
+        #dlg.Destroy()
+        win.Show(True)
+        
     def OnPopupTwo(self, event):
         activenotebook = self.parent.nb.GetSelection()
         page = self.parent.nb.GetPage(activenotebook)
         item=self.getColumnText(self.GetFirstSelected(), 0)
         corpus = page.corpus
-        win = message(self, u"Concordancier", (750, 600))
-        avap=60
-        listmot = corpus.getlems()[item].formes       
         uce_ok = corpus.getlemuces(item)
-        txt = '<h1>Concordancier</h1>'
-        res = corpus.getconcorde(uce_ok)
-        for uce in res :
-            ucetxt = ' '+uce[1]+' '
-            txt += ' '.join(corpus.ucis[corpus.getucefromid(uce[0]).uci].etoiles) + '<br>'
-            for forme in listmot :
-                forme = corpus.getforme(forme).forme
-                ucetxt = ucetxt.replace(' '+forme+' ', '<font color=red> ' + forme + ' </font>')
-            txt += ucetxt + '<br><br>'        
-        win.HtmlPage.SetPage(txt)
+        win = message(self, u"Concordancier", (750, 600))
+        ucis_txt, ucestxt = doconcorde(corpus, uce_ok, [item])
+        win.html = ('<html>\n<h1>%s</h1>' % item) + '<br>'.join(['<br>'.join([ucis_txt[i], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
+        win.HtmlPage.SetPage(win.html)
         win.Show(True)
 
     def getinf(self, txt) :
@@ -249,7 +292,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         page = self.parent.nb.GetPage(activenotebook)
         corpus = page.corpus
 
-        tmpgraph = tempfile.mktemp(dir=self.gparent.parent.TEMPDIR)
+        tmpgraph = tempfile.mktemp(dir=self.parent.TEMPDIR)
         intxt = """
         load("%s")
         """ % corpus.dictpathout['RData']
@@ -267,11 +310,11 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         spec.Tgen.glob <- spec.Tgen.glob[[1]][((nrow(Tgen.table)-ncol(Tgen.table))+1):nrow(Tgen.table),]
         di <- spec.Tgen.glob
         """
-        txt = barplot('', '', '', self.gparent.parent.RscriptsPath['Rgraph'], tmpgraph, intxt = intxt) 
-        tmpscript = tempfile.mktemp(dir=self.gparent.parent.TEMPDIR)
+        txt = barplot('', '', '', self.parent.RscriptsPath['Rgraph'], tmpgraph, intxt = intxt) 
+        tmpscript = tempfile.mktemp(dir=self.parent.TEMPDIR)
         with open(tmpscript, 'w') as f :
             f.write(txt)
-        exec_rcode(self.gparent.parent.RPath, tmpscript, wait = True)
+        exec_rcode(self.parent.RPath, tmpscript, wait = True)
         win = MessageImage(self, -1, u"Graphique", size=(700, 500),style = wx.DEFAULT_FRAME_STYLE)
         win.addsaveimage(tmpgraph)
         txt = "<img src='%s'>" % tmpgraph

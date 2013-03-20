@@ -27,7 +27,7 @@ import webbrowser
 #import cStringIO
 import tempfile
 import codecs
-from functions import exec_rcode, MessageImage, progressbar, treat_var_mod
+from functions import exec_rcode, MessageImage, progressbar, treat_var_mod, doconcorde
 from PrintRScript import barplot
 from textclassechd import ClasseCHD
 from shutil import copyfile
@@ -358,7 +358,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         parametres['clusterprof'] = prof
         parametres['type'] = 'clustercloud'
         parametres['prof'] = self.Source.pathout['actprof_classe_%i.csv' % self.cl]
-        print parametres['prof']
+        del  parametres['uuid']
         #if not os.path.exists(self.Source.pathout['actprof_classe_%i.csv' % self.lc]) :
         #    with open(self.Source.pathout['actprof_classe_%i.csv' % self.lc], 'w') as f :
         #        f.write('\n'.join(prof).encode(self.parent.syscoding))
@@ -553,24 +553,10 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             ntab2 = ntab2[:limite]
             nuces = [val[1] for val in ntab2]
             dlg.Update(3, u'concordancier...')
-            #ucestxt = [corpus.ucis_paras_uces[val[1][0]][val[1][1]][val[1][2]] for val in ntab2]
-            ucestxt1 = [row for row in corpus.getconcorde(nuces)]
-            ucestxt = []
-            ucis_txt = []
-            for uce in ucestxt1 :
-                ucetxt = ' '+uce[1]+' '
-                ucis_txt.append(' '.join(corpus.ucis[corpus.getucefromid(uce[0]).uci].etoiles) + '<br>')
-                for lem in self.la :
-                    listmot = corpus.getlems()[lem].formes
-                    for id in listmot :
-                        forme = corpus.getforme(id).forme
-                        ucetxt = ucetxt.replace(' '+forme+' ', '<font color=red> ' + forme + ' </font>')
-                ucestxt.append(ucetxt)        
-            #ucestxt = [corpus.make_concord(self.la, ' '.join(uce), 'red') for uce in ucestxt]
+            ucis_txt, ucestxt = doconcorde(corpus, nuces, self.la)
             dlg.Update(4, u'texte...')
-            #ucis_txt = [' '.join(corpus.ucis[val[1][0]][0]) for val in ntab2]
             win = message(self, u"Segments de texte caractéristiques - Classe %i" % self.cl, (750, 600))
-            win.html = '<html>\n' + '<br><br>'.join(['<br>'.join([ucis_txt[i], 'score : ' + str(ntab2[i][0]), ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
+            win.html = '<html>\n' + '<br>'.join(['<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table>' % ntab2[i][0], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
             win.HtmlPage.SetPage(win.html)
             dlg.Destroy()
             win.Show(True)
@@ -667,26 +653,13 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         while self.GetNextSelected(last) != -1:
             last = self.GetNextSelected(last)
             ListWord.append(self.getColumnText(last, 6))
-        listmot = [forme for item in ListWord for forme in corpus.getlems()[item].formes]
-        win = message(self, title, size=(750, 600))
-        toshow = ['<html>\n<H1>Concordancier</H1>\n']
-        toshow.append('<h3><font color=%s>' % color + ' '.join(ListWord) + '</font></h3><br>')
-        duce = {}
         ucef = []
         for word in ListWord : 
             ucef += list(set(corpus.getlemuces(word)).intersection(uces))
-        ucef = list(set(ucef))
-        ucef.sort()
-        res = corpus.getconcorde(ucef)
-        txt = '<br>'.join(toshow) +'<br><br>'
-        for uce in res :
-            ucetxt = ' '+uce[1]+' '
-            txt += ' '.join(corpus.ucis[corpus.getucefromid(uce[0]).uci].etoiles) + '<br>'
-            for forme in listmot:
-                forme = corpus.getforme(forme).forme
-                ucetxt = ucetxt.replace(' '+forme+' ', '<font color=red> ' + forme + ' </font>')
-            txt += ucetxt + '<br><br>'
-        win.HtmlPage.SetPage(txt)
+        ucis_txt, ucestxt = doconcorde(corpus, ucef, ListWord)
+        win = message(self, title, size=(750, 600))
+        win.html = ('<html>\n<h1>%s</h1>' % ' '.join(ListWord)) + '<br>'.join(['<br>'.join([ucis_txt[i], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
+        win.HtmlPage.SetPage(win.html)
         return win
 
     def OnPopupTwo(self, event):
