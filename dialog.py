@@ -2687,3 +2687,119 @@ class FreqDialog(wx.Dialog):
   
         # end wxGlade
 
+class ProtoDial ( wx.Dialog ):
+    
+    def __init__( self, parent, headers ):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u'Préférences', pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        
+        self.SetSizeHintsSz( wx.Size( 200,300 ), wx.DefaultSize )
+        
+        bSizer1 = wx.BoxSizer( wx.VERTICAL )
+        
+        fgSizer1 = wx.FlexGridSizer( 0, 2, 0, 0 )
+        fgSizer1.SetFlexibleDirection( wx.BOTH )
+        fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Variables", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1.Wrap( -1 )
+        fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+        
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"Rangs", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2.Wrap( -1 )
+        fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+        
+        variablesChoices = headers
+        self.variables = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, variablesChoices, wx.LB_MULTIPLE )
+        self.variables.SetMinSize( wx.Size( 150,-1 ) )
+        
+        fgSizer1.Add( self.variables, 0, wx.ALL|wx.EXPAND, 5 )
+        
+        rangsChoices = headers
+        self.rangs = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, rangsChoices, wx.LB_MULTIPLE )
+        self.rangs.SetMinSize( wx.Size( 150,-1 ) )
+        
+        fgSizer1.Add( self.rangs, 0, wx.ALL|wx.EXPAND, 5 )
+        
+        
+        bSizer1.Add( fgSizer1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 5 )
+        
+        fgSizer3 = wx.FlexGridSizer( 0, 2, 0, 0 )
+        fgSizer3.SetFlexibleDirection( wx.BOTH )
+        fgSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        
+        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"Limite fréquence", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3.Wrap( -1 )
+        fgSizer3.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
+        
+        choix_freqChoices = [ u"automatique (moyenne)", u"manuelle" ]
+        self.choix_freq = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choix_freqChoices, 0 )
+        self.choix_freq.SetSelection( 0 )
+        bSizer2.Add( self.choix_freq, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.freqlim = wx.TextCtrl( self, wx.ID_ANY, u"0", wx.DefaultPosition, wx.DefaultSize, wx.TE_CENTRE )
+        self.freqlim.Enable( False )
+        self.freqlim.SetMinSize( wx.Size( 100,-1 ) )
+        
+        bSizer2.Add( self.freqlim, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        
+        fgSizer3.Add( bSizer2, 1, wx.EXPAND, 5 )
+        
+        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, u"Limite rang", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4.Wrap( -1 )
+        fgSizer3.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        bSizer21 = wx.BoxSizer( wx.HORIZONTAL )
+        
+        choix_rangChoices = [ u"automatique (moyenne)", u"manuelle" ]
+        self.choix_rang = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choix_rangChoices, 0 )
+        self.choix_rang.SetSelection( 0 )
+        bSizer21.Add( self.choix_rang, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.ranglim = wx.TextCtrl( self, wx.ID_ANY, u"0", wx.DefaultPosition, wx.DefaultSize, wx.TE_CENTRE )
+        self.ranglim.Enable( False )
+        self.ranglim.SetMinSize( wx.Size( 100,-1 ) )
+        
+        bSizer21.Add( self.ranglim, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        
+        fgSizer3.Add( bSizer21, 1, wx.EXPAND, 5 )
+        
+        self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, u"Fréquence minimum", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText5.Wrap( -1 )
+        fgSizer3.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.m_textCtrl4 = wx.TextCtrl( self, wx.ID_ANY, u"2", wx.DefaultPosition, wx.DefaultSize, wx.TE_CENTRE )
+        fgSizer3.Add( self.m_textCtrl4, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+        
+        
+        bSizer1.Add( fgSizer3, 1, wx.EXPAND, 5 )
+        
+        m_sdbSizer1 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
+        self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
+        m_sdbSizer1.Realize();
+        
+        bSizer1.Add( m_sdbSizer1, 0, wx.EXPAND, 5 )
+        
+        self.SetSizer( bSizer1 )
+        self.Layout()
+        bSizer1.Fit( self )
+        
+        self.Centre( wx.BOTH )
+        
+        # Connect Events
+        self.choix_freq.Bind( wx.EVT_CHOICE, self.UpdateText )
+        self.choix_rang.Bind( wx.EVT_CHOICE, self.UpdateText )
+    
+    def __del__( self ):
+        pass
+    
+    
+    # Virtual event handlers, overide them in your derived class
+    def UpdateText( self, event ):
+        event.Skip()

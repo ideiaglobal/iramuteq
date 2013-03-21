@@ -59,7 +59,7 @@ class AnalyseMatrix :
         pass
     
     def doR(self, Rscript, wait = False, dlg = None, message = '') :
-        log.info('R code...')
+        #log.info('R code...')
         pid = exec_rcode(self.ira.RPath, Rscript, wait = wait)
         while pid.poll() is None :
             if dlg :

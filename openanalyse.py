@@ -5,13 +5,13 @@
 #Lisense: GNU/GPL
 
 from chemins import ChdTxtPathOut, StatTxtPathOut, PathOut
-from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout, SimiMatLayout
+from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout, SimiMatLayout, ProtoLayout
 from corpus import Corpus, copycorpus
 from tableau import Tableau
 import os
-import shelve
+#import shelve
 #from tabsimi import DoSimi
-from functions import BugReport, DoConf, progressbar
+from functions import DoConf
 from tableau import Tableau
 import logging
 
@@ -140,4 +140,6 @@ class OpenAnalyse():
         elif self.conf['type'] == 'simimatrix' :
             #self.parent.ShowMenu(_("Spreadsheet analysis"))
             SimiMatLayout(self.parent, corpus, self.conf)
+        elif self.conf['type'] == 'proto' :
+            ProtoLayout(self.parent, corpus, self.conf)
         

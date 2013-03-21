@@ -46,7 +46,8 @@ else:
 UserConfigPath = os.path.abspath(os.path.join(user_home, '.iramuteq'))
 
 class CmdLine :
-    def __init__(self, args = None) :
+    def __init__(self, args = None, AppliPath = None) :
+        AppliPath = AppliPath
         self.DictPath = ConstructDicoPath(AppliPath)
         self.ConfigPath = ConstructConfigPath(UserConfigPath)
         self.syscoding = sys.getdefaultencoding()
@@ -175,5 +176,5 @@ class CmdLine :
 
 if __name__ == '__main__':
     __name__ = 'Main'
-    CmdLine()
+    CmdLine(AppliPath = AppliPath)
 

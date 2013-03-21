@@ -62,6 +62,23 @@ def ffr(filename):
 def FFF(filename):
     return filename.replace('\\', '/')
 
+RscriptsPath = {
+        'Rfunct': 'Rfunct.R',
+        'chdfunct': 'chdfunct.R',
+        'Rgraph': 'Rgraph.R',
+        'plotafcm': 'plotafcm.R',
+        'afc_graph' : 'afc_graph.R',
+        #'CHD': 'CHDPOND.R',
+        'CHD': 'CHD.R',
+        #'CHD' : 'NCHD.R',
+        'chdtxt': 'chdtxt.R',
+        'chdquest': 'chdquest.R',
+        'pamtxt' : 'pamtxt.R',
+        'anacor' : 'anacor.R',
+        #'anacor' : 'Nanacor.R',
+        'simi' : 'simi.R',
+    }
+
 def ConstructRscriptsPath(AppliPath):
     RScriptsPath = os.path.join(AppliPath, 'Rscripts')
     #print('@@@@@@@@@@@PONDERATION CHDPOND.R@@@@@@@@@@@@@@@@')

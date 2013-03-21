@@ -477,16 +477,120 @@ make_afc_graph <- function(toplot, classes, clnb, xlab, ylab, cex.txt = NULL, le
     }
 }
 
+plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro = "phylogram", from.cmd = FALSE, bw = FALSE, lab = NULL) {
+    library(ape)
+    library(wordcloud)
+    classes<-classes[classes!=0]
+	classes<-as.factor(classes)
+	sum.cl<-as.matrix(summary(classes, maxsum=1000000))
+	sum.cl<-(sum.cl/colSums(sum.cl)*100)
+	sum.cl<-round(sum.cl,2)
+	sum.cl<-cbind(sum.cl,as.matrix(100-sum.cl[,1]))
+    sum.cl <- sum.cl[,1]
+    tree.order<- as.numeric(tree$tip.label)
+	vec.mat<-NULL
+    row.keep <- select.chi.classe(chisqtable, nbbycl)
+    toplot <- chisqtable[row.keep,]
+    lclasses <- list()
+    for (classe in 1:length(sum.cl)) {
+       ntoplot <- toplot[,classe]
+       ntoplot <- ntoplot[order(ntoplot, decreasing = TRUE)]
+       ntoplot <- round(ntoplot, 0)
+       ntoplot <- ntoplot[1:nbbycl]
+       #ntoplot <- ntoplot[order(ntoplot)]
+       #ntoplot <- ifelse(length(ntoplot) > nbbycl, ntoplot[1:nbbycl], ntoplot)
+       lclasses[[classe]] <- ntoplot
+    }
+    vec.mat <- matrix(1, nrow = 2, ncol = length(sum.cl))
+    vec.mat[2,] <- 2:(length(sum.cl)+1)
+    layout(matrix(vec.mat, nrow=2, ncol=length(sum.cl)),heights=c(1,4))
+    if (! bw) {
+        col <- rainbow(length(sum.cl))[as.numeric(tree$tip.label)]
+        colcloud <- rainbow(length(sum.cl))
+    }
+    par(mar=c(1,0,0,0))
+    label.ori<-tree[[2]]
+    if (!is.null(lab)) {
+        tree$tip.label <- lab
+    } else {
+	    tree[[2]]<-paste('classe ',tree[[2]])
+    }
+	plot.phylo(tree,label.offset=0.1,tip.col=col, type=type.dendro, direction = 'downwards', srt=90, adj = 0)
+    for (i in tree.order) {
+        par(mar=c(0,0,1,0),cex=0.7)
+        #wordcloud(names(lclasses[[i]]), lclasses[[i]], scale = c(1.5, 0.2), random.order=FALSE, colors = colcloud[i])
+        yval <- 1.1
+        plot(0,0,pch='', axes = FALSE)
+        vcex <- norm.vec(lclasses[[i]], 0.8, 3)
+        for (j in 1:length(lclasses[[i]])) {
+            yval <- yval-(strheight( names(lclasses[[i]])[j],cex=vcex[j])+0.02)
+            text(-0.9, yval, names(lclasses[[i]])[j], cex = vcex[j], col = colcloud[i], adj=0)
+        }
+    }
+    
+}
+
+plot.dendro.cloud <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro = "phylogram", from.cmd = FALSE, bw = FALSE, lab = NULL) {
+    library(wordcloud)
+    library(ape)
+    classes<-classes[classes!=0]
+	classes<-as.factor(classes)
+	sum.cl<-as.matrix(summary(classes, maxsum=1000000))
+	sum.cl<-(sum.cl/colSums(sum.cl)*100)
+	sum.cl<-round(sum.cl,2)
+	sum.cl<-cbind(sum.cl,as.matrix(100-sum.cl[,1]))
+    sum.cl <- sum.cl[,1]
+    tree.order<- as.numeric(tree$tip.label)
+	vec.mat<-NULL
+    row.keep <- select.chi.classe(chisqtable, nbbycl)
+    toplot <- chisqtable[row.keep,]
+    lclasses <- list()
+    for (classe in 1:length(sum.cl)) {
+       ntoplot <- toplot[,classe]
+       ntoplot <- ntoplot[order(ntoplot, decreasing = TRUE)]
+       ntoplot <- round(ntoplot, 0)
+       ntoplot <- ntoplot[1:nbbycl]
+       ntoplot <- ntoplot[order(ntoplot)]
+       #ntoplot <- ifelse(length(ntoplot) > nbbycl, ntoplot[1:nbbycl], ntoplot)
+       lclasses[[classe]] <- ntoplot
+    }
+	for (i in 1:length(sum.cl)) vec.mat<-append(vec.mat,1)
+	v<-2
+	for (i in 1:length(sum.cl)) {
+		vec.mat<-append(vec.mat,v)
+		v<-v+1
+	}    
+    layout(matrix(vec.mat,length(sum.cl),2),widths=c(1,2))
+    if (! bw) {
+        col <- rainbow(length(sum.cl))[as.numeric(tree$tip.label)]
+        colcloud <- rainbow(length(sum.cl))
+    }
+    par(mar=c(0,0,0,0))
+    label.ori<-tree[[2]]
+    if (!is.null(lab)) {
+        tree$tip.label <- lab
+    } else {
+	    tree[[2]]<-paste('classe ',tree[[2]])
+    }
+	plot.phylo(tree,label.offset=0.1,tip.col=col, type=type.dendro)
+    for (i in rev(tree.order)) {
+        par(mar=c(0,0,1,0),cex=0.9)
+        wordcloud(names(lclasses[[i]]), lclasses[[i]], scale = c(4, 0.8), random.order=FALSE, colors = colcloud[i])
+    }
+}
+
 plot.dendropr <- function(tree, classes, type.dendro="phylogram", histo=FALSE, from.cmd=FALSE, bw=FALSE, lab = NULL, tclasse=TRUE) {
 	classes<-classes[classes!=0]
 	classes<-as.factor(classes)
-	sum.cl<-as.matrix(summary(classes))
+	sum.cl<-as.matrix(summary(classes, maxsum=1000000))
 	sum.cl<-(sum.cl/colSums(sum.cl)*100)
 	sum.cl<-round(sum.cl,2)
 	sum.cl<-cbind(sum.cl,as.matrix(100-sum.cl[,1]))
     tree.order<- as.numeric(tree$tip.label)
+
+
     if (! bw) {
-        col = rainbow(nrow(sum.cl))[as.numeric(tree$tip.label)]
+        col <- rainbow(nrow(sum.cl))[as.numeric(tree$tip.label)]
         col.bars <- col
         col.pie <- rainbow(nrow(sum.cl))
 	    #col.vec<-rainbow(nrow(sum.cl))[as.numeric(tree[[2]])]

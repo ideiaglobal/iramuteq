@@ -43,8 +43,8 @@ class WordCloud(AnalyseText):
         else :
             return 'NOK'
     
-    def make_option(self) :
-        dial = PrefWordCloud(self.ira)
+    def make_option(self, fromcluster = False) :
+        dial = PrefWordCloud(self.ira, fromcluster)
         dial.CenterOnParent()
         res = dial.ShowModal()
         if res == wx.ID_OK :
@@ -61,6 +61,8 @@ class WordCloud(AnalyseText):
             self.parametres['col_bg'] = dial.color_bg.GetColour()
             self.parametres['mode'] = dial.typeformeschoice.GetSelection()
             self.parametres['svg'] = svg
+            if fromcluster :
+                self.parametres['indice'] = dial.indice.GetSelection()
             outgraph = os.path.join(os.path.dirname(self.pathout['zipf.png']), 'nuage_')
             nb = 1
             if svg :
@@ -84,11 +86,11 @@ class ClusterCloud(WordCloud) :
         self.parametres['type'] = 'clustercloud'
         #FIXME
         limit = 2
-        res = self.make_option()
+        res = self.make_option(True)
         if res == wx.ID_OK :
             prof = self.parametres['clusterprof']
             del self.parametres['clusterprof']
-            if self.parametres.get('unit', 0) == 0 :
+            if self.parametres['indice'] == 0 :
                 tokeep = 1
             else : 
                 tokeep = 2

@@ -49,9 +49,8 @@ from tabafcm import DoAFCM
 from tabchdalc import AnalyseQuest
 from tabsimi import DoSimi
 from tabrsimple import InputText
-from tabverges import Verges
+from tabverges import Prototypical
 #from textafcuci import AfcUci
-#from textchdalc import AnalyseAlceste
 from analysetxt import Alceste
 from textdist import AnalysePam
 from textstat import Stat
@@ -64,7 +63,7 @@ from openanalyse import OpenAnalyse
 from corpus import BuildFromAlceste, Builder
 from sheet import MySheet
 from checkinstall import CreateIraDirectory, CheckRPath, FindRPAthWin32, FindRPathNix, CheckRPackages, IsNew, UpgradeConf, CopyConf, RLibsAreInstalled
-from chemins import ConstructRscriptsPath, ConstructConfigPath, ConstructDicoPath, ConstructGlobalPath, PathOut
+from chemins import RscriptsPath, ConstructConfigPath, ConstructDicoPath, ConstructGlobalPath, PathOut
 from parse_factiva_xml import ImportFactiva
 from tools import Extract
 
@@ -96,6 +95,7 @@ ID_RESULT = wx.NewId()
 ID_VIEWDATA = wx.NewId()
 ID_HTMLcontent = wx.NewId()
 ID_SimiTxt = wx.NewId()
+ID_proto = wx.NewId()
 ##########################################################
 #elements de configuration
 ##########################################################
@@ -164,7 +164,9 @@ class IraFrame(wx.Frame):
         self.AppliPath = AppliPath
         self.images_path = os.path.join(AppliPath,'images')
         self.UserConfigPath = UserConfigPath
-        self.RscriptsPath = ConstructRscriptsPath(AppliPath)
+        #self.RscriptsPath = ConstructRscriptsPath(AppliPath)
+        self.RscriptsPath = PathOut(dirout=os.path.join(AppliPath, 'Rscripts'))
+        self.RscriptsPath.basefiles(RscriptsPath)
         #self.DictPath = ConstructDicoPath(AppliPath)
         self.DictPath = ConstructDicoPath(UserConfigPath)
         self.ConfigGlob = ConfigGlob
@@ -244,6 +246,7 @@ class IraFrame(wx.Frame):
         analyse_menu.AppendMenu(-1, u"Classification", menu_classif)
         #analyse_menu.Append(ID_AFCM, u"AFCM")
         analyse_menu.Append(ID_SIMI, u"Analyse de similitudes")
+        analyse_menu.Append(ID_proto, _(u"Prototypical analysis"))
         ID_RCODE = wx.NewId()
         analyse_menu.Append(ID_RCODE, u"Code R...")
 
@@ -369,6 +372,7 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnCHDSIM, id=ID_CHDSIM)
         self.Bind(wx.EVT_MENU, self.OnCHDAlceste, id=ID_CHDAlceste)
         self.Bind(wx.EVT_MENU, self.OnAFCM, id=ID_AFCM)
+        self.Bind(wx.EVT_MENU, self.OnProto, id=ID_proto)
         self.Bind(wx.EVT_MENU, self.OnRCode, id=ID_RCODE)
         #self.Bind(wx.EVT_MENU, self.OnCheckcorpus, id = ID_CHECKCORPUS)
         self.Bind(wx.EVT_MENU, self.OnTextStat, id=ID_TEXTSTAT)
@@ -874,6 +878,9 @@ Voulez-vous fermer quand même ?"""
                 PlaySound(self)
         except:
             BugReport(self)
+    
+    def OnProto(self, evt) :
+        Prototypical(self, {'type' : 'proto'})
 
     def OnSimiTxt(self, evt, corpus = None) :
         #    print 'PLUS DE BUG SUR SIMITXT'

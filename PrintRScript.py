@@ -1117,3 +1117,17 @@ class WordCloudRScript(PrintRScript) :
         """ % (ffr(self.analyse.pathout['actives_eff.csv']), ffr(self.analyse.pathout['selected.csv']), self.parametres['maxword'], ffr(self.parametres['graphout']), self.parametres['width'], self.parametres['height'], bg_col, self.parametres['maxcex'], self.parametres['mincex'], txt_col)
         self.add(txt)
         self.write()
+
+class ProtoScript(PrintRScript) :
+    def make_script(self) :
+        self.sources([self.analyse.parent.RscriptsPath['Rgraph'], self.analyse.parent.RscriptsPath['prototypical.R']])
+        self.packages(['wordcloud'])
+        txt = """
+        mat <- read.csv2("%s", header = FALSE, row.names=1, sep='\t', quote='"', dec='.')
+        open_file_graph("%s",height=600, width=600)
+        prototypical(mat, mfreq = %s, mrank = %s, cloud = FALSE, cexrange=c(1,2.4), cexalpha= c(0.4, 1))
+        dev.off()
+        """ % (self.analyse.pathout['table.csv'], self.analyse.pathout['proto.png'], self.parametres['limfreq'], self.parametres['limrang'])
+        self.add(txt)
+        self.write()
+
