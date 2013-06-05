@@ -711,8 +711,12 @@ class PrintSimiScript(PrintRScript) :
             dm <-readMM(dm.path)
             cn <- read.table(cn.path, sep='\t', quote='"')
             colnames(dm) <- cn[,1]
-            sel.col <- read.csv2(selected.col, header = FALSE)
-            sel.col <- sel.col[,1] + 1
+            if (file.exists(selected.col)) {
+                sel.col <- read.csv2(selected.col, header = FALSE)
+                sel.col <- sel.col[,1] + 1
+            } else {
+                sel.col <- 1:ncol(dm)
+            }
             if (!word) {
                 dm <- dm[, sel.col]
             } else {
@@ -741,8 +745,12 @@ class PrintSimiScript(PrintRScript) :
             txt += """
             dm <-read.csv2(dm.path)
             dm <- as.matrix(dm)
-            sel.col <- read.csv2(selected.col, header = FALSE)
-            sel.col <- sel.col[,1] + 1
+            if (file.exists(selected.col)) {
+                sel.col <- read.csv2(selected.col, header = FALSE)
+                sel.col <- sel.col[,1] + 1
+            } else {
+                sel.col <- 1:ncol(dm)
+            }
             if (!word) {
                 dm <- dm[, sel.col]
             } else {
@@ -845,6 +853,14 @@ class PrintSimiScript(PrintRScript) :
                 graphnb +=1
             self.filename = ffr(os.path.join(dirout,'graph_simi_'+str(graphnb)+'.png'))
         if self.parametres['type_graph'] == 2 : type = 'rgl'
+        if self.parametres['type_graph'] == 3 : 
+            graphnb = 1
+            type = 'rglweb'
+            dirout = os.path.dirname(self.pathout['mat01'])
+            while os.path.exists(os.path.join(dirout,'webrgl_'+str(graphnb))):
+                graphnb +=1
+            self.filename = ffr(os.path.join(dirout,'webrgl_'+str(graphnb)))
+            os.mkdir(self.filename)
 
         if self.parametres['arbremax'] : 
             arbremax = 'TRUE'
@@ -1018,7 +1034,7 @@ class PrintSimiScript(PrintRScript) :
                     """
             else :
                 txt+="""
-                label.cex <- NULL
+                label.cex <- cex
                 """
             if self.parametres.get('sfromchi', False) :
                 txt += """
@@ -1029,7 +1045,8 @@ class PrintSimiScript(PrintRScript) :
                 vertex.size <- NULL
                 """
         else :
-            if self.parametres['type'] == 'clustersimitxt' : 
+            print self.parametres
+            if (self.parametres['type'] == 'clustersimitxt' and self.parametres.get('tmpchi', False)) or (self.parametres['type'] == 'simimatrix' and 'tmpchi' in self.parametres): 
                 txt += """
                 lchi <- read.table("%s")
                 lchi <- lchi[,1]
@@ -1044,12 +1061,12 @@ class PrintSimiScript(PrintRScript) :
             else :
                 txt += """
             if (is.null(vcexminmax[1])) {
-                label.cex <- NULL
+                label.cex <- cex
             } else {
                 label.cex <- graph.simi$label.cex
             }
             """
-            if self.parametres['type'] == 'clustersimitxt' and self.parametres.get('sfromchi', False) :
+            if (self.parametres['type'] == 'clustersimitxt' or self.parametres['type'] == 'simimatrix') and self.parametres.get('sfromchi', False):
                 txt += """ 
                 vertex.size <- norm.vec(lchi, minmaxeff[1], minmaxeff[2])
                 if (!length(vertex.size)) vertex.size <- 0
@@ -1124,10 +1141,18 @@ class ProtoScript(PrintRScript) :
         self.packages(['wordcloud'])
         txt = """
         mat <- read.csv2("%s", header = FALSE, row.names=1, sep='\t', quote='"', dec='.')
-        open_file_graph("%s",height=600, width=600)
+        open_file_graph("%s",height=800, width=1000)
         prototypical(mat, mfreq = %s, mrank = %s, cloud = FALSE, cexrange=c(1,2.4), cexalpha= c(0.4, 1))
         dev.off()
         """ % (self.analyse.pathout['table.csv'], self.analyse.pathout['proto.png'], self.parametres['limfreq'], self.parametres['limrang'])
         self.add(txt)
         self.write()
 
+
+class ExportAfc(PrintRScript) :
+    def make_script(self) :
+        self.source([self.analyse.parent.RscriptsPath['Rgraph']])
+        self.packages(['rgexf'])
+        txt = """
+        """
+         

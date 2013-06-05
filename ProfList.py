@@ -431,6 +431,10 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 
     def quest_simi(self, evt) :
         tableau = self.Source.tableau
+        if self.tmpchi is None :
+            self.tmpchi = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
+            with open(self.tmpchi, 'w') as f:
+                f.write('\n'.join([str(val) for val in self.lchi]))
         tab = tableau.make_table_from_classe(self.cl, self.la)
         pathout = ConstructPathOut(self.Source.pathout.dirout, 'simi_classe_%i' %self.cl)
         self.filename = os.path.join(pathout,'mat01.csv')
@@ -468,7 +472,8 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                           'film': False,
                           'com' : 0,
                           'communities' : 0,
-                          'halo' : 0
+                          'halo' : 0,
+                          'tmpchi': self.tmpchi
                           }
         act = {}
         tableau.chi = {}
