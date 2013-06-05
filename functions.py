@@ -121,6 +121,11 @@ class History :
 
     def rmtab(self, analyse) :
         del self.opened[analyse['uuid']]
+
+    def clean(self) :
+        corpustodel = [corpus for corpus in self.history if not os.path.exists(corpus['ira'])]
+        for corpus in corpustodel :
+            self.delete(corpus, corpus = True)
     
     def __str__(self) :
         return str(self.history)

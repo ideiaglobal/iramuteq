@@ -18,9 +18,8 @@ Package: \tab textometrieR\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
 Date: \tab 2009-01-18\cr
-License: \tab BSD\cr
+License: \tab GPLv3\cr
 Depends: \tab R (>= 2.5.0)\cr
-LazyLoad: \tab yes\cr
 Packaged: \tab Thu Mar 12 17:00:01 2009; sloiseau\cr
 Built: \tab R 2.7.1; ; 2009-03-12 17:00:03; unix\cr
 }
@@ -35,7 +34,7 @@ repartition            compute repartition graph
 % ~~ functions ~~
 }
 \author{
-Sylvain Loiseau, Matthieu Decorde
+Sylvain Loiseau, Lise Vaudor, Matthieu Decorde
 % ~~ The author and/or maintainer of the package ~~
 }
 \references{

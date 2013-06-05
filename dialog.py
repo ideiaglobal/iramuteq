@@ -589,9 +589,9 @@ class PrefGraph(wx.Dialog):
         self.paramgraph=paramgraph
         self.labeltype = wx.StaticText(self, -1, u'Type de graph')
         if self.paramgraph['clnb'] <= 3 :
-            choix = [u'2D']
+            choix = [u'2D', 'web 2D']
         else :
-            choix=[u'2D' ,u'3D']
+            choix=[u'2D' ,u'3D', 'web 2D', 'web 3D']
         self.choicetype = wx.Choice(self, -1, (100,50), choices=choix)
         self.label_format = wx.StaticText(self, -1, u"Format de l'image")
         self.choix_format =  wx.Choice(self, -1, (100,50), choices = ['png', 'svg'])        
@@ -675,7 +675,7 @@ au chi2 d'association de la forme"""
 
     def __set_properties(self):
         self.choicetype.SetSelection(self.paramgraph['typegraph'])
-        if self.paramgraph['typegraph'] == 0 :
+        if self.paramgraph['typegraph'] == 0  or self.paramgraph['typegraph'] == 2:
             self.film.Enable(False)
             self.spin_f3.Enable(False)
             self.slider_sphere.Enable(False)
@@ -2803,3 +2803,45 @@ class ProtoDial ( wx.Dialog ):
     # Virtual event handlers, overide them in your derived class
     def UpdateText( self, event ):
         event.Skip()
+
+class SimpleDialog ( wx.Dialog ):
+    
+    def __init__( self, parent ):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        
+        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        
+        bSizer1 = wx.BoxSizer( wx.VERTICAL )
+        
+        self.m_panel1 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+        bSizer2 = wx.BoxSizer( wx.VERTICAL )
+        
+        self.m_staticText1 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Export terminé. Ouvrez le lien suivant dans un navgateur :", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1.Wrap( -1 )
+        bSizer2.Add( self.m_staticText1, 0, wx.ALL, 5 )
+        
+        self.link = wx.HyperlinkCtrl( self.m_panel1, wx.ID_ANY, u"wxFB Website", u"http://www.wxformbuilder.org", wx.DefaultPosition, wx.DefaultSize, wx.HL_DEFAULT_STYLE )
+        bSizer2.Add( self.link, 0, wx.ALL, 5 )
+        
+        
+        self.m_panel1.SetSizer( bSizer2 )
+        self.m_panel1.Layout()
+        bSizer2.Fit( self.m_panel1 )
+        bSizer1.Add( self.m_panel1, 1, wx.EXPAND |wx.ALL, 5 )
+        
+        m_sdbSizer1 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
+        m_sdbSizer1.Realize();
+        
+        bSizer1.Add( m_sdbSizer1, 0, wx.EXPAND, 5 )
+        
+        
+        self.SetSizer( bSizer1 )
+        self.Layout()
+        bSizer1.Fit( self )
+        
+        self.Centre( wx.BOTH )
+    
+    def __del__( self ):
+        pass

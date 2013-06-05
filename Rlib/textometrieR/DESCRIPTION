@@ -1,15 +1,14 @@
 Package: textometrieR
 Type: Package
 Title: Statistical exploration of textual corpora
-Version: 0.4.5
+Version: 0.5
 Date: 2009-01-18
-Author: Sylvain Loiseau
-Maintainer: Sylvain Loiseau <sloiseau@ens-lsh.fr>
+Author: Sylvain Loiseau, Vaudor Lise, Matthieu Decorde
+Maintainer: Matthieu Decorde <matthieu.decorde@ens-lyon.fr>
 Description: Statistical exploration of textual corpora using several methods
     from french 'lexiometrie' and french 'Data Analysis' schools. It includes
     methods for exploring irregularity of distribution of lexicon (or other
     features) accross parts of texts; multidimensionnal exploration ('Analyse
     des correspondances'), etc.
-License: BSD
+License: GPLv3
 Depends: R (>= 2.5.0)
-LazyLoad: yes

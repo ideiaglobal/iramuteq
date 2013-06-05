@@ -174,7 +174,7 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
     } else {
         we.label <- round(E(g.toplot)$weight,3)
     }
-	if (p.type=='rgl') {
+	if (p.type=='rgl' || p.type=='rglweb') {
         nd<-3
     } else {
         nd<-2
@@ -306,7 +306,7 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
     return(coords)
 	}
 	
-	if (p.type == 'rgl') {
+	if (p.type == 'rgl' || p.type == 'rglweb') {
 		library('rgl')
         #rgl.open()
         #par3d(cex=0.8)
@@ -315,7 +315,8 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
         #los <- layout.norm(lo, -1, 1, -1, 1, -1, 1)
 		text3d(lo[,1], lo[,2], lo[,3], vire.nonascii(v.label), col = vertex.label.color, alpha = 1, cex = vertex.label.cex)
         rgl.spheres(lo, col = vertex.col, radius = vertex.size/100, alpha = alpha)
-        rgl.bg(color = c('white','black'))
+        #rgl.bg(color = c('white','black'))
+        #bg3d('white')
         if (!is.null(movie)) {
             require(tcltk)
             ReturnVal <- tkmessageBox(title="RGL 3 D",message="Cliquez pour commencer le film",icon="info",type="ok")
@@ -324,8 +325,12 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
             ReturnVal <- tkmessageBox(title="RGL 3 D",message="Film fini !",icon="info",type="ok")
         }
         #play3d(spin3d(axis=c(0,1,0),rpm=6))
-        require(tcltk)
-        ReturnVal <- tkmessageBox(title="RGL 3 D",message="Cliquez pour fermer",icon="info",type="ok")
+        if (p.type == 'rglweb') {
+            writeWebGL(dir = filename, width = width, height= height)
+        } else {
+            require(tcltk)
+            ReturnVal <- tkmessageBox(title="RGL 3 D",message="Cliquez pour fermer",icon="info",type="ok")
+        }
         rgl.close()
 	#	while (rgl.cur() != 0)
 	#		Sys.sleep(0.5)
@@ -338,4 +343,61 @@ graph.word <- function(mat.simi, index) {
     nm[,index] <- mat.simi[,index]
     nm[index,] <- mat.simi[index,]
     nm
+}
+
+#from : 
+#http://gopalakrishna.palem.in/iGraphExport.html#GexfExport
+# Converts the given igraph object to GEXF format and saves it at the given filepath location
+#     g: input igraph object to be converted to gexf format
+#     filepath: file location where the output gexf file should be saved
+#
+saveAsGEXF = function(g, filepath="converted_graph.gexf")
+{
+  require(igraph)
+  require(rgexf)
+  
+  # gexf nodes require two column data frame (id, label)
+  # check if the input vertices has label already present
+  # if not, just have the ids themselves as the label
+  if(is.null(V(g)$label))
+    V(g)$label <- as.character(V(g))
+  
+  # similarily if edges does not have weight, add default 1 weight
+  if(is.null(E(g)$weight))
+    E(g)$weight <- rep.int(1, ecount(g))
+  
+  nodes <- data.frame(cbind(1:vcount(g), V(g)$label))
+  nodes[,1] <- as.character(nodes[,1])
+  nodes[,2] <- as.character(nodes[,2])
+  edges <- t(Vectorize(get.edge, vectorize.args='id')(g, 1:ecount(g)))
+  
+  # combine all node attributes into a matrix (and take care of & for xml)
+  vAttrNames <- setdiff(list.vertex.attributes(g), "label")
+  for (val in c("x","y","color")) {
+        vAttrNames <- setdiff(vAttrNames, val)
+  }
+  nodesAtt <- data.frame(sapply(vAttrNames, function(attr) sub("&", "&",get.vertex.attribute(g, attr))))
+  for (i in 1:ncol(nodesAtt)) {
+      nodesAtt[,i] <- as.character(nodesAtt[,i])
+  }
+  
+  # combine all edge attributes into a matrix (and take care of & for xml)
+  eAttrNames <- setdiff(list.edge.attributes(g), "weight") 
+  edgesAtt <- data.frame(sapply(eAttrNames, function(attr) sub("&", "&",get.edge.attribute(g, attr))))
+  
+  # combine all graph attributes into a meta-data
+  graphAtt <- sapply(list.graph.attributes(g), function(attr) sub("&", "&",get.graph.attribute(g, attr)))
+  ll <- length(V(g)$x)
+  cc <- t(sapply(V(g)$color, col2rgb, alpha=TRUE))
+  cc[,4] <- cc[,4]/255
+  # generate the gexf object
+  output <- write.gexf(nodes, edges, 
+                       edgesWeight=E(g)$weight,
+                       edgesAtt = edgesAtt,
+                       #edgesVizAtt = list(size=as.matrix(E(g)$weight)),
+                       nodesAtt = nodesAtt,
+                       nodesVizAtt=list(color=cc, position=cbind(V(g)$x,V(g)$y, rep(0,ll)), size=V(g)$weight),
+                       meta=c(list(creator="iramuteq", description="igraph -> gexf converted file", keywords="igraph, gexf, R, rgexf"), graphAtt))
+  
+  print(output, filepath, replace=T)
 }

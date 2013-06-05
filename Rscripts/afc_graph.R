@@ -168,25 +168,42 @@ if (is.null(xminmax)) {
         yminmax <- c(min(table.in[,2], na.rm = TRUE) + ((max(cex.par)/10) * min(table.in[,2], na.rm = TRUE)), max(table.in[,2], na.rm = TRUE) + ((max(cex.par)/10) * max(table.in[,2], na.rm = TRUE)))
     }
 
-if (typegraph == 0) {
+if (typegraph == 0 || typegraph == 2) {
 
     open_file_graph(fileout, width = width, height = height, svg = do.svg)
     parcex <- taillecar/10
     par(cex = parcex)
     if (over) {
-    table.in <- table.in[order(cex.par, decreasing = TRUE),]
-    classes <- classes[order(cex.par, decreasing = TRUE)]
-    cex.par <- cex.par[order(cex.par, decreasing = TRUE)]
-    table.out <- stopoverlap(table.in, cex.par=cex.par, xlim = xminmax, ylim = yminmax)
-    table.in <- table.out$toplot
-    notplot <- table.out$notplot
-    if (! is.null(notplot)) {
-        write.csv2(notplot, file = paste(fileout,'_notplotted.csv', sep=''))
-    }    
-    classes <- classes[table.in[,4]]
-    cex.par <- cex.par[table.in[,4]]
+        table.in <- table.in[order(cex.par, decreasing = TRUE),]
+        classes <- classes[order(cex.par, decreasing = TRUE)]
+        cex.par <- cex.par[order(cex.par, decreasing = TRUE)]
+        table.out <- stopoverlap(table.in, cex.par=cex.par, xlim = xminmax, ylim = yminmax)
+        table.in <- table.out$toplot
+        notplot <- table.out$notplot
+        if (! is.null(notplot)) {
+            write.csv2(notplot, file = paste(fileout,'_notplotted.csv', sep=''))
+        }    
+        classes <- classes[table.in[,4]]
+        cex.par <- cex.par[table.in[,4]]
     }
-    make_afc_graph(table.in, classes, clnb, xlab, ylab, cex.txt = cex.par, xminmax = xminmax, yminmax = yminmax)
+    if (typegraph == 0) {
+        make_afc_graph(table.in, classes, clnb, xlab, ylab, cex.txt = cex.par, xminmax = xminmax, yminmax = yminmax)
+    } else {
+        dev.off()
+        require(rgexf)
+        nodes.attr <- make.afc.attributes(rownames(table.in), afc_table, afctable, clnb)
+        if (qui != 3) {
+            tokeep <- rownames(chistabletot) %%in%% rownames(table.in)
+            chis <- chistabletot[tokeep,]
+            if (over) {
+                chis<-chis[rownames(table.in),]
+            }
+            nodes.attr$chiclasse <- chis
+        } else {
+            chis <- NULL
+        }
+        afctogexf(fileout, table.in, classes, clnb, cex.par, nodes.attr = nodes.attr)
+    }
 
 } else {
     library(rgl)
@@ -232,7 +249,11 @@ if (typegraph == 0) {
         ReturnVal <- tkmessageBox(title="RGL 3 D",message="Fini !",icon="info",type="ok")
     }
 
-    require(tcltk)
-    ReturnVal <- tkmessageBox(title="RGL 3 D",message="Cliquez pour fermer",icon="info",type="ok")
+    if (typegraph == 2) {
+        require(tcltk)
+        ReturnVal <- tkmessageBox(title="RGL 3 D",message="Cliquez pour fermer",icon="info",type="ok")
+    } else {
+        writeWebGL(dir = fileout, width = width, height= height)
+    }
     rgl.close()
 }
