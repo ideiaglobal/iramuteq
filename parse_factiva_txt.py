@@ -6,6 +6,7 @@
 
 import os
 import codecs
+import re
 
 
 #txtdir = 'dev/factiva_txt'
@@ -32,7 +33,9 @@ def parsetxtpaste(txt):
                     ucis.append([[u'****'],''])
                     keepline = False
         if line.startswith('SN ') : #source
-            source = '*source_' + line[4:].replace(' ','').replace('\'','').replace(u'´','').replace(u'’','').replace('-','').lower()
+            jsource = re.sub('[^A-Za-z0-9]', '', line[4:])
+            source = u'_'.join([u'*source', jsource]).lower()
+            #source = '*source_' + line[4:].replace(' ','').replace('\'','').replace(u'´','').replace(u'’','').replace('-','').lower()
             ucis[-1][0].append(source)
         elif line.startswith('PD ') : #date
             mois_annee = '*ma_' + line[4:].split(' ')[1] + line[4:].split(' ')[2]
@@ -56,18 +59,22 @@ def print_ucis(ucis, ofile, encodage) :
     #elimination des articles vides
     ucis = [uci for uci in ucis if uci[1].strip() != '']
     toprint = '\n\n'.join(['\n'.join([' '.join(uci[0]),uci[1]]) for uci in ucis])
-    ofile.write(toprint.encode(encodage))
+    ofile.write(toprint.encode(encodage) + '\n')
 
 class ParseFactivaPaste :
     def __init__(self, txtdir, fileout, encodage_in, encodage_out) :
         files = os.listdir(txtdir) 
+        tot = 0
         with open(fileout,'w') as outf : 
             for f in files : 
-                f= os.path.join(txtdir, f) 
+                print f
+                f = os.path.join(txtdir, f) 
                 with codecs.open(f, 'rU', encodage_in) as infile : 
                     content = infile.read() 
                 ucis = parsetxtpaste(content)
                 print_ucis(ucis, outf, encodage_out)
+                tot += len(ucis)
+                print 'ok', len(ucis), 'articles', ' - total : ', tot
 
 #for dat in ['2001','2002','2003','2004', '2005','2006','2007','2008','2009','2010','2011'] :
 #    path = os.path.join(txtdir,dat)
