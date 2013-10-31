@@ -81,17 +81,20 @@ def getcorpus_from_xml(xmldir, corpus_out):
     return 'ok'
 
 class PrefImport(wx.Dialog):
-    def __init__(self, parent, size=wx.DefaultSize, pos=wx.DefaultPosition, style=wx.DEFAULT_DIALOG_STYLE):
+    def __init__(self, parent, size=wx.DefaultSize, pos=wx.DefaultPosition, style=wx.DEFAULT_DIALOG_STYLE, methode = 'mail'):
         pre = wx.PreDialog()
         pre.SetExtraStyle(wx.DIALOG_EX_CONTEXTHELP)
         pre.Create(parent, -1, '', pos, size, style)
         self.PostCreate(pre)
-
+        if methode == 'xml' :
+            txt = _(u'Select a directory of xml files')
+        else :
+            txt = _(u'Select a directory of txt files')
         self.parent = parent
-        self.txt1 = wx.StaticText(self, -1, u"Répertoire des fichiers xml")
+        self.txt1 = wx.StaticText(self, -1, txt.encode('utf8'))
         self.dbb = filebrowse.DirBrowseButton(self, -1, size=(450, -1), changeCallback = self.fbbCallback)
         self.dbb.SetLabel("")
-        self.txt2 = wx.StaticText(self, -1, u"Fichier en sortie")
+        self.txt2 = wx.StaticText(self, -1, _(u'Output file').encode('utf8'))
         self.fbb = filebrowse.FileBrowseButton(self, -1, size=(450, -1), fileMode = 2)
         self.fbb.SetLabel("")
 
@@ -156,7 +159,7 @@ class PrefImport(wx.Dialog):
 
 class ImportFactiva():
     def __init__(self, parent, methode):
-       self.dial =  PrefImport(parent)
+       self.dial =  PrefImport(parent, methode=methode)
        self.dial.CenterOnParent()
        val = self.dial.ShowModal()
        if val == wx.ID_OK :
