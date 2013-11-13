@@ -14,6 +14,7 @@ import re
 import wx
 from parse_factiva_mail import ParseFactivaMail
 from parse_factiva_txt import ParseFactivaPaste
+from import_txm import TXM2IRA
 
 def ParseDocument(filename) :
     print filename
@@ -86,15 +87,15 @@ class PrefImport(wx.Dialog):
         pre.SetExtraStyle(wx.DIALOG_EX_CONTEXTHELP)
         pre.Create(parent, -1, '', pos, size, style)
         self.PostCreate(pre)
-        if methode == 'xml' :
-            txt = _(u'Select a directory of xml files')
+        if methode in ['xml', 'txm'] :
+            txt = _(u'Select a directory of xml files').decode('utf8')
         else :
-            txt = _(u'Select a directory of txt files')
+            txt = _(u'Select a directory of txt files').decode('utf8')
         self.parent = parent
         self.txt1 = wx.StaticText(self, -1, txt.encode('utf8'))
         self.dbb = filebrowse.DirBrowseButton(self, -1, size=(450, -1), changeCallback = self.fbbCallback)
         self.dbb.SetLabel("")
-        self.txt2 = wx.StaticText(self, -1, _(u'Output file').encode('utf8'))
+        self.txt2 = wx.StaticText(self, -1, _(u'Output file').decode('utf8'))
         self.fbb = filebrowse.FileBrowseButton(self, -1, size=(450, -1), fileMode = 2)
         self.fbb.SetLabel("")
 
@@ -171,6 +172,8 @@ class ImportFactiva():
                res = ParseFactivaMail(xmldir, corp_out, 'utf8', parent.syscoding)
            elif methode == 'txt' :
                res = ParseFactivaPaste(xmldir, corp_out, 'utf8', parent.syscoding)
+           elif methode == 'txm' :
+               res = TXM2IRA(xmldir, corp_out, 'utf8', parent.syscoding)
            if res == 'nofile' :
                 dlg = wx.MessageDialog(parent, u"Pas de fichier \'.xml\' dans %s" % xmldir, 'ATTENTION', wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
                 dlg.CenterOnParent()
