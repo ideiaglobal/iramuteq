@@ -96,6 +96,7 @@ ID_VIEWDATA = wx.NewId()
 ID_HTMLcontent = wx.NewId()
 ID_SimiTxt = wx.NewId()
 ID_proto = wx.NewId()
+ID_ImportTXM = wx.NewId()
 ##########################################################
 #elements de configuration
 ##########################################################
@@ -209,7 +210,11 @@ class IraFrame(wx.Frame):
         menuFactiva.AppendItem(fact_from_xml)
         menuFactiva.AppendItem(fact_from_mail)
         menuFactiva.AppendItem(fact_from_txt)
-        file_menu.AppendMenu(-1, _(u"Import from factiva"), menuFactiva)
+        file_menu.AppendMenu(-1, _(u"Import from factiva").decode('utf8'), menuFactiva)
+
+        item = wx.MenuItem(file_menu, ID_ImportTXM, _(u"Import from TXM").decode('utf8'), _(u"Import from TXM").decode('utf8'))
+        item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
+        file_menu.AppendItem(item)
 
         menuTools = wx.Menu()
         splitvar = wx.MenuItem(menuTools, wx.ID_ANY, _(u"Split from variable").decode('utf8'))
@@ -225,7 +230,7 @@ class IraFrame(wx.Frame):
         item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_SAVE_AS))
         file_menu.AppendItem(item)
         
-        file_menu.Append(wx.ID_EXIT, _(u"Exit"))
+        file_menu.Append(wx.ID_EXIT, _(u"Exit").decode('utf8'))
         
         edit_menu = wx.Menu()
         edit_menu.Append(wx.ID_PREFERENCES, '', _(u'Preferences').decode('utf8'))
@@ -237,40 +242,40 @@ class IraFrame(wx.Frame):
         #view_menu.AppendSeparator()
 
         analyse_menu = wx.Menu()
-        analyse_menu.Append(ID_Freq, u"Fréquences")
-        analyse_menu.Append(ID_Chi2, u"Chi2")
+        analyse_menu.Append(ID_Freq, _(u"Frequencies").decode('utf8'))
+        analyse_menu.Append(ID_Chi2, _(u"Chi2").decode('utf8'))
         #analyse_menu.Append(ID_Student, u"t de Student")
         menu_classif = wx.Menu()
-        menu_classif.Append(ID_CHDAlceste, u"Méthode GNEPA")
+        menu_classif.Append(ID_CHDAlceste, _(u"Reinert Method").decode('utf8'))
         #menu_classif.Append(ID_CHDSIM, u"Par matrice des distances")
-        analyse_menu.AppendMenu(-1, u"Classification", menu_classif)
+        analyse_menu.AppendMenu(-1, _(u"Clustering").decode('utf8'), menu_classif)
         #analyse_menu.Append(ID_AFCM, u"AFCM")
-        analyse_menu.Append(ID_SIMI, u"Analyse de similitudes")
-        analyse_menu.Append(ID_proto, _(u"Prototypical analysis"))
+        analyse_menu.Append(ID_SIMI, _(u"Similarities Analysis").decode('utf8'))
+        analyse_menu.Append(ID_proto, _(u"Prototypical analysis").decode('utf8'))
         ID_RCODE = wx.NewId()
         analyse_menu.Append(ID_RCODE, u"Code R...")
 
         text_menu = wx.Menu()
         #text_menu.Append(ID_CHECKCORPUS, u"Vérifier le corpus")
-        text_menu.Append(ID_TEXTSTAT, u"Statistiques textuelles")
-        text_menu.Append(ID_ASLEX, u"Spécificités et AFC")
+        text_menu.Append(ID_TEXTSTAT, _(u"Statistics").decode('utf8'))
+        text_menu.Append(ID_ASLEX, _(u"Specificities and CA").decode('utf8'))
         #text_menu.Append(ID_TEXTAFCM, u"AFC sur UCI / Vocabulaire")
         menu_classiftxt = wx.Menu()
-        menu_classiftxt.Append(ID_TEXTALCESTE, u"Méthode GNEPA")
+        menu_classiftxt.Append(ID_TEXTALCESTE, _(u"Reinert Method").decode('utf8'))
         #menu_classiftxt.Append(ID_TEXTPAM, u"Par matrice des distances")
-        text_menu.AppendMenu(-1, u"Classification", menu_classiftxt)
-        text_menu.Append(ID_SimiTxt, u'Analyse de similitude') 
+        text_menu.AppendMenu(-1, _(u"Clustering").decode('utf8'), menu_classiftxt)
+        text_menu.Append(ID_SimiTxt, _(u"Similarities Analysis").decode('utf8')) 
         ID_WC = wx.NewId()
-        text_menu.Append(ID_WC, u'Nuage de mots')
+        text_menu.Append(ID_WC, _(u"WordCloud").decode('utf8'))
         
         help_menu = wx.Menu()
-        help_menu.Append(wx.ID_ABOUT, u'À propos...')
-        help_menu.Append(wx.ID_HELP, u'Aide en ligne')
+        help_menu.Append(wx.ID_ABOUT, _(u"About...").decode('utf8'))
+        help_menu.Append(wx.ID_HELP, _(u"Inline help...").decode('utf8'))
         
         self.mb.Append(file_menu, _(u"File").decode('utf8'))
         self.mb.Append(edit_menu, _(u"Edition").decode('utf8'))
         self.mb.Append(view_menu, _(u"View").decode('utf8'))
-        self.mb.Append(analyse_menu, _("Spreadsheet analysis").decode('utf8'))
+        self.mb.Append(analyse_menu, _("Matrix analysis").decode('utf8'))
         self.mb.Append(text_menu, _(u"Text analysis").decode('utf8'))
         self.mb.Append(help_menu, _(u"Help").decode('utf8'))
         
@@ -388,6 +393,7 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnAbout, id=wx.ID_ABOUT)
         self.Bind(wx.EVT_MENU, self.OnHelp, id=wx.ID_HELP)
         self.Bind(wx.EVT_MENU, self.OnPref, id=wx.ID_PREFERENCES)
+        self.Bind(wx.EVT_MENU, self.OnImportTXM, id=ID_ImportTXM)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 ##################################################################
         flags = self._mgr.GetAGWFlags()
@@ -427,9 +433,9 @@ class IraFrame(wx.Frame):
 
 ##############################################################@
         self.DisEnSaveTabAs(False)
-        self.ShowMenu(_("View"), False)
-        self.ShowMenu(_("Spreadsheet analysis"), False)
-        self.ShowMenu(_("Text analysis"), False)
+        self.ShowMenu(_("View").decode('utf8'), False)
+        self.ShowMenu(_("Matrix analysis").decode('utf8'), False)
+        self.ShowMenu(_("Text analysis").decode('utf8'), False)
    
         self._mgr.Update()
 
@@ -628,34 +634,12 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
                 OpenAnalyse(self, corpus.parametres)
             except :
                 BugReport(self)
-        #self.content = DoConf().totext(corpus.parametres)
-#        parametres = DoConf(os.path.join(UserConfigPath,'corpus.cfg')).getoptions('corpus')
-#        parametres['originalpath'] = self.filename
-#        
-#        parametres['pathout'] = PathOut(self.filename, 'corpus').dirout
-#        dial = CorpusPref(self, parametres)
-#        dial.CenterOnParent()
-#        dial.txtpath.SetLabel(self.filename)
-#        res = dial.ShowModal()
-#        parametres = dial.doparametres()
-#        print parametres
-#        ReadLexique(self, lang = parametres['lang'])
-#        self.expressions = ReadDicoAsDico(self.DictPath.get(parametres['lang'], 'french_exp'))
-#        corpus = BuildFromAlceste(self.filename, parametres, self.lexique, self.expressions).corpus
-        #self.corpus_encodage =  dial.encodages[dial.list_encodages.GetSelection()][0]
-        #self.corpus_lang = dial.langues[dial.choice_dict.GetSelection()]
             else :
                 count = 1
                 keepGoing = dlg.Update(count, u"Lecture du fichier")
-    #            msg = u"Ce fichier ne semble pas être encodé en %s" % self.corpus_encodage
-    #            dial = wx.MessageDialog(self, msg, u"Problème d'encodage", wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
-    #            dial.CenterOnParent()
-    #            res = dial.ShowModal()
-    #            dial.Destroy()
-    #            self.OpenText()
-                self.ShowMenu(_("View"))
-                self.ShowMenu(_("Text analysis"))
-                self.ShowMenu(_(u"Spreadsheet analysis"), False)
+                self.ShowMenu(_(u"View").decode('utf8'))
+                self.ShowMenu(_(u"Text analysis").decode('utf8'))
+                self.ShowMenu(_(u"Matrix analysis").decode('utf8'), False)
                 self.type = "Texte"
                 self.DataTxt = False
                 self.Text = ''
@@ -914,12 +898,6 @@ Voulez-vous fermer quand même ?"""
         except:
             BugReport(self)
 
-#    def OnCheckcorpus(self, evt):
-#        try :
-#            checkcorpus(self)
-#        except :
-#            BugReport(self)
-
     def OnTextStat(self, event, corpus = None):
             #print 'PAS DE BUG SUR TEXT STAT'
         try:
@@ -966,6 +944,12 @@ Voulez-vous fermer quand même ?"""
     def import_factiva_txt(self, evt) :
         try :
             ImportFactiva(self, 'txt')
+        except :
+            BugReport(self)
+
+    def OnImportTXM(self, evt) :
+        try :
+            ImportFactiva(self, 'txm')
         except :
             BugReport(self)
 
