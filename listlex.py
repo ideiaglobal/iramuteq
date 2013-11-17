@@ -196,7 +196,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         lems = corpus.getlems()
         rep = []
         for forme in lems[word].formes :
-             rep.append([corpus.getforme(forme).forme, corpus.getforme(forme).freq])
+            rep.append([corpus.getforme(forme).forme, corpus.getforme(forme).freq])
         rep.sort(key = itemgetter(1), reverse = True)
         win = message(self, u"Formes associées", (300, 200))
         win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
