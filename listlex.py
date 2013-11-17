@@ -76,6 +76,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
 #-----------------------------------------------------------------------------------------    
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self)
         
+        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED , self.OnPopupTwo, self)
         # for wxMSW
         self.Bind(wx.EVT_COMMAND_RIGHT_CLICK, self.OnRightClick)
 
