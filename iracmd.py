@@ -11,7 +11,7 @@ reload(sys)
 import locale
 import codecs
 sys.setdefaultencoding(locale.getpreferredencoding())
-from chemins import ConstructConfigPath, ConstructDicoPath, ConstructRscriptsPath
+from chemins import ConstructConfigPath, ConstructDicoPath, ConstructRscriptsPath, PathOut
 from functions import ReadLexique, DoConf, History, ReadDicoAsDico
 from ConfigParser import *
 #######################################
@@ -19,10 +19,11 @@ from ConfigParser import *
 #from textdist import PamTxt
 #from textafcuci import AfcUci
 from analysetxt import Alceste
-from corpus import Corpus, copycorpus
+from corpus import Corpus, copycorpus, BuildFromAlceste
 from textaslexico import Lexico
 from textstat import Stat
 from tools import SubCorpus
+from textsimi import SimiTxt
 import tempfile
 ######################################
 import logging
@@ -46,7 +47,7 @@ else:
 UserConfigPath = os.path.abspath(os.path.join(user_home, '.iramuteq'))
 
 class CmdLine :
-    def __init__(self, args = None, AppliPath = None) :
+    def __init__(self, args = None, AppliPath = None, parametres = None) :
         AppliPath = AppliPath
         self.DictPath = ConstructDicoPath(AppliPath)
         self.ConfigPath = ConstructConfigPath(UserConfigPath)
@@ -59,6 +60,8 @@ class CmdLine :
         self.pref = RawConfigParser()
         self.pref.read(self.ConfigPath['preferences'])
         self.history = History(os.path.join(UserConfigPath, 'history.db'))
+        print 'CLEAN HISTORY'
+#        self.history.clean()
 
         parser = OptionParser()
     
@@ -128,6 +131,7 @@ class CmdLine :
                 corpus.parametres['pathout'] = os.path.dirname(os.path.abspath(options.read))
                 pathout = os.path.dirname(os.path.dirname(os.path.abspath(options.read)))
                 self.corpus = corpus
+                print self.corpus
 
             if corpus is not None :
                 corpus.conn_all()
@@ -135,22 +139,20 @@ class CmdLine :
                 #corpus.conn_all()
                 corpus.make_lems()
                 corpus.parse_active(gramact, gramsup)
-                for forme in corpus.formes :
-                    if corpus.formes[forme].gram == '' or corpus.formes[forme].gram == ' ' :
-                        print forme
-                        for val in dir(corpus.formes[forme]) :
-                            print getattr(corpus.formes[forme], val)
                 #print corpus.getlemconcorde('de').fetchall()
 #            log.warning('ATTENTION gethapaxuces')
 #            MakeUciStat(corpus)
-#            qfqsdf
             #corpus.gethapaxuces()
-            #ucisize = corpus.getucisize()
-            #ucisize = [`val` for val in ucisize]
-            #uciet = [uci.etoiles[1] for uci in corpus.ucis]
-            #res = zip(uciet, ucisize)
-            #with open('ucisize.csv', 'w') as f :
-            #    f.write('\n'.join(['\t'.join(val) for val in res]))
+                ucisize = corpus.getucisize()
+                ucisize = [`val` for val in ucisize]
+                uciet = [[val.split('_')[1] for val in uci.etoiles[1:]] for uci in corpus.ucis]
+                #for line in uciet :
+                #    print '\t'.join(line)
+                #res = zip(uciet, ucisize)
+                res = [uciet[i] + [ucisize[i]] for i, val in enumerate(uciet)]
+                print res[0:10]
+                with open('ucisize.csv', 'w') as f :
+                    f.write('\n'.join(['\t'.join(val) for val in res]))
                 #    self.content = f.read()
                 #self.content = self.content.replace('\r','')
                 if options.type_analyse == 'alceste' :
@@ -171,6 +173,8 @@ class CmdLine :
                     self.Text = Stat(self, corpus, parametres = {'type':'stat'})
                 elif options.type_analyse == 'spec' :
                     self.Text = Lexico(self, corpus, config = {'type' : 'spec'})
+                elif options.type_analyse == 'simitxt' :
+                    self.Text = SimiTxt(self, corpus, parametres = parametres)
             #print self.Text.corpus.hours, 'h', self.Text.corpus.minutes,'min', self.Text.corpus.seconds, 's'
 #            self.Text.corpus.make_colored_corpus('colored.html')
 
