@@ -38,8 +38,7 @@ def copycorpus(corpus) :
 
 class Corpus :
     """Corpus class
-    list of uci
-
+    list of text
     """
     def __init__(self, parent, parametres = {}, read = False) :
         self.parent = parent
@@ -549,6 +548,8 @@ class Corpus :
         allactives = [[self.lems[lem].freq, lem] for lem in self.lems if self.lems[lem].act == key and self.lems[lem].freq >= 3]
         self.activenb = len(allactives)
         allactives = sorted(allactives, reverse = True)
+        if self.activenb == 0 :
+            return [], 0
         if len(allactives) <= nbmax :
             log.info('nb = %i - eff min = %i ' % (len(allactives), allactives[-1][0]))
             return [val[1] for val in allactives], allactives[-1][0]
@@ -845,8 +846,7 @@ class MakeUciStat :
         ucinb = corpus.getucinb()
         ucisize = corpus.getucisize()
         ucimean = float(sum(ucisize))/float(ucinb)
-        detoile = corpus.make_etoiles_dict()
-        
+        detoile = corpus.make_etoiles_dict() 
 
 class Uci :
     def __init__(self, iduci, line, paraset = None) :
