@@ -8,7 +8,7 @@ _ = gettext.gettext
 import locale
 import sys
 from time import time
-from functions import decoupercharact, ReadDicoAsDico, DoConf
+from functions import decoupercharact, ReadDicoAsDico, DoConf, ReadLexique
 import re
 import sqlite3
 import itertools
@@ -17,7 +17,6 @@ from operator import itemgetter
 from uuid import uuid4
 from chemins import PathOut
 from dialog import CorpusPref
-from functions import ReadLexique, ReadDicoAsDico
 from colors import colors
 import datetime
 
