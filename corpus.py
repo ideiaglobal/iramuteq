@@ -123,6 +123,10 @@ class Corpus :
             wordid = self.formes[wordid].ident
         res = self.cformes.execute('SELECT uces FROM uces where id=? ORDER BY id;', (`wordid`,))
         return list(itertools.chain(*[[int(val) for val in row[0].split()] if not isinstance(row[0], int) else [row[0]] for row in res]))
+    
+    def getworducis(self, wordid) :
+        res = self.getworduces(wordid)
+        return list(set([self.getucefromid(uce).uci for uce in res]))
 
     def getformeuceseff(self, formeid) :
         if isinstance(formeid, basestring) :
@@ -158,7 +162,7 @@ class Corpus :
         lemuceeff = {}
         for i, uce in enumerate(uces) :
             lemuceeff[uce] = lemuceeff.get(uce, 0) + eff[i]
-        return lemuceeff    
+        return lemuceeff
 
     def getlemclustereff(self, lem, cluster) :
         return len(list(set(self.lc[cluster]).intersection(self.getlemuces(lem))))
@@ -195,6 +199,11 @@ class Corpus :
 
     def getconcorde(self, uces) :
         return self.cuces.execute('select * from uces where id IN (%s);' % ', '.join([`i` for i in uces])) 
+    
+    def getuciconcorde(self, ucis) :
+        uces = [[val,[uce.ident for uce in self.ucis[val].uces]] for val in ucis]
+        uces = [[val[0], '\n'.join([row[1] for row in self.getconcorde(val[1])])] for val in uces]
+        return uces
 
     def getwordconcorde(self, word) :
         return self.getconcorde(self.getworduces(word))
@@ -204,7 +213,11 @@ class Corpus :
 
     def getalluces(self) :
         return self.cuces.execute('SELECT * FROM uces')
-
+    
+    def getallucis(self):
+        uces = [row[1] for row in self.getalluces()]
+        return [[uci.ident, '\n'.join([uces[uce.ident] for uce in uci.uces])] for uci in self.ucis]
+        
     def getucesfrometoile(self, etoile) :
         return [uce.ident for uci in self.ucis for uce in uci.uces if etoile in uci.etoiles]
 
@@ -228,6 +241,17 @@ class Corpus :
                     idpara += 1
             else :
                 idpara += 1
+        return etoileuces
+    
+    def getetoileucis(self):
+        etoileuces = {}
+        for uci in self.ucis :
+            etoiles = uci.etoiles[1:]
+            for et in etoiles :
+                if et in etoileuces :
+                    etoileuces[et] += [uci.ident]
+                else :
+                    etoileuces[et] = [uci.ident]
         return etoileuces
 
     def getucefromid(self, uceid) :
@@ -413,36 +437,48 @@ class Corpus :
                     ident += 1
                     f.write('\n'.join([self.ucis[self.iduces[uce[0]].uci].paras[ident].encode(self.parametres['syscoding']), uce[1].encode(self.parametres['syscoding'])]) + '\n')
     
-    def export_corpus_classes(self, outf, alc = True, lem = False) :
+    def export_corpus_classes(self, outf, alc = True, lem = False, uci = False) :
         ucecl = {}
         for i, lc in enumerate(self.lc) :
             for uce in lc : 
                 ucecl[uce] = i + 1
         for uce in self.lc0 :
             ucecl[uce] = 0
-        res = self.getalluces()
-        self.make_iduces()
+        if not uci :
+            res = self.getalluces()
+            self.make_iduces()
+        else :
+            res = self.getallucis()
         with open(outf, 'w') as f :
             for uce in res :
                 guce = uce[1]
-                actuci = self.iduces[uce[0]].uci
+                if not uci :
+                    actuci = self.iduces[uce[0]].uci
+                else :
+                    actuci = uce[0]
                 if lem :
                     guce = ' '.join([self.formes[forme].lem for forme in guce.split()])
                 if alc :
-                    etline = ' '.join(self.ucis[self.iduces[uce[0]].uci].etoiles + ['*classe_%i' % ucecl[uce[0]]])
+                    etline = ' '.join(self.ucis[actuci].etoiles + ['*classe_%i' % ucecl[uce[0]]])
                 else :
-                    etline = ' '.join(['<' + '='.join(et.split('_')) + '>' for et in self.ucis[self.iduces[uce[0]].uci].etoiles[1:]])
+                    etline = ' '.join(['<' + '='.join(et.split('_')) + '>' for et in self.ucis[actuci].etoiles[1:]])
                 f.write(etline.encode(self.parametres['syscoding']) + '\n')
                 f.write(guce.encode(self.parametres['syscoding']) + '\n\n')
 
-    def export_classe(self, outf, classe, lem = False) :
+    def export_classe(self, outf, classe, lem = False, uci = False) :
         sts = self.lc[classe - 1] 
-        res = self.getconcorde(sts)
-        self.make_iduces()
+        if not uci :
+            res = self.getconcorde(sts)
+            self.make_iduces()
+        else :
+            res = self.getuciconcorde(sts)
         with open(outf, 'w') as f :
             for uce in res :
                 guce = uce[1]
-                f.write(' '.join(self.ucis[self.iduces[uce[0]].uci].etoiles).encode(self.parametres['syscoding']) + '\n')
+                if not uci :
+                    f.write(' '.join(self.ucis[self.iduces[uce[0]].uci].etoiles).encode(self.parametres['syscoding']) + '\n')
+                else :
+                    f.write(' '.join(self.ucis[uce[0]].etoiles).encode(self.parametres['syscoding']) + '\n')
                 if lem :
                     guce = ' '.join([self.formes[forme].lem for forme in guce.split()])
                 f.write(guce.encode(self.parametres['syscoding']) + '\n\n')
@@ -499,11 +535,15 @@ class Corpus :
                     ffin.write(line)
         os.remove(outfile + '~')
     
-    def make_table_with_classe(self, uces, list_act) :
+    def make_table_with_classe(self, uces, list_act, uci = False) :
         table_uce = [[0 for val in list_act] for line in range(0,len(uces))]
         uces = dict([[uce, i] for i, uce in enumerate(uces)])
+        if uci :
+            getlem = self.getlemucis
+        else :
+            getlem = self.getlemuces
         for i, lem in enumerate(list_act) :
-            lemuces = list(set(self.getlemuces(lem)).intersection(uces))
+            lemuces = list(set(getlem(lem)).intersection(uces))
             for uce in lemuces :
                 table_uce[uces[uce]][i] = 1
         table_uce.insert(0, list_act)
@@ -569,9 +609,12 @@ class Corpus :
         log.info('nb actives = %i - eff min = %i ' % (stop + 1, lim))
         return [val[1] for val in allactives[0:stop + 1]], lim
 
-    def make_and_write_profile(self, actives, ucecl, fileout) :
+    def make_and_write_profile(self, actives, ucecl, fileout, uci = False) :
         log.info('formes/classes')
-        tab = [[lem] + [len(set(self.getlemuces(lem)).intersection(classe)) for classe in ucecl] for lem in actives]
+        if uci :
+            tab = [[lem] + [len(set(self.getlemucis(lem)).intersection(classe)) for classe in ucecl] for lem in actives]
+        else :
+            tab = [[lem] + [len(set(self.getlemuces(lem)).intersection(classe)) for classe in ucecl] for lem in actives]
         tab = [[line[0]] + [`val` for val in line[1:]] for line in tab if sum(line[1:]) >= 3]
         with open(fileout, 'w') as f :
             f.write('\n'.join([';'.join(line) for line in tab]).encode(self.parametres['syscoding']))
@@ -614,9 +657,12 @@ class Corpus :
                 etuces[listet.index(get[0])] += [uce.ident for uce in uci.uces]
         return etuces
 
-    def make_and_write_profile_et(self, ucecl, fileout) :
+    def make_and_write_profile_et(self, ucecl, fileout, uci = False) :
         log.info('etoiles/classes')
-        etoileuces = self.getetoileuces()
+        if not uci :
+            etoileuces = self.getetoileuces()
+        else :
+            etoileuces = self.getetoileucis()
         etoileuces = dict([[et, etoileuces[et]] for et in etoileuces if len(etoileuces[et]) > 1])
         with open(fileout, 'w') as f :
             f.write('\n'.join([';'.join([et] + [`len(set(etoileuces[et]).intersection(classe))` for classe in ucecl]) for et in etoileuces]).encode(self.parametres['syscoding']))
@@ -624,7 +670,7 @@ class Corpus :
         #with open(fileout, 'w') as f :
         #    f.write('\n'.join([';'.join([etoile] + [`len(set(self.getucesfrometoile(etoile)).intersection(classe))` for classe in ucecl]) for etoile in etoiles]).encode(self.parametres['syscoding']))
 
-    def make_colored_corpus(self) :
+    def make_colored_corpus(self, uci = False) :
         ucecl = {}
         for i, lc in enumerate(self.lc) :
             for uce in lc : 
@@ -636,17 +682,28 @@ class Corpus :
         <meta http-equiv="content-Type" content="text/html; charset=%s" />
         <body>
 ''' % sys.getdefaultencoding()
-        res = self.getalluces()
-        self.make_iduces()
-        actuci = ''
-        actpara = False
-        for uce in res :
-            if self.iduces[uce[0]].uci != actuci :
-                actuci = self.iduces[uce[0]].uci
-                txt += '<br><hr>' + ' '.join(self.ucis[self.iduces[uce[0]].uci].etoiles) + '<br><br>'
-                txt += '<font color="%s">' % (color[ucecl[uce[0]]]) + uce[1] + '</font><br><br>'
-            else :
-                txt += '<font color="%s">' % (color[ucecl[uce[0]]]) + uce[1] + '</font><br><br>'
+        if not uci :
+            res = self.getalluces()
+            self.make_iduces()
+            actuci = ''
+            actpara = False
+            for uce in res :
+                if self.iduces[uce[0]].uci != actuci :
+                    actuci = self.iduces[uce[0]].uci
+                    txt += '<br><hr>' + ' '.join(self.ucis[self.iduces[uce[0]].uci].etoiles) + '<br><br>'
+                    txt += '<font color="%s">' % (color[ucecl[uce[0]]]) + uce[1] + '</font><br><br>'
+                else :
+                    txt += '<font color="%s">' % (color[ucecl[uce[0]]]) + uce[1] + '</font><br><br>'
+        else :
+            res = self.getallucis()
+            actuci = ''
+            for uce in res :
+                if self.ucis[uce[0]].ident != actuci :
+                    actuci = self.ucis[uce[0]].ident
+                    txt += '<br><hr>' + ' '.join(self.ucis[self.ucis[uce[0]].ident].etoiles) + '<br><br>'
+                    txt += '<font color="%s">' % (color[ucecl[uce[0]]]) + uce[1] + '</font><br><br>'
+                else :
+                    txt += '<font color="%s">' % (color[ucecl[uce[0]]]) + uce[1] + '</font><br><br>'
         return txt + '\n</body></html>'
 
     def count_from_list(self, l, d) :
@@ -678,9 +735,13 @@ class Corpus :
             l = l[-taille_limite:]
         return l
 
-    def find_segments_in_classe(self, list_uce, taille_segment, taille_limite):
+    def find_segments_in_classe(self, list_uce, taille_segment, taille_limite, uci = False):
         d={}
-        for uce in self.getconcorde(list_uce) :
+        if not uci : 
+            concorde = self.getconcorde
+        else :
+            concorde = self.getuciconcorde
+        for uce in concorde(list_uce) :
             uce = uce[1].split()
             d =self.count_from_list([' '.join(uce[i:i+taille_segment]) for i in range(len(uce)-(taille_segment - 1))], d)
         l = [[d[val], val, taille_segment] for val in d if d[val] >= 3]
@@ -1073,10 +1134,10 @@ class BuildCorpus :
             self.cleans.append(self.dotiret)
 
     def make_expression(self,txt) :
-         for expression in self.expressions:
+        for expression in self.expressions:
             if expression in txt :
                 txt = txt.replace(expression, self.expressions[expression][0])
-         return txt
+        return txt
     
     def dolower(self, txt) :
         return txt.lower()
@@ -1155,7 +1216,7 @@ class BuildFromAlceste(BuildCorpus) :
         try :
             with codecs.open(infile, 'r', self.encoding) as f :
                 for linenb, line in enumerate(f) :
-                    line = line.rstrip('\n\r')
+                    line = line.rstrip('\n\r')#FIXME .lstrip(codecs.BOM).lstrip(codecs.BOM_UTF8)
                     if self.testuci(line) :
                         iduci += 1
                         if txt != [] :
@@ -1284,6 +1345,6 @@ class Builder :
 
 if __name__ == '__main__' :
     t1 = time()
-    parametres = {'formesdb':'formes.db', 'ucesdb': 'uces.db', 'corpusdb' : 'corpus.db', 'syscoding' : 'utf-8', 'encoding' : encoding}
+    parametres = {'formesdb':'formes.db', 'ucesdb': 'uces.db', 'corpusdb' : 'corpus.db', 'syscoding' : 'utf-8', 'encoding' : 'utf8'}
     intro = BuildCorpus(infile, parametres)#, tar_in, tar_infouce)#, tar_formes)
     print time() - t1
