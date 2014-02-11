@@ -294,8 +294,8 @@ AsLexico2<- function(mat, chip = FALSE) {
 }
 
 make.spec.hypergeo <- function(mat) {
-    library(textometrieR)
-    spec <- specificites(mat)
+    library(textometry)
+    spec <- specificities(mat)
 	sumcol<-colSums(mat)
     eff_relatif<-round(t(apply(mat,1,function(x) {(x/t(as.matrix(sumcol))*1000)})),2)
     colnames(eff_relatif) <- colnames(mat)

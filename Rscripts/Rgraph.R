@@ -43,7 +43,7 @@ PlotDendroCut <- function(chd,filename,reso,clusternb) {
 #	dev.off()
 #}
 
-PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axetoplot=c(1,2), deb=0,fin=0, width=900, height=900, quality=100, reso=200, parcex=PARCEX, xlab = NULL, ylab = NULL, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL) {
+PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axetoplot=c(1,2), deb=0,fin=0, width=900, height=900, quality=100, reso=200, parcex=PARCEX, xlab = NULL, ylab = NULL, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL, active = TRUE) {
 	if (col) {
 		if (what == 'coord') {
 			rowcoord <- as.matrix(afc$colcoord)
@@ -75,7 +75,7 @@ PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axeto
 	if (!col) {
         classes <- as.matrix(apply(chitable,1,which.max))
         cex.par <- norm.vec(apply(chitable,1,max), 0.8,3)
-        row.keep <- select.chi.classe(chitable, 80)
+        row.keep <- select.chi.classe(chitable, 80, active=active)
         rowcoord <- rowcoord[row.keep,]
         classes <- classes[row.keep]
         cex.par <- cex.par[row.keep]
@@ -142,7 +142,6 @@ open_file_graph <- function (filename, width=800, height = 800, quality = 100, s
             svg(filename.to.svg(filename), width=width, height=height)
         }
 	} else {
-        #library(RSvgDevice)
         if (svg) {
             svg(filename.to.svg(filename), width=width/74.97, height=height/74.97)
         } else {
@@ -316,8 +315,13 @@ select_point_chi <- function(tablechi, chi_limit) {
 	row_keep
 }
 
-select.chi.classe <- function(tablechi, nb) {
+select.chi.classe <- function(tablechi, nb, active = TRUE) {
     rowkeep <- NULL
+    if (active & !is.null(debsup)) {
+        print(debsup)
+        print('###############################################################@')
+        tablechi <- tablechi[1:(debsup-1),]
+    }
     if (nb > nrow(tablechi)) {
         nb <- nrow(tablechi)
     }
@@ -441,6 +445,29 @@ create_afc_table <- function(x) {
 	res
 }
 
+is.yellow <- function(my.color) {
+    if ((my.color[1] > 200) & (my.color[2] > 200) & (my.color[3] < 20)) {
+        return(TRUE)
+    } else {
+        return(FALSE)
+    }
+}
+
+del.yellow <- function(colors) {
+    rgbs <- col2rgb(colors)
+    tochange <- apply(rgbs, 2, is.yellow)
+    tochange <- which(tochange)
+    if (length(tochange)) {
+        gr.col <- grey.colors(length(tochange))
+    }
+    compt <- 1
+    for (val in tochange) {
+        colors[val] <- gr.col[compt]
+        compt <- compt + 1
+    }
+    colors
+}
+
 make_afc_graph <- function(toplot, classes, clnb, xlab, ylab, cex.txt = NULL, leg = FALSE, cmd = FALSE, black = FALSE, xminmax=NULL, yminmax=NULL) {
     
     rain <- rainbow(clnb)
@@ -494,6 +521,7 @@ plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro
     lclasses <- list()
     for (classe in 1:length(sum.cl)) {
        ntoplot <- toplot[,classe]
+       names(ntoplot) <- rownames(toplot)
        ntoplot <- ntoplot[order(ntoplot, decreasing = TRUE)]
        ntoplot <- round(ntoplot, 0)
        ntoplot <- ntoplot[1:nbbycl]
@@ -501,27 +529,33 @@ plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro
        #ntoplot <- ifelse(length(ntoplot) > nbbycl, ntoplot[1:nbbycl], ntoplot)
        lclasses[[classe]] <- ntoplot
     }
-    vec.mat <- matrix(1, nrow = 2, ncol = length(sum.cl))
-    vec.mat[2,] <- 2:(length(sum.cl)+1)
-    layout(matrix(vec.mat, nrow=2, ncol=length(sum.cl)),heights=c(1,4))
+    vec.mat <- matrix(1, nrow = 3, ncol = length(sum.cl))
+	vec.mat[2,] <- 2
+    vec.mat[3,] <- 3:(length(sum.cl)+2)
+    layout(matrix(vec.mat, nrow=3, ncol=length(sum.cl)),heights=c(1,1,6))
     if (! bw) {
         col <- rainbow(length(sum.cl))[as.numeric(tree$tip.label)]
+        col <- del.yellow(col)
         colcloud <- rainbow(length(sum.cl))
+        colcloud <- del.yellow(colcloud)
     }
-    par(mar=c(1,0,0,0))
     label.ori<-tree[[2]]
     if (!is.null(lab)) {
         tree$tip.label <- lab
     } else {
 	    tree[[2]]<-paste('classe ',tree[[2]])
     }
-	plot.phylo(tree,label.offset=0.1,tip.col=col, type=type.dendro, direction = 'downwards', srt=90, adj = 0)
+	par(mar=c(1,1,0,1))
+	plot.phylo(tree,label.offset=0, tip.col=col, type=type.dendro, direction = 'downwards', srt=90, adj = 0.5, cex = 1.4, y.lim=c(-0.3,tree$Nnode))
+	par(mar=c(0,0,0,0))
+	d <- barplot(-sum.cl[tree.order], col=col, names.arg='', axes=FALSE, axisname=FALSE)
+	text(x=d, y=(-sum.cl[tree.order]+3), label=paste(round(sum.cl[tree.order],1),'%'), cex=1.4)
     for (i in tree.order) {
         par(mar=c(0,0,1,0),cex=0.7)
         #wordcloud(names(lclasses[[i]]), lclasses[[i]], scale = c(1.5, 0.2), random.order=FALSE, colors = colcloud[i])
         yval <- 1.1
         plot(0,0,pch='', axes = FALSE)
-        vcex <- norm.vec(lclasses[[i]], 0.8, 3)
+        vcex <- norm.vec(lclasses[[i]], 1.5, 2.5)
         for (j in 1:length(lclasses[[i]])) {
             yval <- yval-(strheight( names(lclasses[[i]])[j],cex=vcex[j])+0.02)
             text(-0.9, yval, names(lclasses[[i]])[j], cex = vcex[j], col = colcloud[i], adj=0)
@@ -591,8 +625,10 @@ plot.dendropr <- function(tree, classes, type.dendro="phylogram", histo=FALSE, f
 
     if (! bw) {
         col <- rainbow(nrow(sum.cl))[as.numeric(tree$tip.label)]
+        col <- del.yellow(col)
         col.bars <- col
         col.pie <- rainbow(nrow(sum.cl))
+        col.pie <- del.yellow(col.pie)
 	    #col.vec<-rainbow(nrow(sum.cl))[as.numeric(tree[[2]])]
     } else {
         col = 'black'
@@ -644,10 +680,24 @@ plot.dendropr <- function(tree, classes, type.dendro="phylogram", histo=FALSE, f
 }
 #tree <- tree.cut1$tree.cl
 #to.plot <- di
-plot.dendro.lex <- function(tree, to.plot, bw=FALSE, lab=NULL, lay.width=c(3,3,2), cmd=FALSE) {
+plot.dendro.lex <- function(tree, to.plot, bw=FALSE, lab=NULL, lay.width=c(3,3,2), colbar=NULL, classes=NULL, cmd=FALSE) {
     tree.order<- as.numeric(tree$tip.label)
+	if (!is.null(classes)) {
+		classes<-classes[classes!=0]
+		classes<-as.factor(classes)
+		sum.cl<-as.matrix(summary(classes, maxsum=1000000))
+		sum.cl<-(sum.cl/colSums(sum.cl)*100)
+		sum.cl<-round(sum.cl,2)
+		sum.cl<-cbind(sum.cl,as.matrix(100-sum.cl[,1]))
+	}
     par(mar=c(0,0,0,0))
-    layout(matrix(c(1,2,3),1,byrow=TRUE), widths=lay.width,TRUE)
+	if (!is.null(classes)) {
+		matlay <- matrix(c(1,2,3,4),1,byrow=TRUE)
+		lay.width <- c(3,1,3,2)
+	} else {
+		matlay <- matrix(c(1,2,3),1,byrow=TRUE)
+	}
+    layout(matlay, widths=lay.width,TRUE)
 	par(mar=c(3,0,2,0),cex=1)
 	label.ori<-tree[[2]]
     if (!is.null(lab)) {
@@ -657,15 +707,27 @@ plot.dendro.lex <- function(tree, to.plot, bw=FALSE, lab=NULL, lay.width=c(3,3,2
     }
     to.plot <- matrix(to.plot[,tree.order], nrow=nrow(to.plot), dimnames=list(rownames(to.plot), colnames(to.plot)))
     if (!bw) {
-        col <- rainbow(ncol(to.plot))
-        col.bars <- rainbow(nrow(to.plot))
+		col <- rainbow(ncol(to.plot))
+		col <- del.yellow(col)
+		if (is.null(colbar)) {
+	        col.bars <- rainbow(nrow(to.plot))
+	        col.bars <- del.yellow(col.bars)
+		} else {
+			col.bars <- colbar
+		}
     } else {
         col <- 'black'
         col.bars <- grey.colors(nrow(to.plot),0,0.8)
     }
     col <- col[tree.order]
 	plot.phylo(tree,label.offset=0.1,tip.col=col)
-    
+	if (!is.null(classes)) {
+		par(cex=0.7)
+		par(mar=c(3,0,2,1))
+		to.plota <- sum.cl[tree.order,1]
+		d <- barplot(to.plota,horiz=TRUE, col=col, names.arg='', axes=FALSE, axisname=FALSE)
+		text(x=to.plota, y=d[,1], label=paste(round(to.plota,1),'%'), adj=1.2)
+	}
     par(mar=c(3,0,2,1))
     d <- barplot(to.plot,horiz=TRUE, col=col.bars, beside=TRUE, names.arg='', space = c(0.1,0.6), axisname=FALSE)
     c <- colMeans(d)
@@ -827,3 +889,95 @@ vire.nonascii <- function(rnames) {
 #d <- barplot(to.plot,horiz=TRUE, names.arg='', axes=FALSE, axisname=FALSE)
 #text(x=to.plot, y=d[,1], label=round(to.plot,1), adj=1.2)
 
+make.afc.attributes <- function(rn, afc.table, contafc, clnb, column = FALSE, x=1, y=2) {
+    if (!column){
+        nd <- clnb - 1
+        afc.res <- afc.table$ligne
+        #tokeep <- which(row.names(afc.res) %in% rn)
+        afc.res <- afc.res[rn,]
+        debcor <- (nd*2) + 1
+        cor <- afc.res[,debcor:(debcor+nd-1)][,c(x,y)]
+        debctr <- (nd*3) + 1
+        ctr <- afc.res[,debctr:(debctr+nd-1)][,c(x,y)]
+        massdeb <- (nd*4) + 1
+        mass <- afc.res[,massdeb]
+        chideb <- massdeb + 1
+        chi <- afc.res[,chideb]
+        inertiadeb <- chideb + 1
+        inertia <- afc.res[,inertiadeb]
+        frequence <- rowSums(contafc[rn,])
+    }
+    res <- list(frequence=frequence, cor, ctr, mass = mass, chi=chi, inertia=inertia)
+    return(res)
+}
+
+
+afctogexf <- function(fileout, toplot, classes, clnb, sizes, nodes.attr=NULL) {
+    toplot <- toplot[,1:3]
+    toplot[,3] <- 0
+    #toplot <- afc$rowcoord[1:100,1:3]
+    #toplot[,3] <- 0
+    #rownames(toplot)<-afc$rownames[1:100]
+    cc <- rainbow(clnb)[classes]
+    cc <- t(sapply(cc, col2rgb, alpha=TRUE))
+    #sizes <- apply(chistabletot[1:100,], 1, max)
+    
+    nodes <- data.frame(cbind(1:nrow(toplot), rownames(toplot)))
+    colnames(nodes) <- c('id', 'label')
+    nodes[,1] <- as.character(nodes[,1])
+    nodes[,2] <- as.character(nodes[,2])
+    #nodes attributs
+    if (! is.null(nodes.attr)) {
+        nodesatt <- as.data.frame(nodes.attr)
+    } else {
+        nodesatt <- data.frame(cbind(toplot[,1],toplot[,2]))
+    }
+    #make axes
+    edges<-matrix(c(1,1),ncol=2)
+    xmin <- min(toplot[,1])
+    xmax <- max(toplot[,1])
+    ymin <- min(toplot[,2])
+    ymax <- max(toplot[,2])
+    nodes<-rbind(nodes, c(nrow(nodes)+1, 'F1'))
+    nodes<-rbind(nodes, c(nrow(nodes)+1, 'F1'))
+    nodes<-rbind(nodes, c(nrow(nodes)+1, 'F2'))
+    nodes<-rbind(nodes, c(nrow(nodes)+1, 'F2'))
+    nodesatt<-rbind(nodesatt, c(0,0))
+    nodesatt<-rbind(nodesatt, c(0,0))
+    nodesatt<-rbind(nodesatt, c(0,0))
+    nodesatt<-rbind(nodesatt, c(0,0))
+    toplot <- rbind(toplot, c(xmin, 0,0))
+    toplot <- rbind(toplot, c(xmax,0,0))
+    toplot <- rbind(toplot, c(0,ymin,0))
+    toplot <- rbind(toplot, c(0,ymax,0))
+    cc <- rbind(cc, c(255,255,255,1))
+    cc <- rbind(cc, c(255,255,255,1))
+    cc <- rbind(cc, c(255,255,255,1))
+    cc <- rbind(cc, c(255,255,255,1))
+    sizes <- c(sizes, c(0.5, 0.5, 0.5, 0.5))
+    edges <- rbind(edges, c(nrow(nodes)-3, nrow(nodes)-2))
+    edges <- rbind(edges, c(nrow(nodes)-1, nrow(nodes)))
+    write.gexf(nodes, edges, output=fileout, nodesAtt=nodesatt, nodesVizAtt=list(color=cc, position=toplot, size=sizes))
+}
+
+simi.to.gexf <- function(fileout, graph.simi, nodes.attr = NULL) {
+	lo <- graph.simi$layout
+	if (ncol(lo) == 3) {
+		lo[,3] <- 0
+	} else {
+		lo <- cbind(lo, rep(0,nrow(lo)))
+	}
+	g <- graph.simi$graph
+	nodes <- data.frame(cbind(1:nrow(lo), V(g)$name))
+	colnames(nodes) <- c('id', 'label')
+	print(nodes)
+	if (! is.null(nodes.attr)) {
+		nodesatt <- as.data.frame(nodes.attr)
+	} else {
+		nodesatt <- data.frame(cbind(lo[,1],lo[,2]))
+	}
+	edges <- as.data.frame(get.edges(g, c(1:ecount(g))))
+	col <- rep('red', nrow(lo))
+	col <- t(sapply(col, col2rgb, alpha=TRUE))
+	write.gexf(nodes, edges, output=fileout, nodesAtt=nodesatt, nodesVizAtt=list(color=col,position=lo))
+}

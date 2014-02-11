@@ -1,6 +1,6 @@
 #Author: Pierre Ratinaud
 #Copyright (c) 20010-2013 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 
 #fichier genere par IRaMuTeq
@@ -130,7 +130,7 @@ if ( qui == 3 ) {
         table.in <- table.in[row.keep,]
         tablechi <- tablechi[row.keep,]
     } else if (do.select.chi.classe) {
-        row.keep <- select.chi.classe(tablechi, ptbycluster)
+        row.keep <- select.chi.classe(tablechi, ptbycluster, active=FALSE)
         table.in <- table.in[row.keep,]
         tablechi <- tablechi[row.keep,]        
     } else {
@@ -195,9 +195,7 @@ if (typegraph == 0 || typegraph == 2) {
         if (qui != 3) {
             tokeep <- rownames(chistabletot) %%in%% rownames(table.in)
             chis <- chistabletot[tokeep,]
-            if (over) {
-                chis<-chis[rownames(table.in),]
-            }
+            chis<-chis[rownames(table.in),]
             nodes.attr$chiclasse <- chis
         } else {
             chis <- NULL
@@ -249,7 +247,7 @@ if (typegraph == 0 || typegraph == 2) {
         ReturnVal <- tkmessageBox(title="RGL 3 D",message="Fini !",icon="info",type="ok")
     }
 
-    if (typegraph == 2) {
+    if (typegraph == 1) {
         require(tcltk)
         ReturnVal <- tkmessageBox(title="RGL 3 D",message="Cliquez pour fermer",icon="info",type="ok")
     } else {

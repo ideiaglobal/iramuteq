@@ -1,6 +1,6 @@
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2009 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 
 #fonction pour la double classification

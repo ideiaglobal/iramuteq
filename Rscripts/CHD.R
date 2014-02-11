@@ -1,6 +1,6 @@
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2011 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 pp<-function(txt,val) {
 	d<-paste(txt,' : ')
