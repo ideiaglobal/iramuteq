@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2009 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 import wx
 import shutil
@@ -26,32 +26,30 @@ class OptionAlc(wx.Dialog):
         #self.label_1 = wx.StaticText(self, -1, u"Lemmatisation")
         #self.radio_1 = wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
 
-        self.label_12 = wx.StaticText(self, -1, u"Classification")
-        self.radio_box_2 = wx.RadioBox(self, -1, u"", choices=[u"double sur RST", u"simple sur segments de texte", u"simple sur textes"], majorDimension=0, style=wx.RA_SPECIFY_ROWS) #, u"simple sur UCE (non implemente)"
-        self.label_2 = wx.StaticText(self, -1, u"taille rst 1")
-        self.spin_ctrl_1 = wx.SpinCtrl(self, -1, "formes actives",size = (100,30), min=0, max=1000000)
-        self.label_3 = wx.StaticText(self, -1, u"taille rst 2")
+        self.label_12 = wx.StaticText(self, -1, _(u"Clustering").decode('utf8'))
+        self.radio_box_2 = wx.RadioBox(self, -1, u"", choices=[_(u"double on RST").decode('utf8'), _(u"simple on text segments").decode('utf8'), _(u"simple on texts").decode('utf8')], majorDimension=0, style=wx.RA_SPECIFY_ROWS) #, u"simple sur UCE (non implemente)"
+        self.label_2 = wx.StaticText(self, -1, _(u"Size of rst1").decode('utf8'))
+        self.spin_ctrl_1 = wx.SpinCtrl(self, -1, _(u"actives forms").decode('utf8'),size = (100,30), min=0, max=1000000)
+        self.label_3 = wx.StaticText(self, -1, _(u"Size of rst2").decode('utf8'))
         self.spin_ctrl_2 = wx.SpinCtrl(self, -1, "",size = (100,30), min=0, max=1000000)
-        self.lab_nbcl = wx.StaticText(self, -1, u"nombre de classes terminales de la phase 1")
+        self.lab_nbcl = wx.StaticText(self, -1, _(u"Number of terminal clusters on phase 1").decode('utf8'))
         self.spin_nbcl = wx.SpinCtrl(self, -1, "",size = (100,30), min=2, max=1000000)
-        txt = """Nombre minimum de segments de texte par classe
-(0 = automatique)"""
+        txt = _(u"Minimum frequency of text segments by clusters (0=automatic)").decode('utf8')
         self.label_7 = wx.StaticText(self, -1, txt)
         self.spin_ctrl_4 = wx.SpinCtrl(self, -1, "",size = (100,30), min=0, max=1000000)       
-        txt = u"""Fréquence minimum d'une forme
-analysée (2 = automatique)"""
+        txt = _(u"Minimum frequency of an analyzed form (2=automatic)").decode('utf8')
         self.label_8 = wx.StaticText(self, -1, txt)
         self.spin_ctrl_5 = wx.SpinCtrl(self, -1, "",size = (100,30), min=2, max=1000000)
-        self.label_max_actives =  wx.StaticText(self, -1, u"Nombre maximum de formes analysées")
+        self.label_max_actives =  wx.StaticText(self, -1, _(u"Maximum number of analyzed forms").decode('utf8'))
         self.spin_max_actives = wx.SpinCtrl(self, -1, "",size = (100,30), min=20, max=1000000)
-        self.label_svd = wx.StaticText(self, -1, u"Méthode pour svd")
+        self.label_svd = wx.StaticText(self, -1, _(u"svd method").decode('utf8'))
         self.choicesvd = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, self.svdmethod, 0 )
-        self.label_patate =  wx.StaticText(self, -1, u"Mode patate (+ rapide, - précis)")
+        self.label_patate =  wx.StaticText(self, -1, _(u"Potato mode (less precise, faster)").decode('utf8'))
         self.check_patate = wx.CheckBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         #self.label_4 = wx.StaticText(self, -1, u"Configuration \ndes clés d'analyse")
         #self.button_5 = wx.Button(self, wx.ID_PREFERENCES, "")
         self.button_1 = wx.Button(self, wx.ID_CANCEL, "")
-        self.button_2 = wx.Button(self, wx.ID_DEFAULT, u"Valeurs par défaut")
+        self.button_2 = wx.Button(self, wx.ID_DEFAULT, _(u"Default values").decode('utf8'))
         self.button_4 = wx.Button(self, wx.ID_OK, "")
         self.static_line_1 = wx.StaticLine(self, -1)
 
@@ -62,7 +60,7 @@ analysée (2 = automatique)"""
         self.Bind(wx.EVT_BUTTON, self.OnDef, self.button_2)
         
     def __set_properties(self):
-        self.SetTitle("Options")
+        self.SetTitle(_(u"Settings").decode('utf8'))
         #lang = self.AlcesteConf.get('ALCESTE', 'lang')
         #self.choice_dict.SetSelection(self.langues.index(lang))
         #DefaultLem = self.parametres['lem']
@@ -85,7 +83,7 @@ analysée (2 = automatique)"""
         if 'mode.patate' in self.parametres :
             self.check_patate.SetValue(self.parametres['mode.patate'])
         else :
-             self.check_patate.SetValue(False)
+            self.check_patate.SetValue(False)
 
 
     def __do_layout(self):

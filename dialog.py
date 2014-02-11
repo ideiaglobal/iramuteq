@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2009 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 import  wx
-import  wx.lib.colourselect as  csel
+import  wx.lib.colourselect as csel
 import wx.lib.sized_controls as sc
 import wx.lib.filebrowsebutton as filebrowse
 import locale
@@ -37,46 +37,46 @@ class FileOptionDialog(wx.Dialog):
         grid_sizer = wx.FlexGridSizer(0, 2, 2, 2)
 ##############################
 
-        label = wx.StaticText(self, -1, u"La première ligne contient les noms de colonne")
-        label.SetHelpText(u"La première ligne contient les noms de colonne")
+        label = wx.StaticText(self, -1, _(u"First line is header").decode('utf8'))
+        label.SetHelpText(_(u"First line is header").decode('utf8'))
         grid_sizer.Add(label, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
-        on = ["oui", "non"]
+        on = [ _(u"yes").decode('utf8'), _(u"no").decode('utf8') ]
         self.radio_box_1 = wx.RadioBox(self, -1, u"", choices=on, majorDimension=0, style=wx.RA_SPECIFY_ROWS)
-        self.radio_box_1.SetHelpText(u"La première ligne contient les noms de colonne")
+        self.radio_box_1.SetHelpText(_(u"First line is header").decode('utf8'))
         grid_sizer.Add(self.radio_box_1, 1, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
 
 ##############################
 
-        label = wx.StaticText(self, -1, u"La première colonne contient un identifiant")
-        label.SetHelpText(u"La première colonne contient un identifiant")
+        label = wx.StaticText(self, -1, _(u"First column is an id").decode('utf8'))
+        label.SetHelpText(_(u"First column is an id").decode('utf8'))
         grid_sizer.Add(label, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
-        on = ["oui", "non"]
+        on = [ _(u"yes").decode('utf8'), _(u"no").decode('utf8') ]
         self.radio_box_2 = wx.RadioBox(self, -1, u"", choices=on, majorDimension=0, style=wx.RA_SPECIFY_ROWS)
-        self.radio_box_2.SetHelpText(u"La première colonne contient un identifiant")
+        self.radio_box_2.SetHelpText(_(u"First column is an id").decode('utf8'))
         grid_sizer.Add(self.radio_box_2, 1, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
 
 ##############################
         if sep:
-            label = wx.StaticText(self, -1, u"Séparateur de colonne")
-            label.SetHelpText(u"Quel charactère sépare les colonnes ?")
+            label = wx.StaticText(self, -1, _(u"Column separator").decode('utf8'))
+            label.SetHelpText(_(u"Column separator").decode('utf8'))
             grid_sizer.Add(label, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
             self.colsep = [";", "tabulation", ","]
             self.choice3 = wx.Choice(self, -1, (100, 50), choices=self.colsep)
-            self.choice3.SetHelpText(u"Quel charactère sépare les colonnes ?")
+            self.choice3.SetHelpText(_(u"Column separator").decode('utf8'))
             grid_sizer.Add(self.choice3, 1, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
     
     ##############################
     
-            label = wx.StaticText(self, -1, u"Séparateur de texte")
-            label.SetHelpText(u"Quel caractère encadre les champs texte ?")
+            label = wx.StaticText(self, -1, _(u"Text separator").decode('utf8'))
+            label.SetHelpText(_(u"Text separator").decode('utf8'))
             grid_sizer.Add(label, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
             self.txtsep = ["\"", "'"]
             self.choice4 = wx.Choice(self, -1, (100, 50), choices=self.txtsep)
-            self.choice4.SetHelpText(u"Quel caractère encadre les champs texte ?")
+            self.choice4.SetHelpText(_(u"Text separator").decode('utf8'))
             grid_sizer.Add(self.choice4, 1, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
             self.choice3.SetSelection(0)
             self.choice4.SetSelection(0)
-            self.text = wx.StaticText(self, -1, u"Encodage du corpus : ")
+            self.text = wx.StaticText(self, -1, _(u"Character set").decode('utf8'))
             grid_sizer.Add(self.text, 1, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
             self.le = [enc[0].lower() for enc in encodages] 
             self.list_encodages = wx.Choice(self, -1, (25, 30), choices=[' - '.join(encodage) for encodage in encodages])
@@ -108,12 +108,10 @@ class FileOptionDialog(wx.Dialog):
             btnsizer.AddButton(btn)
         
         btn = wx.Button(self, wx.ID_OK)
-        btn.SetHelpText("The OK button completes the dialog")
         btn.SetDefault()
         btnsizer.AddButton(btn)
 
         btn = wx.Button(self, wx.ID_CANCEL)
-        btn.SetHelpText("The Cancel button cnacels the dialog. (Cool, huh?)")
         btnsizer.AddButton(btn)
         btnsizer.Realize()
 
@@ -172,12 +170,10 @@ class ClusterNbDialog(wx.Dialog):
             btnsizer.AddButton(btn)
         
         btn = wx.Button(self, wx.ID_OK)
-        btn.SetHelpText("The OK button completes the dialog")
         btn.SetDefault()
         btnsizer.AddButton(btn)
 
         btn = wx.Button(self, wx.ID_CANCEL)
-        btn.SetHelpText("The Cancel button cnacels the dialog. (Cool, huh?)")
         btnsizer.AddButton(btn)
         btnsizer.Realize()
 
@@ -185,51 +181,6 @@ class ClusterNbDialog(wx.Dialog):
 
         self.SetSizer(sizer)
         sizer.Fit(self)
-
-class EncodeDialog(wx.Dialog):
-    def __init__(self, *args, **kwds):
-        # begin wxGlade: MyDialog.__init__
-        kwds["style"] = wx.DEFAULT_DIALOG_STYLE
-        kwds["size"] = wx.Size(100, 60)
-        kwds["title"] = u'Encodage'
-        wx.Dialog.__init__(self, *args, **kwds)
-        self.label_dict = wx.StaticText(self, -1, u"Langue")
-        langues_n = [u'français', u'english', u'german (expérimentale)', u'italian (expérimentale)', u'swedish (exp.)', u'portuguese (exp.)']
-        self.langues = [u'french', u'english', u'german', 'italian', 'swedish', 'portuguese']
-        self.choice_dict = wx.Choice(self, -1, choices = langues_n)
-        self.encodages = encodages
-        self.text = wx.StaticText(self, -1, u"Encodage du corpus : ")
-        self.le = [enc[0].lower() for enc in self.encodages] 
-        self.list_encodages = wx.Choice(self, -1, (25, 50), choices=[' - '.join(encodage) for encodage in self.encodages])#style=wx.LB_SINGLE | wx.LB_HSCROLL)
-        self.button_1 = wx.Button(self, wx.ID_OK, "")
-
-        self.__set_properties()
-        self.__do_layout()
-        # end wxGlade
-
-    def __set_properties(self):
-        # begin wxGlade: MyDialog.__set_properties
-        self.SetTitle(u"Encodage du corpus")
-        self.SetMinSize(wx.Size(300, 100))
-        if  locale.getpreferredencoding().lower() == 'mac-roman' :
-            enc = self.le.index('macroman')
-        else :
-            enc = self.le.index(locale.getpreferredencoding().lower())
-        self.list_encodages.SetSelection(enc)
-        self.choice_dict.SetSelection(0)
-        # end wxGlade
-
-    def __do_layout(self):
-        # begin wxGlade: MyDialog.__do_layout
-        sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        sizer_1.Add(self.text, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 0)
-        sizer_1.Add(self.list_encodages, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 0)
-        sizer_1.Add(self.label_dict, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 0)
-        sizer_1.Add(self.choice_dict, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 0)
-        sizer_1.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 0)
-        self.SetSizer(sizer_1)
-        sizer_1.Fit(self)
-        self.Layout()
 
 class CHDDialog(wx.Dialog):
     def __init__(
@@ -373,7 +324,7 @@ class CHDDialog(wx.Dialog):
 class PrefDialog ( wx.Dialog ):
     
     def __init__( self, parent ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Préférences", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Settings").decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         self.parent = parent
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
@@ -384,7 +335,7 @@ class PrefDialog ( wx.Dialog ):
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Jouer un son à la fin des analyses", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Play a sound at the end of analysis").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -392,13 +343,13 @@ class PrefDialog ( wx.Dialog ):
         self.m_staticText2.Wrap( -1 )
         fgSizer1.Add( self.m_staticText2, 0, wx.ALL, 5 )
         
-        m_radioBox1Choices = [ u"oui", u"non" ]
+        m_radioBox1Choices = [ _(u"yes").decode('utf8'), _(u"no").decode('utf8') ]
         self.m_radioBox1 = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_radioBox1Choices, 1, wx.RA_SPECIFY_COLS )
         self.m_radioBox1.SetSelection( 0 )
         fgSizer1.Add( self.m_radioBox1, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
 
-        msg = u"""Vérifier au démarrage si une
-nouvelle version est disponible"""
+        msg = _(u"""Check for new 
+releases at startup""").decode('utf8')
         self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, msg, wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
         fgSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
@@ -407,12 +358,12 @@ nouvelle version est disponible"""
         self.m_staticText4.Wrap( -1 )
         fgSizer1.Add( self.m_staticText4, 0, wx.ALL, 5 )
         
-        m_radioBox2Choices = [ u"oui", u"non" ]
+        m_radioBox2Choices = [ _(u"yes").decode('utf8'), _(u"no").decode('utf8') ]
         self.m_radioBox2 = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_radioBox2Choices, 1, wx.RA_SPECIFY_COLS )
         self.m_radioBox2.SetSelection( 0 )
         fgSizer1.Add( self.m_radioBox2, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
 
-        msg = u"""Langue de l'interface"""
+        msg = _(u"Interface language").decode('utf8')
         self.m_staticText45 = wx.StaticText( self, wx.ID_ANY, msg, wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText45.Wrap( -1 )
         fgSizer1.Add( self.m_staticText45, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
@@ -421,13 +372,13 @@ nouvelle version est disponible"""
         self.m_staticText46.Wrap( -1 )
         fgSizer1.Add( self.m_staticText46, 0, wx.ALL, 5 )
         
-        self.listlangues = [ u"french", u"english" ]
+        self.listlangues = [ u"french", u"english", u"spanish", u"portuguese", u"italian" ]
         self.langues = wx.Choice( self, wx.ID_ANY, (200, -1), choices = self.listlangues)
         #self.langues.SetSelection( 0 )
         fgSizer1.Add( self.langues, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
         
-        msg = u"""Vérifier l'installation des
-bibliothèques de R"""
+        msg = _(u"""Check installation 
+of R packages""").decode('utf8')
         self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, msg, wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText5.Wrap( -1 )
         fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
@@ -436,15 +387,15 @@ bibliothèques de R"""
         self.m_staticText6.Wrap( -1 )
         fgSizer1.Add( self.m_staticText6, 0, wx.ALL, 5 )
         
-        self.m_button1 = wx.Button( self, wx.ID_ANY, u"Vérifier", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_button1 = wx.Button( self, wx.ID_ANY, _(u"Check").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer1.Add( self.m_button1, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
         
         bSizer1.Add( fgSizer1, 1, wx.EXPAND, 5 )
         if sys.platform == 'win32' :
             bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
             
-            msg = u"""Mémoire maximum allouée
-    à R (en Mo)"""
+            msg = _(u"""Maximum 
+memory for R""").decode('utf8')
             self.m_staticText7 = wx.StaticText( self, wx.ID_ANY, msg, wx.DefaultPosition, wx.DefaultSize, 0 )
             self.m_staticText7.Wrap( -1 )
             bSizer2.Add( self.m_staticText7, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
@@ -463,7 +414,7 @@ bibliothèques de R"""
 
         bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
         bSizer4 = wx.BoxSizer( wx.HORIZONTAL )
-        self.text8 = wx.StaticText( self, wx.ID_ANY, u"Utiliser svdlibc", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.text8 = wx.StaticText( self, wx.ID_ANY, _(u"Use svdlibc").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.text8.Wrap( -1 )
         fgSizer1.Add( self.text8, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         self.check_svdc = wx.CheckBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -471,19 +422,19 @@ bibliothèques de R"""
         bSizer3.Add( bSizer4, 0, wx.EXPAND, 5 )
         self.fbb = filebrowse.FileBrowseButton(self, -1, size=(250, -1), fileMode = 2, fileMask = '*')
         bSizer3.Add( self.fbb, 0, wx.EXPAND, 5 )
-        self.fbb.SetLabel(u"Chemin : ")
+        self.fbb.SetLabel(_(u"Path : ").decode('utf8'))
         fgSizer1.Add( wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 ),  wx.ID_ANY, wx.ALL, 5)
         fgSizer1.Add( bSizer3, 0,  wx.ALIGN_RIGHT|wx.ALL, 5 )
 
-        Rpath_text =  wx.StaticText( self, wx.ID_ANY, u"Chemin de R", wx.DefaultPosition, wx.DefaultSize, 0 )
+        Rpath_text =  wx.StaticText( self, wx.ID_ANY, _(u"R path").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         Rpath_text.Wrap( -1 )
         fgSizer1.Add( Rpath_text, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         fgSizer1.Add( wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 ),  wx.ID_ANY, wx.ALL, 5)
         self.Rpath_value = filebrowse.FileBrowseButton(self, -1, size=(350, -1), fileMode = 2, fileMask = '*')
-        self.Rpath_value.SetLabel(u'Chemin : ')
+        self.Rpath_value.SetLabel(_(u"Path : ").decode('utf8'))
         fgSizer1.Add( self.Rpath_value, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
 
-        mirror_text =  wx.StaticText( self, wx.ID_ANY, u"Miroir de R par défaut", wx.DefaultPosition, wx.DefaultSize, 0 )
+        mirror_text =  wx.StaticText( self, wx.ID_ANY, _(u"Default R mirror").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         mirror_text.Wrap( -1 )
         fgSizer1.Add( mirror_text, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         fgSizer1.Add( wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 ),  wx.ID_ANY, wx.ALL, 5)
@@ -512,7 +463,7 @@ bibliothèques de R"""
         self.__set_properties()
 
     def __set_properties(self):
-        self.SetTitle(u"Préférences")
+        self.SetTitle(_(u"Settings").decode('utf8'))
         if self.parent.pref.getboolean('iramuteq', 'sound'): val1 = 0
         else : val1 = 1
         self.m_radioBox1.SetSelection(val1)
@@ -587,65 +538,62 @@ class PrefGraph(wx.Dialog):
         self.PostCreate(pre)
         self.parent = parent
         self.paramgraph=paramgraph
-        self.labeltype = wx.StaticText(self, -1, u'Type de graph')
+        self.labeltype = wx.StaticText(self, -1, _(u"Graphic type").decode('utf8'))
         if self.paramgraph['clnb'] <= 3 :
             choix = [u'2D', 'web 2D']
         else :
             choix=[u'2D' ,u'3D', 'web 2D', 'web 3D']
         self.choicetype = wx.Choice(self, -1, (100,50), choices=choix)
-        self.label_format = wx.StaticText(self, -1, u"Format de l'image")
+        self.label_format = wx.StaticText(self, -1, _(u"Picture format").decode('utf8'))
         self.choix_format =  wx.Choice(self, -1, (100,50), choices = ['png', 'svg'])        
-        self.label_1 = wx.StaticText(self, -1, u'Largeur')
+        self.label_1 = wx.StaticText(self, -1, _(u"width").decode('utf8'))
         self.spin1 = wx.SpinCtrl(self, -1, '',size = (100,30), min=100, max=5000)
-        self.label_2 = wx.StaticText(self, -1, u'Hauteur')
+        self.label_2 = wx.StaticText(self, -1, _(u"height").decode('utf8'))
         self.spin2 = wx.SpinCtrl(self, -1, '', size = (100,30), min=100, max=5000)
-        self.label_what = wx.StaticText(self, -1, u'Représentation')
-        self.choice1 = wx.Choice(self, -1, (100,50), choices=[u'coordonnées' ,u'corrélation'])
+        self.label_what = wx.StaticText(self, -1, _(u"Representation").decode('utf8'))
+        self.choice1 = wx.Choice(self, -1, (100,50), choices=[_(u"coordinates").decode('utf8'),_(u"correlations").decode('utf8')])
         self.label_qui = wx.StaticText(self, -1, u'Variables')
-        self.choice2 = wx.Choice(self, -1, (100,50), choices=[u'actives' ,u'supplémentaires', u'étoilées', 'classes'])
-        self.label_3 = wx.StaticText(self, -1, u'Taille du texte')
+        self.choice2 = wx.Choice(self, -1, (100,50), choices=[_(u"actives").decode('utf8') ,_(u"supplementaries").decode('utf8'), _(u"stars").decode('utf8'), _(u"clusters").decode('utf8')])
+        self.label_3 = wx.StaticText(self, -1, _(u"Text size").decode('utf8'))
         self.spin3 = wx.SpinCtrl(self, -1, '', size = (100,30), min=1, max=20)
-        txt = u"""Prendre les x premiers points"""
+        txt = _(u"Take the x first points").decode('utf8')
         self.label_4 = wx.StaticText(self, -1, txt)
         self.check1 = wx.CheckBox(self, -1)
         self.spin_nb = wx.SpinCtrl(self, -1, '', size = (100,30), min=2, max=1000)
-        txt = u"""Prendre les x premiers points par classe"""
+        txt = _(u"Take the x first points by cluster").decode('utf8')
         self.label_chic = wx.StaticText(self, -1, txt)
         self.check_chic = wx.CheckBox(self, -1)
         self.spin_nbchic = wx.SpinCtrl(self, -1, '', size = (100,30), min=2, max=1000)        
-        txt = u"""Limiter le nombre de points 
-par le chi2 de liaison aux classes"""
+        txt = _(u"Limit points by cluster chi2").decode('utf8')
         self.label_5 = wx.StaticText(self, -1, txt)
         self.check2 = wx.CheckBox(self, -1)
         self.spin_chi = wx.SpinCtrl(self, -1, '',size = (100,30),  min=2, max=1000)
-        self.label_6 = wx.StaticText(self, -1, u'Eliminer les recouvrements')
+        self.label_6 = wx.StaticText(self, -1, _(u"Avoid overlay").decode('utf8'))
         self.check3 = wx.CheckBox(self, -1)
-        txt = u"""Taille du texte proportionnel
-à l'effectif de la forme"""
+        txt = _(u"Text size proportional to frequency").decode('utf8')
         self.label_7 = wx.StaticText(self, -1, txt)
         self.check4 = wx.CheckBox(self, -1)
         self.label_min = wx.StaticText(self, -1, 'min')
         self.spin_min = wx.SpinCtrl(self, -1, '',size = (100,30), min = 1, max = 100)
         self.label_max = wx.StaticText(self, -1, 'max')
         self.spin_max = wx.SpinCtrl(self, -1, '',size = (100,30), min = 1, max = 100)
-        txt = u"""Taille du texte proportionnel
-au chi2 d'association de la forme"""
+        txt = _(u"Text size proportional to chi2").decode('utf8')
         self.label_tchi = wx.StaticText(self, -1, txt)
         self.check_tchi = wx.CheckBox(self, -1)
         self.label_min_tchi = wx.StaticText(self, -1, 'min')
         self.spin_min_tchi = wx.SpinCtrl(self, -1, '', size = (100,30), min = 1, max = 100)
         self.label_max_tchi = wx.StaticText(self, -1, 'max')
         self.spin_max_tchi = wx.SpinCtrl(self, -1, '', size = (100,30), min = 1, max = 100)
-        self.label_8 = wx.StaticText(self, -1, 'Facteur x :')
+        self.label_8 = wx.StaticText(self, -1, _(u"Factor x : ").decode('utf8'))
         self.spin_f1 = wx.SpinCtrl(self, -1, '',size = (100,30), min=1, max=self.paramgraph['clnb']-1)
-        self.label_9 = wx.StaticText(self, -1, 'Facteur y :')
+        self.label_9 = wx.StaticText(self, -1, _(u"Factor y : ").decode('utf8'))
         self.spin_f2 = wx.SpinCtrl(self, -1, '',size = (100,30), min=1, max=self.paramgraph['clnb']-1)
-        self.label_f3 = wx.StaticText(self, -1, 'Facteur z :')
+        self.label_f3 = wx.StaticText(self, -1, _(u"Factor z : ").decode('utf8'))
         self.spin_f3 = wx.SpinCtrl(self, -1, '',size = (100,30), min=1, max=self.paramgraph['clnb']-1)
-        self.label_sphere = wx.StaticText(self, -1, u"Transparence des sphères")
+        self.label_sphere = wx.StaticText(self, -1, _(u"Sphere transparency").decode('utf8'))
         self.slider_sphere = wx.Slider(self, -1, 10, 1, 100, size = (255,-1), style = wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS)
 
-        self.label_film = wx.StaticText(self, -1, 'Faire un film')
+        self.label_film = wx.StaticText(self, -1, _(u"Make a movie").decode('utf8'))
         self.film = wx.CheckBox(self, -1)
                
         self.btnsizer = wx.StdDialogButtonSizer()
@@ -653,11 +601,9 @@ au chi2 d'association de la forme"""
             btn = wx.ContextHelpButton(self)
             self.btnsizer.AddButton(btn)
         btn = wx.Button(self, wx.ID_OK)
-        btn.SetHelpText("Ok")
         btn.SetDefault()
         self.btnsizer.AddButton(btn)
         btn = wx.Button(self, wx.ID_CANCEL)
-        btn.SetHelpText("Annuler")
         self.btnsizer.AddButton(btn)
         self.btnsizer.Realize()
         
@@ -878,7 +824,7 @@ au chi2 d'association de la forme"""
             self.spin_nb.Enable(False)
             self.spin_nbchic.Enable(False)
         else :
-           self.spin_chi.Enable(False) 
+            self.spin_chi.Enable(False) 
 
     def OnCheckChic(self, event) :
         if self.check_chic.GetValue() :
@@ -921,7 +867,7 @@ au chi2 d'association de la forme"""
             self.slider_sphere.Enable(False)
     
     def OnPass(self,evt) :
-        if evt.GetString() == u'classes' :
+        if evt.GetString() == _(u"clusters").decode('utf8') :
             self.check4.SetValue(False)
             self.check4.Enable(False)
             self.OnNorm(wx.EVT_CHECKBOX)
@@ -967,18 +913,18 @@ class PrefExport(wx.Dialog):
         sizer = wx.BoxSizer(wx.VERTICAL)
         box = wx.BoxSizer(wx.HORIZONTAL)
         box3 = wx.BoxSizer(wx.HORIZONTAL)
-        self.label_lem = wx.StaticText(self, -1, u"Corpus Lemmatisé")
+        self.label_lem = wx.StaticText(self, -1, _(u"Lemmatised corpora").decode('utf8'))
         box3.Add(self.label_lem, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT, 5)
-        self.radio_lem = wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
+        self.radio_lem = wx.RadioBox(self, -1, u"", choices= [ _(u"yes").decode('utf8'), _(u"no").decode('utf8') ], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
         box3.Add(self.radio_lem, 0, wx.ALIGN_RIGHT, 5)
         sizer.Add(box3, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
-        self.label_txt = wx.StaticText(self, -1, u"Exporter pour...")
+        self.label_txt = wx.StaticText(self, -1, _(u"Export for ...").decode('utf8'))
         box.Add(self.label_txt, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
         self.radio_type = wx.RadioBox(self, -1, u"", choices=['IRaMuTeQ/ALCESTE', 'Lexico'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
         box.Add(self.radio_type, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
         sizer.Add(box, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
         box2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.txt2 = wx.StaticText(self, -1, u"Fichier en sortie")
+        self.txt2 = wx.StaticText(self, -1, _(u"Output file").decode('utf8'))
         box2.Add(self.txt2, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
         self.fbb = filebrowse.FileBrowseButton(self, -1, size=(450, -1), fileMode = 2)
         box2.Add(self.fbb, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
@@ -1000,12 +946,12 @@ class PrefExport(wx.Dialog):
     def check_file(self, evt) :
         if evt.GetId() == wx.ID_OK :
             if os.path.exists(self.fbb.GetValue()):
-                dlg = wx.MessageDialog(self, u"%s\nCe fichier existe, continuer quand même ?" % self.fbb.GetValue(), 'ATTENTION', wx.NO | wx.YES | wx.ICON_WARNING)
+                dlg = wx.MessageDialog(self, '\n'.join([u"%s" % self.fbb.GetValue(), _(u"This file already exists. Continue anyway ?").decode('utf8')]), _(u"Attention").decode('utf8'), wx.NO | wx.YES | wx.ICON_WARNING)
                 dlg.CenterOnParent()
                 if dlg.ShowModal() not in [wx.ID_NO, wx.ID_CANCEL]:
                     self.EndModal(wx.ID_OK)
             else :
-                 self.EndModal(wx.ID_OK)
+                self.EndModal(wx.ID_OK)
         else :
             self.EndModal(wx.ID_CANCEL)
 
@@ -1018,13 +964,13 @@ class PrefProfTypes(wx.Dialog):
         sizer = wx.BoxSizer(wx.VERTICAL)
         box = wx.BoxSizer(wx.HORIZONTAL)
         box3 = wx.BoxSizer(wx.HORIZONTAL)
-        self.label_txt = wx.StaticText(self, -1, u"Préférences")
+        self.label_txt = wx.StaticText(self, -1, _(u"Settings").decode('utf8'))
         box.Add(self.label_txt, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
-        self.radio_type = wx.RadioBox(self, -1, u"", choices=['comme ALCESTE', 'comme Lexico'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
+        self.radio_type = wx.RadioBox(self, -1, u"", choices=[_(u"Like ALCESTE").decode('utf8'), _(u"Like Lexico").decode('utf8')], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
         box.Add(self.radio_type, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
         sizer.Add(box, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
         box2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.txt2 = wx.StaticText(self, -1, u"Fichier en sortie")
+        self.txt2 = wx.StaticText(self, -1, _(u"Output file").decode('utf8'))
         box2.Add(self.txt2, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
         self.fbb = filebrowse.FileBrowseButton(self, -1, size=(450, -1), fileMode = 2)
         box2.Add(self.fbb, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
@@ -1055,7 +1001,7 @@ class PrefSimpleFile(wx.Dialog):
         self.parent = parent
         sizer = wx.BoxSizer(wx.VERTICAL)
         box2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.txt2 = wx.StaticText(self, -1, u"Fichier en sortie")
+        self.txt2 = wx.StaticText(self, -1, _(u"Output file").decode('utf8'))
         box2.Add(self.txt2, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
         self.fbb = filebrowse.FileBrowseButton(self, -1, size=(450, -1), fileMode = 2, fileMask = self.mask)
         box2.Add(self.fbb, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
@@ -1077,12 +1023,12 @@ class PrefSimpleFile(wx.Dialog):
     def check_file(self, evt) :
         if evt.GetId() == wx.ID_OK :
             if os.path.exists(self.fbb.GetValue()):
-                dlg = wx.MessageDialog(self, u"%s\nCe fichier existe, continuer quand même ?" % self.fbb.GetValue(), 'ATTENTION', wx.NO | wx.YES | wx.ICON_WARNING)
+                dlg = wx.MessageDialog(self, '\n'.join([u"%s" % self.fbb.GetValue(), _(u"This file already exists. Continue anyway ?").decode('utf8')]), _(u"Attention").decode('utf8'), wx.NO | wx.YES | wx.ICON_WARNING)
                 dlg.CenterOnParent()
                 if dlg.ShowModal() not in [wx.ID_NO, wx.ID_CANCEL]:
                     self.EndModal(wx.ID_OK)
             else :
-                 self.EndModal(wx.ID_OK)
+                self.EndModal(wx.ID_OK)
         else :
             self.EndModal(wx.ID_CANCEL)
 
@@ -1093,7 +1039,7 @@ class StatDialog(wx.Dialog):
         wx.Dialog.__init__(self, *args, **kwds)
         self.fileout = ""
         self.parent = parent
-        self.label_lem = wx.StaticText(self, -1, u"Lemmatisation")
+        self.label_lem = wx.StaticText(self, -1, _(u"Lemmatization").decode('utf8'))
         self.radio_lem = wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
         #txt = u"""Fréquence minimum d'une forme
 #analysée (0 = non utilisé)"""
@@ -1101,7 +1047,7 @@ class StatDialog(wx.Dialog):
         #self.spin_ctrl_5 = wx.SpinCtrl(self, -1, "",size = (100,30), min=0, max=1000, initial=0)
         #self.label_max_actives =  wx.StaticText(self, -1, u"Nombre maximum de formes analysées")
         #self.spin_max_actives = wx.SpinCtrl(self, -1, "",size = (100,30), min=20, max=10000, initial=1500)
-        self.label_4 = wx.StaticText(self, -1, u"Configuration des clés d'analyse")
+        self.label_4 = wx.StaticText(self, -1, _(u"Keys settings").decode('utf8'))
         self.button_5 = wx.Button(self, wx.ID_PREFERENCES, "")
 
         #self.Bind(wx.EVT_CHECKBOX, self.OnCheckUce, self.check_uce)
@@ -1145,7 +1091,7 @@ class StatDialog(wx.Dialog):
         first.Fit(self)
 
     def __set_properties(self) :
-        self.SetTitle(u'Préférences')
+        self.SetTitle(_(u"Settings").decode('utf8'))
 
     def OnKeys(self, evt):
         dial = AlcOptFrame(self, self.parent.parent)
@@ -1156,65 +1102,19 @@ class StatDialog(wx.Dialog):
         DoConf().makeoptions(['KEY'], [dial.keys], outfile = self.parent.parent.ConfigPath['key'])
         dial.Destroy()
 
-class LexDialog( wx.Dialog ):
-    
-    def __init__( self, parent ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
-        
-        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
-        
-        bSizer2 = wx.BoxSizer( wx.VERTICAL )
-        
-        fgSizer2 = wx.FlexGridSizer( 0, 2, 0, 0 )
-        fgSizer2.SetFlexibleDirection( wx.BOTH )
-        fgSizer2.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
-        self.m_staticText9 = wx.StaticText( self, wx.ID_ANY, u"Lemmatisation", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_staticText9.Wrap( -1 )
-        fgSizer2.Add( self.m_staticText9, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 3 )
-        
-        m_radioBox2Choices = [ u"oui", u"non" ]
-        self.m_radioBox2 = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_radioBox2Choices, 1, wx.RA_SPECIFY_COLS )
-        self.m_radioBox2.SetSelection( 0 )
-        fgSizer2.Add( self.m_radioBox2, 0, wx.ALIGN_RIGHT|wx.ALL, 3 )
-        
-#        self.m_staticText10 = wx.StaticText( self, wx.ID_ANY, u"Utiliser le Dict. des expressions", wx.DefaultPosition, wx.DefaultSize, 0 )
-#        self.m_staticText10.Wrap( -1 )
-#        fgSizer2.Add( self.m_staticText10, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 3 )
-#        
-#        m_radioBox21Choices = [ u"oui", u"non" ]
-#        self.m_radioBox21 = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_radioBox21Choices, 1, wx.RA_SPECIFY_COLS )
-#        self.m_radioBox21.SetSelection( 0 )
-#        fgSizer2.Add( self.m_radioBox21, 0, wx.ALIGN_RIGHT|wx.ALL, 3 )
-#        bSizer2.Add( fgSizer2, 1, wx.EXPAND, 5 )
-        
-        btnsizer = wx.StdDialogButtonSizer()
-        btn = wx.Button(self, wx.ID_CANCEL)
-        btnsizer.AddButton(btn)
-        btn_ok = wx.Button( self, wx.ID_OK)
-        btn_ok.SetDefault()
-        btnsizer.AddButton(btn_ok)
-        btnsizer.Realize()
-
-        bSizer2.Add(btnsizer, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5)
-        self.SetSizer( bSizer2 )
-        self.Layout()
-        bSizer2.Fit( self )
-        self.Centre( wx.BOTH )
-
 class PrefUCECarac(wx.Dialog):
     def __init__(self, parent, *args, **kwds):
         kwds['style'] = wx.DEFAULT_DIALOG_STYLE 
-        kwds['title'] = u"Segments de texte caractéristiques"
+        kwds['title'] = _(u"Characteristic text segments").decode('utf8')
         wx.Dialog.__init__(self, *args, **kwds)
         self.parent = parent
         first = wx.BoxSizer(wx.VERTICAL)
         sizer = wx.FlexGridSizer(0,2,0,0)
-        self.label_type = wx.StaticText(self, -1, u"Score de classement")
+        self.label_type = wx.StaticText(self, -1, _(u"Ranking score").decode('utf8'))
         sizer.Add(self.label_type, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT, 5)
-        self.radio_type = wx.RadioBox(self, -1, u"", choices=[u'absolu (somme des chi2 des formes marquées du segment)', u'relatif (moyenne des chi2 des formes marquées du segment)'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
+        self.radio_type = wx.RadioBox(self, -1, u"", choices=[_(u"absolute (sum of chi2 of marked forms in segment)").decode('utf8'), _(u"relative (mean of chi2 of marked forms in segment)").decode('utf8')], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
         sizer.Add(self.radio_type, 0, wx.ALIGN_RIGHT, 5)
-        self.txt_eff = wx.StaticText(self, -1, u"Nombre maximum de segments de texte")
+        self.txt_eff = wx.StaticText(self, -1, _(u"Maximum number of text segments").decode('utf8'))
         sizer.Add(self.txt_eff, 0, wx.ALIGN_CENTRE, 5)
         self.spin_eff = wx.SpinCtrl(self, -1, '', size = (100, 30), min = 1, max = 100000, initial = 50)
         self.spin_eff.SetValue(50)
@@ -1233,11 +1133,11 @@ class PrefUCECarac(wx.Dialog):
 
 class PrefSegProf(wx.Dialog) :
     def __init__( self, parent ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Profils des segments répétés", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Repeated segments profiles").decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
-        txt = u"ATTENTION : le calcul des profils des segments répétés\npeut être très long sur les corpus importants"
+        txt = _(u"Be carefull : computation of repeated segments profiles can be very long on large corpora").decode('utf8')
         self.label = wx.StaticText( self, wx.ID_ANY, txt, wx.DefaultPosition, wx.DefaultSize, 0 ) 
         bSizer1.Add( self.label, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
 
@@ -1245,17 +1145,17 @@ class PrefSegProf(wx.Dialog) :
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Corpus lemmatisé", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Lemmatised corpora").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        box_lemChoices = [ u"oui", u"non" ]
+        box_lemChoices = [ _(u"yes").decode('utf8'), _(u"no").decode('utf8') ]
         self.box_lem = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, box_lemChoices, 1, wx.RA_SPECIFY_COLS )
         self.box_lem.SetSelection( 1 )
         fgSizer1.Add( self.box_lem, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         #self.box_lem.Enable(False)
         
-        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"Taille minimum des segments", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, _(u"Minimum size of segments").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
         fgSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -1263,7 +1163,7 @@ class PrefSegProf(wx.Dialog) :
         self.spin_min.SetValue(2)
         fgSizer1.Add( self.spin_min, 0, wx.ALL, 5 )
         
-        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, u"Taille maximum des segments", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, _(u"Minimum size of segments").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText4.Wrap( -1 )
         fgSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -1271,7 +1171,7 @@ class PrefSegProf(wx.Dialog) :
         self.spin_max.SetValue(10)
         fgSizer1.Add( self.spin_max, 0, wx.ALL, 5 )
         
-        self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, u"Effectif minimum d'un segment retenu", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, _(u"Minimum frequency of segments").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText5.Wrap( -1 )
         fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -1298,7 +1198,7 @@ class PrefSegProf(wx.Dialog) :
 class PrefQuestAlc ( wx.Dialog ):
     
     def __init__( self, parent, sim = False):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u'Classification', pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Clustering").decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
@@ -1317,20 +1217,20 @@ class PrefQuestAlc ( wx.Dialog ):
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
 
         if not self.sim :
-            self.lab_format = wx.StaticText( self, wx.ID_ANY, u"Le corpus est formaté", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.lab_format = wx.StaticText( self, wx.ID_ANY, _(u"Supplementary variables are marked with a *").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
             self.lab_format.Wrap( -1 )
             fgSizer1.Add( self.lab_format, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-            m_radioBox1Choices = [ u"oui", u"non" ]
+            m_radioBox1Choices = [ _(u"yes").decode('utf8'), _(u"no").decode('utf8') ]
             self.m_radioBox1 = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_radioBox1Choices, 1, wx.RA_SPECIFY_COLS )
             self.m_radioBox1.SetSelection( 0 )
             fgSizer1.Add( self.m_radioBox1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"Variables actives (min = 3) :", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, _(u"Actives variables (almost 3)").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
         fgSizer1.Add( self.m_staticText3, 0, wx.ALL, 5 )
         
-        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"Variables illustratives (min = 1):", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, _(u"Supplementaries variables (almost 1)").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         fgSizer1.Add( self.m_staticText2, 0, wx.ALL, 5 )
         
@@ -1344,14 +1244,14 @@ class PrefQuestAlc ( wx.Dialog ):
         
         fgSizer1.Add( self.ListSup, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
         
-        self.but_suiv = wx.Button( self, wx.ID_ANY, u"Suivant", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.but_suiv = wx.Button( self, wx.ID_ANY, _(u"Next").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer1.Add( self.but_suiv, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.but_prec = wx.Button( self, wx.ID_ANY, u"Précédent", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.but_prec = wx.Button( self, wx.ID_ANY, _(u"Previous").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer1.Add( self.but_prec, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         if not sim :
-            self.lab_nbcl = wx.StaticText( self, wx.ID_ANY, u"Nombre de classes terminales de la phase 1", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.lab_nbcl = wx.StaticText( self, wx.ID_ANY, _(u"Number of terminal clusters in phase 1").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
             self.lab_nbcl.Wrap( -1 )
             fgSizer1.Add( self.lab_nbcl, 0, wx.ALL, 5 )
             
@@ -1361,7 +1261,7 @@ class PrefQuestAlc ( wx.Dialog ):
             
             fgSizer1.Add( self.spin_nbcl, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
             
-            self.lab_mincl = wx.StaticText( self, wx.ID_ANY, u"Effectif minimum d'une classe (2 = automatique)", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.lab_mincl = wx.StaticText( self, wx.ID_ANY, _(u"Minimum text segments frenquency in clusters (2= automatic)").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
             self.lab_mincl.Wrap( -1 )
             fgSizer1.Add( self.lab_mincl, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
             
@@ -1471,7 +1371,7 @@ class FindInCluster(wx.Frame):
         self.sizer1 = wx.FlexGridSizer(0,4,0,0)
         self.parent = parent
         self.formes = {}
-        txt =  [u'forme',u'classe',u'chi2',u'voir']
+        txt =  [_(u"form").decode('utf8'),_(u"cluster").decode('utf8'),_(u"Chi2").decode('utf8'), _(u"see").decode('utf8')]
         for val in txt :
             self.sizer1.Add( wx.StaticText(self.spanel, -1, val), 0, wx.ALL, 5)
         for val in txt :
@@ -1511,7 +1411,7 @@ class FindInCluster(wx.Frame):
         # end wxGlade
     
     def __set_properties(self):
-        self.SetTitle(u'Résultats')
+        self.SetTitle(_(u"Results").decode('utf8'))
         self.spanel.EnableScrolling(True,True)
         #self.panel_1.SetSize((1000,1000))
         self.spanel.SetScrollRate(20, 20)
@@ -1571,8 +1471,8 @@ class SearchDial ( wx.Frame ):
         self.search.ShowCancelButton( True )
         bSizer1.Add( self.search, 0, wx.ALL, 5 )
         sizer2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.backward = wx.Button(self, wx.ID_BACKWARD, u"Précédent")
-        self.forward = wx.Button(self, wx.ID_FORWARD, u"Suivant")
+        self.backward = wx.Button(self, wx.ID_BACKWARD, _(u"Previous").decode('utf8'))
+        self.forward = wx.Button(self, wx.ID_FORWARD, _(u"Next").decode('utf8'))
         sizer2.Add(self.backward, 0, wx.ALL, 5)
         sizer2.Add(self.forward, 0, wx.ALL, 5)
         bSizer1.Add( sizer2, 0, wx.ALL, 5 )
@@ -1682,8 +1582,8 @@ class SearchDial ( wx.Frame ):
             self.forward.Enable(True)
 
     def noresult(self) :
-        msg = u"Forme absente"
-        dial = wx.MessageDialog(self, 'Forme absente','Forme absente', wx.OK | wx.ICON_INFORMATION)
+        msg = _(u"Absent form").decode('utf8')
+        dial = wx.MessageDialog(self, _(u"Absent form").decode('utf8'),_(u"Absent form").decode('utf8'), wx.OK | wx.ICON_INFORMATION)
         dial.CenterOnParent()
         dial.ShowModal()
         dial.Destroy()
@@ -1696,8 +1596,8 @@ def UnSelectList(liste) :
         last = liste.GetFirstSelected()
         liste.Select(liste.GetFirstSelected(), False)
         while liste.GetNextSelected(last) != -1 :
-             last = liste.GetNextSelected(last)
-             liste.Select(liste.GetFirstSelected(),False)
+            last = liste.GetNextSelected(last)
+            liste.Select(liste.GetFirstSelected(),False)
 
 
 class OptLexi(wx.Dialog):
@@ -1711,25 +1611,25 @@ class OptLexi(wx.Dialog):
         #self.labellem =  wx.StaticText(self, -1, u"Lemmatisation : ")
         #self.checklem = wx.CheckBox(self, -1)
         if not self.force_chi :
-            self.label_typeformes =  wx.StaticText(self, -1, u"Formes retenues")
-            typeformeschoiceChoices = [ u"actives et supplémentaires", u"actives", u"supplémentaires"]
+            self.label_typeformes =  wx.StaticText(self, -1, _(u"Used forms").decode('utf8'))
+            typeformeschoiceChoices = [ _(u"actives and supplementaries").decode('utf8'), _(u"actives").decode('utf8'), _(u"supplementaries").decode('utf8')]
             self.typeformes = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, typeformeschoiceChoices, 0 )
             self.typeformes.SetSelection( 0 )
 
-        self.label_var =  wx.StaticText(self, -1, u"Sélection par :")
-        self.choice = wx.Choice(self, -1, (100,50), choices = [u'variables', u'modalités'])
-        self.label1 =  wx.StaticText(self, -1, u"Choix")
+        self.label_var =  wx.StaticText(self, -1, _(u"Select by").decode('utf8'))
+        self.choice = wx.Choice(self, -1, (100,50), choices = [_(u"variables").decode('utf8'), _(u"modalities").decode('utf8')])
+        self.label1 =  wx.StaticText(self, -1, _(u"Choice").decode('utf8'))
         self.list_box_1 = wx.ListBox(self, -1, choices=[],  size = wx.Size( 150,200 ), style=wx.LB_EXTENDED | wx.LB_HSCROLL)
         self.button_2 = wx.Button(self, wx.ID_CANCEL, "")
         self.button_1 = wx.Button(self, wx.ID_OK, "")
         if not self.force_chi :
-            indices = [u'loi hypergéométique', u'chi2']
+            indices = [_(u"hypergeometrical law").decode('utf8'), _(u"chi2").decode('utf8')]
         else :
-            indices = [u'chi2']
-        self.label_indice =  wx.StaticText(self, -1, u"indice")
+            indices = [_(u"chi2").decode('utf8')]
+        self.label_indice =  wx.StaticText(self, -1, _(u"Score").decode('utf8'))
         self.choice_indice =  wx.Choice(self, -1, (100,50), choices = indices)
         if not self.force_chi :
-            self.label = wx.StaticText(self, -1, u"effectif minimum")
+            self.label = wx.StaticText(self, -1, _(u"Minimum frequency").decode('utf8'))
             self.spin = wx.SpinCtrl(self, -1, min = 1, max = 10000, initial = 10)
         self.Bind(wx.EVT_CHOICE, self.onselect, self.choice)
         self.__set_properties()
@@ -1738,7 +1638,7 @@ class OptLexi(wx.Dialog):
 
     def __set_properties(self):
         # begin wxGlade: MyDialog.__set_properties
-        self.SetTitle("Choix des variables")
+        self.SetTitle(_(u"Variables choice").decode('utf8'))
         if not self.force_chi :
             self.spin.SetValue(10)
         self.choice.SetSelection(0)
@@ -1787,7 +1687,7 @@ class OptLexi(wx.Dialog):
 class PrefDendro ( wx.Dialog ):
     
     def __init__( self, parent, param ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Dendrogramme", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Dendrogram").decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         self.param = param
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
@@ -1795,7 +1695,7 @@ class PrefDendro ( wx.Dialog ):
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Taille de l'image", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Picture size").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -1803,7 +1703,7 @@ class PrefDendro ( wx.Dialog ):
         
         bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
         
-        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"Hauteur", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, _(u"height").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         bSizer3.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -1814,7 +1714,7 @@ class PrefDendro ( wx.Dialog ):
         
         bSizer31 = wx.BoxSizer( wx.HORIZONTAL )
         
-        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"Largeur", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, _(u"width").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
         bSizer31.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -1831,7 +1731,7 @@ class PrefDendro ( wx.Dialog ):
         self.m_staticline2 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline2, 0, wx.EXPAND |wx.ALL, 5 )
         
-        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, u"Type de dendrogramme", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, _(u"Dendrogram type").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText4.Wrap( -1 )
         fgSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -1846,11 +1746,11 @@ class PrefDendro ( wx.Dialog ):
         self.m_staticline4 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline4, 0, wx.EXPAND |wx.ALL, 5 )
         
-        self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, u"Couleur ou noir et blanc", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, _(u"Color or black and white").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText5.Wrap( -1 )
         fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        m_radioBox1Choices = [ u"couleur", u"noir et blanc" ]
+        m_radioBox1Choices = [ _(u"color").decode('utf8'), _(u"black and white").decode('utf8') ]
         self.m_radioBox1 = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_radioBox1Choices, 1, wx.RA_SPECIFY_COLS )
         self.m_radioBox1.SetSelection( 0 )
         fgSizer1.Add( self.m_radioBox1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
@@ -1863,7 +1763,7 @@ class PrefDendro ( wx.Dialog ):
         
         bSizer4 = wx.BoxSizer( wx.HORIZONTAL )
         
-        self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, u"Ajouter la taille des classes", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, _(u"Add cluster size").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText6.Wrap( -1 )
         bSizer4.Add( self.m_staticText6, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -1873,7 +1773,7 @@ class PrefDendro ( wx.Dialog ):
         
         fgSizer1.Add( bSizer4, 1, wx.EXPAND, 5 )
         
-        m_radioBox2Choices = [ u"camemberts", u"barres" ]
+        m_radioBox2Choices = [ _(u"circular diagram").decode('utf8'), _(u"bar").decode('utf8') ]
         self.m_radioBox2 = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_radioBox2Choices, 1, wx.RA_SPECIFY_COLS )
         self.m_radioBox2.SetSelection( 0 )
         fgSizer1.Add( self.m_radioBox2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
@@ -1917,7 +1817,7 @@ class PrefDendro ( wx.Dialog ):
 class PrefWordCloud ( wx.Dialog ):
     
     def __init__( self, parent, fromcluster = False ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Préférences wordcloud", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Wordcloud settings").decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
@@ -1940,7 +1840,7 @@ class PrefWordCloud ( wx.Dialog ):
         
         bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
         
-        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"Hauteur", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, _(u"height").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
         bSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -1952,7 +1852,7 @@ class PrefWordCloud ( wx.Dialog ):
         
         bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
         
-        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, u"Largeur", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, _(u"width").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText4.Wrap( -1 )
         bSizer3.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -1968,7 +1868,7 @@ class PrefWordCloud ( wx.Dialog ):
         self.m_staticline4 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline4, 0, wx.EXPAND |wx.ALL, 5 )
         
-        self.m_staticText11 = wx.StaticText( self, wx.ID_ANY, u"Format de l'image", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText11 = wx.StaticText( self, wx.ID_ANY, _(u"Picture format").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText11.Wrap( -1 )
         fgSizer1.Add( self.m_staticText11, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -1978,11 +1878,11 @@ class PrefWordCloud ( wx.Dialog ):
         fgSizer1.Add( self.format, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
         if fromcluster :
-            self.m_staticText111 = wx.StaticText( self, wx.ID_ANY, u"Taille des mots en fonction de ...", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_staticText111 = wx.StaticText( self, wx.ID_ANY, _(u"Word size proportional to ...").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
             self.m_staticText11.Wrap( -1 )
             fgSizer1.Add( self.m_staticText111, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-            IndiceChoices = [ u"chi2", u"fréquence" ]
+            IndiceChoices = [ _(u"chi2").decode('utf8'), _(u"frequency").decode('utf8') ]
             self.indice = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, IndiceChoices, 0 )
             self.indice.SetSelection( 0 )
             fgSizer1.Add( self.indice, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
@@ -1993,7 +1893,7 @@ class PrefWordCloud ( wx.Dialog ):
         self.m_staticline14 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline14, 0, wx.EXPAND |wx.ALL, 5 )
 
-        self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, u"Nombre maximum de formes", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, _(u"Maximum number of forms").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText5.Wrap( -1 )
         fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2007,11 +1907,11 @@ class PrefWordCloud ( wx.Dialog ):
         self.m_staticline6 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline6, 0, wx.EXPAND |wx.ALL, 5 )
         
-        self.typeformes = wx.StaticText( self, wx.ID_ANY, u"formes retenues", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.typeformes = wx.StaticText( self, wx.ID_ANY, _(u"Used forms").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.typeformes.Wrap( -1 )
         fgSizer1.Add( self.typeformes, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        typeformeschoiceChoices = [ u"actives", u"supplémentaires", u"actives et supplémentaires" ]
+        typeformeschoiceChoices = [ _(u"actives").decode('utf8'), _(u"supplementaries").decode('utf8'), _(u"actives and supplementaries").decode('utf8') ]
         self.typeformeschoice = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, typeformeschoiceChoices, 0 )
         self.typeformeschoice.SetSelection( 0 )
         fgSizer1.Add( self.typeformeschoice, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
@@ -2022,7 +1922,7 @@ class PrefWordCloud ( wx.Dialog ):
         self.m_staticline12 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline12, 0, wx.EXPAND |wx.ALL, 5 )        
         
-        self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, u"Taille du texte", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, _(u"Text size").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText6.Wrap( -1 )
         fgSizer1.Add( self.m_staticText6, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2062,7 +1962,7 @@ class PrefWordCloud ( wx.Dialog ):
         
         bSizer61 = wx.BoxSizer( wx.HORIZONTAL )
         
-        self.m_staticText81 = wx.StaticText( self, wx.ID_ANY, u"Couleur du texte", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText81 = wx.StaticText( self, wx.ID_ANY, _(u"Text color").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText81.Wrap( -1 )
         bSizer61.Add( self.m_staticText81, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2073,7 +1973,7 @@ class PrefWordCloud ( wx.Dialog ):
         
         bSizer7 = wx.BoxSizer( wx.HORIZONTAL )
         
-        self.m_staticText9 = wx.StaticText( self, wx.ID_ANY, u"Couleur du fond", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText9 = wx.StaticText( self, wx.ID_ANY, _(u"Background color").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText9.Wrap( -1 )
         bSizer7.Add( self.m_staticText9, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2110,7 +2010,7 @@ class PrefWordCloud ( wx.Dialog ):
 class PrefChi(sc.SizedDialog):
     def __init__(self, parent, ID, optionchi, title):
 
-        sc.SizedDialog.__init__(self, None, -1, u"Paramètres", 
+        sc.SizedDialog.__init__(self, None, -1, _(u"Settings").decode('utf8'), 
                         style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
         pane = self.GetContentsPane()
         pane.SetSizerType("form")
@@ -2119,32 +2019,32 @@ class PrefChi(sc.SizedDialog):
         self.optionchi = optionchi
         
 
-        self.label_obs = wx.StaticText(pane, -1, u'valeurs observée')
+        self.label_obs = wx.StaticText(pane, -1, _(u"observed values").decode('utf8'))
         self.check1 = wx.CheckBox(pane, -1)
  
-        self.label_theo = wx.StaticText(pane, -1, u'valeurs théoriques')
+        self.label_theo = wx.StaticText(pane, -1, _(u"expected values").decode('utf8'))
         self.check2 = wx.CheckBox(pane, -1)
 
-        self.label_resi = wx.StaticText(pane, -1, u'residuals')
+        self.label_resi = wx.StaticText(pane, -1, _(u"residuals").decode('utf8'))
         self.check3 = wx.CheckBox(pane, -1)
 
-        self.label_contrib = wx.StaticText(pane, -1, u'contributions a posteriori')
+        self.label_contrib = wx.StaticText(pane, -1, _(u"standardized residuals").decode('utf8'))
         self.check4 = wx.CheckBox(pane, -1)
 #        self.label_graph = wx.StaticText(pane, -1, u'graphique')
 #        self.check8 = wx.CheckBox(pane, -1)
-        self.label_pourcent = wx.StaticText(pane, -1, u'pourcentage total')
+        self.label_pourcent = wx.StaticText(pane, -1, _(u"total percentage").decode('utf8'))
         self.check5 = wx.CheckBox(pane, -1)
 
-        self.label_prl = wx.StaticText(pane, -1, u'pourcentages en ligne')
+        self.label_prl = wx.StaticText(pane, -1, _(u"row percentage").decode('utf8'))
         self.check6 = wx.CheckBox(pane, -1)
 
-        self.label_prc = wx.StaticText(pane, -1, u'pourcentages en colonne')
+        self.label_prc = wx.StaticText(pane, -1, _(u"column percentage").decode('utf8'))
         self.check7 = wx.CheckBox(pane, -1)
 
-        self.label_graph = wx.StaticText(pane, -1, u'graphique')
+        self.label_graph = wx.StaticText(pane, -1, _(u"graphical").decode('utf8'))
         self.check8 = wx.CheckBox(pane, -1)
         
-        self.label_graphbw = wx.StaticText(pane, -1, u'graphique en noir et blanc')
+        self.label_graphbw = wx.StaticText(pane, -1, _(u"black and white graphical").decode('utf8'))
         self.checkbw = wx.CheckBox(pane, -1)
 
         self.SetButtonSizer(self.CreateStdDialogButtonSizer(wx.OK | wx.CANCEL))
@@ -2206,7 +2106,7 @@ class ChiDialog(wx.Dialog):
 #-------------------------------
     def __set_properties(self):
         # begin wxGlade: ConfChi2.__set_properties
-        self.SetTitle(u"Sélection des variables")
+        self.SetTitle(_(u"Variables selection").decode('utf8'))
 
     def __do_layout(self):
         # begin wxGlade: ConfChi2.__do_layout
@@ -2239,14 +2139,14 @@ class ChiDialog(wx.Dialog):
 class CorpusPref ( wx.Dialog ):
     
     def __init__( self, parent, parametres ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Préférences", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Settings").decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         self.parent = parent 
         langues_n = [u'français', u'english', u'german (expérimentale)', u'italian', u'swedish (expérimentale)', u'portuguese (expérimentale)', u'spanish (expérimentale)', u'greek (expériementale)', u'autre...']
         self.langues = [u'french', u'english', u'german', u'italian', u'swedish', u'portuguese', u'spanish', u'greek', u'other']
         self.encodages = [enc[0].lower() for enc in encodages]
 
         ucimark = [u'****', u'0000']
-        ucemethod = [u'charactères', u'occurrences', u'paragraphes']
+        ucemethod = [_(u"characters").decode('utf8'), _(u"occurrences").decode('utf8'), _(u"paragraphs").decode('utf8')]
 
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
@@ -2258,15 +2158,15 @@ class CorpusPref ( wx.Dialog ):
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText7 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Corpus", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText7 = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"Corpora").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText7.Wrap( -1 )
         fgSizer1.Add( self.m_staticText7, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
-        self.txtpath = wx.StaticText( self.m_panel1, wx.ID_ANY, u"path", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.txtpath = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"Path").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.txtpath.Wrap( -1 )
         fgSizer1.Add( self.txtpath, 0, wx.ALL, 5 )
         
-        self.m_staticText1 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Encodage", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"Characters set").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2275,7 +2175,7 @@ class CorpusPref ( wx.Dialog ):
         self.encodage_choices.SetSelection( 0 )
         fgSizer1.Add( self.encodage_choices, 0, wx.ALL, 5 )
         
-        self.m_staticText2 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Langue", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"Language").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2284,7 +2184,7 @@ class CorpusPref ( wx.Dialog ):
         self.lang_choices.SetSelection( 0 )
         fgSizer1.Add( self.lang_choices, 0, wx.ALL, 5 )
 
-        self.m_staticText3 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Répertoire en sortie", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3 = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"Output folder").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
         fgSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2297,12 +2197,12 @@ class CorpusPref ( wx.Dialog ):
         self.repout_choices.SetMinSize( wx.Size( 400,-1 ) )
         fgSizer41.Add( self.repout_choices, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_button1 = wx.Button( self.m_panel1, wx.ID_ANY, u"Modifier...", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_button1 = wx.Button( self.m_panel1, wx.ID_ANY, _(u"Change ...").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer41.Add( self.m_button1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         fgSizer1.Add( fgSizer41, 1, wx.EXPAND, 5 )        
 
-        self.m_staticText12 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Marqueur de texte", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText12 = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"Text mark").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText12.Wrap( -1 )
         fgSizer1.Add( self.m_staticText12, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2311,7 +2211,7 @@ class CorpusPref ( wx.Dialog ):
         self.ucimark_choices.SetSelection( 0 )
         fgSizer1.Add( self.ucimark_choices, 0, wx.ALL, 5 )
         
-        self.m_staticText6 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Utiliser le dictionnaire des expressions", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText6 = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"Use the expression dictionary").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText6.Wrap( -1 )
         fgSizer1.Add( self.m_staticText6, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2319,7 +2219,7 @@ class CorpusPref ( wx.Dialog ):
         self.check_expressions.SetValue(True) 
         fgSizer1.Add( self.check_expressions, 0, wx.ALL, 5 )
         
-        self.m_staticText9 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Construire des segments de texte", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText9 = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"Make text segments").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText9.Wrap( -1 )
         fgSizer1.Add( self.m_staticText9, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2327,7 +2227,7 @@ class CorpusPref ( wx.Dialog ):
         self.check_makeuce.SetValue(True) 
         fgSizer1.Add( self.check_makeuce, 0, wx.ALL, 5 )
         
-        self.m_staticText10 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Mode de construction des segments de texte", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText10 = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"Text segments build process").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText10.Wrap( -1 )
         fgSizer1.Add( self.m_staticText10, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2336,7 +2236,7 @@ class CorpusPref ( wx.Dialog ):
         self.uce_mode.SetSelection( 0 )
         fgSizer1.Add( self.uce_mode, 0, wx.ALL, 5 )
         
-        self.m_staticText13 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Taille des segments de texte", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText13 = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"Text segments size").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText13.Wrap( -1 )
         fgSizer1.Add( self.m_staticText13, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2347,13 +2247,13 @@ class CorpusPref ( wx.Dialog ):
         self.m_panel1.SetSizer( fgSizer1 )
         self.m_panel1.Layout()
         fgSizer1.Fit( self.m_panel1 )
-        self.m_notebook1.AddPage( self.m_panel1, u"Générale", True )
+        self.m_notebook1.AddPage( self.m_panel1, _(u"General").decode('utf8'), True )
         self.m_panel2 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
         fgSizer3 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer3.SetFlexibleDirection( wx.BOTH )
         fgSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText4 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Passer le corpus en minuscule", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Put text in lowercase").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText4.Wrap( -1 )
         fgSizer3.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2361,7 +2261,7 @@ class CorpusPref ( wx.Dialog ):
         self.check_lower.SetValue(True) 
         fgSizer3.Add( self.check_lower, 0, wx.ALL, 5 )
         
-        self.m_staticText5 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Retirez les caractères en dehors cette liste", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText5 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Delete characters not in this list").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText5.Wrap( -1 )
         fgSizer3.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2381,7 +2281,7 @@ class CorpusPref ( wx.Dialog ):
         
         fgSizer3.Add( fgSizer4, 1, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
         
-        self.m_staticText14 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Remplacer les apostrophes par des espaces", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText14 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Replace apostrophe by space").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText14.Wrap( -1 )
         fgSizer3.Add( self.m_staticText14, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2389,7 +2289,7 @@ class CorpusPref ( wx.Dialog ):
         self.check_apos.SetValue(True) 
         fgSizer3.Add( self.check_apos, 0, wx.ALL, 5 )
         
-        self.m_staticText15 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Remplacer les tirets par des espaces", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText15 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Replace dash by space").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText15.Wrap( -1 )
         fgSizer3.Add( self.m_staticText15, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2397,14 +2297,14 @@ class CorpusPref ( wx.Dialog ):
         self.check_tirets.SetValue(True) 
         fgSizer3.Add( self.check_tirets, 0, wx.ALL, 5 )
         
-        self.m_staticText17 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Conserver la ponctuation", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText17 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Keep punctuation").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText17.Wrap( -1 )
         fgSizer3.Add( self.m_staticText17, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
         self.check_ponct = wx.CheckBox( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer3.Add( self.check_ponct, 0, wx.ALL, 5 )
 
-        self.m_staticText16 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Pas d'espace entre deux formes", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText16 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"No space between two forms").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText16.Wrap( -1 )
         fgSizer3.Add( self.m_staticText16, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2415,7 +2315,7 @@ class CorpusPref ( wx.Dialog ):
         self.m_panel2.SetSizer( fgSizer3 )
         self.m_panel2.Layout()
         fgSizer3.Fit( self.m_panel2 )
-        self.m_notebook1.AddPage( self.m_panel2, u"Nettoyage", False )
+        self.m_notebook1.AddPage( self.m_panel2, _(u"Cleaning").decode('utf8'), False )
         
         bSizer1.Add( self.m_notebook1, 1, wx.EXPAND |wx.ALL, 5 )
         
@@ -2438,7 +2338,7 @@ class CorpusPref ( wx.Dialog ):
         self.Centre( wx.BOTH )
 
     def OnChangeDir(self, evt) :
-        dlg = wx.DirDialog(self.parent, u"Choisissez un répertoire", style = wx.DD_DEFAULT_STYLE)
+        dlg = wx.DirDialog(self.parent, _(u"Choose a folder").decode('utf8'), style = wx.DD_DEFAULT_STYLE)
         if dlg.ShowModal() == wx.ID_OK :
             self.repout_choices.SetValue(dlg.GetPath())
     
@@ -2531,7 +2431,7 @@ class message(wx.Dialog):
 
     def OnSavePage(self, evt) :
         dlg = wx.FileDialog(
-            self, message="Enregistrer sous...", defaultDir=os.getcwd(),
+            self, message=_(u"Save as ...").decode('utf8'), defaultDir=os.getcwd(),
             defaultFile="concordancier.html", wildcard="html|*.html", style=wx.SAVE | wx.OVERWRITE_PROMPT
             )
         dlg.SetFilterIndex(2)
@@ -2560,16 +2460,16 @@ class ExtractDialog ( wx.Dialog ):
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Corpus", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Corpora").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
-        self.corpusfile = wx.FilePickerCtrl( self, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.txt", wx.DefaultPosition, wx.Size( -1,-1 ), wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST|wx.FLP_OPEN )
+        self.corpusfile = wx.FilePickerCtrl( self, wx.ID_ANY, wx.EmptyString, _(u"Select a file").decode('utf8'), u"*.txt", wx.DefaultPosition, wx.Size( -1,-1 ), wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST|wx.FLP_OPEN )
         self.corpusfile.SetMinSize( wx.Size( 500,-1 ) )
         
         fgSizer1.Add( self.corpusfile, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
         
-        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"Encodage", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, _(u"Characters set").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -2581,7 +2481,7 @@ class ExtractDialog ( wx.Dialog ):
         fgSizer1.Add( self.encodage, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
         
         if option == 'splitvar' :
-            self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"Variable (avec * mais sans le _ )", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, _(u"Variables (with the * but without the _)").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
             self.m_staticText3.Wrap( -1 )
             fgSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
             
@@ -2591,7 +2491,7 @@ class ExtractDialog ( wx.Dialog ):
             fgSizer1.Add( self.txtvar, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
         
         if option == 'mods' :
-            self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, u"Modalités (une par ligne, avec * )", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, _(u"Modalities (one by line, with the *)").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
             self.m_staticText4.Wrap( -1 )
             fgSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
             
@@ -2600,11 +2500,11 @@ class ExtractDialog ( wx.Dialog ):
             
             fgSizer1.Add( self.txtmods, 0, wx.ALL|wx.EXPAND, 5 )
             
-            self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, u"Format de l'extraction", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, _(u"Extraction type").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
             self.m_staticText5.Wrap( -1 )
             fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
             
-            extractformatChoices = [ u"Un seul fichier", u"Un fichier par modalité" ]
+            extractformatChoices = [ _(u"Only one file").decode('utf8'), _(u"One file by modality").decode('utf8') ]
             self.extractformat = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, extractformatChoices, 1, wx.RA_SPECIFY_COLS )
             self.extractformat.SetSelection( 0 )
             fgSizer1.Add( self.extractformat, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
@@ -2672,25 +2572,23 @@ class FreqDialog(wx.Dialog):
         btnsizer = wx.BoxSizer(wx.HORIZONTAL)
         
         btn = wx.Button(self, wx.ID_CANCEL)
-        btn.SetHelpText("Annuler")
         btnsizer.Add(btn)
         
         btn = wx.Button(self, wx.ID_OK)
-        btn.SetHelpText("Valider")
         btn.SetDefault()
         btnsizer.Add(btn)
         
         sizer.Add(btnsizer, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_HORIZONTAL, 5)
         self.SetSizer(sizer)
         sizer.Fit(self)
-        self.SetTitle(u"Sélection")
+        self.SetTitle(_(u"Selection").decode('utf8'))
   
         # end wxGlade
 
 class ProtoDial ( wx.Dialog ):
     
     def __init__( self, parent, headers ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u'Préférences', pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Settings").decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         
         self.SetSizeHintsSz( wx.Size( 200,300 ), wx.DefaultSize )
         
@@ -2700,11 +2598,11 @@ class ProtoDial ( wx.Dialog ):
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Variables", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Variables").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
         
-        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"Rangs", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, _(u"Ranks").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
         
@@ -2727,13 +2625,13 @@ class ProtoDial ( wx.Dialog ):
         fgSizer3.SetFlexibleDirection( wx.BOTH )
         fgSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"Limite fréquence", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, _(u"Limit frequency").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
         fgSizer3.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
         
-        choix_freqChoices = [ u"automatique (moyenne)", u"manuelle" ]
+        choix_freqChoices = [ _(u"automatic (mean)").decode('utf8'), _(u"manual").decode('utf8') ]
         self.choix_freq = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choix_freqChoices, 0 )
         self.choix_freq.SetSelection( 0 )
         bSizer2.Add( self.choix_freq, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
@@ -2747,13 +2645,13 @@ class ProtoDial ( wx.Dialog ):
         
         fgSizer3.Add( bSizer2, 1, wx.EXPAND, 5 )
         
-        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, u"Limite rang", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, _(u"Limit rank").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText4.Wrap( -1 )
         fgSizer3.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         bSizer21 = wx.BoxSizer( wx.HORIZONTAL )
         
-        choix_rangChoices = [ u"automatique (moyenne)", u"manuelle" ]
+        choix_rangChoices = [ _(u"automatic (mean)").decode('utf8'), _(u"manual").decode('utf8')]
         self.choix_rang = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choix_rangChoices, 0 )
         self.choix_rang.SetSelection( 0 )
         bSizer21.Add( self.choix_rang, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
@@ -2767,7 +2665,7 @@ class ProtoDial ( wx.Dialog ):
         
         fgSizer3.Add( bSizer21, 1, wx.EXPAND, 5 )
         
-        self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, u"Fréquence minimum", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, _(u"Minimum frequency").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText5.Wrap( -1 )
         fgSizer3.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -2816,7 +2714,7 @@ class SimpleDialog ( wx.Dialog ):
         self.m_panel1 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
         bSizer2 = wx.BoxSizer( wx.VERTICAL )
         
-        self.m_staticText1 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Export terminé. Ouvrez le lien suivant dans un navgateur :", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"Export finished. Open in a web browser :").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         bSizer2.Add( self.m_staticText1, 0, wx.ALL, 5 )
         
