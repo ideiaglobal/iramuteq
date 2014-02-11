@@ -334,6 +334,9 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
         rgl.close()
 	#	while (rgl.cur() != 0)
 	#		Sys.sleep(0.5)
+	} else if (p.type == 'web') {
+		library(rgexf)
+		simi.to.gexf(filename, graph.simi, nodes.attr = NULL)
 	}
 }
 
