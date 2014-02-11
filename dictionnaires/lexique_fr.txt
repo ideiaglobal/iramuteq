@@ -78492,7 +78492,7 @@ mollassonne	mollasson	adj	f	s	0.3	0.27	0.04	0.07
 mollassons	mollasson	adj	m	p	0.3	0.27	0.02	0.07	
 molle	mou	adj	f	s	5.37	34.53	3.92	22.7	
 mollement	mollement	adv			0.33	11.55	0.33	11.55	
-molles	mou adj	f	p	5.37	34.53	1.45	11.82	
+molles	mou	adj	f	p	5.37	34.53	1.45	11.82	
 mollesse	mollesse	nom	f	s	0.44	6.42	0.44	6.28	
 mollesses	mollesse	nom	f	p	0.44	6.42	0	0.14	
 mollet	mollet	nom	m	s	1.77	14.93	0.67	5.27	
