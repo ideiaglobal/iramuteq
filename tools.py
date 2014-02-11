@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2013, Pierre Ratinaud
-#Lisense: GNU GPL
+#License: GNU GPL
 
 import codecs
 import os
@@ -68,19 +68,19 @@ class SplitFromVar :
         keepline = False
         filedict = {}
         with codecs.open(self.filein, 'r', self.encodein) as fin :
-             for line in fin :
-                 if istext(line) :
-                     varmod = testvar(line, self.var)
-                     if varmod :
-                         keepline = True
-                         if varmod not in filedict :
-                             filename = os.path.join(self.basepath, varmod + '.txt')
-                             filedict[varmod] = open(filename, 'w')
-                         fileout = filedict[varmod]
-                     else : 
-                         keepline = False
-                 if keepline :
-                     fileout.write(line.encode(self.encodeout))
+            for line in fin :
+                if istext(line) :
+                    varmod = testvar(line, self.var)
+                    if varmod :
+                        keepline = True
+                        if varmod not in filedict :
+                            filename = os.path.join(self.basepath, varmod + '.txt')
+                            filedict[varmod] = open(filename, 'w')
+                        fileout = filedict[varmod]
+                    else : 
+                        keepline = False
+                if keepline :
+                    fileout.write(line.encode(self.encodeout))
         for f in filedict :
             filedict[f].close()
 
@@ -101,22 +101,22 @@ class ExtractMods :
         keepline = False
         filedict = {}
         with codecs.open(self.filein, 'r', self.encodein) as fin :
-             for line in fin :
-                 if istext(line) :
-                     modinline = testmod(line, self.mods)
-                     if modinline :
-                         keepline = True
-                         if not self.onefile :
+            for line in fin :
+                if istext(line) :
+                    modinline = testmod(line, self.mods)
+                    if modinline :
+                        keepline = True
+                        if not self.onefile :
                             if modinline not in filedict :
                                 filename = os.path.join(self.basepath, modinline + '.txt')
                                 filedict[modinline] = open(filename, 'w')
                             fileout = filedict[modinline]
-                         else :
-                             fileout = self.fileout
-                     else : 
-                         keepline = False
-                 if keepline :
-                     fileout.write(line.encode(self.encodeout))
+                        else :
+                            fileout = self.fileout
+                    else : 
+                        keepline = False
+                if keepline :
+                    fileout.write(line.encode(self.encodeout))
         if not self.onefile :
             for f in filedict :
                 filedict[f].close()
@@ -150,7 +150,16 @@ class SubCorpus(Corpus) :
     def getlemuces(self, lem) :
         return list(set(self.sgts).intersection(self.corpus.getlemuces(lem)))
 
-
+def converttabletocorpus(table, fileout, enc='UTF8') :
+    var = table.pop(0)
+    var = var[0:len(var)-1]
+    print var
+    et = [zip(var, line[0:len(line)-1]) for line in table]
+    et = ['**** ' + ' '.join(['*' + '_'.join(val) for val in line]) for line in et] 
+    txt = ['\n'.join([et[i], line[-1]]) for i, line in enumerate(table)]
+    print '\n'.join(txt)
+    #with open(fileout, 'w') as f :
+        
 
 
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2013 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 from chemins import ffr, simipath
 #from corpus import Corpus
@@ -9,8 +9,7 @@ import os
 from analysetxt import AnalyseText
 #from ConfigParser import RawConfigParser
 #from guifunct import getPage, getCorpus
-from dialog import StatDialog
-from guifunct import SelectColumn, PrepSimi
+from guifunct import PrepSimi
 from functions import indices_simi, progressbar, treat_var_mod, read_list_file, print_liste
 #from tableau import Tableau
 #from tabsimi import DoSimi
@@ -27,14 +26,13 @@ class SimiTxt(AnalyseText):
         self.parametres['type'] = 'simitxt'
         self.pathout.basefiles(simipath)
         self.indices = indices_simi
-        self.makesimiparam()
+        if self.dlg :
+            self.makesimiparam()
         #FIXME
         self.actives = self.corpus.make_actives_limit(3)
         dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)]) 
         continu = False
         if self.dlg :
-            #cont = SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], dlg = self.dlg)
-            #if cont.ok :
             self.listet = self.corpus.make_etoiles()
             self.listet.sort()
             self.stars = copy(self.listet)
@@ -44,6 +42,8 @@ class SimiTxt(AnalyseText):
             if prep.val == wx.ID_OK :
                 continu = True
                 self.parametres = prep.parametres
+        else :
+            continu = True
         if continu :
             self.makefiles()
             script = PrintSimiScript(self)
@@ -94,7 +94,7 @@ class SimiTxt(AnalyseText):
                           'height' : 1000,
                           'bystar' : False,
                           'first' : True,
-                          'keep_coord' : True,
+                          'keep_coord' : False,
                           'alpha' : 20,
                           'film': False,
                           'svg' : 0,
@@ -130,7 +130,8 @@ class SimiFromCluster(SimiTxt) :
         self.parametres['type'] = 'clustersimitxt'
         self.pathout.basefiles(simipath)
         self.indices = indices_simi
-        self.makesimiparam()
+        if self.dlg  :
+            self.makesimiparam()
         if 'bystar' in self.parametres :
             del self.parametres['bystar']
         dictcol = dict([[i, [act, self.corpus.getlemclustereff(act, self.numcluster)]] for i, act in enumerate(self.actives)]) 
@@ -139,8 +140,8 @@ class SimiFromCluster(SimiTxt) :
             #self.listet = self.corpus.make_etoiles()
             #self.listet.sort()
             self.stars = []#copy(self.listet)
-            self.parametres['stars'] = False#copy(self.listet)
-            self.parametres['sfromchi'] = True
+            self.parametres['stars'] = 0#copy(self.listet)
+            self.parametres['sfromchi'] = 1
             prep = PrepSimi(self.ira, self, self.parametres, self.pathout['selected.csv'], self.actives, indices_simi, wordlist=dictcol)
             if prep.val == wx.ID_OK :
                 continu = True
@@ -149,6 +150,7 @@ class SimiFromCluster(SimiTxt) :
                 continu = False
         if continu :
             self.makefiles()
+            self.parametres['type'] = 'clustersimitxt'
             script = PrintSimiScript(self)
             script.make_script()
             if not self.doR(script.scriptout, dlg = self.dlg, message = 'R ...') :

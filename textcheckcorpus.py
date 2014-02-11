@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2010, Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 from corpus import Corpus
 import wx
 import wx.lib.dialogs

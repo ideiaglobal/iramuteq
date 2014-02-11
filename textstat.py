@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2012 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 #from chemins import ConstructPathOut, StatTxtPathOut, ffr
 from chemins import PathOut
@@ -65,13 +65,13 @@ class Stat(AnalyseText) :
         phapax_forme = (float(len(hapax)) / (float(len(formes)))) * 100
         moy_occu_mot = float(occurrences) / float(len(formes))
         txt = 'Globale\n'
-        txt += 'nombre d\'uci : %i\n' % len(self.corpus.ucis)
+        txt += 'nombre de textes : %i\n' % len(self.corpus.ucis)
         txt += 'nombre d\'occurrences : %i\n' % occurrences
         txt += 'nombre de formes : %i\n' % (len(formes))
         txt += 'moyenne d\'occurrences par forme : %.2f\n' % moy_occu_mot
         txt += 'nombre d\'hapax : %i (%.2f%% des occurrences - %.2f%% des formes)\n' % (len(hapax), phapax, phapax_forme)
         print float(occurrences), float(len(self.corpus.ucis))
-        txt += 'moyenne d\'occurrences par uci : %.2f' % (float(occurrences)/float(len(self.corpus.ucis)))
+        txt += 'moyenne d\'occurrences par texte : %.2f' % (float(occurrences)/float(len(self.corpus.ucis)))
         if self.dlg :
              self.dlg.Update(7, u'Ecriture...')
         self.result['glob'] = txt
