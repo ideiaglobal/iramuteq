@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2011 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 from chemins import ConstructPathOut, StatTxtPathOut
 #from corpus import Corpus
@@ -11,7 +11,7 @@ import os
 import sys
 from listlex import *
 from functions import exec_rcode, progressbar, check_Rresult, CreateIraFile, print_liste, treat_var_mod, write_tab, DoConf
-from dialog import OptLexi, StatDialog #LexDialog
+from dialog import OptLexi, StatDialog 
 from openanalyse import OpenAnalyse
 import tempfile
 from ConfigParser import RawConfigParser
@@ -46,6 +46,9 @@ class Lexico(AnalyseText) :
         txt += """
         dmt<-read.csv2("%s",row.names=1)
         """ % self.dictpathout['tabletypem']
+        txt += """
+        indice <- "%s"
+        """ % self.parametres['indice']
         if self.parametres['indice'] == 'hypergeo' :
             txt += """
             outf <- make.spec.hypergeo(dmf)
@@ -56,7 +59,19 @@ class Lexico(AnalyseText) :
             outf<-AsLexico2(dmf)
             outt<-AsLexico2(dmt)
             """
-
+        txt += """
+        if (indice == 'hypergeo') {
+            banseuil <- 2
+        } else if (indice == 'chi2') {
+            banseuil <- 3
+        }
+        banal <- apply(abs(outf[[1]]), 1, max)
+        banal <- which(banal < banseuil)
+        banalfreq <- rowSums(dmf[banal,])
+        banalspec <- specf<-outf[[1]][banal,]
+        banal <- cbind(banalfreq, banalspec)
+        write.csv2(banal,file="%s")
+        """ % self.pathout['banalites.csv']
         txt += """
         specf<-outf[[1]]
         spect<-outt[[1]]
