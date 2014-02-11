@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2012, Pierre Ratinaud
-#Lisense: GNU GPL
+#License: GNU GPL
 
 from optparse import OptionParser
 
@@ -28,10 +28,7 @@ import logging
 #------------------------------------
 import wx
 #import wx.aui
-if wx.__version__ >= '2.11' :
-    import wx.lib.agw.aui as aui
-else :
-    import aui
+import wx.lib.agw.aui as aui
 import wx.html
 import wx.grid
 import wx.lib.hyperlink as hl
@@ -40,7 +37,7 @@ from functions import BugReport, PlaySound, ReadLexique, History, DoConf, ReadDi
 from checkversion import NewVersion
 from guifunct import *
 from tableau import Tableau
-from dialog import PrefDialog, EncodeDialog, CorpusPref
+from dialog import PrefDialog, CorpusPref
 from tabfrequence import Frequences
 from tabchi2 import ChiSquare
 #from tabstudent import MakeStudent
@@ -57,10 +54,10 @@ from textstat import Stat
 from textaslexico import Lexico
 from textsimi import SimiTxt, SimiFromCluster
 from textwordcloud import WordCloud, ClusterCloud
-from profile_segment import ProfileSegment
+#from profile_segment import ProfileSegment
 #from textcheckcorpus import checkcorpus
 from openanalyse import OpenAnalyse
-from corpus import BuildFromAlceste, Builder
+from corpus import Builder
 from sheet import MySheet
 from checkinstall import CreateIraDirectory, CheckRPath, FindRPAthWin32, FindRPathNix, CheckRPackages, IsNew, UpgradeConf, CopyConf, RLibsAreInstalled
 from chemins import RscriptsPath, ConstructConfigPath, ConstructDicoPath, ConstructGlobalPath, PathOut
@@ -318,7 +315,7 @@ class IraFrame(wx.Frame):
         #        f.write('')
         self.history = History(os.path.join(UserConfigPath, 'history.db'))
         self.tree = LeftTree(self)
-        self._mgr.AddPane(self.tree, aui.AuiPaneInfo().Name("lefttree").Caption("Navigateur").
+        self._mgr.AddPane(self.tree, aui.AuiPaneInfo().Name("lefttree").Caption(_(u"Navigator").decode('utf8')).
                           Left().MinSize(wx.Size(200,500)).Layer(1).Position(1).CloseButton(False).MaximizeButton(True).
                           MinimizeButton(True))
         
@@ -494,7 +491,7 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
             dlg = wx.MessageDialog(self, msg, u"Problème de configuration", wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
             dlg.CenterOnParent()
             if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
-                 evt.Veto()
+                pass
             dlg.Destroy()
 
 
@@ -522,7 +519,7 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
             dlg = wx.MessageDialog(self, u"Installation OK", u"Installation", wx.OK | wx.ICON_INFORMATION)
             dlg.CenterOnParent()
             if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
-                 evt.Veto()
+                evt.Veto()
 
     def DisEnSaveTabAs(self, DISEN):
     #Disable SaveTabAs
@@ -595,7 +592,7 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
         inputname, self.input_path = OnOpen(self, "Texte")
         self.filename = self.input_path[0]
         if inputname:
-             self.OpenText()
+            self.OpenText()
    
     def OnViewData(self, event):
         print self.type
@@ -617,7 +614,6 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
         self._mgr.Update()
         
     def OpenText(self):
-        #dial = EncodeDialog(self)
         dlg = wx.ProgressDialog("Ouverture...",
                                    "Veuillez patienter...",
                                    maximum=2,
@@ -735,7 +731,7 @@ Voulez-vous fermer quand même ?"""
                 elif True in ListFile :
                     remove = True
                 if remove:
-                   del self.DictTab[TabTitle]
+                    del self.DictTab[TabTitle]
             else : 
                 self.LastTabClose()
         else :
@@ -992,7 +988,7 @@ Voulez-vous fermer quand même ?"""
             self.res = DoSimi(self, param = None)
             #self.res = Verges(self)
             if self.res.val == wx.ID_OK :
-                 PlaySound(self)
+                PlaySound(self)
         except :
             BugReport(self)
 #################################################################
@@ -1048,11 +1044,11 @@ Voulez-vous fermer quand même ?"""
 class IntroPanel(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        #col = randint(0, 255)
-        #col1 = randint(0,255)
-        #col2 = randint(0,255)
-        col = 0
-        bckgrdcolor = wx.Colour(col, col, col)
+        col = randint(0, 255)
+        col1 = randint(0,255)
+        col2 = randint(0,255)
+        col = 57
+        bckgrdcolor = wx.Colour(col, col1, col2)
         self.SetBackgroundColour(bckgrdcolor)
         txtcolour = wx.Colour(250, 250, 250)
         linkcolor = wx.Colour(255, 0, 0)
@@ -1094,7 +1090,7 @@ class IntroPanel(wx.Panel):
         self.hyper_lerass.UpdateLink()
         blank = wx.StaticText(PanelPres, -1, u'\n')
         blank1 = wx.StaticText(PanelPres, -1, u'\n')
-        labellicence = wx.StaticText(PanelPres, -1, u'Licence GNU GPL')
+        labellicence = wx.StaticText(PanelPres, -1, _(u"License GNU GPL").decode('utf8'))
         labellicence.SetForegroundColour(txtcolour)
         labellicence.SetBackgroundColour(bckgrdcolor)
         labelcopy = wx.StaticText(PanelPres, -1, ConfigGlob.get('DEFAULT', 'copyright'))

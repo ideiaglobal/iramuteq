@@ -71,6 +71,7 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
 
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick, self)
+        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED , self.OnPopupTwo, self)
         # for wxMSW
         self.Bind(wx.EVT_COMMAND_RIGHT_CLICK, self.OnRightClick)
 

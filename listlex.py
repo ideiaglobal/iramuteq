@@ -243,7 +243,6 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         win = message(self, u"Segments de texte caractéristiques - %s" % self.first[ind], (750, 600))
         win.html = '<html>\n' + '<br>'.join(['<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table>' % ntab2[i][0], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
         win.HtmlPage.SetPage(win.html)
-        #dlg.Destroy()
         win.Show(True)
         
     def OnPopupTwo(self, event):

@@ -134,7 +134,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 
         #events
         #self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected)
-        #self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnItemActivated)
+        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnPopupTwo, self)
         #self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnItemDeselected)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick)
 
@@ -147,6 +147,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         #for searching
         search_id = wx.NewId()
         searchall_id = wx.NewId()
+        concord_id = wx.NewId()
         self.parent.Bind(wx.EVT_MENU, self.onsearch, id = search_id)
         self.parent.Bind(wx.EVT_MENU, self.onsearchall, id = searchall_id)
         self.accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('F'), search_id),
@@ -367,7 +368,11 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
     def onexport(self, evt) :
         if 'corpus' in dir(self.Source):
             corpus = self.Source.corpus
-        corpus.export_classe(self.Source.pathout['classe_%i_export.txt' % self.cl], self.cl)
+        if self.Source.parametres['classif_mode'] != 2 :
+            uci = False
+        else :
+            uci = True
+        corpus.export_classe(self.Source.pathout['classe_%i_export.txt' % self.cl], self.cl, uci = uci)
         dial = wx.MessageDialog(self, self.Source.pathout['classe_%i_export.txt' % self.cl], u"Export", wx.OK|wx.ICON_INFORMATION)
         dial.ShowModal()
         dial.Destroy()
@@ -517,10 +522,14 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         dlg = progressbar(self, 2)
         corpus = self.Source.corpus
         uces = corpus.lc[self.cl-1]
+        if self.Source.parametres['classif_mode'] != 2 :
+            uci = False
+        else :
+            uci = True
         l = []
         dlg.Update(1, u'Segments...')
         for i in range(2,10) :
-            li = corpus.find_segments_in_classe(uces, i, 1000)
+            li = corpus.find_segments_in_classe(uces, i, 1000, uci = uci)
             if li == [] :
                 break
             else :
@@ -545,7 +554,11 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             dlg = progressbar(self,maxi = 4)
             corpus = self.Source.corpus
             uces = corpus.lc[self.cl-1]
-            tab = corpus.make_table_with_classe(uces, self.la)
+            if self.Source.parametres['classif_mode'] != 2 :
+                uci = False
+            else :
+                uci = True
+            tab = corpus.make_table_with_classe(uces, self.la, uci = uci)
             tab.pop(0)
             dlg.Update(2, u'score...')
             if atype == 0 :
@@ -558,7 +571,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             ntab2 = ntab2[:limite]
             nuces = [val[1] for val in ntab2]
             dlg.Update(3, u'concordancier...')
-            ucis_txt, ucestxt = doconcorde(corpus, nuces, self.la)
+            ucis_txt, ucestxt = doconcorde(corpus, nuces, self.la, uci = uci)
             dlg.Update(4, u'texte...')
             win = message(self, u"Segments de texte caractéristiques - Classe %i" % self.cl, (750, 600))
             win.html = '<html>\n' + '<br>'.join(['<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table>' % ntab2[i][0], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
@@ -650,7 +663,6 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         win.HtmlPage.SetPage(txt)
         win.Show(True)
 
-
     def make_concord(self, uces, title, color = 'red') :
         corpus = self.Source.corpus
         ListWord = [self.getColumnText(self.GetFirstSelected(), 6)]
@@ -659,9 +671,15 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             last = self.GetNextSelected(last)
             ListWord.append(self.getColumnText(last, 6))
         ucef = []
-        for word in ListWord : 
-            ucef += list(set(corpus.getlemuces(word)).intersection(uces))
-        ucis_txt, ucestxt = doconcorde(corpus, ucef, ListWord)
+        if self.Source.parametres['classif_mode'] != 2 :
+            for word in ListWord : 
+                uci = False
+                ucef += list(set(corpus.getlemuces(word)).intersection(uces))
+        else :
+            for word in ListWord : 
+                ucef += list(set(corpus.getlemucis(word)).intersection(uces))            
+                uci = True
+        ucis_txt, ucestxt = doconcorde(corpus, ucef, ListWord, uci = uci)
         win = message(self, title, size=(750, 600))
         win.html = ('<html>\n<h1>%s</h1>' % ' '.join(ListWord)) + '<br>'.join(['<br>'.join([ucis_txt[i], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
         win.HtmlPage.SetPage(win.html)
@@ -725,7 +743,10 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         rep = []
         #FIXME : donner aussi eff reel a la place de nb uce
         for forme in lems[word].formes :
-            ucef = list(set(corpus.getworduces(forme)).intersection(uces))
+            if self.Source.parametres['classif_mode'] != 2 :
+                ucef = list(set(corpus.getworduces(forme)).intersection(uces))
+            else :
+                ucef = list(set(corpus.getworducis(forme)).intersection(uces))
             #ucef = [uce for uce in corpus.formes[forme][1] if uce in uces]
             if ucef != [] :
                 nb = len(ucef)

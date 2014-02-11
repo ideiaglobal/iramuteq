@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2011 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 import tempfile
 from chemins import ffr
@@ -390,15 +390,15 @@ write.csv2(gbcluster,file="%s")
     xyminmax <- PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab)
     """ % (DictChdTxtOut['AFC2DL_OUT'])
         txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debsup, fin=(debet-1), xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2])
+    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debsup, fin=(debet-1), xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2], active=FALSE)
     """ % (DictChdTxtOut['AFC2DSL_OUT'])
         txt += """
         if ((fin - debet) > 2) {
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debet, fin=fin, xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2])
+    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debet, fin=fin, xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2], active = FALSE)
         }
     """ % (DictChdTxtOut['AFC2DEL_OUT'])
         txt += """
-    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col=TRUE, what='coord', xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2])
+    PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col=TRUE, what='coord', xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2], active=FALSE)
     """ % (DictChdTxtOut['AFC2DCL_OUT'])
 #        txt += """
  #   PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='crl', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab)
@@ -855,6 +855,15 @@ class PrintSimiScript(PrintRScript) :
         if self.parametres['type_graph'] == 2 : type = 'rgl'
         if self.parametres['type_graph'] == 3 : 
             graphnb = 1
+            type = 'web'
+            dirout = os.path.dirname(self.pathout['mat01'])
+            while os.path.exists(os.path.join(dirout,'web_'+str(graphnb))):
+                graphnb +=1
+            self.filename = ffr(os.path.join(dirout,'web_'+str(graphnb)))
+            os.mkdir(self.filename)        
+            self.filename = os.path.join(self.filename, 'gexf.gexf')
+        if self.parametres['type_graph'] == 4 : 
+            graphnb = 1
             type = 'rglweb'
             dirout = os.path.dirname(self.pathout['mat01'])
             while os.path.exists(os.path.join(dirout,'webrgl_'+str(graphnb))):
@@ -1045,7 +1054,7 @@ class PrintSimiScript(PrintRScript) :
                 vertex.size <- NULL
                 """
         else :
-            print self.parametres
+            #print self.parametres
             if (self.parametres['type'] == 'clustersimitxt' and self.parametres.get('tmpchi', False)) or (self.parametres['type'] == 'simimatrix' and 'tmpchi' in self.parametres): 
                 txt += """
                 lchi <- read.table("%s")
