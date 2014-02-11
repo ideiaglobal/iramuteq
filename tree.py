@@ -1,8 +1,7 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2012, Pierre Ratinaud
-#Lisense: GNU GPL
+#License: GNU GPL
 
 import wx
 import os
@@ -89,7 +88,7 @@ class LeftTree(CT.CustomTreeCtrl):
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition,
                  size=wx.DefaultSize,
                  style=wx.SUNKEN_BORDER|wx.WANTS_CHARS,
-                 agwStyle=CT.TR_HAS_BUTTONS|CT.TR_HAS_VARIABLE_ROW_HEIGHT):
+                 agwStyle=CT.TR_HIDE_ROOT|CT.TR_HAS_BUTTONS|CT.TR_HAS_VARIABLE_ROW_HEIGHT):
 
         CT.CustomTreeCtrl.__init__(self, parent, id, pos, size, style, agwStyle)
         self.log = log
@@ -106,8 +105,19 @@ class LeftTree(CT.CustomTreeCtrl):
         self.styles = treestyles
         self.item = None
         
-        il = wx.ImageList(16, 16)
-
+        self.il = wx.ImageList(16, 16)
+        self.ild = {}
+        imgtextroot = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'textroot.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
+        self.ild['alceste'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'reinert.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
+        self.ild['corpus'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'textcorpus.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
+        self.ild['wordcloud'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'wordcloud.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
+        self.ild['stat'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'stats.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
+        self.ild['simitxt'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'simitxt.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
+        self.ild['clustersimitxt'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'clustersimitxt.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
+        self.ild['clustercloud'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'clustercloud.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
+        self.ild['spec'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'spec.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
+        self.SetImageList(self.il)
+        
         self.count = 0
         self.log = log
 
@@ -119,22 +129,36 @@ class LeftTree(CT.CustomTreeCtrl):
             self.SetPyData(self.root, None)
             self.SetItemImage(self.root, 24, CT.TreeItemIcon_Normal)
             self.SetItemImage(self.root, 13, CT.TreeItemIcon_Expanded)
+        
+        self.textroot = self.AppendItem(self.root, u'Corpus texte')
+        self.SetPyData(self.textroot, {'uuid': 'textroot'})
+        self.SetItemImage(self.textroot, imgtextroot, CT.TreeItemIcon_Normal)
+        self.SetItemImage(self.textroot, imgtextroot, CT.TreeItemIcon_Expanded)     
 
-        for corpus in self.h :
-            child = self.AppendItem(self.root, corpus['corpus_name'])
+        for corpus in reversed(self.h) :
+            child = self.AppendItem(self.textroot, corpus['corpus_name'])
             self.SetPyData(child, corpus)
-            self.SetItemImage(child, 24, CT.TreeItemIcon_Normal)
-            self.SetItemImage(child, 13, CT.TreeItemIcon_Expanded)
+            self.SetItemImage(child, self.ild['corpus'], CT.TreeItemIcon_Normal)
+            self.SetItemImage(child, self.ild['corpus'], CT.TreeItemIcon_Expanded)
 
             if 'analyses' in corpus :
                 for y in corpus['analyses'] :
                     last = self.AppendItem(child, y['name'], ct_type=0)
                     self.SetPyData(last, y)
-                    self.SetItemImage(last, 24, CT.TreeItemIcon_Normal)
+                    if y['type'] in self.ild :
+                        img = self.ild[y['type']]
+                    else :
+                        img = 24
+                    self.SetItemImage(last, img, CT.TreeItemIcon_Normal)
                     self.SetItemImage(last, 13, CT.TreeItemIcon_Expanded)
 
+        self.matroot = self.AppendItem(self.root, u'Matrices')
+        self.SetPyData(self.matroot, {'uuid': 'matroot'})
+        self.SetItemImage(self.matroot, 24, CT.TreeItemIcon_Normal)
+        self.SetItemImage(self.matroot, 13, CT.TreeItemIcon_Expanded)
+        
         for matrix in self.history.matrix :
-            last = self.AppendItem(self.root, matrix['name'])
+            last = self.AppendItem(self.matroot, matrix['name'])
             self.SetPyData(last, matrix)
             self.SetItemImage(last, 24, CT.TreeItemIcon_Normal)
             self.SetItemImage(last, 13, CT.TreeItemIcon_Expanded)
@@ -332,81 +356,80 @@ class LeftTree(CT.CustomTreeCtrl):
                          "selexp": selexp, "haswin": haswin, "children": children,
                          "itemtype": itemtype, "text": text, "pydata": pydata, "enabled": enabled}
         
-        menu = wx.Menu()
-        info = menu.Append(wx.ID_ANY, "Informations")
-        menu.AppendSeparator()
-
-        if 'corpus_name' in pydata :
-            stat = menu.Append(wx.ID_ANY, u"Statistiques")
-            spec = menu.Append(wx.ID_ANY, u"Spécificté et AFC")
-            classification = wx.Menu()
-            alceste = classification.Append(wx.ID_ANY, u"Méthode GNEPA")
-            #pam = classification.Append(wx.ID_ANY, u"Par matrice des distances")
-            menu.AppendMenu(-1, u"Classification", classification)
-            simi = menu.Append(wx.ID_ANY, u"Analyse de similitude")
-            wdc = menu.Append(wx.ID_ANY, u"Nuage de mots")
+        if not item in [self.textroot, self.matroot] :
+            menu = wx.Menu()
+            info = menu.Append(wx.ID_ANY, "Informations")
             menu.AppendSeparator()
-            self.Bind(wx.EVT_MENU, self.OnAlceste, alceste)
-            #self.Bind(wx.EVT_MENU, self.OnPam, pam)
-            self.Bind(wx.EVT_MENU, self.OnStat, stat)
-            self.Bind(wx.EVT_MENU, self.OnSpec, spec)
-            self.Bind(wx.EVT_MENU, self.OnSimiTxt, simi)
-            self.Bind(wx.EVT_MENU, self.OnWordCloud, wdc)
-        elif pydata.get('type', False) == 'alceste' and pydata['uuid'] in self.parent.history.opened :
-            openmenu = wx.Menu()
-            antipro = openmenu.Append(wx.ID_ANY, u"antiprofils")
-            menu.AppendMenu(wx.ID_ANY, u"Ouvrir...", openmenu)
-
-            profsr = menu.Append(wx.ID_ANY, u"Profils des segments répétés")
-            profgram = menu.Append(wx.ID_ANY, u"Profils des types")
-            export_corpus = menu.Append(wx.ID_ANY, u"Exporter le corpus")
-            colored = menu.Append(wx.ID_ANY, u"Corpus en couleur")
-            navig = menu.Append(wx.ID_ANY, u"Outil de navigation")
-            statclasse = menu.Append(wx.ID_ANY, u"Statistiques par classe")
-            rapport = menu.Append(wx.ID_ANY, u"Rapport")
-            menu.AppendSeparator()
-            self.Bind(wx.EVT_MENU, self.OpenAntipro, antipro)
-            self.Bind(wx.EVT_MENU, self.OnProfSR, profsr)
-            self.Bind(wx.EVT_MENU, self.OnProfGram, profgram)
-            self.Bind(wx.EVT_MENU, self.OnExportCorpus, export_corpus)
-            self.Bind(wx.EVT_MENU, self.OnColored, colored)
-            self.Bind(wx.EVT_MENU, self.OnNavig, navig)
-            self.Bind(wx.EVT_MENU, self.StatClasse, statclasse)
-            self.Bind(wx.EVT_MENU, self.OnRapport, rapport)
-        elif pydata.get('type', False) == 'stat'  and pydata['uuid'] in self.parent.history.opened :
-            export_dictionary =  menu.Append(wx.ID_ANY, u"Exporter le dictionnaire")
-            export_lems =  menu.Append(wx.ID_ANY, u"Exporter le dictionnaire des lemmes")
-            self.Bind(wx.EVT_MENU, self.OnExportDictionary, export_dictionary)
-            self.Bind(wx.EVT_MENU, self.OnExportLems, export_lems)
-            menu.AppendSeparator()
-        elif pydata.get('type', False) == 'gnepamatrix' and pydata['uuid'] in self.parent.history.opened :
-            openmenu = wx.Menu()
-            antipro = openmenu.Append(wx.ID_ANY, u"antiprofils")
-            menu.AppendMenu(wx.ID_ANY, u"Ouvrir...", openmenu)
-            self.Bind(wx.EVT_MENU, self.OpenAntipro, antipro)
-
-
-        itemdelete = menu.Append(wx.ID_ANY, "Supprimer de l'historique")
-        if item == self.GetRootItem():
-            itemdelete.Enable(False)
-        #item11 = menu.Append(wx.ID_ANY, "Prepend An Item")
-        #item12 = menu.Append(wx.ID_ANY, "Append An Item")
-
-        #self.Bind(wx.EVT_MENU, self.OnItemBackground, item1)
-        #self.Bind(wx.EVT_MENU, self.OnItemForeground, item2)
-        #self.Bind(wx.EVT_MENU, self.OnItemBold, item3)
-        #self.Bind(wx.EVT_MENU, self.OnItemFont, item4)
-        #self.Bind(wx.EVT_MENU, self.OnItemHyperText, item5)
-        #self.Bind(wx.EVT_MENU, self.OnEnableWindow, item6)
-        #self.Bind(wx.EVT_MENU, self.OnDisableItem, item7)
-        #self.Bind(wx.EVT_MENU, self.OnItemIcons, item8)
-        self.Bind(wx.EVT_MENU, self.OnItemInfo, info)
-        self.Bind(wx.EVT_MENU, self.OnItemDelete, itemdelete)
-        #self.Bind(wx.EVT_MENU, self.OnItemPrepend, item11)
-        #self.Bind(wx.EVT_MENU, self.OnItemAppend, item12)
-        
-        self.PopupMenu(menu)
-        menu.Destroy()
+    
+            if 'corpus_name' in pydata :
+                stat = menu.Append(wx.ID_ANY, _(u"Statistics").decode('utf8'))
+                spec = menu.Append(wx.ID_ANY, _(u"Specificities and CA").decode('utf8'))
+                classification = wx.Menu()
+                alceste = classification.Append(wx.ID_ANY, _(u"Reinert method").decode('utf8'))
+                #pam = classification.Append(wx.ID_ANY, u"Par matrice des distances")
+                menu.AppendMenu(-1, _(u"Clustering").decode('utf8'), classification)
+                simi = menu.Append(wx.ID_ANY, _(u"Similarities analysis").decode('utf8'))
+                wdc = menu.Append(wx.ID_ANY, _(u"Wordcloud").decode('utf8'))
+                menu.AppendSeparator()
+                self.Bind(wx.EVT_MENU, self.OnAlceste, alceste)
+                #self.Bind(wx.EVT_MENU, self.OnPam, pam)
+                self.Bind(wx.EVT_MENU, self.OnStat, stat)
+                self.Bind(wx.EVT_MENU, self.OnSpec, spec)
+                self.Bind(wx.EVT_MENU, self.OnSimiTxt, simi)
+                self.Bind(wx.EVT_MENU, self.OnWordCloud, wdc)
+            elif pydata.get('type', False) == 'alceste' and pydata['uuid'] in self.parent.history.opened :
+                openmenu = wx.Menu()
+                antipro = openmenu.Append(wx.ID_ANY, _(u"antiprofiles").decode('utf8'))
+                menu.AppendMenu(wx.ID_ANY, _(u"Open ...").decode('utf8'), openmenu)
+    
+                profsr = menu.Append(wx.ID_ANY, _(u"Repeated segments profiles").decode('utf8'))
+                profgram = menu.Append(wx.ID_ANY, _(u"POS profiles").decode('utf8'))
+                export_corpus = menu.Append(wx.ID_ANY, _(u"Export corpora").decode('utf8'))
+                colored = menu.Append(wx.ID_ANY, _(u"Colored corpora").decode('utf8'))
+                navig = menu.Append(wx.ID_ANY, _(u"Navigator").decode('utf8'))
+                statclasse = menu.Append(wx.ID_ANY, _(u"Clusters statistics").decode('utf8'))
+                rapport = menu.Append(wx.ID_ANY, _(u"Report").decode('utf8'))
+                menu.AppendSeparator()
+                self.Bind(wx.EVT_MENU, self.OpenAntipro, antipro)
+                self.Bind(wx.EVT_MENU, self.OnProfSR, profsr)
+                self.Bind(wx.EVT_MENU, self.OnProfGram, profgram)
+                self.Bind(wx.EVT_MENU, self.OnExportCorpus, export_corpus)
+                self.Bind(wx.EVT_MENU, self.OnColored, colored)
+                self.Bind(wx.EVT_MENU, self.OnNavig, navig)
+                self.Bind(wx.EVT_MENU, self.StatClasse, statclasse)
+                self.Bind(wx.EVT_MENU, self.OnRapport, rapport)
+            elif pydata.get('type', False) == 'stat'  and pydata['uuid'] in self.parent.history.opened :
+                export_dictionary =  menu.Append(wx.ID_ANY, _(u"Export dictionary").decode('utf8'))
+                export_lems =  menu.Append(wx.ID_ANY, _(u"Export lemma dictionary").decode('utf8'))
+                self.Bind(wx.EVT_MENU, self.OnExportDictionary, export_dictionary)
+                self.Bind(wx.EVT_MENU, self.OnExportLems, export_lems)
+                menu.AppendSeparator()
+            elif pydata.get('type', False) == 'gnepamatrix' and pydata['uuid'] in self.parent.history.opened :
+                openmenu = wx.Menu()
+                antipro = openmenu.Append(wx.ID_ANY, _(u"antiprofiles").decode('utf8'))
+                menu.AppendMenu(wx.ID_ANY, _(u"Open ...").decode('utf8'), openmenu)
+                self.Bind(wx.EVT_MENU, self.OpenAntipro, antipro)
+    
+    
+            itemdelete = menu.Append(wx.ID_ANY, _(u"Delete from history").decode('utf8'))
+            #item11 = menu.Append(wx.ID_ANY, "Prepend An Item")
+            #item12 = menu.Append(wx.ID_ANY, "Append An Item")
+    
+            #self.Bind(wx.EVT_MENU, self.OnItemBackground, item1)
+            #self.Bind(wx.EVT_MENU, self.OnItemForeground, item2)
+            #self.Bind(wx.EVT_MENU, self.OnItemBold, item3)
+            #self.Bind(wx.EVT_MENU, self.OnItemFont, item4)
+            #self.Bind(wx.EVT_MENU, self.OnItemHyperText, item5)
+            #self.Bind(wx.EVT_MENU, self.OnEnableWindow, item6)
+            #self.Bind(wx.EVT_MENU, self.OnDisableItem, item7)
+            #self.Bind(wx.EVT_MENU, self.OnItemIcons, item8)
+            self.Bind(wx.EVT_MENU, self.OnItemInfo, info)
+            self.Bind(wx.EVT_MENU, self.OnItemDelete, itemdelete)
+            #self.Bind(wx.EVT_MENU, self.OnItemPrepend, item11)
+            #self.Bind(wx.EVT_MENU, self.OnItemAppend, item12)
+            
+            self.PopupMenu(menu)
+            menu.Destroy()
 
     def getcorpus(self):
         if self.pydata['uuid'] in self.parent.history.openedcorpus :
@@ -455,7 +478,11 @@ class LeftTree(CT.CustomTreeCtrl):
             else : alc = False
             if dial.radio_lem.GetSelection() == 0 : lem = True
             else : lem = False
-            self.page.corpus.export_corpus_classes(dial.fbb.GetValue(), alc = alc, lem = lem)
+            if self.page.parametres['classif_mode'] != 2 :
+                uci = False
+            else :
+                uci = True
+            self.page.corpus.export_corpus_classes(dial.fbb.GetValue(), alc = alc, lem = lem, uci = uci)
             msg = u"Fini !"
             dial.Destroy()
             dlg = wx.MessageDialog(self.parent, msg, u"Export", wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
@@ -464,17 +491,21 @@ class LeftTree(CT.CustomTreeCtrl):
             dlg.Destroy()
 
     def OnColored(self, evt) :
-        dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.html', 'title': 'Corpus en couleur'})
+        dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.html', 'title': _(u"Colored corpora").decode('utf8')})
         dial.fbb.SetValue(os.path.join(os.path.dirname(self.page.dictpathout['ira']), 'corpus_couleur.html'))
         dial.CenterOnParent()
         res = dial.ShowModal()
         if res == wx.ID_OK :
             fileout = dial.fbb.GetValue()
             dial.Destroy()
-            txt = self.page.corpus.make_colored_corpus()
+            if self.page.parametres['classif_mode'] != 2 :
+                uci = False
+            else :
+                uci = True
+            txt = self.page.corpus.make_colored_corpus(uci = uci)
             with open(fileout, 'w') as f :
                 f.write(txt)
-            msg = u"Fini !\nVoulez-vous ouvrir le corpus dans votre navigateur ?"
+            msg = ' !\n'.join([_(u"Done").decode('utf8'), _(u"Open in a web browser ?").decode('utf8')])
             dlg = wx.MessageDialog(self.parent, msg, u"Corpus en couleur", wx.NO | wx.YES | wx.NO_DEFAULT | wx.ICON_QUESTION)
             dlg.CenterOnParent()
             if dlg.ShowModal() == wx.ID_YES :
@@ -483,11 +514,11 @@ class LeftTree(CT.CustomTreeCtrl):
 
     def OnNavig(self, evt):
         if 'FrameSearch' not in dir(self.page) :
-            self.page.FrameSearch = SearchFrame(self.parent, -1, u"Rechercher...", self.page.corpus)
+            self.page.FrameSearch = SearchFrame(self.parent, -1, _(u"Search ...").decode('utf8'), self.page.corpus)
         self.page.FrameSearch.Show()
 
     def StatClasse(self, evt):
-        dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.csv', 'title': 'Stat par classe'})
+        dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.csv', 'title': _(u"Clusters statistics").decode('utf8')})
         dial.fbb.SetValue( os.path.join(os.path.dirname(self.page.dictpathout['ira']), 'stat_par_classe.csv'))
         dial.CenterOnParent()
         res = dial.ShowModal()
@@ -496,7 +527,7 @@ class LeftTree(CT.CustomTreeCtrl):
             dial.Destroy()
             self.page.corpus.get_stat_by_cluster(fileout)
             msg = u"Fini !"
-            dlg = wx.MessageDialog(self.parent, msg, u"Stat par classe", wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+            dlg = wx.MessageDialog(self.parent, msg, _(u"Clusters statistics").decode('utf8'), wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
             dlg.CenterOnParent()
             if dlg.ShowModal() == wx.ID_OK :
                 dlg.Destroy()        
@@ -505,7 +536,7 @@ class LeftTree(CT.CustomTreeCtrl):
         find = False
         for i in range(0, self.page.TabChdSim.GetPageCount()) :
             page = self.page.TabChdSim.GetPage(i)
-            if self.page.TabChdSim.GetPageText(i) == 'Antiprofils' :
+            if self.page.TabChdSim.GetPageText(i) == _(u"Antiprofiles").decode('utf8') :
                 self.page.TabChdSim.SetSelection(i)
                 find = True
                 break
@@ -514,7 +545,7 @@ class LeftTree(CT.CustomTreeCtrl):
             self.page.TabChdSim.SetSelection(self.page.TabChdSim.GetPageCount() - 1)
 
     def OnRapport(self, evt) :
-        dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.txt', 'title': 'Rapport'})
+        dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.txt', 'title': _(u"Report").decode('utf8')})
         dial.fbb.SetValue(self.page.dictpathout['rapport'])
         dial.CenterOnParent()
         res = dial.ShowModal()
@@ -524,7 +555,7 @@ class LeftTree(CT.CustomTreeCtrl):
             with open(fileout, 'w') as f :
                 f.write(self.page.debtext + '\n' + GetTxtProfile(self.page.DictProfile, self.page.cluster_size))
             msg = u"Fini !"
-            dlg = wx.MessageDialog(self.parent, msg, u"Rapport", wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+            dlg = wx.MessageDialog(self.parent, msg, _(u"Report").decode('utf8'), wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
             dlg.CenterOnParent()
             dlg.ShowModal()
             dlg.Destroy()
@@ -703,7 +734,7 @@ class LeftTree(CT.CustomTreeCtrl):
         uuid = parametres.get('corpus', None)
         if uuid is not None :
             if itemParent is None :
-                itemParent = self.root
+                itemParent = self.textroot
             child, cookie = self.GetFirstChild(itemParent)
             corpus = None
             while child :
@@ -714,22 +745,31 @@ class LeftTree(CT.CustomTreeCtrl):
                 self.GiveFocus(child, uuid)
                 child, cookie = self.GetNextChild(itemParent, cookie)
             #item = self.AppendItem(child, parametres['name'])
+            print corpus
             if corpus is not None : 
                 item = self.AppendItem(corpus, parametres['name'])
             else :
-                item = self.AppendItem(self.root, parametres['name'])
+                item = self.AppendItem(self.textroot, parametres['name'])
         else :
-            item = self.AppendItem(self.root, parametres['name'])
+            item = self.AppendItem(self.matroot, parametres['name'])
         self.SetPyData(item, parametres)
-        self.SetItemImage(item, 24, CT.TreeItemIcon_Normal)
+        if parametres['type'] in self.ild :
+            img = self.ild[parametres['type']]
+        else :
+            img = 24
+        self.SetItemImage(item, img, CT.TreeItemIcon_Normal)
         self.SetItemImage(item, 13, CT.TreeItemIcon_Expanded)
         self.SetItemBold(item, bold)
         
     def OnItemAppend(self, item):
-        child = self.AppendItem(self.root, item['corpus_name'])
+        child = self.InsertItem(self.textroot, 0, item['corpus_name'])
         self.SetPyData(child, item)
         self.history.addtab(item)
-        self.SetItemImage(child, 24, CT.TreeItemIcon_Normal)
+        if item['type'] in self.ild :
+            img = self.ild[item['type']]
+        else :
+            img = 24
+        self.SetItemImage(child, img, CT.TreeItemIcon_Normal)
         self.SetItemImage(child, 13, CT.TreeItemIcon_Expanded)
         self.SetItemBold(child, True)
         
@@ -779,7 +819,6 @@ class LeftTree(CT.CustomTreeCtrl):
 
 
     def OnLeftDClick(self, event):
-        
         pt = event.GetPosition()
         item, flags = self.HitTest(pt)
         if item is not None :
@@ -791,8 +830,13 @@ class LeftTree(CT.CustomTreeCtrl):
                         if page.parametres['uuid'] == pydata['uuid'] :
                             self.parent.nb.SetSelection(i)
                             break
+            elif pydata['uuid'] in ['textroot', 'matroot'] :
+                pass
             else :
+                busy = wx.BusyInfo(_("Please wait..."), self.parent)
+                wx.SafeYield()
                 OpenAnalyse(self.parent, pydata)
+                del busy
                 self.SetItemBold(item, True)
                 self.OnSelChanged(pydata = pydata)
         #if item and (flags & CT.TREE_HITTEST_ONITEMLABEL):
