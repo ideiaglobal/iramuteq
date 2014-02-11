@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2012-2013 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 import os
 import codecs

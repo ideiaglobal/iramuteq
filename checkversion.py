@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2009, Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 import urllib2
 import socket

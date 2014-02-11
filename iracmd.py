@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2010 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 import os
 from optparse import OptionParser
@@ -143,16 +143,20 @@ class CmdLine :
 #            log.warning('ATTENTION gethapaxuces')
 #            MakeUciStat(corpus)
             #corpus.gethapaxuces()
-                ucisize = corpus.getucisize()
-                ucisize = [`val` for val in ucisize]
-                uciet = [[val.split('_')[1] for val in uci.etoiles[1:]] for uci in corpus.ucis]
-                #for line in uciet :
-                #    print '\t'.join(line)
+             #   ucisize = corpus.getucisize()
+             #   ucisize = [`val` for val in ucisize]
+                #uciet = [uci.etoiles[1:] for uci in corpus.ucis]
+                uceet = [corpus.ucis[uce.uci].etoiles[1:] for uci in corpus.ucis for uce in uci.uces]
+                print uceet[0:10]
+                for line in uceet :
+                    print '\t'.join(line)
                 #res = zip(uciet, ucisize)
-                res = [uciet[i] + [ucisize[i]] for i, val in enumerate(uciet)]
-                print res[0:10]
-                with open('ucisize.csv', 'w') as f :
-                    f.write('\n'.join(['\t'.join(val) for val in res]))
+             #   res = [uciet[i] + [ucisize[i]] for i, val in enumerate(uciet)]
+             #   print res[0:10]
+                #ucesize = corpus.getucesize()
+                #print ucesize[0:40]
+                #with open('sentences_size.csv', 'w') as f :
+                #    f.write('\n'.join([`val`  for val in ucesize]))
                 #    self.content = f.read()
                 #self.content = self.content.replace('\r','')
                 if options.type_analyse == 'alceste' :

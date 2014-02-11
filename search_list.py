@@ -197,7 +197,7 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         lems = corpus.lems
         rep = []
         for forme in lems[word] :
-             rep.append([forme, corpus.formes[forme][0]])
+            rep.append([forme, corpus.formes[forme][0]])
         win = message(self, u"Formes associées", size=(300, 200))
         win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
         win.HtmlPage.SetPage(win.html)

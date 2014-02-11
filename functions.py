@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2012 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 import wx
 import re
@@ -124,7 +124,9 @@ class History :
 
     def clean(self) :
         corpustodel = [corpus for corpus in self.history if not os.path.exists(corpus['ira'])]
+        print corpustodel
         for corpus in corpustodel :
+            print 'cleaning :', corpus['corpus_name']
             self.delete(corpus, corpus = True)
     
     def __str__(self) :
@@ -315,7 +317,8 @@ def ReadProfileAsDico(File, Alceste=False, encoding = sys.getdefaultencoding()):
     FileReader.close()
     DictProfile = {}
     count = 0
-    rows = [row.replace('\n', '').replace("'", '').replace('\"', '').replace(',', '.').replace('\r','').split(';') for row in Filecontent]
+    #rows = [row.replace('\n', '').replace("'", '').replace('\"', '').replace(',', '.').replace('\r','').split(';') for row in Filecontent]
+    rows = [row.replace('\n', '').replace("'", '').replace('\"', '').replace('\r','').split(';') for row in Filecontent]
     rows.pop(0)
     ClusterNb = rows[0][2]
     rows.pop(0)
@@ -669,20 +672,30 @@ def progressbar(self, maxi) :
 
 def treat_var_mod(variables) :
     var_mod = {}
-    for variable in variables :
-        if u'_' in variable :
-            forme = variable.split(u'_')
-            var = forme[0]
-            mod = forme[1]
-            if not var in var_mod :
-                var_mod[var] = [variable]
-            else :
-                if not mod in var_mod[var] :
-                    var_mod[var].append(variable)
+    variables = list(set(variables))
+    varmod = [variable.split('_') for variable in variables]
+    vars = list(set([var[0] for var in varmod if len(var) >=2]))
+    for var in vars :
+        mods = ['_'.join(v) for v in varmod if v[0] == var]
+        var_mod[var] = mods
+    
+#     for variable in variables :
+#         if u'_' in variable :
+#             forme = variable.split(u'_')
+#             var = forme[0]
+#             mod = forme[1]
+#             if not var in var_mod :
+#                 var_mod[var] = [variable]
+#             else :
+#                 if not mod in var_mod[var] :
+#                     var_mod[var].append(variable)
     return var_mod
 
-def doconcorde(corpus, uces, mots) :
-    ucestxt1 = [row for row in corpus.getconcorde(uces)]
+def doconcorde(corpus, uces, mots, uci = False) :
+    if not uci :
+        ucestxt1 = [row for row in corpus.getconcorde(uces)]
+    else :
+        ucestxt1 = [row for row in corpus.getuciconcorde(uces)]
     ucestxt1 = dict(ucestxt1)
     ucestxt = []
     ucis_txt = []
@@ -693,7 +706,15 @@ def doconcorde(corpus, uces, mots) :
     for uce in uces :
         ucetxt = ucestxt1[uce].split()
         ucetxt = ' '.join([dmots.get(mot, mot) for mot in ucetxt])
-        ucis_txt.append('<p><b>' + ' '.join(corpus.ucis[corpus.getucefromid(uce).uci].etoiles) + '</b></p>')
+        if not uci :
+            ucis_txt.append('<p><b>' + ' '.join(corpus.ucis[corpus.getucefromid(uce).uci].etoiles) + '</b></p>')
+        else :
+            ucis_txt.append('<p><b>' + ' '.join(corpus.ucis[uce].etoiles) + '</b></p>')
         ucestxt.append(ucetxt)        
     return ucis_txt, ucestxt
  
+
+def getallstcarac(corpus, analyse) :
+   pathout = PathOut(analyse['ira'])
+   profils =  ReadProfileAsDico(pathout['PROFILE_OUT'], Alceste, self.encoding)
+   print profils

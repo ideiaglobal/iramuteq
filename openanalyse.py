@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2012, Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 from chemins import ChdTxtPathOut, StatTxtPathOut, PathOut
 from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout, SimiMatLayout, ProtoLayout
@@ -38,9 +38,9 @@ class OpenAnalyse():
                 intree = False
             corpus = self.openanalyse()
             if self.conf.get('lem',1) :
-               corpus.make_lems(True)
+                corpus.make_lems(True)
             else :
-               corpus.make_lems(False)
+                corpus.make_lems(False)
             if not intree :
                 self.parent.tree.AddAnalyse(self.conf, bold = True)
             else :

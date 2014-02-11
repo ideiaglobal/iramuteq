@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-#Author: Pierre Ratinaud
-#lisence : GNU GPL
-#copyright : 2012-2013 (c) Pierre Ratinaud
+# Author: Pierre Ratinaud
+# lisence : GNU GPL
+# copyright : 2012-2013 (c) Pierre Ratinaud
 
 import logging
 from chemins import PathOut, ChdTxtPathOut
@@ -14,12 +14,11 @@ from OptionAlceste import OptionAlc
 from layout import PrintRapport
 from openanalyse import OpenAnalyse
 from dialog import StatDialog
-from time import time
 
 log = logging.getLogger('iramuteq.analyse')
 
 class AnalyseText :
-    def __init__(self, ira, corpus, parametres = None, dlg = False, lemdial = True) :
+    def __init__(self, ira, corpus, parametres=None, dlg=False, lemdial=True) :
         self.corpus = corpus
         self.ira = ira
         self.parent = ira
@@ -30,9 +29,9 @@ class AnalyseText :
         self.val = False
         self.keys = DoConf(self.ira.ConfigPath['key']).getoptions()
         if not 'pathout' in self.parametres :
-            self.pathout = PathOut(corpus.parametres['originalpath'], analyse_type = parametres['type'], dirout = corpus.parametres['pathout'])
+            self.pathout = PathOut(corpus.parametres['originalpath'], analyse_type=parametres['type'], dirout=corpus.parametres['pathout'])
         else :
-            self.pathout = PathOut(filename = corpus.parametres['originalpath'], dirout = self.parametres['pathout'], analyse_type = self.parametres['type'])
+            self.pathout = PathOut(filename=corpus.parametres['originalpath'], dirout=self.parametres['pathout'], analyse_type=self.parametres['type'])
         self.parametres = self.lemparam()
         if self.parametres is not None :
             self.parametres = self.make_config(parametres)
@@ -42,7 +41,7 @@ class AnalyseText :
             gramact = [k for k in self.keys if self.keys[k] == 1]
             gramsup = [k for k in self.keys if self.keys[k] == 2]
             self.parametres['pathout'] = self.pathout.mkdirout()
-            self.pathout = PathOut(dirout = self.parametres['pathout'])
+            self.pathout = PathOut(dirout=self.parametres['pathout'])
             self.pathout.createdir(self.parametres['pathout'])
             self.parametres['corpus'] = self.corpus.parametres['uuid']
             self.parametres['uuid'] = str(uuid4())
@@ -50,26 +49,26 @@ class AnalyseText :
             self.parametres['type'] = parametres['type']
             self.parametres['encoding'] = self.ira.syscoding
             self.t1 = time()
-            self.corpus.make_lems(lem = self.parametres['lem'])
+            self.corpus.make_lems(lem=self.parametres['lem'])
             self.corpus.parse_active(gramact, gramsup)
             result_analyse = self.doanalyse()
             if result_analyse is None :
-                 self.time = time() - self.t1
-                 minutes, seconds = divmod(self.time, 60)
-                 hours, minutes = divmod(minutes, 60)            
-                 self.parametres['time'] = '%.0fh %.0fm %.0fs' % (hours, minutes, seconds)
-                 self.parametres['ira'] = self.pathout['Analyse.ira']
-                 DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
-                 self.ira.history.add(self.parametres)
-                 if dlg :
-                     dlg.Destroy()
-                     OpenAnalyse(self.parent, self.parametres['ira'])
-                     self.ira.tree.AddAnalyse(self.parametres)
-                     self.val = 5100
+                self.time = time() - self.t1
+                minutes, seconds = divmod(self.time, 60)
+                hours, minutes = divmod(minutes, 60)            
+                self.parametres['time'] = '%.0fh %.0fm %.0fs' % (hours, minutes, seconds)
+                self.parametres['ira'] = self.pathout['Analyse.ira']
+                DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
+                self.ira.history.add(self.parametres)
+                if dlg :
+                    dlg.Destroy()
+                    OpenAnalyse(self.parent, self.parametres['ira'])
+                    self.ira.tree.AddAnalyse(self.parametres)
+                    self.val = 5100
             else :
-                 self.val = False
-                 if dlg :
-                     dlg.Destroy()
+                self.val = False
+                if dlg :
+                    dlg.Destroy()
         else :
             if dlg :
                 dlg.Destroy()
@@ -115,9 +114,9 @@ class AnalyseText :
     def printRscript(self) :
         pass
 
-    def doR(self, Rscript, wait = False, dlg = None, message = '') :
+    def doR(self, Rscript, wait=False, dlg=None, message='') :
         log.info('R code...')
-        pid = exec_rcode(self.ira.RPath, Rscript, wait = wait)
+        pid = exec_rcode(self.ira.RPath, Rscript, wait=wait)
         while pid.poll() is None :
             if dlg :
                 self.dlg.Pulse(message)
@@ -135,6 +134,7 @@ class Alceste(AnalyseText) :
         self.actives, lim = self.corpus.make_actives_nb(self.parametres['max_actives'], 1)
         self.parametres['eff_min_forme'] = lim
         self.parametres['nbactives'] = len(self.actives)
+        uci = False
         if self.parametres['classif_mode'] == 0 :
             lenuc1, lenuc2 = self.corpus.make_and_write_sparse_matrix_from_uc(self.actives, self.parametres['tailleuc1'], self.parametres['tailleuc2'], self.pathout['TableUc1'], self.pathout['TableUc2'], self.pathout['listeuce1'], self.pathout['listeuce2'])
             self.parametres['lenuc1'] = lenuc1
@@ -143,18 +143,19 @@ class Alceste(AnalyseText) :
             self.corpus.make_and_write_sparse_matrix_from_uces(self.actives, self.pathout['TableUc1'], self.pathout['listeuce1'])
         elif self.parametres['classif_mode'] == 2 :
             self.corpus.make_and_write_sparse_matrix_from_uci(self.actives, self.pathout['TableUc1'], self.pathout['listeuce1'])
+            uci = True
         Rscript = self.printRscript()
-        self.doR(Rscript, dlg = self.dlg, message = 'CHD...')
+        self.doR(Rscript, dlg=self.dlg, message='CHD...')
 
         self.corpus.make_ucecl_from_R(self.pathout['uce'])
-        self.corpus.make_and_write_profile(self.actives, self.corpus.lc, self.pathout['Contout'])
+        self.corpus.make_and_write_profile(self.actives, self.corpus.lc, self.pathout['Contout'], uci = uci)
         self.sup, lim = self.corpus.make_actives_nb(self.parametres['max_actives'], 2)
-        self.corpus.make_and_write_profile(self.sup, self.corpus.lc, self.pathout['ContSupOut'])
-        self.corpus.make_and_write_profile_et(self.corpus.lc, self.pathout['ContEtOut'])
+        self.corpus.make_and_write_profile(self.sup, self.corpus.lc, self.pathout['ContSupOut'], uci = uci)
+        self.corpus.make_and_write_profile_et(self.corpus.lc, self.pathout['ContEtOut'], uci = uci)
         self.clnb = len(self.corpus.lc)
         self.parametres['clnb'] = self.clnb
         Rscript = self.printRscript2()
-        self.doR(Rscript, dlg = self.dlg, message = 'profils et A.F.C. ...')
+        self.doR(Rscript, dlg=self.dlg, message='profils et A.F.C. ...')
         self.time = time() - self.t1
         minutes, seconds = divmod(self.time, 60)
         hours, minutes = divmod(minutes, 60)            
@@ -189,7 +190,7 @@ class Alceste(AnalyseText) :
             return None
 
     def printRscript(self) :
-        RchdTxt(self.pathout, self.parent.RscriptsPath, self.parametres['mincl'], self.parametres['classif_mode'], nbt = self.parametres['nbcl_p1'] - 1, svdmethod = self.parametres['svdmethod'], libsvdc = self.parent.pref.getboolean('iramuteq','libsvdc'), libsvdc_path = self.parent.pref.get('iramuteq','libsvdc_path'), R_max_mem = False, mode_patate = self.parametres['mode.patate'])
+        RchdTxt(self.pathout, self.parent.RscriptsPath, self.parametres['mincl'], self.parametres['classif_mode'], nbt=self.parametres['nbcl_p1'] - 1, svdmethod=self.parametres['svdmethod'], libsvdc=self.parent.pref.getboolean('iramuteq', 'libsvdc'), libsvdc_path=self.parent.pref.get('iramuteq', 'libsvdc_path'), R_max_mem=False, mode_patate=self.parametres['mode.patate'])
         return self.pathout['Rchdtxt']
 
     def printRscript2(self) :
@@ -208,12 +209,12 @@ class Alceste(AnalyseText) :
         chd_graph_list.append([os.path.basename(self.pathout['arbre1']), u'chd1'])
         if self.parametres['classif_mode'] == 0 :
             chd_graph_list.append([os.path.basename(self.pathout['arbre2']), u'chd2'])       
-        print_liste(self.pathout['liste_graph_afc'],afc_graph_list)
-        print_liste(self.pathout['liste_graph_chd'],chd_graph_list)
+        print_liste(self.pathout['liste_graph_afc'], afc_graph_list)
+        print_liste(self.pathout['liste_graph_chd'], chd_graph_list)
         PrintRapport(self, self.corpus, self.parametres)
 
 
-#keys = {'art_def' : 2,
+# keys = {'art_def' : 2,
 #        'pre' : 2,
 #        'adj_dem' : 2,
 #        'ono' : 2,
@@ -240,7 +241,7 @@ class Alceste(AnalyseText) :
 #        'num' : 2,
 #        'nr' : 1,
 #        'sw' : 2,
-#}
+# }
 #
-#gramact = [k for k in keys if keys[k] == 1]
-#gramsup = [k for k in keys if keys[k] == 2]
+# gramact = [k for k in keys if keys[k] == 1]
+# gramsup = [k for k in keys if keys[k] == 2]

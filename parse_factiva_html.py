@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2012 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 from HTMLParser import HTMLParser
 import wx.lib.sized_controls as sc
