@@ -88,7 +88,7 @@ class Stat(AnalyseText) :
             """ % self.pathout['hapax.csv']
         txt += """
         open_file_graph("%s", width = 400, height = 400)
-        plot(log(tot[,1]), log = 'x', xlab='log(rangs)', ylab = 'log(frequences)', col = 'red', pch=16)
+        plot(tot[,1], log = 'xy', xlab='log(rangs)', ylab = 'log(frequences)', col = 'red', pch=16)
         dev.off()
         """ % (self.pathout['zipf.png'])
         tmpscript = tempfile.mktemp(dir=self.parent.TEMPDIR)
