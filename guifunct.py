@@ -376,7 +376,7 @@ class PrefSimi ( wx.Dialog ):
         self.m_panel2.SetSizer( bSizer18 )
         self.m_panel2.Layout()
         bSizer18.Fit( self.m_panel2 )
-        self.m_notebook1.AddPage( self.m_panel2, _(u"Graphic settings").decode('utf8'), True )
+        self.m_notebook1.AddPage( self.m_panel2, _(u"Graph settings").decode('utf8'), True )
         self.m_panel3 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
         fgSizer5 = wx.FlexGridSizer( 0, 3, 0, 0 )
         fgSizer5.SetFlexibleDirection( wx.BOTH )
