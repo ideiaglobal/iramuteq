@@ -482,6 +482,38 @@ class Corpus :
                 if lem :
                     guce = ' '.join([self.formes[forme].lem for forme in guce.split()])
                 f.write(guce.encode(self.parametres['syscoding']) + '\n\n')
+    
+    def export_owledge(self, rep, classe, lem = False, uci = False) :
+        sts = self.lc[classe - 1]
+        if not uci :
+            res = self.getconcorde(sts)
+            self.make_iduces()
+        else :
+            res = self.getuciconcorde(sts)
+        for uce in res :
+            ident = uce[0]
+            guce = uce[1]
+            outf = '.'.join([`ident`, 'txt'])
+            outf = os.path.join(rep, outf)
+            if lem :
+                guce = ' '.join([self.formes[forme].lem for forme in guce.split()])
+            with open(outf, 'w') as f :
+                f.write(guce.encode('cp1252', errors = 'replace'))
+
+    def export_tropes(self, fileout, classe, lem = False, uci = False) :
+        sts = self.lc[classe - 1]
+        if not uci :
+            res = self.getconcorde(sts)
+            self.make_iduces()
+        else :
+            res = self.getuciconcorde(sts)
+        with open(fileout, 'w') as f :
+            for uce in res :
+                guce = uce[1]
+                if lem :
+                    guce = ' '.join([self.formes[forme].lem for forme in guce.split()])
+                f.write(guce.encode('cp1252', errors = 'replace'))
+                f.write('\n')
 
     def make_and_write_sparse_matrix_from_uces(self, actives, outfile, listuce = False) :
         log.info('make_and_write_sparse_matrix_from_uces %s' % outfile)

@@ -274,6 +274,8 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 self.idlexdendro = wx.NewId()
                 self.idcloud = wx.NewId()
                 self.idexport = wx.NewId()
+                self.idexporttropes = wx.NewId()
+                self.idexportowledge = wx.NewId()
             #    self.export_classes = wx.NewId()
    
                 self.Bind(wx.EVT_MENU, self.OnPopupOne, id=self.popupID1)
@@ -296,6 +298,8 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 self.Bind(wx.EVT_MENU, self.onlexdendro, id = self.idlexdendro)
                 self.Bind(wx.EVT_MENU, self.oncloud, id = self.idcloud)
                 self.Bind(wx.EVT_MENU, self.onexport, id = self.idexport)
+                self.Bind(wx.EVT_MENU, self.onexporttropes, id = self.idexporttropes)
+                self.Bind(wx.EVT_MENU, self.onexportowledge, id = self.idexportowledge)
              #  self.Bind(wx.EVT_MENU, self.on_export_classes, id = self.export_classes)
    #            self.Bind(wx.EVT_MENU, self.OnPopupThree, id=self.popupID3)
     
@@ -329,6 +333,8 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             menu.Append(self.iducecarac, u"Segments de texte caractéristiques")
             menu.Append(self.idcloud, u"Nuage de la classe")
             menu.Append(self.idexport, u'Exporter...')
+            menu.Append(self.idexporttropes, 'Exporter pour Tropes')
+            menu.Append(self.idexportowledge, 'Exporter pour Owledge')
             #menu.Append(self.popupID2, u"Concordancier")
     #        menu.Append(self.popupID3, "recharger")
     
@@ -379,6 +385,28 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         #if 'corpus' in dir(self.Source):
         #    corpus = self.Source.corpus
         #ClasseCHD(self.parent, corpus, self.cl)
+    
+    def onexporttropes(self, evt) :
+        if 'corpus' in dir(self.Source):
+            corpus = self.Source.corpus
+        if self.Source.parametres['classif_mode'] != 2 :
+            uci = False
+        else :
+            uci = True
+        fileout = self.Source.pathout['export_tropes_classe_%i.txt' % self.cl]
+        corpus.export_tropes(fileout, self.cl, uci = uci)
+    
+    def onexportowledge(self, evt):
+        if 'corpus' in dir(self.Source):
+            corpus = self.Source.corpus
+        if self.Source.parametres['classif_mode'] != 2 :
+            uci = False
+        else :
+            uci = True
+        repout = self.Source.pathout['export_owledge_classe_%i' % self.cl]
+        if not os.path.exists(repout) :
+            os.mkdir(repout)
+        corpus.export_owledge(repout, self.cl, uci = uci)        
 
     def getselectedwords(self) :
         words = [self.getColumnText(self.GetFirstSelected(), 6)]
@@ -436,12 +464,12 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 
     def quest_simi(self, evt) :
         tableau = self.Source.tableau
-        if self.tmpchi is None :
-            self.tmpchi = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
-            with open(self.tmpchi, 'w') as f:
-                f.write('\n'.join([str(val) for val in self.lchi]))
         tab = tableau.make_table_from_classe(self.cl, self.la)
         pathout = ConstructPathOut(self.Source.pathout.dirout, 'simi_classe_%i' %self.cl)
+        if self.tmpchi is None :
+            self.tmpchi = os.path.join(pathout,'chi.csv')
+            with open(self.tmpchi, 'w') as f:
+                f.write('\n'.join([str(val) for val in self.lchi]))
         self.filename = os.path.join(pathout,'mat01.csv')
         tableau.printtable(self.filename, tab)
         del tab
@@ -492,7 +520,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
     def onwordgraph(self, evt):
         word = self.getColumnText(self.GetFirstSelected(), 6)
         if self.tmpchi is None :
-            self.tmpchi = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
+            self.tmpchi = os.path.join(self.Source.parametres['pathout'],'chi_%i.csv' % self.cl)
             with open(self.tmpchi, 'w') as f:
                 f.write('\n'.join([str(val) for val in self.lchi]))
         index = self.la.index(word)
@@ -508,7 +536,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 
     def on_graph(self, evt):
         if self.tmpchi is None :
-            self.tmpchi = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
+            self.tmpchi = os.path.join(self.Source.parametres['pathout'],'chi_%i.csv' % self.cl)
             with open(self.tmpchi, 'w') as f:
                 f.write('\n'.join([str(val) for val in self.lchi]))
         parametres = {'type' : 'clustersimitxt', 
