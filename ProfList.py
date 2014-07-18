@@ -511,7 +511,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         act = {}
         tableau.chi = {}
         tableau.lchi = self.lchi
-        tableau.parametre['fromprof'] = True
+        tableau.parametres['fromprof'] = True
         for i, val in enumerate(self.la) :
             act[val] = [self.lfreq[i]]
             tableau.chi[val] = [self.lchi[i]]
@@ -600,10 +600,11 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             nuces = [val[1] for val in ntab2]
             dlg.Update(3, u'concordancier...')
             ucis_txt, ucestxt = doconcorde(corpus, nuces, self.la, uci = uci)
+            items = dict([[i, '<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table><br>' % ntab2[i][0], ucestxt[i]])] for i in range(0,len(ucestxt))])
             dlg.Update(4, u'texte...')
-            win = message(self, u"Segments de texte caractéristiques - Classe %i" % self.cl, (750, 600))
-            win.html = '<html>\n' + '<br>'.join(['<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table>' % ntab2[i][0], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
-            win.HtmlPage.SetPage(win.html)
+            win = message(self, items, u"Segments de texte caractéristiques - Classe %i" % self.cl, (750, 600))
+            #win.html = '<html>\n' + '<br>'.join(['<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table>' % ntab2[i][0], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
+            #win.HtmlPage.SetPage(win.html)
             dlg.Destroy()
             win.Show(True)
     
@@ -708,16 +709,19 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 ucef += list(set(corpus.getlemucis(word)).intersection(uces))            
                 uci = True
         ucis_txt, ucestxt = doconcorde(corpus, ucef, ListWord, uci = uci)
-        win = message(self, title, size=(750, 600))
-        win.html = ('<html>\n<h1>%s</h1>' % ' '.join(ListWord)) + '<br>'.join(['<br>'.join([ucis_txt[i], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
-        win.HtmlPage.SetPage(win.html)
+        items = dict([[i, '<br><br>'.join([ucis_txt[i], ucestxt[i]])] for i in range(0,len(ucestxt))])
+        win = message(self, items, title, (800, 500))
+        #win = message(self, title, size=(750, 600))
+        #win.html = ('<html>\n<h1>%s</h1>' % ' '.join(ListWord)) + '<br>'.join(['<br>'.join([ucis_txt[i], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
+        #win.HtmlPage.SetPage(win.html)
         return win
 
     def OnPopupTwo(self, event):
-        corpus = self.Source.corpus
-        uces = corpus.lc[self.cl-1]
-        win = self.make_concord(uces, "Concordancier - Classe %i" % self.cl)
-        win.Show(True)
+        if 'corpus' in dir(self.Source) :
+            corpus = self.Source.corpus
+            uces = corpus.lc[self.cl-1]
+            win = self.make_concord(uces, "Concordancier - Classe %i" % self.cl)
+            win.Show(True)
     
     def OnPopupThree(self, event):
         corpus = self.Source.corpus
@@ -780,9 +784,11 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 nb = len(ucef)
                 rep.append([corpus.getforme(forme).forme, nb])
         rep.sort(key = itemgetter(1), reverse = True)
-        win = message(self, u"Formes associées", wx.Size(300, 200))
-        win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
-        win.HtmlPage.SetPage(win.html)
+        #win = message(self, u"Formes associées", wx.Size(300, 200))
+        items = dict([[i, '\t:\t'.join([str(val) for val in forme])] for i, forme in enumerate(rep)])
+        win = message(self, items, u"Formes associées", (300, 200))
+        #win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
+        #win.HtmlPage.SetPage(win.html)
         win.Show(True)
 
 

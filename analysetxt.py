@@ -4,14 +4,12 @@
 # copyright : 2012-2013 (c) Pierre Ratinaud
 
 import logging
-from chemins import PathOut, ChdTxtPathOut
-from functions import exec_rcode, check_Rresult, DoConf, print_liste
+from chemins import PathOut
+from functions import exec_rcode, check_Rresult, DoConf, ReadDicoAsDico
+from shutil import copy
 from time import time, sleep
 from uuid import uuid4
 import os
-from PrintRScript import RchdTxt, AlcesteTxtProf
-from OptionAlceste import OptionAlc 
-from layout import PrintRapport
 from openanalyse import OpenAnalyse
 from dialog import StatDialog
 
@@ -49,7 +47,15 @@ class AnalyseText :
             self.parametres['type'] = parametres['type']
             self.parametres['encoding'] = self.ira.syscoding
             self.t1 = time()
-            self.corpus.make_lems(lem=self.parametres['lem'])
+            if not self.parametres.get('dictionary', False) :
+                self.corpus.make_lems(lem=self.parametres['lem'])
+            else :
+                dico = ReadDicoAsDico(self.parametres['dictionary'])
+                self.corpus.make_lems_from_dict(dico, dolem=self.parametres['lem'])
+                dictname = os.path.basename(self.parametres['dictionary'])
+                dictpath = os.path.join(self.pathout.dirout, dictname)
+                copy(self.parametres['dictionary'], dictpath)
+                self.parametres['dictionary'] = dictpath
             self.corpus.parse_active(gramact, gramsup)
             result_analyse = self.doanalyse()
             if result_analyse is None :
@@ -79,7 +85,7 @@ class AnalyseText :
 
     def lemparam(self) :
         if self.dlg and self.lemdial:
-            dial = StatDialog(self, self.parent)
+            dial = StatDialog(self.parent, self.keys)
             dial.CenterOnParent()
             val = dial.ShowModal()
             if val == 5100 :
@@ -88,6 +94,8 @@ class AnalyseText :
                 else :
                     lem = 0            
                 self.parametres['lem'] = lem
+                if dial.radio_dictchoice.GetSelection() == 1 :
+                    self.parametres['dictionary'] = dial.dictpath.GetValue() 
                 dial.Destroy()
                 return self.parametres
             else :
@@ -127,91 +135,7 @@ class AnalyseText :
 
 
 
-class Alceste(AnalyseText) :
-    def doanalyse(self) :
-        self.parametres['type'] = 'alceste'
-        self.pathout.basefiles(ChdTxtPathOut)
-        self.actives, lim = self.corpus.make_actives_nb(self.parametres['max_actives'], 1)
-        self.parametres['eff_min_forme'] = lim
-        self.parametres['nbactives'] = len(self.actives)
-        uci = False
-        if self.parametres['classif_mode'] == 0 :
-            lenuc1, lenuc2 = self.corpus.make_and_write_sparse_matrix_from_uc(self.actives, self.parametres['tailleuc1'], self.parametres['tailleuc2'], self.pathout['TableUc1'], self.pathout['TableUc2'], self.pathout['listeuce1'], self.pathout['listeuce2'])
-            self.parametres['lenuc1'] = lenuc1
-            self.parametres['lenuc2'] = lenuc2
-        elif self.parametres['classif_mode'] == 1 :
-            self.corpus.make_and_write_sparse_matrix_from_uces(self.actives, self.pathout['TableUc1'], self.pathout['listeuce1'])
-        elif self.parametres['classif_mode'] == 2 :
-            self.corpus.make_and_write_sparse_matrix_from_uci(self.actives, self.pathout['TableUc1'], self.pathout['listeuce1'])
-            uci = True
-        Rscript = self.printRscript()
-        self.doR(Rscript, dlg=self.dlg, message='CHD...')
 
-        self.corpus.make_ucecl_from_R(self.pathout['uce'])
-        self.corpus.make_and_write_profile(self.actives, self.corpus.lc, self.pathout['Contout'], uci = uci)
-        self.sup, lim = self.corpus.make_actives_nb(self.parametres['max_actives'], 2)
-        self.corpus.make_and_write_profile(self.sup, self.corpus.lc, self.pathout['ContSupOut'], uci = uci)
-        self.corpus.make_and_write_profile_et(self.corpus.lc, self.pathout['ContEtOut'], uci = uci)
-        self.clnb = len(self.corpus.lc)
-        self.parametres['clnb'] = self.clnb
-        Rscript = self.printRscript2()
-        self.doR(Rscript, dlg=self.dlg, message='profils et A.F.C. ...')
-        self.time = time() - self.t1
-        minutes, seconds = divmod(self.time, 60)
-        hours, minutes = divmod(minutes, 60)            
-        self.parametres['time'] = '%.0fh %.0fm %.0fs' % (hours, minutes, seconds)
-        self.print_graph_files()
-
-    def preferences(self) :
-        parametres = DoConf(self.parent.ConfigPath['alceste']).getoptions('ALCESTE')
-        parametres['corpus'] = self.corpus
-        parametres['pathout'] = self.pathout
-        self.dial = OptionAlc(self.parent, parametres)
-        self.dial.CenterOnParent()
-        self.dialok = self.dial.ShowModal()
-        if self.dialok == 5100 :
-            parametres['classif_mode'] = self.dial.radio_box_2.GetSelection()
-            parametres['tailleuc1'] = self.dial.spin_ctrl_1.GetValue()
-            parametres['tailleuc2'] = self.dial.spin_ctrl_2.GetValue()
-            parametres['mincl'] = self.dial.spin_ctrl_4.GetValue()
-            parametres['minforme'] = self.dial.spin_ctrl_5.GetValue()
-            parametres['nbcl_p1'] = self.dial.spin_nbcl.GetValue()
-            parametres['max_actives'] = self.dial.spin_max_actives.GetValue()
-            parametres['corpus'] = ''
-            parametres['svdmethod'] = self.dial.svdmethod[self.dial.choicesvd.GetSelection()]
-            parametres['pathout'] = self.pathout.dirout
-            parametres['mode.patate'] = self.dial.check_patate.GetValue()
-            DoConf(self.parent.ConfigPath['alceste']).makeoptions(['ALCESTE'], [parametres])
-            self.dial.Destroy()
-            print parametres
-            return parametres
-        else :
-            self.dial.Destroy()
-            return None
-
-    def printRscript(self) :
-        RchdTxt(self.pathout, self.parent.RscriptsPath, self.parametres['mincl'], self.parametres['classif_mode'], nbt=self.parametres['nbcl_p1'] - 1, svdmethod=self.parametres['svdmethod'], libsvdc=self.parent.pref.getboolean('iramuteq', 'libsvdc'), libsvdc_path=self.parent.pref.get('iramuteq', 'libsvdc_path'), R_max_mem=False, mode_patate=self.parametres['mode.patate'])
-        return self.pathout['Rchdtxt']
-
-    def printRscript2(self) :
-        AlcesteTxtProf(self.pathout, self.parent.RscriptsPath, self.clnb, 0.9)
-        return self.pathout['RTxtProfGraph']
-
-    def print_graph_files(self) :
-        mess_afc = u"La position des points n'est peut être pas exacte"
-        afc_graph_list = [[os.path.basename(self.pathout['AFC2DL_OUT']), u'Variables actives - coordonnées - 30 points par classes - facteurs 1 / 2 - %s' % mess_afc],
-                      [os.path.basename(self.pathout['AFC2DSL_OUT']), u'variables supplémentaires - coordonnées - 30 points par classes - facteurs 1 / 2 - %s' % mess_afc],
-                      [os.path.basename(self.pathout['AFC2DEL_OUT']), u'Variables illustratives - Coordonnées - 30 points par classes - facteur 1 / 2 - %s' % mess_afc],
-                      [os.path.basename(self.pathout['AFC2DCL_OUT']), u'Classes - Coordonnées - facteur 1 / 2']]
-        chd_graph_list = [[os.path.basename(self.pathout['dendro1']), u'dendrogramme à partir de chd1']]
-        if self.parametres['classif_mode'] == 0 :
-            chd_graph_list.append([os.path.basename(self.pathout['dendro2']), u'dendrogramme à partir de chd2'])
-        chd_graph_list.append([os.path.basename(self.pathout['arbre1']), u'chd1'])
-        if self.parametres['classif_mode'] == 0 :
-            chd_graph_list.append([os.path.basename(self.pathout['arbre2']), u'chd2'])       
-        print_liste(self.pathout['liste_graph_afc'], afc_graph_list)
-        print_liste(self.pathout['liste_graph_chd'], chd_graph_list)
-        PrintRapport(self, self.corpus, self.parametres)
 
 
 # keys = {'art_def' : 2,

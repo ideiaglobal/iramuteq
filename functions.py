@@ -30,12 +30,52 @@ log = logging.getLogger('iramuteq')
 indices_simi = [u'cooccurrence' ,'pourcentage de cooccurrence',u'Russel',u'Jaccard', 'Kulczynski1', 'Kulczynski2', 'Mountford', 'Fager', 'simple matching', 'Hamman', 'Faith', 'Tanimoto', 'Dice', 'Phi', 'Stiles', 'Michael', 'Mozley', 'Yule', 'Yule2', 'Ochiai', 'Simpson', 'Braun-Blanquet','Chi-squared', 'Phi-squared', 'Tschuprow', 'Cramer', 'Pearson', 'binomial']
 
 
+class TGen :
+    def __init__(self, path = None, encoding = 'utf8'):
+        self.path = path
+        self.tgen = {}
+        self.encoding = encoding
+    
+    def __getitem__(self, key):
+        return self.tgen[key]
+    
+    def read(self, path):
+        with codecs.open(path, 'r', self.encoding) as f :
+            tgen = f.read()
+        tgen = [line.split('\t') for line in tgen.splitlines()]
+        tgen = dict([[line[0], line[1:]] for line in tgen])
+        self.tgen = tgen
+        self.path = path
+    
+    def write(self, path = None):
+        if path is None :
+            path = self.path
+        with open(path, 'w') as f :
+            f.write('\n'.join(['\t'.join([val] + self.tgen[val]) for val in self.tgen]))
+    
+    def writetable(self, pathout, tgens, totocc):
+        etoiles = totocc.keys()
+        with open(pathout, 'w') as f :
+            line = '\t'.join([u'tgens'] + etoiles) + '\n'
+            f.write(line.encode(self.encoding))
+            for t in tgens :
+                line = '\t'.join([t] + [`tgens[t][et]` for et in etoiles]) + '\n'
+                f.write(line.encode(self.encoding))
+            i = 0
+            totname = 'total'
+            while totname + `i` in tgens :
+                i += 1
+            totname = totname + `i`
+            line = '\t'.join([totname] + [`totocc[et]` for et in etoiles])
+            f.write(line.encode(self.encoding))
+
 class History :
     def __init__(self, filein, syscoding = 'utf8') :
         self.filein = filein
         self.syscoding = syscoding
         self.corpora = {}
         self.openedcorpus = {}
+        self.openedmatrix = {}
         self.orph = []
         self.analyses = {}
         self.history = []
@@ -50,6 +90,7 @@ class History :
         self.corpus = dict([[corpus['uuid'], corpus] for corpus in self.history])
         self.analyses = dict([[analyse['uuid'], analyse] for corpus in self.history for analyse in corpus.get('analyses', [])])
         self.matrixanalyse = dict([[mat['uuid'], mat] for mat in self.matrix])
+        self.ordermatrix = dict([[matrix['uuid'], i] for i, matrix in enumerate(self.matrix)])
         d.close()
 
     def write(self) :
@@ -81,12 +122,21 @@ class History :
         self.read()
 
     def addMatrix(self, analyse) :
-        tosave = {'uuid' : analyse['uuid'], 'ira': analyse['ira'], 'type' : analyse['type']}
-        tosave['name'] = analyse['name']
+        tosave = analyse
+        #tosave['matrix_name'] = analyse['matrix_name']
+        tosave['analyses'] = []
         self.matrix.append(tosave)
         self.write()
         self.read()
 
+    def addMatrixAnalyse(self, analyse) :
+        tosave = {'uuid' : analyse['uuid'], 'ira': analyse['ira'], 'type' : analyse['type'], 'matrix' : analyse['matrix']}
+        tosave['name'] = analyse['name']
+        if tosave['matrix'] in self.ordermatrix :
+            self.matrix[self.ordermatrix[tosave['matrix']]]['analyses'].append(tosave)
+        self.write()
+        self.read()
+                
     def addmultiple(self, analyses) :
         log.info('add multiple')
         for analyse in analyses :
@@ -128,6 +178,10 @@ class History :
         for corpus in corpustodel :
             print 'cleaning :', corpus['corpus_name']
             self.delete(corpus, corpus = True)
+        anatodel = [analyse for corpus in self.history for analyse in corpus.get('analyses', []) if not os.path.exists(analyse.get('ira', '/'))]
+        for analyse in anatodel :
+            print 'cleaning :', analyse['name']
+            self.delete(analyse)
     
     def __str__(self) :
         return str(self.history)
@@ -473,12 +527,8 @@ def PlaySound(parent):
 def ReadDicoAsDico(dicopath):
     with codecs.open(dicopath, 'r', 'UTF8') as f:
         content = f.readlines()
-    dico = {}
-    for line in content :
-        if line[0] != u'':
-            line = line.rstrip('\n\r').replace(u'\n', '').replace('"', '').split('\t')
-            dico[line[0]] = line[1:]
-    return dico
+    lines = [line.rstrip('\n\r').replace(u'\n', '').replace('"', '').split('\t') for line in content if line != u'']
+    return dict([[line[0], line[1:]] for line in lines])
 
 def ReadLexique(parent, lang = 'french', filein = None):
     if lang != 'other' :
@@ -489,18 +539,21 @@ def ReadLexique(parent, lang = 'french', filein = None):
     else :
         parent.lexique = {}
 
-def ReadList(filein, encoding = sys.getdefaultencoding()):
+def ReadList(filein, encoding = sys.getdefaultencoding(), sep = ';'):
     #file = open(filein)
-    file = codecs.open(filein, 'r', encoding)
-    content = file.readlines()
-    file.close()
+    with codecs.open(filein, 'r', encoding) as f :
+        content = f.read()
+    content = [line.replace('\n', '').replace('\r','').replace('\"', '').replace(',', '.').split(sep) for line in content.splitlines()]
+    #file = codecs.open(filein, 'r', encoding)
+    #content = file.readlines()
+    #file.close()
     first = content.pop(0)
-    first = first.replace('\n', '').replace('\r','').replace('\"', '').split(';')
+    #first = first.replace('\n', '').replace('\r','').replace('\"', '').split(sep)
     dict = {}
     i = 0
     for line in content:
-        line = line.replace('\n', '').replace('\r','').replace('\"', '').replace(',', '.')
-        line = line.split(';')
+        #line = line.replace('\n', '').replace('\r','').replace('\"', '').replace(',', '.')
+        #line = line.split(';')
         nline = [line[0]]
         for val in line[1:]:
             if val == u'NA' :
@@ -701,7 +754,7 @@ def doconcorde(corpus, uces, mots, uci = False) :
     ucis_txt = []
     listmot = [corpus.getlems()[lem].formes for lem in mots]
     listmot = [corpus.getforme(fid).forme for lem in listmot for fid in lem]
-    mothtml = ['<font color=red><b>'+mot+'</b></font>' for mot in listmot]
+    mothtml = ['<font color=red><b>%s</b></font>' % mot for mot in listmot]
     dmots = dict(zip(listmot, mothtml))
     for uce in uces :
         ucetxt = ucestxt1[uce].split()
@@ -710,7 +763,7 @@ def doconcorde(corpus, uces, mots, uci = False) :
             ucis_txt.append('<p><b>' + ' '.join(corpus.ucis[corpus.getucefromid(uce).uci].etoiles) + '</b></p>')
         else :
             ucis_txt.append('<p><b>' + ' '.join(corpus.ucis[uce].etoiles) + '</b></p>')
-        ucestxt.append(ucetxt)        
+        ucestxt.append(ucetxt)
     return ucis_txt, ucestxt
  
 

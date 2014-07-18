@@ -293,7 +293,7 @@ def RchdQuest(DicoPath, RscriptPath, nbcl = 10, mincl = 10):
     chd.result<-Rchdquest("%s","%s","%s", nbt = nbt, mincl = mincl)
     n1 <- chd.result$n1
     classeuce1 <- chd.result$cuce1
-    """ % (DicoPath['mat01'], DicoPath['listeuce1'], DicoPath['uce'])
+    """ % (DicoPath['mat01.csv'], DicoPath['listeuce1'], DicoPath['uce'])
     
     txt += """
     tree_tot1 <- make_tree_tot(chd.result$chd)
@@ -848,7 +848,7 @@ class PrintSimiScript(PrintRScript) :
         if self.parametres['type_graph'] == 1 : 
             graphnb = 1
             type = 'nplot'
-            dirout = os.path.dirname(self.pathout['mat01'])
+            dirout = os.path.dirname(self.pathout['mat01.csv'])
             while os.path.exists(os.path.join(dirout,'graph_simi_'+str(graphnb)+'.png')):
                 graphnb +=1
             self.filename = ffr(os.path.join(dirout,'graph_simi_'+str(graphnb)+'.png'))
@@ -856,7 +856,7 @@ class PrintSimiScript(PrintRScript) :
         if self.parametres['type_graph'] == 3 : 
             graphnb = 1
             type = 'web'
-            dirout = os.path.dirname(self.pathout['mat01'])
+            dirout = os.path.dirname(self.pathout['mat01.csv'])
             while os.path.exists(os.path.join(dirout,'web_'+str(graphnb))):
                 graphnb +=1
             self.filename = ffr(os.path.join(dirout,'web_'+str(graphnb)))
@@ -865,7 +865,7 @@ class PrintSimiScript(PrintRScript) :
         if self.parametres['type_graph'] == 4 : 
             graphnb = 1
             type = 'rglweb'
-            dirout = os.path.dirname(self.pathout['mat01'])
+            dirout = os.path.dirname(self.pathout['mat01.csv'])
             while os.path.exists(os.path.join(dirout,'webrgl_'+str(graphnb))):
                 graphnb +=1
             self.filename = ffr(os.path.join(dirout,'webrgl_'+str(graphnb)))
@@ -1149,6 +1149,12 @@ class ProtoScript(PrintRScript) :
         self.sources([self.analyse.parent.RscriptsPath['Rgraph'], self.analyse.parent.RscriptsPath['prototypical.R']])
         self.packages(['wordcloud'])
         txt = """
+        errorn <- function(x) {
+            qnorm(0.975)*sd(x)/sqrt(lenght(n))
+        }
+        errort <- function(x) {
+            qt(0.975,df=lenght(x)-1)*sd(x)/sqrt(lenght(x))
+        }
         mat <- read.csv2("%s", header = FALSE, row.names=1, sep='\t', quote='"', dec='.')
         open_file_graph("%s",height=800, width=1000)
         prototypical(mat, mfreq = %s, mrank = %s, cloud = FALSE, cexrange=c(1,2.4), cexalpha= c(0.4, 1))
@@ -1164,4 +1170,25 @@ class ExportAfc(PrintRScript) :
         self.packages(['rgexf'])
         txt = """
         """
-         
+
+class TgenSpecScript(PrintRScript):
+    def make_script(self):
+        self.packages(['textometry'])
+        txt = """
+        tgen <- read.csv2("%s", row.names = 1, sep = '\\t')
+        """ % self.parametres['tgeneff']
+        txt += """
+        tot <- tgen[nrow(tgen), ]
+        result <- NULL
+        tgen <- tgen[-nrow(tgen),]
+        for (i in 1:nrow(tgen)) {
+            mat <- rbind(tgen[i,], tot - tgen[i,])
+            specmat <- specificities(mat)
+            result <- rbind(result, specmat[1,])
+        }
+        colnames(result) <- colnames(tgen)
+        row.names(result) <- rownames(tgen)
+        write.table(result, file = "%s", sep='\\t', col.names = NA)
+        """ % self.pathout['tgenspec.csv']
+        self.add(txt)
+        

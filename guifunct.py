@@ -9,6 +9,7 @@ import sys
 from copy import copy
 import dialog
 from listlex import *
+from vitemspicker import VItemsPicker, EVT_IP_SELECTION_CHANGED, IP_SORT_CHOICES, IP_SORT_SELECTED, IP_REMOVE_FROM_CHOICES
 from functions import treat_var_mod
 
 
@@ -52,37 +53,31 @@ def get_table_param(self, filename) :
         dlg.CenterOnParent()
         val = dlg.ShowModal()
         if val == wx.ID_OK:
-            self.tableau.parametre['colsep'] = dlg.colsep[dlg.choice3.GetSelection()]
-            self.tableau.parametre['txtsep'] = dlg.txtsep[dlg.choice4.GetSelection()]
-            if self.tableau.parametre['colsep'] == 'tabulation' :
-                self.tableau.parametre['colsep'] = '\t'
-            self.tableau.parametre['filetype'] = 'csv'
-        else :
-            dlg.Destroy()
+            self.tableau.parametres['colsep'] = dlg.colsep[dlg.choice3.GetSelection()]
+            self.tableau.parametres['txtsep'] = dlg.txtsep[dlg.choice4.GetSelection()]
+            if self.tableau.parametres['colsep'] == 'tabulation' :
+                self.tableau.parametres['colsep'] = '\t'
+            self.tableau.parametres['filetype'] = 'csv'
     elif  getfileextension(filename) == '.xls' :
         dlg = dialog.FileOptionDialog(self, -1, _(u"File format").decode('utf8'), sep=False, sheet = True, size=(350, 200),
                      style=wx.DEFAULT_DIALOG_STYLE)
         dlg.CenterOnParent()
         val = dlg.ShowModal()
         if val == wx.ID_OK:    
-            self.tableau.parametre['colsep'] = ';'
-            self.tableau.parametre['txtsep'] = '\"'
-            self.tableau.parametre['encodage'] = sys.getdefaultencoding()
-            self.tableau.parametre['sheetnb'] = dlg.spin1.GetValue()
-            self.tableau.parametre['filetype'] = 'xls'
-        else :
-            dlg.Destroy()
+            self.tableau.parametres['colsep'] = ';'
+            self.tableau.parametres['txtsep'] = '\"'
+            self.tableau.parametres['encodage'] = sys.getdefaultencoding()
+            self.tableau.parametres['sheetnb'] = dlg.spin1.GetValue()
+            self.tableau.parametres['filetype'] = 'xls'
     elif getfileextension(filename) == '.ods':
         dlg = dialog.FileOptionDialog(self, -1, _(u"File format").decode('utf8'), sep=False, size=(350, 200),
                      style=wx.DEFAULT_DIALOG_STYLE)
         dlg.CenterOnParent()
         val = dlg.ShowModal()
         if val == wx.ID_OK:          
-            self.tableau.parametre['colsep'] = ';'
-            self.tableau.parametre['txtsep'] = '\"'
-            self.tableau.parametre['filetype'] = 'ods'
-        else :
-            dlg.Destroy()
+            self.tableau.parametres['colsep'] = ';'
+            self.tableau.parametres['txtsep'] = '\"'
+            self.tableau.parametres['filetype'] = 'ods'
     else :
         val = False
     if val == wx.ID_OK:       
@@ -94,7 +89,8 @@ def get_table_param(self, filename) :
             self.tableau.firstcolisrownames = True
         else:
             self.tableau.firstcolisrownames = False
-        dlg.Destroy()
+    dlg.Destroy()
+    return val
 
 def getPage(ira) :
     if '_mgr' in dir(ira) :
@@ -962,3 +958,232 @@ class PrepSimi :
             param['stars'] = self.parametres['stars']
         self.parametres.update(param)
 
+class CreateTgenDialog ( wx.Frame ):
+    
+    def __init__( self, parent, lemlist, tgen = None, tgens = None ):
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u'Tgen Creator', pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL|wx.FRAME_FLOAT_ON_PARENT|wx.STAY_ON_TOP )
+        
+        self.tgens = tgens
+        self.edit = False
+        self.parent = parent
+        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        
+        bSizer2 = wx.BoxSizer( wx.VERTICAL )
+        
+        fgSizer3 = wx.FlexGridSizer( 0, 2, 0, 0 )
+        fgSizer3.SetFlexibleDirection( wx.BOTH )
+        fgSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        
+        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"Name", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3.Wrap( -1 )
+        fgSizer3.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
+        
+        self.m_textCtrl1 = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_textCtrl1.SetMinSize( wx.Size( 250,-1 ) )
+
+        
+        fgSizer3.Add( self.m_textCtrl1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        
+        bSizer2.Add( fgSizer3, 1, wx.ALIGN_CENTER_HORIZONTAL, 5 )
+        
+        self.ip = VItemsPicker(self,-1, lemlist,'Forms', 'Selected')
+        self.ip._source.SetMinSize( wx.Size( 250, 400 ) )
+        
+        bSizer2.Add( self.ip, 0, wx.ALL, 5 )
+        
+        m_sdbSizer3 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer3OK = wx.Button( self, wx.ID_OK )
+        m_sdbSizer3.AddButton( self.m_sdbSizer3OK )
+        self.m_sdbSizer3Cancel = wx.Button( self, wx.ID_CANCEL )
+        m_sdbSizer3.AddButton( self.m_sdbSizer3Cancel )
+        m_sdbSizer3.Realize();
+        
+        bSizer2.Add( m_sdbSizer3, 1, wx.EXPAND, 5 )
+        
+        
+        self.SetSizer( bSizer2 )
+        self.Layout()
+        bSizer2.Fit( self )
+        
+        self.Centre( wx.BOTH )
+        
+        self.m_textCtrl1.Bind( wx.EVT_TEXT, self.OnTextEnter )
+        self.ip.Bind(EVT_IP_SELECTION_CHANGED, self.OnSelectionChange)
+        self.m_sdbSizer3OK.Bind(wx.EVT_BUTTON, self.OnClose)
+        self.m_sdbSizer3Cancel.Bind(wx.EVT_BUTTON, self.OnCancel)
+        
+        #self.ip.SetItems(lemlist)
+        self.m_sdbSizer3OK.Enable(False)
+        
+        if tgen is not None :
+            self.m_textCtrl1.SetValue(tgen)
+            self.ip._destData = dict([[i,[word,'']] for i, word in enumerate(tgens[tgen])])
+            self.ip._SetDestItems()
+            #self.ip.SetSelections(tgens[tgen])
+            self.m_sdbSizer3OK.Enable(True)
+            self.edit = True
+        else :
+            self.edit = False
+    
+    def __del__( self ):
+        pass
+    
+    def OnTextEnter(self, evt):
+        if self.m_textCtrl1.GetValue() != '' and self.m_textCtrl1.GetValue() not in self.tgens and self.ip.GetSelections() != []:
+            self.m_sdbSizer3OK.Enable(True)
+        else :
+            self.m_sdbSizer3OK.Enable(False)
+        if self.m_textCtrl1.GetValue() != '' and self.ip.GetSelections() and self.edit:
+            self.m_sdbSizer3OK.Enable(True)
+    
+    def OnSelectionChange(self, evt):
+        if self.ip.GetSelections() != [] and self.m_textCtrl1.GetValue() != '' and self.m_textCtrl1.GetValue() not in self.tgens :
+            self.m_sdbSizer3OK.Enable(True)
+        else :
+            self.m_sdbSizer3OK.Enable(False)
+        if self.m_textCtrl1.GetValue() != '' and self.ip.GetSelections() and self.edit:
+            self.m_sdbSizer3OK.Enable(True)
+    
+    def OnClose(self, evt):
+        self.Close()
+    
+    def OnCancel(self, evt):
+        self.Destroy()
+
+class TGenFrame ( wx.Frame ):
+    
+    def __init__( self, parent, corpus, Tgen ):
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Tgen", pos = wx.DefaultPosition, size = wx.Size( 473,434 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL|wx.FRAME_FLOAT_ON_PARENT|wx.STAY_ON_TOP )
+        
+        self.Tgen = Tgen
+        self.parent = parent
+        self.corpus = corpus
+        self.activetgen = None
+        
+        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        
+        bSizer1 = wx.BoxSizer( wx.VERTICAL )
+        
+        fgSizer1 = wx.FlexGridSizer( 0, 2, 0, 0 )
+        fgSizer1.SetFlexibleDirection( wx.BOTH )
+        fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Tgen", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1.Wrap( -1 )
+        fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"Content", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2.Wrap( -1 )
+        fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        tgensChoices = Tgen.tgen.keys()
+        self.tgens = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, tgensChoices, 0 )
+        self.tgens.SetMinSize( wx.Size( 200,250 ) )
+        
+        fgSizer1.Add( self.tgens, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        tgencontentChoices = []
+        self.tgencontent = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, tgencontentChoices, 0|wx.VSCROLL )
+        self.tgencontent.SetMinSize( wx.Size( 200,250 ) )
+        
+        fgSizer1.Add( self.tgencontent, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        fgSizer2 = wx.FlexGridSizer( 0, 2, 0, 0 )
+        fgSizer2.SetFlexibleDirection( wx.BOTH )
+        fgSizer2.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        
+        self.but_new = wx.Button( self, wx.ID_ANY, u"New...", wx.DefaultPosition, wx.DefaultSize, 0 )
+        fgSizer2.Add( self.but_new, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.but_del = wx.Button( self, wx.ID_ANY, u"Delete", wx.DefaultPosition, wx.DefaultSize, 0 )
+        fgSizer2.Add( self.but_del, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        
+        fgSizer1.Add( fgSizer2, 1, wx.EXPAND, 5 )
+        
+        self.but_edit = wx.Button( self, wx.ID_ANY, u"Edit", wx.DefaultPosition, wx.DefaultSize, 0 )
+        fgSizer1.Add( self.but_edit, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        
+        bSizer1.Add( fgSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        m_sdbSizer2 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer2OK = wx.Button( self, wx.ID_OK )
+        m_sdbSizer2.AddButton( self.m_sdbSizer2OK )
+        #self.m_sdbSizer2Cancel = wx.Button( self, wx.ID_CANCEL )
+        #m_sdbSizer2.AddButton( self.m_sdbSizer2Cancel )
+        m_sdbSizer2.Realize();
+        
+        bSizer1.Add( m_sdbSizer2, 0, wx.EXPAND, 5 )
+        
+        
+        self.SetSizer( bSizer1 )
+        self.Layout()
+        
+        self.Centre( wx.BOTH )
+        
+        # Connect Events
+        self.tgens.Bind( wx.EVT_LISTBOX, self.GetContent )
+        self.but_new.Bind( wx.EVT_BUTTON, self.OnNewTgen )
+        self.but_del.Bind( wx.EVT_BUTTON, self.OnDeleteTgen )
+        self.but_edit.Bind( wx.EVT_BUTTON, self.OnEditTgen )
+        self.m_sdbSizer2OK.Bind( wx.EVT_BUTTON, self.OnOK )
+        
+    def __del__( self ):
+        pass
+
+    def GetContent( self, event ):
+        tgen = event.GetString()
+        if tgen != '' :
+            self.tgencontent.Clear()
+            for word in self.Tgen[tgen] :
+                self.tgencontent.Append(word)
+    
+    def OnNewTgen( self, event, tgen = None ):
+        if tgen is None :
+            self.dial = CreateTgenDialog(self, dict([[i, [lem, self.corpus.lems[lem].freq]] for i, lem in enumerate(self.corpus.lems.keys())]), tgens = self.Tgen.tgen)
+        else :
+            self.dial = CreateTgenDialog(self, dict([[i, [lem, self.corpus.lems[lem].freq]] for i, lem in enumerate(self.corpus.lems.keys())]), tgen = tgen, tgens = self.Tgen.tgen)
+            self.activetgen = tgen
+        self.dial.Show()
+        self.dial.Bind(wx.EVT_CLOSE, self.OnDialClose)
+    
+    def OnDeleteTgen( self, event ):
+        if self.tgens.GetSelection() != -1 :
+            tgens = self.tgens.GetItems()
+            del self.Tgen.tgen[tgens[self.tgens.GetSelection()]]
+            self.Tgen.write()
+            self.tgens.Clear()
+            self.tgencontent.Clear()
+            for val in self.Tgen.tgen :
+                self.tgens.Append(val)
+        event.Skip()
+    
+    def OnEditTgen( self, event ):
+        if self.tgens.GetSelection() != -1 :
+            tgens = self.tgens.GetItems()
+            tgen = tgens[self.tgens.GetSelection()]
+            self.activetgen = tgen
+            self.dial = CreateTgenDialog(self, dict([[i, [lem, self.corpus.lems[lem].freq]] for i, lem in enumerate(self.corpus.lems.keys())]), tgen = tgen, tgens = self.Tgen.tgen)
+            self.dial.Bind(wx.EVT_CLOSE, self.OnDialClose)
+            self.dial.m_textCtrl1.Enable(False)
+            self.dial.ip._source.selected = dict(zip(self.Tgen.tgen[tgen], self.Tgen.tgen[tgen]))
+            self.dial.Show()
+        event.Skip()
+    
+    def OnOK(self, evt):
+        self.Destroy()
+    
+    def OnDialClose(self, evt):
+        if self.dial.edit :
+            del self.Tgen.tgen[self.activetgen]
+            self.tgens.Clear()
+            self.tgencontent.Clear()
+            for val in self.Tgen.tgen :
+                self.tgens.Append(val)
+        self.Tgen.tgen[self.dial.m_textCtrl1.GetValue()] = self.dial.ip.GetSelections()
+        self.Tgen.write()
+        self.tgens.Append(self.dial.m_textCtrl1.GetValue())
+        self.dial.Destroy()
+        evt.Skip()

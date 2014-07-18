@@ -1,6 +1,6 @@
 #Author: Pierre Ratinaud
 #Copyright (c) 20011 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 
 #fichier genere par IRaMuTeq

@@ -63,3 +63,8 @@ prototypical <- function(x, mfreq = NULL, mrank = NULL, cexrange=c(0.8, 3), cexa
     mtext(paste('<', mfreq, '  Fréquences  ', '>=', mfreq, sep = ' '), side=2, line=1, cex=1, col="red", outer=TRUE)
     mtext(paste('<=', mrank,  '  Rangs  ', '>', mrank, sep = ' '), side=3, line=1, cex=1, col="red", outer=TRUE)
 }
+
+intervalle.freq <- function(x, SX=NULL) {
+	errorn <- (x/SX) + (1.96 * sqrt(((x/SX) * (1-(x/SX))/SX)))
+	print(errorn)
+}

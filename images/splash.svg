@@ -15,13 +15,36 @@
    height="400"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.3.1 r9886"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="splash.svg"
    inkscape:export-filename="/home/pierre/workspace/iramuteq/images/splash.png"
    inkscape:export-xdpi="100"
    inkscape:export-ydpi="100">
   <defs
      id="defs4">
+    <linearGradient
+       id="linearGradient5278">
+      <stop
+         style="stop-color:#31ed11;stop-opacity:1;"
+         offset="0"
+         id="stop5280" />
+      <stop
+         style="stop-color:#f3f20f;stop-opacity:1;"
+         offset="1"
+         id="stop5282" />
+    </linearGradient>
+    <linearGradient
+       osb:paint="gradient"
+       id="linearGradient5268">
+      <stop
+         style="stop-color:#1daf1a;stop-opacity:1;"
+         offset="0"
+         id="stop5270" />
+      <stop
+         id="stop5272"
+         offset="1"
+         style="stop-color:#236b19;stop-opacity:1;" />
+    </linearGradient>
     <linearGradient
        id="linearGradient5500">
       <stop
@@ -69,7 +92,7 @@
        id="linearGradient5474"
        osb:paint="solid">
       <stop
-         style="stop-color:#22f86b;stop-opacity:1;"
+         style="stop-color:#f5e422;stop-opacity:1;"
          offset="0"
          id="stop5476" />
     </linearGradient>
@@ -90,13 +113,14 @@
          width="260" />
     </pattern>
     <linearGradient
-       id="linearGradient3854">
+       id="linearGradient3854"
+       osb:paint="gradient">
       <stop
          id="stop3856"
          offset="0"
-         style="stop-color:#474b79;stop-opacity:1;" />
+         style="stop-color:#ecde0c;stop-opacity:1;" />
       <stop
-         style="stop-color:#489b97;stop-opacity:0.99248123;"
+         style="stop-color:#3ee327;stop-opacity:1;"
          offset="1"
          id="stop3801" />
     </linearGradient>
@@ -113,21 +137,20 @@
     </linearGradient>
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient3836"
-       id="linearGradient5496"
-       x1="22.284641"
+       xlink:href="#linearGradient3854"
+       id="linearGradient5288"
+       x1="17.39444"
        y1="852.94373"
-       x2="483.92432"
+       x2="482.60556"
        y2="852.94373"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.0077364,0,0,1,-3.7438314,0)" />
+       gradientUnits="userSpaceOnUse" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient5500"
-       id="linearGradient5498"
-       x1="5.122551"
+       xlink:href="#linearGradient5278"
+       id="linearGradient5294"
+       x1="3.9517059"
        y1="852.02026"
-       x2="497.21915"
+       x2="496.04828"
        y2="852.02026"
        gradientUnits="userSpaceOnUse" />
   </defs>
@@ -139,16 +162,22 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="213.60775"
-     inkscape:cy="156.61747"
+     inkscape:cx="240.01838"
+     inkscape:cy="170.0922"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1018"
-     inkscape:window-height="1030"
-     inkscape:window-x="0"
-     inkscape:window-y="18"
-     inkscape:window-maximized="0" />
+     inkscape:window-width="1631"
+     inkscape:window-height="1026"
+     inkscape:window-x="49"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid5286" />
+  </sodipodi:namedview>
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -157,7 +186,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -167,31 +196,31 @@
      id="layer1"
      transform="translate(0,-652.36218)">
     <rect
-       style="fill:url(#linearGradient5498);fill-opacity:1.0;fill-rule:nonzero;stroke:#000000;stroke-width:0;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:url(#linearGradient5294);fill-opacity:1.0;fill-rule:nonzero;stroke:#000000;stroke-width:0;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect2995"
        width="492.09659"
        height="392.21405"
-       x="5.122551"
+       x="3.9517059"
        y="655.91327"
        inkscape:export-filename="/home/pierre/workspace/iramuteq/images/splash.png"
        inkscape:export-xdpi="100"
        inkscape:export-ydpi="100" />
     <rect
-       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:#da1515;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect2997"
        width="470.48599"
        height="369.93991"
-       x="16.284966"
+       x="14.757004"
        y="667.79523"
        inkscape:export-filename="/home/pierre/workspace/iramuteq/images/splash.png"
        inkscape:export-xdpi="100"
        inkscape:export-ydpi="100" />
     <rect
-       style="fill:url(#linearGradient5496);fill-opacity:1;fill-rule:nonzero;stroke:none"
+       style="fill:url(#linearGradient5288);fill-opacity:1;fill-rule:nonzero;stroke:none"
        id="rect2999"
        width="465.21112"
        height="364.96094"
-       x="18.713213"
+       x="17.39444"
        y="670.46326"
        inkscape:export-filename="/home/pierre/workspace/iramuteq/images/splash.png"
        inkscape:export-xdpi="100"
@@ -199,8 +228,8 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot2985"
-       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
-       transform="matrix(1.0448226,0,0,1.1117284,-2.8815227,685.09285)"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#e91616;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       transform="matrix(1.0448226,0,0,1.1117284,-2.6868848,685.09285)"
        inkscape:export-filename="/home/pierre/workspace/iramuteq/images/splash.png"
        inkscape:export-xdpi="100"
        inkscape:export-ydpi="100"><flowRegion
@@ -210,13 +239,13 @@
            height="81.822365"
            x="31.31473"
            y="15.13188"
-           style="fill:#ffffff" /></flowRegion><flowPara
+           style="fill:#e91616;fill-opacity:1" /></flowRegion><flowPara
          id="flowPara2991"
-         style="font-size:72px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;font-family:Purisa;-inkscape-font-specification:Purisa Bold">IRaMuTeQ</flowPara></flowRoot>    <flowRoot
+         style="font-size:72px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#e91616;fill-opacity:1;font-family:Purisa;-inkscape-font-specification:Purisa Bold">IRaMuTeQ</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3005"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:FreeSans;-inkscape-font-specification:FreeSans"
-       transform="translate(68.762161,722.33755)"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#240c0c;fill-opacity:1;stroke:none;font-family:FreeSans;-inkscape-font-specification:FreeSans"
+       transform="translate(66.443125,722.33755)"
        inkscape:export-filename="/home/pierre/workspace/iramuteq/images/splash.png"
        inkscape:export-xdpi="100"
        inkscape:export-ydpi="100"><flowRegion
@@ -226,12 +255,12 @@
            height="24.243656"
            x="91.923882"
            y="176.75629"
-           style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;font-family:FreeSans;-inkscape-font-specification:FreeSans" /></flowRegion><flowPara
+           style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#240c0c;font-family:FreeSans;-inkscape-font-specification:FreeSans;fill-opacity:1" /></flowRegion><flowPara
          id="flowPara3011">Laboratoire LERASS</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3013"
-       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
-       transform="translate(45.110235,694.61528)"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#201111;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       transform="translate(43.084063,694.61528)"
        inkscape:export-filename="/home/pierre/workspace/iramuteq/images/splash.png"
        inkscape:export-xdpi="100"
        inkscape:export-ydpi="100"><flowRegion
@@ -241,13 +270,13 @@
            height="25.253817"
            x="166.67517"
            y="246.45682"
-           style="fill:#ffffff" /></flowRegion><flowPara
+           style="fill:#201111;fill-opacity:1" /></flowRegion><flowPara
          id="flowPara3019"
-         style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;font-family:FreeSans;-inkscape-font-specification:FreeSans">REPERE</flowPara></flowRoot>    <flowRoot
+         style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;font-family:FreeSans;-inkscape-font-specification:FreeSans;fill:#201111;fill-opacity:1">REPERE</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3021"
-       style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:FreeSans;-inkscape-font-specification:FreeSans"
-       transform="translate(86.771593,672.81034)"
+       style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#210f0f;fill-opacity:1;stroke:none;font-family:FreeSans;-inkscape-font-specification:FreeSans"
+       transform="translate(83.841813,672.81034)"
        inkscape:export-filename="/home/pierre/workspace/iramuteq/images/splash.png"
        inkscape:export-xdpi="100"
        inkscape:export-ydpi="100"><flowRegion
@@ -257,12 +286,12 @@
            height="18.18276"
            x="109.09647"
            y="318.17764"
-           style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;font-family:FreeSans;-inkscape-font-specification:FreeSans" /></flowRegion><flowPara
+           style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#210f0f;font-family:FreeSans;-inkscape-font-specification:FreeSans;fill-opacity:1" /></flowRegion><flowPara
          id="flowPara3029">Licence GNU GPL</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3033"
-       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:FreeSans;-inkscape-font-specification:FreeSans"
-       transform="translate(49.915894,767.51957)"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1d0e0e;fill-opacity:1;stroke:none;font-family:FreeSans;-inkscape-font-specification:FreeSans"
+       transform="translate(51.419563,767.51957)"
        inkscape:export-filename="/home/pierre/workspace/iramuteq/images/splash.png"
        inkscape:export-xdpi="100"
        inkscape:export-ydpi="100"><flowRegion
@@ -272,12 +301,12 @@
            height="16.162449"
            x="109.09647"
            y="248.47711"
-           style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;font-family:FreeSans;-inkscape-font-specification:FreeSans" /></flowRegion><flowPara
+           style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#1d0e0e;font-family:FreeSans;-inkscape-font-specification:FreeSans;fill-opacity:1" /></flowRegion><flowPara
          id="flowPara3039">(c) 2008-2013 Pierre Ratinaud</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3041"
-       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:FreeSans;-inkscape-font-specification:FreeSans"
-       transform="translate(62.629458,659.43325)"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#1a1b20;fill-opacity:1;stroke:none;font-family:FreeSans;-inkscape-font-specification:FreeSans"
+       transform="translate(67.515625,659.43325)"
        inkscape:export-filename="/home/pierre/workspace/iramuteq/images/splash.png"
        inkscape:export-xdpi="100"
        inkscape:export-ydpi="100"><flowRegion
@@ -287,12 +316,12 @@
            height="16.162449"
            x="135.36044"
            y="129.27911"
-           style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;font-family:FreeSans;-inkscape-font-specification:FreeSans" /></flowRegion><flowPara
+           style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#1a1b20;fill-opacity:1;font-family:FreeSans;-inkscape-font-specification:FreeSans" /></flowRegion><flowPara
          id="flowPara3047">www.iramuteq.org</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3860"
-       style="font-size:14px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:gargi;-inkscape-font-specification:gargi Medium"
-       transform="translate(76.843383,705.72695)"
+       style="font-size:14px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#1c1010;fill-opacity:1;stroke:none;font-family:gargi;-inkscape-font-specification:gargi Medium"
+       transform="translate(73.529297,703.58409)"
        inkscape:export-filename="/home/pierre/workspace/iramuteq/images/splash.png"
        inkscape:export-xdpi="100"
        inkscape:export-ydpi="100"><flowRegion
@@ -302,7 +331,7 @@
            height="19.192894"
            x="110.10663"
            y="146.45171"
-           style="font-size:14px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;font-family:gargi;-inkscape-font-specification:gargi Medium" /></flowRegion><flowPara
+           style="font-size:14px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#1c1010;fill-opacity:1;font-family:gargi;-inkscape-font-specification:gargi Medium" /></flowRegion><flowPara
          id="flowPara3866">Version 0.6 alpha 4</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3868"

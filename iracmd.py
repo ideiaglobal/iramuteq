@@ -18,8 +18,8 @@ from ConfigParser import *
 #from textchdalc import AnalyseAlceste
 #from textdist import PamTxt
 #from textafcuci import AfcUci
-from analysetxt import Alceste
-from corpus import Corpus, copycorpus, BuildFromAlceste
+from textreinert import Reinert
+from corpus import Corpus, copycorpus, BuildFromAlceste, BuildSubCorpus
 from textaslexico import Lexico
 from textstat import Stat
 from tools import SubCorpus
@@ -132,6 +132,8 @@ class CmdLine :
                 pathout = os.path.dirname(os.path.dirname(os.path.abspath(options.read)))
                 self.corpus = corpus
                 print self.corpus
+                corpus.parametres['pathout'] = '/home/pierre/fac/etudiant/verdier/corpus20_corpus_2/test2'
+                BuildSubCorpus(corpus, parametres = {'fromthem' : True, 'theme' : [u'-*thématique_idéal']})
 
             if corpus is not None :
                 corpus.conn_all()
@@ -146,10 +148,10 @@ class CmdLine :
              #   ucisize = corpus.getucisize()
              #   ucisize = [`val` for val in ucisize]
                 #uciet = [uci.etoiles[1:] for uci in corpus.ucis]
-                uceet = [corpus.ucis[uce.uci].etoiles[1:] for uci in corpus.ucis for uce in uci.uces]
-                print uceet[0:10]
-                for line in uceet :
-                    print '\t'.join(line)
+                #uceet = [corpus.ucis[uce.uci].etoiles[1:] for uci in corpus.ucis for uce in uci.uces]
+                #print uceet[0:10]
+                #for line in uceet :
+                #    print '\t'.join(line)
                 #res = zip(uciet, ucisize)
              #   res = [uciet[i] + [ucisize[i]] for i, val in enumerate(uciet)]
              #   print res[0:10]
@@ -166,7 +168,7 @@ class CmdLine :
                     #corpus.read_corpus()
                     #corpus.parse_active(gramact, gramsup)
                     config['type'] = 'alceste'
-                    self.Text = Alceste(self, corpus, parametres = config)
+                    self.Text = Reinert(self, corpus, parametres = config)
                 #    self.Text = AnalyseAlceste(self, cmd = True, big = True)
                     #self.Text = AnalyseAlceste(self, cmd = True)
                 elif options.type_analyse == 'pam' :

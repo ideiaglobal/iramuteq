@@ -242,6 +242,107 @@ stopoverlap <- function(x, cex.par = NULL, xlim = NULL, ylim = NULL) {
 }
 ###############################################################################
 
+getwordcloudcoord <- function(words,freq,scale=c(4,.5),min.freq=3,max.words=Inf,random.order=TRUE,random.color=FALSE,
+		rot.per=.1,colors="black",ordered.colors=FALSE,use.r.layout=FALSE,fixed.asp=TRUE,...) { 
+	tails <- "g|j|p|q|y"
+	last <- 1
+	
+	overlap <- function(x1, y1, sw1, sh1) {
+		if(!use.r.layout)
+			return(.overlap(x1,y1,sw1,sh1,boxes))
+		s <- 0
+		if (length(boxes) == 0) 
+			return(FALSE)
+		for (i in c(last,1:length(boxes))) {
+			bnds <- boxes[[i]]
+			x2 <- bnds[1]
+			y2 <- bnds[2]
+			sw2 <- bnds[3]
+			sh2 <- bnds[4]
+			if (x1 < x2) 
+				overlap <- x1 + sw1 > x2-s
+			else 
+				overlap <- x2 + sw2 > x1-s
+			
+			if (y1 < y2) 
+				overlap <- overlap && (y1 + sh1 > y2-s)
+			else 
+				overlap <- overlap && (y2 + sh2 > y1-s)
+			if(overlap){
+				last <<- i
+				return(TRUE)
+			}
+		}
+		FALSE
+	}
+	
+	ord <- rank(-freq, ties.method = "random")
+	words <- words[ord<=max.words]
+	freq <- freq[ord<=max.words]
+
+
+	ord <- order(freq,decreasing=TRUE)
+	words <- words[ord]
+	freq <- freq[ord]
+	words <- words[freq>=min.freq]
+	freq <- freq[freq>=min.freq]
+	if (ordered.colors) {
+		colors <- colors[ord][freq>=min.freq]
+	}
+	
+	thetaStep <- .1
+	rStep <- .05
+	plot.new()
+
+	normedFreq <- freq/max(freq)
+	size <- (scale[1]-scale[2])*normedFreq + scale[2]
+	boxes <- list()
+	toplot <- NULL	
+	
+	
+	for(i in 1:length(words)){
+		rotWord <- runif(1)<rot.per
+		r <-0
+		theta <- runif(1,0,2*pi)
+		x1<-.5
+		y1<-.5
+		wid <- strwidth(words[i],cex=size[i],...)
+		ht <- strheight(words[i],cex=size[i],...)
+		#mind your ps and qs
+		if(grepl(tails,words[i]))
+			ht <- ht + ht*.2
+		if(rotWord){
+			tmp <- ht
+			ht <- wid
+			wid <- tmp	
+		}
+		isOverlaped <- TRUE
+		while(isOverlaped){
+			if(!overlap(x1-.5*wid,y1-.5*ht,wid,ht) &&
+					x1-.5*wid>0 && y1-.5*ht>0 &&
+					x1+.5*wid<1 && y1+.5*ht<1){
+				toplot <- rbind(toplot, c(x1,y1,size[i], i))
+				boxes[[length(boxes)+1]] <- c(x1-.5*wid,y1-.5*ht,wid,ht)
+				isOverlaped <- FALSE
+			}else{
+				if(r>sqrt(.5)){
+					warning(paste(words[i],
+									"could not be fit on page. It will not be plotted."))
+					isOverlaped <- FALSE
+				}
+				theta <- theta+thetaStep
+				r <- r + rStep*thetaStep/(2*pi)
+				x1 <- .5+r*cos(theta)
+				y1 <- .5+r*sin(theta)
+			}
+		}
+	}
+	toplot <- cbind(toplot,norm.vec(freq[toplot[,4]], 1, 50))
+	row.names(toplot) <- words[toplot[,4]]
+	toplot <- toplot[,-4]
+	return(toplot)
+}
+
 make_tree_tot <- function (chd) {
 	library(ape)
 	lf<-chd$list_fille
@@ -458,7 +559,7 @@ del.yellow <- function(colors) {
     tochange <- apply(rgbs, 2, is.yellow)
     tochange <- which(tochange)
     if (length(tochange)) {
-        gr.col <- grey.colors(length(tochange))
+        gr.col <- grey.colors(length(tochange), start = 0.5)
     }
     compt <- 1
     for (val in tochange) {
@@ -497,6 +598,8 @@ make_afc_graph <- function(toplot, classes, clnb, xlab, ylab, cex.txt = NULL, le
 	if (is.null(cex.txt))
 		text(toplot[,1],toplot[,2],rownames(toplot),col=cl.color, offset=0)
 	else 
+		#require(wordcloud)
+		#textplot(toplot[,1],toplot[,2],rownames(toplot),col=cl.color, cex = cex.txt, xlim=xminmax, ylim = yminmax)
         text(toplot[,1],toplot[,2],rownames(toplot),col=cl.color, cex = cex.txt, offset=0)
 
     if (!cmd) {    
@@ -532,7 +635,7 @@ plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro
     vec.mat <- matrix(1, nrow = 3, ncol = length(sum.cl))
 	vec.mat[2,] <- 2
     vec.mat[3,] <- 3:(length(sum.cl)+2)
-    layout(matrix(vec.mat, nrow=3, ncol=length(sum.cl)),heights=c(1,1,6))
+    layout(matrix(vec.mat, nrow=3, ncol=length(sum.cl)),heights=c(2,1,6))
     if (! bw) {
         col <- rainbow(length(sum.cl))[as.numeric(tree$tip.label)]
         col <- del.yellow(col)
@@ -545,7 +648,7 @@ plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro
     } else {
 	    tree[[2]]<-paste('classe ',tree[[2]])
     }
-	par(mar=c(1,1,0,1))
+	par(mar=c(2,1,0,1))
 	plot.phylo(tree,label.offset=0, tip.col=col, type=type.dendro, direction = 'downwards', srt=90, adj = 0.5, cex = 1.4, y.lim=c(-0.3,tree$Nnode))
 	par(mar=c(0,0,0,0))
 	d <- barplot(-sum.cl[tree.order], col=col, names.arg='', axes=FALSE, axisname=FALSE)
@@ -980,4 +1083,44 @@ simi.to.gexf <- function(fileout, graph.simi, nodes.attr = NULL) {
 	col <- rep('red', nrow(lo))
 	col <- t(sapply(col, col2rgb, alpha=TRUE))
 	write.gexf(nodes, edges, output=fileout, nodesAtt=nodesatt, nodesVizAtt=list(color=col,position=lo))
+}
+
+
+graph.to.file <- function(grah.simi, nodesfile = NULL, edgesfile = NULL, community = FALSE, color = NULL, sweight = NULL) {
+	require(igraph)
+	g <- graph.simi$graph
+	V(g)$weight <- graph.simi$eff
+	V(g)$x <- graph.simi$layout[,1]
+	V(g)$y <- graph.simi$layout[,2]
+	if (ncol(graph.simi$layout) == 3) {
+		V(g)$z <- graph.simi$layout[,3]
+	}
+	if (community) {
+		member <- graph.simi$communities$membership
+		col <- rainbow(max(member))
+		v.colors <- col[member]
+		v.colors <- col2rgb(v.colors)
+		V(g)$r <- v.colors[1,]
+		V(g)$g <- v.colors[2,]
+		V(g)$b <- v.colors[3,]
+	}
+	if (!is.null(color)) {
+		v.colors <- col2rgb(color)
+		V(g)$r <- v.colors[1,]
+		V(g)$g <- v.colors[2,]
+		V(g)$b <- v.colors[3,]		
+	}
+	if (!is.null(sweight)) {
+		V(g)$sweight <- sweight
+	}
+	df <- get.data.frame(g, what='both')
+	if (!is.null(nodesfile)) {
+		write.table(df$vertices, nodesfile, sep='\t')
+	}
+	if (!is.null(edgesfile)) {
+		write.table(df$edges, edgesfile, sep='\t')
+	}
+	if (is.null(edgesfile) & is.null(nodesfile)) {
+		df
+	}
 }

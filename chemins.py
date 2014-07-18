@@ -129,7 +129,7 @@ def ConstructConfigPath(AppliPath, user=True):
     else :
         ConfigPath = AppliPath
     DictConfigPath = {
-        'alceste': os.path.join(ConfigPath, 'alceste.cfg'),
+        'reinert': os.path.join(ConfigPath, 'reinert.cfg'),
         'key': os.path.join(ConfigPath, 'key.cfg'),
         'path': os.path.join(ConfigPath, 'path.cfg'),
         'preferences' : os.path.join(ConfigPath, 'iramuteq.cfg'),
@@ -137,6 +137,7 @@ def ConstructConfigPath(AppliPath, user=True):
         'corpus' : os.path.join(ConfigPath, 'corpus.cfg'),
         'stat' : os.path.join(ConfigPath, 'stat.cfg'),
         'simitxt' : os.path.join(ConfigPath, 'simitxt.cfg'),
+        'matrix' : os.path.join(ConfigPath, 'matrix.cfg'),
     }
     return DictConfigPath
 

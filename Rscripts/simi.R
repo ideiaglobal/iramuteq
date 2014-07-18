@@ -143,7 +143,7 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
         w<-E(g.toplot)$weight
         tovire <- which(w<=seuil)
         g.toplot <- delete.edges(g.toplot,(tovire))
-        for (i in 0:(length(V(g.toplot)))) {
+        for (i in 1:(length(V(g.toplot)))) {
             if (length(neighbors(g.toplot,i))==0) {
                 vec<-append(vec,i)
             }
@@ -151,7 +151,9 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
         g.toplot <- delete.vertices(g.toplot,vec)
         v.label <- V(g.toplot)$name
         if (!is.logical(vec)) mat.eff <- mat.eff[-(vec)]
-    }
+    } else {
+		vec <- NULL
+	}
 
 	if (!is.null(minmaxeff[1])) {
         eff<-norm.vec(mat.eff,minmaxeff[1],minmaxeff[2])
@@ -217,7 +219,7 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
         com <- NULL
     }
     
-	out <- list(graph = g.toplot, mat.eff = mat.eff, eff = eff, mat = mat.simi, v.label = v.label, we.width = we.width, we.label=we.label, label.cex = label.cex, layout = lo, communities = com, halo = halo)
+	out <- list(graph = g.toplot, mat.eff = mat.eff, eff = eff, mat = mat.simi, v.label = v.label, we.width = we.width, we.label=we.label, label.cex = label.cex, layout = lo, communities = com, halo = halo, elim=vec)
 }
 	
 plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities = NULL, vertex.col = 'red', edge.col = 'black', edge.label = TRUE, vertex.label=TRUE, vertex.label.color = 'black', vertex.label.cex= NULL, vertex.size=NULL, leg=NULL, width = 800, height = 800, alpha = 0.1, cexalpha = FALSE, movie = NULL, svg = FALSE) {
@@ -270,14 +272,14 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
         }
         par(pch=' ')
         if (is.null(graph.simi$com)) {
-            plot(g.toplot,vertex.label='', edge.width=we.width, vertex.size=vertex.size, vertex.color=vertex.col, vertex.label.color='white', edge.label=we.label, edge.label.cex=cex, edge.color=edge.col, vertex.label.cex = 0, layout=lo)#, rescale = FALSE)
+            plot(g.toplot,vertex.label='', edge.width=we.width, vertex.size=vertex.size, vertex.color=vertex.col, vertex.label.color='white', edge.label=we.label, edge.label.cex=cex, edge.color=edge.col, vertex.label.cex = 0, layout=lo, edge.curved=FALSE)#, rescale = FALSE)
         } else {
             if (graph.simi$halo) {
                 mark.groups <- communities(graph.simi$com)
             } else {
                 mark.groups <- NULL
             }
-            plot(com, g.toplot,vertex.label='', edge.width=we.width, vertex.size=vertex.size, vertex.color=vertex.col, vertex.label.color='white', edge.label=we.label, edge.label.cex=cex, edge.color=edge.col, vertex.label.cex = 0, layout=lo, mark.groups = mark.groups)
+            plot(com, g.toplot,vertex.label='', edge.width=we.width, vertex.size=vertex.size, vertex.color=vertex.col, vertex.label.color='white', edge.label=we.label, edge.label.cex=cex, edge.color=edge.col, vertex.label.cex = 0, layout=lo, mark.groups = mark.groups, edge.curved=FALSE)
         }
         #txt.layout <- lo
         txt.layout <- layout.norm(lo, -1, 1, -1, 1, -1, 1)

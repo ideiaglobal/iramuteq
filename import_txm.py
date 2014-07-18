@@ -35,7 +35,7 @@ class TXMParser(xml.sax.ContentHandler) :
             pass
 
     def endElement(self, name) :
-        if name == 's' :
+        if name == 's' or name == 'w' :
             self.printsent()
         if name == 'p' :
             self.printsent()
@@ -48,7 +48,7 @@ class TXMParser(xml.sax.ContentHandler) :
             #self.fileout.write(content.encode('utf8'))
 
     def text2stars(self, attrs) :
-        stars = ['_'.join(val).replace(' ', '_').replace("'", '_') for val in attrs.items()]
+        stars = ['_'.join(val).replace(' ', '_').replace("'", '_').replace('/','').replace('.','').replace(';', '').replace(':', '').replace(u'·','') for val in attrs.items()]
         stars = [''.join([u'*', val]) for val in stars]
         stars = u'**** ' + ' '.join(stars)
         self.fileout.write(stars.encode(self.encodage_out))
@@ -74,5 +74,6 @@ class TXM2IRA :
             for f in files :
                 parser.parse(open(f, 'r'))
                 fout.write('\n\n')
+        print 'done'
 
 #TXM2IRA(infiledir, fileout)

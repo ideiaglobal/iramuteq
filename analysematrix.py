@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2013 Pierre Ratinaud
-#Lisense: GNU GPL
+#License: GNU GPL
 
 
 
 import logging
 import os
-from time import time
 from uuid import uuid4
 
 
@@ -17,26 +16,37 @@ from functions import exec_rcode, check_Rresult, DoConf
 from time import time, sleep
 from openanalyse import OpenAnalyse
 
+
 class AnalyseMatrix :
     def __init__(self, ira, tableau, parametres = None, dlg = False) :
         self.tableau = tableau
+        if self.tableau.csvtable is None :
+            self.tableau.open()
         self.ira = ira
         self.parent = ira
         self.dlg = dlg
         self.parametres = parametres
         self.val = False
+        self.parametres['pathout'] = PathOut(tableau.parametres['originalpath'], analyse_type = self.parametres['type'], dirout = tableau.parametres['pathout']).mkdirout()
         if not 'pathout' in self.parametres :
-            self.pathout = PathOut(tableau.parametres['filename'], analyse_type = parametres['type'], dirout = parametres['pathout'])
+            self.pathout = PathOut(tableau.parametres['originalpath'], analyse_type = self.parametres['type'], dirout = tableau.parametres['pathout'])
         else :
-            self.pathout = PathOut(filename = tableau.parametres['filename'], dirout = self.parametres['pathout'], analyse_type = self.parametres['type'])
+            self.pathout = PathOut(filename = tableau.parametres['originalpath'], dirout = self.parametres['pathout'], analyse_type = self.parametres['type'])
 
-        self.parametres['pathout'] = self.pathout.dirout
+        #self.parametres['pathout'] = self.pathout.dirout
         self.parametres['uuid'] = str(uuid4())
         self.parametres['name'] = os.path.split(self.parametres['pathout'])[1]
         self.parametres['encoding'] = self.ira.syscoding
-
-        self.t1 = time()
-        result_analyse = self.doanalyse()
+        self.parametres['matrix'] = self.tableau.parametres['uuid']
+        self.tableau.pathout.dirout = self.parametres['pathout']
+        self.doparametres(dlg = dlg)
+        if self.parametres is not None :
+            self.t1 = time()
+            if not os.path.exists(self.parametres['pathout']) :
+                self.pathout.createdir(self.parametres['pathout'])
+            result_analyse = self.doanalyse()
+        else :
+            result_analyse = False
         if result_analyse is None :
             self.time = time() - self.t1
             minutes, seconds = divmod(self.time, 60)
@@ -44,11 +54,11 @@ class AnalyseMatrix :
             self.parametres['time'] = '%.0fh %.0fm %.0fs' % (hours, minutes, seconds)
             self.parametres['ira'] = self.pathout['Analyse.ira']
             DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
-            self.ira.history.addMatrix(self.parametres)
+            self.ira.history.addMatrixAnalyse(self.parametres)
             if dlg :
                 dlg.Destroy()
                 OpenAnalyse(self.parent, self.parametres['ira'])
-                #self.ira.tree.AddAnalyse(self.parametres)
+                self.ira.tree.AddMatAnalyse(self.parametres)
                 self.val = 5100
         else :
             self.val = False
@@ -56,6 +66,9 @@ class AnalyseMatrix :
                 dlg.Destroy()
  
     def doanalyse(self) :
+        pass
+    
+    def doparametres(self, dlg = None):
         pass
     
     def doR(self, Rscript, wait = False, dlg = None, message = '') :

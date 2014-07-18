@@ -174,7 +174,7 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
         lems = corpus.getlems()
         rep = []
         for forme in lems[word].formes :
-             rep.append([corpus.getforme(forme).forme, corpus.getforme(forme).freq])
+            rep.append([corpus.getforme(forme).forme, corpus.getforme(forme).freq])
         rep.sort(key = itemgetter(1), reverse = True)
         win = message(self, u"Formes associées", (300, 200))
         win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
@@ -186,7 +186,9 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
         item = self.getColumnText(self.GetFirstSelected(), 0)
         uce_ok = corpus.getlemuces(item)
         ucis_txt, ucestxt = doconcorde(corpus, uce_ok, [item])
-        win = message(self, u"Concordancier", (750, 600))
-        win.html = ('<html>\n<h1>%s</h1>' % item) + '<br>'.join(['<br>'.join([ucis_txt[i], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
-        win.HtmlPage.SetPage(win.html)
+        items = dict([[i, '<br><br>'.join([ucis_txt[i], ucestxt[i]])] for i in range(0,len(ucestxt))])
+        win = message(self, items, u"Concordancier - %s" % item, (800, 500))
+        #win = message(self, u"Concordancier", (750, 600))
+        #win.html = ('<html>\n<h1>%s</h1>' % item) + '<br>'.join(['<br>'.join([ucis_txt[i], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
+        #win.HtmlPage.SetPage(win.html)
         win.Show(True)

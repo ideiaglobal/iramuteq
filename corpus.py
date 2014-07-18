@@ -16,7 +16,7 @@ import logging
 from operator import itemgetter
 from uuid import uuid4
 from chemins import PathOut
-from dialog import CorpusPref
+from dialog import CorpusPref, SubTextFromMetaDial
 from colors import colors
 import datetime
 
@@ -82,6 +82,22 @@ class Corpus :
                 lem = word
             self.formes[word] =  Word(word, gramtype, len(self.formes), lem)
             self.idformesuces[self.formes[word].ident] = {self.ucis[-1].uces[-1].ident : 1}
+    
+    def add_word_from_forme(self, word, stident):
+        if word.forme in self.formes :
+            self.formes[word.forme].freq += 1
+            if self.formes[word.forme].ident in self.idformesuces :
+                if stident in self.idformesuces[self.formes[word.forme].ident] :
+                    self.idformesuces[self.formes[word.forme].ident][stident] += 1
+                else :
+                    self.idformesuces[self.formes[word.forme].ident][stident] = 1
+            else :
+                self.idformesuces[self.formes[word.forme].ident] = {stident: 1}
+        else :
+            self.formes[word.forme] = word
+            self.formes[word.forme].ident = len(self.formes)
+            self.formes[word.forme].freq = 1
+            self.idformesuces[self.formes[word.forme].ident] = {stident : 1}       
 
     def conn_all(self): 
         """connect corpus to db"""
@@ -289,6 +305,30 @@ class Corpus :
                     self.lems[self.formes[forme].lem] = Lem(self, self.formes[forme])
         else :
             self.lems = dict([[forme, Lem(self, self.formes[forme])] for forme in self.formes])
+    
+    def make_lems_from_dict(self, dictionnaire, dolem = True) :
+        log.info('make lems from dict')
+        self.lems = {}
+        for forme in self.formes :
+            if self.formes[forme].forme in dictionnaire :
+                lem = dictionnaire[forme][0]
+                gram = dictionnaire[forme][1]
+            elif forme.isdigit() :
+                gram = u'num'
+                lem = forme
+            else :
+                gram = u'nr'
+                lem = forme
+            self.formes[forme].lem = lem
+            self.formes[forme].gram = gram
+            if dolem :
+                if self.formes[forme].lem in self.lems :
+                    if self.formes[forme].ident not in self.lems[self.formes[forme].lem].formes :
+                        self.lems[self.formes[forme].lem].add_forme(self.formes[forme])
+                else :
+                    self.lems[self.formes[forme].lem] = Lem(self, self.formes[forme])
+            else :
+                self.lems[forme] = Lem(self, self.formes[forme])
                 
     def make_idformes(self) :
         self.idformes = dict([[self.formes[forme].ident, self.formes[forme]] for forme in self.formes])
@@ -318,6 +358,29 @@ class Corpus :
             tab.append([lem] + [sum([deff[uce] for uce in et.intersection(ucesk)]) for et in etuces])
         tab.insert(0, [''] + etoiles)
         return tab
+    
+    def make_tgen_table(self, tgen, etoiles, tot = None):
+        lclasses = [self.getucesfrometoile(etoile) for etoile in etoiles]
+        sets = [set(cl) for cl in lclasses]
+        totoccurrences = dict([[val, 0] for val in etoiles])
+        if tot is None :
+            for forme in self.formes :
+                formeuceeff = self.getformeuceseff(forme)
+                for i, classe in enumerate(lclasses) :
+                    concern = sets[i].intersection(formeuceeff.keys())
+                    if len(concern) :
+                        totoccurrences[etoiles[i]] += sum([formeuceeff[uce] for uce in concern])
+        #tgenoccurrences = dict([[val, 0] for val in etoiles])
+        tgenoccurrences = {}
+        for t in tgen.tgen :
+            tgenoccurrences[t] = dict([[val, 0] for val in etoiles])
+            for lem in tgen[t] :
+                lemuceeff = self.getlemuceseff(lem)
+                for i, classe in enumerate(lclasses) :
+                    concern = sets[i].intersection(lemuceeff.keys())
+                    if len(concern) :
+                        tgenoccurrences[t][etoiles[i]] += sum([lemuceeff[uce] for uce in concern])
+        return tgenoccurrences, totoccurrences
     
     def make_efftype_from_etoiles(self, etoiles) :
         dtype = {}
@@ -656,6 +719,12 @@ class Corpus :
         for uci in self.ucis :
             etoiles.update(uci.etoiles[1:])
         return list(etoiles)
+    
+    def make_themes(self):
+        themes = set([])
+        for uci in self.ucis :
+            themes.update(uci.paras)
+        return list(themes)
 
     def make_etoiles_dict(self) :
         etoiles = [et for uci in self.ucis for et in uci.etoiles[1:]]
@@ -929,8 +998,7 @@ class Corpus :
         listlem.sort()
         with open(fileout, 'w') as f :
             f.write('\n'.join(['\t'.join(lem) for lem in listlem]).encode(syscoding))
-
-
+    
 
 
 class MakeUciStat :
@@ -1230,6 +1298,77 @@ class BuildCorpus :
         pourhapaxocc = (float(hapaxnb) / self.corpus.parametres['occurrences']) * 100
         self.corpus.parametres['hapax'] = '%i - %.2f %% des formes - %.2f %% des occurrences' % (hapaxnb, pourhapaxf, pourhapaxocc)
 
+class BuildSubCorpus(BuildCorpus):
+    def __init__(self, corpus, parametres, dlg = None) :
+        log.info('begin subcorpus...')
+        self.dlg = dlg
+        self.ori = corpus
+        self.infile = None
+        self.corpus = Corpus(self, corpus.parametres)
+        self.last = 0
+        self.encoding = corpus.parametres['encoding']
+        self.corpus.parametres['corpus_name'] = parametres['corpus_name']
+        self.corpus.pathout = PathOut(filename = corpus.parametres['originalpath'], dirout = parametres['pathout'])
+        self.corpus.pathout.createdir(parametres['pathout'])
+        self.corpus.parametres['pathout'] = parametres['pathout']
+        self.corpus.parametres['meta'] = parametres.get('meta', False)
+        self.corpus.parametres['uuid'] = str(uuid4())
+        if parametres.get('frommeta', False) :
+            print 'make subtexts'
+            self.corpus.ucis = [uci for uci in self.ori.ucis if set(parametres['meta']).intersection(uci.etoiles) != set()]
+        elif parametres.get('fromtheme', False) :
+            print 'make subtexts from theme'
+            idpara = 0
+            for uci in self.ori.ucis :
+                if uci.paras != [] :
+                    newuce = []
+                    newpara = []
+                    for et in uci.paras :
+                        if et in parametres['meta'] :
+                            newuce += [uce for uce in uci.uces if uce.para == idpara]
+                            newpara.append(et)
+                        idpara += 1
+                    if newuce != [] :
+                        uci.uces = newuce
+                        uci.paras = newpara
+                        self.corpus.ucis.append(uci)
+                else :
+                    idpara += 1  
+        elif parametres.get('fromcluster', False) :
+            pass
+        #create database
+        self.connect()
+        self.dobuild()
+    
+    def read_corpus(self, infile = None):
+        self.olduceid = [uce.ident for uci in self.corpus.ucis for uce in uci.uces]
+        ident_uci = 0
+        ident_uce = 0
+        ident_para = -1
+        lastpara = -1
+        newuceident = {}
+        print 'redo text, para and st ident'
+        for uci in self.corpus.ucis :
+            uci.ident = ident_uci
+            ident_uci += 1
+            for uce in uci.uces :
+                uce.uci = uci.ident
+                if uce.para != lastpara :
+                    ident_para += 1
+                    lastpara = uce.para
+                    uce.para = ident_para
+                else :
+                    uce.para = ident_para
+                newuceident[uce.ident] = ident_uce
+                uce.ident = ident_uce
+                ident_uce += 1
+        print 'backup st text and forms'
+        for row in self.ori.getconcorde(self.olduceid) :
+            self.c.execute('INSERT INTO uces VALUES(?,?);', (`newuceident[row[0]]`, row[1]))
+            for word in row[1].split() :
+                self.corpus.add_word_from_forme(self.ori.formes[word], newuceident[row[0]])
+        self.backup_uce()
+        print 'done'
 
 class BuildFromAlceste(BuildCorpus) :
     def read_corpus(self, infile) :
@@ -1374,6 +1513,41 @@ class Builder :
     def doanalyse(self) :
         return BuildFromAlceste(self.parent.filename, self.parametres, self.parent.lexique, self.parent.expressions, dlg = self.dlg).corpus
 
+class SubBuilder :
+    def __init__(self, parent, corpus, parametres = None, dlg = None):
+        self.parent = parent
+        self.ori = corpus
+        self.dlg = dlg
+        corpus_name = 'Sub' + corpus.parametres['corpus_name']
+        parametres['corpus_name'] = corpus_name
+        if parametres.get('frommeta', False) :
+            parametres['meta'] = corpus.make_etoiles()
+        elif parametres.get('fromtheme', False) :
+            parametres['meta'] = corpus.make_themes()
+        parametres['meta'].sort()
+        dial = SubTextFromMetaDial(parent, parametres)
+        self.res = dial.ShowModal()
+        if self.res == 5100 :
+            if dial.subcorpusname.GetValue() != '' :
+                corpus_name = ''.join([l for l in dial.subcorpusname.GetValue() if l.isalnum() or l in ['_']])
+            if corpus_name != '' :
+                parametres['corpus_name'] = corpus_name
+            else :
+                parametres['corpus_name'] = 'Sub' + corpus.parametres['corpus_name']
+            pathout = os.path.join(corpus.parametres['pathout'], parametres['corpus_name'])
+            i = 1
+            while os.path.exists(pathout + '_%i' % i) :
+                i += 1
+            parametres['pathout'] = pathout + '_%i' % i
+            meta = dial.m_listBox1.GetSelections()
+            parametres['meta'] = [parametres['meta'][val] for val in meta]
+            self.parametres = parametres
+            dial.Destroy()
+        else :
+            dial.Destroy()
+    
+    def doanalyse(self):
+        return BuildSubCorpus(self.ori, parametres = self.parametres, dlg = self.dlg).corpus
 
 if __name__ == '__main__' :
     t1 = time()

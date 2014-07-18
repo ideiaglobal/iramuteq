@@ -1,6 +1,6 @@
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2009 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 fille<-function(classe,classeuce) {
 	listfm<-unique(unlist(classeuce[classeuce[,classe%/%2]==classe,]))

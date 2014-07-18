@@ -43,7 +43,7 @@ class AlcOptFrame(wx.Dialog):
         'nr' : [wx.NewId(),wx.NewId(),u"Formes non reconnues"],
         }
         self.parent=parent
-        self.keys=self.parent.parent.keys
+        self.keys=self.parent.keys
         self.listlabel=[]
         self.listspin=[]
         self.listbutton=[]
@@ -73,7 +73,7 @@ class AlcOptFrame(wx.Dialog):
         
         #self.Bind(wx.EVT_BUTTON, self.OnApply, self.button_val)
         
-        self.dico=self.parent.parent.parent.lexique#'dictionnaires/lexique.txt')
+        self.dico=self.parent.parent.lexique#'dictionnaires/lexique.txt')
 
         self.__set_properties()
         self.__do_layout()
