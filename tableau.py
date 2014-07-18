@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2010 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 import codecs
 import sys
@@ -12,7 +12,9 @@ import tempfile
 import re
 import htmlentitydefs
 import shelve
+from functions import DoConf
 from uuid import uuid4
+from chemins import PathOut
 import logging
 
 log = logging.getLogger('iramuteq.tableau')
@@ -51,18 +53,41 @@ def UpdateDico(Dico, word, line):
         Dico[word][1].append(line)
     else:
         Dico[word] = [1, [line]]
+        
+def copymatrix(tableau):
+    log.info('copy matrix')
+    copymat = Tableau(tableau.parent, parametres = tableau.parametres)
+    copymat.linecontent = tableau.linecontent
+    copymat.csvtable = tableau.csvtable
+    copymat.pathout = tableau.pathout
+    copymat.colnames = tableau.colnames
+    copymat.rownb = tableau.rownb
+    copymat.colnb = tableau.colnb
+    if copymat.csvtable is None :
+        copymat.open()
+    return copymat
 
 class Tableau() :
-    def __init__(self, parent, filename = '', filetype = 'csv', encodage = 'utf-8') :
+    def __init__(self, parent, filename = '', filetype = 'csv', encodage = 'utf-8', parametres = None) :
         self.parent = parent
-        self.parametre = {'filename' : filename}
-        self.parametre['filetype'] = filetype
-        self.parametre['encodage'] = encodage
-        self.parametre['pathout'] = os.path.dirname(os.path.abspath(filename))
-        self.parametre['mineff'] = 3
-        self.parametre['syscoding'] = sys.getdefaultencoding()
-        self.parametre['type'] = 'matrix'
-        self.parametre['name'] = 'unNOm'
+        if parametres is None :
+            self.parametres = DoConf(os.path.join(self.parent.UserConfigPath,'matrix.cfg')).getoptions('matrix')
+            self.parametres['pathout'] = PathOut(filename, 'matrix').mkdirout()
+            self.parametres['originalpath'] = filename
+            self.parametres['filetype'] = filetype
+            self.parametres['encodage'] = encodage
+            #self.parametre['pathout'] = os.path.dirname(os.path.abspath(filename))
+            self.parametres['mineff'] = 3
+            self.parametres['syscoding'] = sys.getdefaultencoding()
+            self.parametres['type'] = 'matrix'
+            self.parametres['matrix_name'] = os.path.basename(filename)
+            self.parametres['uuid'] = str(uuid4())
+            self.parametres['shelves'] = os.path.join(self.parametres['pathout'], 'shelve.db')
+            self.parametres['ira'] = os.path.join(self.parametres['pathout'], 'Matrix.ira')
+        else :
+            self.parametres = parametres
+        self.pathout = PathOut(filename = filename, dirout = self.parametres['pathout'])
+        self.csvtable = None
         self.sups = {}
         self.actives = {}
         self.listactives = None
@@ -77,13 +102,13 @@ class Tableau() :
         self.colnb = 0
         self.rownb = 0
         self.classes = []
-        self.parametres = self.parametre
+        #self.parametres = self.parametre
 
     def read_tableau(self, fileout) :
         d=shelve.open(fileout)
-        self.parametre = d['parametre']
-        if 'syscoding' not in self.parametre :
-            self.parametre['syscoding'] = sys.getdefaultencoding()
+        #self.parametres = d['parametres']
+        #if 'syscoding' not in self.parametres :
+        #    self.parametres['syscoding'] = sys.getdefaultencoding()
         self.actives = d['actives']
         self.sups = d['sups']
         self.classes = d['classes']
@@ -96,11 +121,20 @@ class Tableau() :
             self.datas = d['datas']
         if 'lchi' in d :
             self.lchi = d['lchi']
+        if 'content' in d :
+            self.content = d['content']
         d.close()
+    
+    def open(self):
+        print 'open matrix'
+        self.read_csvfile()
+        self.colnames = self.csvtable[0][1:]
+        self.rownb = len(self.linecontent)
+        self.colnb = len(self.linecontent[0])
 
     def save_tableau(self, fileout) :
         d=shelve.open(fileout)
-        d['parametre'] = self.parametre
+        d['parametres'] = self.parametres
         d['actives'] = self.actives
         d['sups'] = self.sups
         d['classes'] = self.classes
@@ -113,28 +147,32 @@ class Tableau() :
             d['datas'] = self.datas
         if 'lchi' in dir(self) :
             d['lchi'] = self.lchi
+        d['content'] = self.content
         d.close()
 
     def make_content(self) :
-        if self.parametre['filetype'] == 'csv' :
+        self.pathout.createdir(self.parametres['pathout'])
+        if self.parametres['filetype'] == 'csv' :
             self.read_csv()
-        elif self.parametre['filetype'] == 'xls' :
+        elif self.parametres['filetype'] == 'xls' :
             self.read_xls()
-        elif self.parametre['filetype'] == 'ods' :
+        elif self.parametres['filetype'] == 'ods' :
             self.read_ods()
-        self.parametre['csvfile'] = tempfile.mktemp(dir=self.parent.TEMPDIR)
+        self.parametres['csvfile'] = os.path.join(self.parametres['pathout'], 'csvfile.csv')
         self.make_tmpfile()
+        DoConf().makeoptions(['matrix'],[self.parametres], self.parametres['ira'])
+        self.parent.history.addMatrix(self.parametres)
 
     def read_xls(self) :
         #FIXME : encodage
         #print '############## ENCODING IN EXCEL #######################'
         #datafile = xlrd.open_workbook(self.parametre['filename'], encoding_override="azerazerazer")
-        datafile = xlrd.open_workbook(self.parametre['filename'])
-        datatable = datafile.sheet_by_index(self.parametre['sheetnb']-1)
-        self.linecontent = [[str(datatable.cell_value(rowx = i, colx = j)) for j in range(datatable.ncols)] for i in range(datatable.nrows)]
+        datafile = xlrd.open_workbook(self.parametres['originalpath'])
+        datatable = datafile.sheet_by_index(self.parametres['sheetnb']-1)
+        self.linecontent = [[str(datatable.cell_value(rowx = i, colx = j)).replace(u'"','').replace(u';','').replace(u'\n',' ').strip() for j in range(datatable.ncols)] for i in range(datatable.nrows)]
 
     def read_ods(self) :
-        doc = ooolib.Calc(opendoc=self.parametre['filename'])
+        doc = ooolib.Calc(opendoc=self.parametres['originalpath'])
         doc.set_sheet_index(0)
         (cols, rows) = doc.get_sheet_dimensions()
         for row in range(1, rows + 1):
@@ -142,19 +180,20 @@ class Tableau() :
             for col in range(1, cols + 1):
                 data = doc.get_cell_value(col, row)
                 if data is not None :
-                    ligne.append(unescape(data[1]))
+                    ligne.append(unescape(data[1].replace(u'"','').replace(u';','').replace(u'\n', ' ').strip()))
                 else :
                     ligne.append('')
             self.linecontent.append(ligne)
 
     def read_csv(self) :
-        with codecs.open(self.parametre['filename'], 'r', self.parametre['encodage']) as f :
+        with codecs.open(self.parametres['originalpath'], 'r', self.parametres['encodage']) as f :
             content = f.read() 
-        self.linecontent = [line.replace('"','').split(self.parametre['colsep']) for line in content.splitlines()]
+        self.linecontent = [line.split(self.parametres['colsep']) for line in content.splitlines()]
+        self.linecontent = [[val.replace(u'"','').strip() for val in line] for line in self.linecontent]
 
     def write_csvfile(self) :
-        with open(self.parametre['csvfile'], 'w') as f :
-            f.write('\n'.join([';'.join(line) for line in self.csvtable]))
+        with open(self.parametres['csvfile'], 'w') as f :
+            f.write('\n'.join(['\t'.join(line) for line in self.csvtable]))
 
     def make_tmpfile(self) :
         self.rownb = len(self.linecontent)
@@ -178,14 +217,11 @@ class Tableau() :
         self.csvtable = [[self.idname] + self.colnames] + [[self.rownames[i]] + self.linecontent[i] for i in range(len(self.rownames))] 
         self.write_csvfile()
 
-    def show_tab(self) :
-        self.parent.content = self.csvtable
-        self.parent.ShowMenu(_("View"))
-        self.parent.ShowMenu(_("Spreadsheet analysis"))
-        self.parent.ShowMenu(_("Text analysis"), False)
-        self.parent.type = "Data"
-        self.parent.DataPop = False
-        self.parent.OnViewData('')
+    def read_csvfile(self):
+        with codecs.open(self.parametres['csvfile'], 'r', self.parametres['syscoding']) as f:
+            self.csvtable = [line.split('\t') for line in f.read().splitlines()]
+        self.linecontent = [line[1:] for line in self.csvtable]
+        self.linecontent.pop(0)
 
     def check_rownames(self) :
         if len(self.rownames) == len(list(set(self.rownames))) :
@@ -197,9 +233,9 @@ class Tableau() :
     def make_unique_list(self) :
         return list(set([val for line in self.linecontent for val in line if val.strip() != '']))
 
-    def make_dico(self, linecontent) :
+    def make_dico(self, selcol) :
         dico = {}
-        for i, line in enumerate(linecontent) :
+        for i, line in enumerate(selcol) :
             for forme in line:
                 if forme.strip() != '' :
                     UpdateDico(dico, forme, i)
@@ -216,11 +252,11 @@ class Tableau() :
         return [[val, self.actives[val][0]] for val in self.actives]       
 
     def make_listactives(self) :
-        self.listactives = [val for val in self.actives if val != 'NA' and self.actives[val] >= self.parametre['mineff']]
+        self.listactives = [val for val in self.actives if val != 'NA' and self.actives[val] >= self.parametres['mineff']]
     
     def write01(self, fileout, dico, linecontent) :
         if self.listactives is None :
-            self.listactives = [val for val in dico if val != 'NA' and dico[val] >= self.parametre['mineff']]
+            self.listactives = [val for val in dico if val != 'NA' and dico[val] >= self.parametres['mineff']]
         out = [['0' for forme in self.listactives] for line in linecontent]
         for i, forme in enumerate(self.listactives) :
             for line in dico[forme][1] :
@@ -234,7 +270,7 @@ class Tableau() :
     def make_01_from_selection(self, listact, listsup = None, dowrite = True) :
         selcol = self.select_col(listact)
         self.actives = self.make_dico(selcol)
-        self.write01(self.dictpathout['mat01'], self.actives, selcol)
+        self.write01(self.pathout['mat01.csv'], self.actives, selcol)
         if listsup is not None :
             selcol = self.select_col(listsup)
             self.sups = self.make_dico(selcol)
@@ -247,7 +283,7 @@ class Tableau() :
                         UpdateDico(self.sups, forme, i)
                     else:
                         UpdateDico(self.actives, forme, i)        
-        self.listactives = [val for val in self.actives if self.actives[val][0] >= self.parametre['mineff']]
+        self.listactives = [val for val in self.actives if self.actives[val][0] >= self.parametres['mineff']]
         table = [['0' for i in range(len(self.listactives))] for j in range(self.rownb)]
         for i, val in enumerate(self.listactives) :
             for j, line in enumerate(self.linecontent) :
@@ -259,12 +295,12 @@ class Tableau() :
         with open(fileout, 'w') as f:
             f.write('\n'.join([';'.join(line) for line in table]))
 
-    def printtable(self, filename, Table):
+    def printtable(self, filename, Table, sep = ';'):
         with open(filename, 'w') as f :
-            f.write('\n'.join([';'.join(line) for line in Table]))
+            f.write('\n'.join([sep.join(line) for line in Table]))
     
     def buildprofil(self) :
-        with open(self.dictpathout['uce'], 'rU') as filein :
+        with open(self.pathout['uce'], 'rU') as filein :
             content = filein.readlines()
         content.pop(0)
         lsucecl = []
@@ -291,7 +327,7 @@ class Tableau() :
                     if cl == i + 1 :
                         if active in self.linecontent[uce]:
                             line[i + 1] += 1
-            if sum(line[1:]) > self.parametre['mineff']:
+            if sum(line[1:]) > self.parametres['mineff']:
                 tablecont.append([line[0]] + [`don` for don in line if type(don) == type(1)])
         
         tablecontet = []
@@ -306,8 +342,8 @@ class Tableau() :
                             line[i + 1] += 1
             tablecontet.append([line[0]] + [`don` for don in line if type(don) == type(1)])
             
-        self.printtable(self.dictpathout['ContEtOut'], tablecontet)
-        self.printtable(self.dictpathout['Contout'], tablecont)        
+        self.printtable(self.pathout['ContEtOut'], tablecontet)
+        self.printtable(self.pathout['Contout'], tablecont)        
 
     def get_colnames(self) :
         return self.colnames[:]

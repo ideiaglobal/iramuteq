@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2012 Pierre Ratinaud
-#Lisense: GNU GPL
+#License: GNU GPL
 
 import os
 import string
@@ -60,7 +60,7 @@ class Prototypical(AnalyseMatrix) :
                     self.makedatas(table_assoc, table_rank)
                     self.DoR()
         else :
-             return 'stop'
+            return 'stop'
 
     def dotable(self) :
         table_assoc = self.tableau.select_col(self.ColSel1)
@@ -71,15 +71,16 @@ class Prototypical(AnalyseMatrix) :
         words = {}
         for i in range(0, len(table_assoc)) :
             for j, word in enumerate(table_assoc[i]) :
-                if word in words :
-                    words[word][0] += 1
-                    if table_rank[i][j] != '' :
-                        words[word][1].append(int(table_rank[i][j]))
-                else :
-                    if table_rank[i][j] != '' :
-                        words[word] = [1, [int(table_rank[i][j])]]
+                if word.strip() != "" :
+                    if word in words :
+                        words[word][0] += 1
+                        if table_rank[i][j] != '' :
+                            words[word][1].append(float(table_rank[i][j]))
                     else :
-                         words[word] = [1, []]
+                        if table_rank[i][j] != '' :
+                            words[word] = [1, [float(table_rank[i][j])]]
+                        else :
+                            words[word] = [1, []]
         res = [[word, words[word][0], float(sum(words[word][1])) / len(words[word][1])] for word in words if len(words[word][1]) != 0 and words[word][0] >= self.parametres['freqmin']]
         with open(self.pathout['table.csv'], 'w') as f :
             f.write('\n'.join(['\t'.join(['"' + val[0] +'"', `val[1]`, `val[2]`]) for val in res]))

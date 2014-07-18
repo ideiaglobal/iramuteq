@@ -3,19 +3,20 @@
 #Copyright (c) 2008-2011 Pierre Ratinaud
 #License: GNU/GPL
 
-from chemins import ConstructPathOut, StatTxtPathOut
+from chemins import ConstructPathOut, StatTxtPathOut, PathOut
 #from corpus import Corpus
 from analysetxt import AnalyseText
 import wx
 import os
-import sys
-from listlex import *
-from functions import exec_rcode, progressbar, check_Rresult, CreateIraFile, print_liste, treat_var_mod, write_tab, DoConf
-from dialog import OptLexi, StatDialog 
-from openanalyse import OpenAnalyse
+#import sys
+#from listlex import *
+from functions import exec_rcode, progressbar, check_Rresult, CreateIraFile, print_liste, treat_var_mod, write_tab, DoConf, TGen
+from dialog import OptLexi#, StatDialog 
+#from openanalyse import OpenAnalyse
 import tempfile
-from ConfigParser import RawConfigParser
-from guifunct import getPage, getCorpus
+#from ConfigParser import RawConfigParser
+#from guifunct import getPage, getCorpus
+from PrintRScript import TgenSpecScript
 from time import sleep
 import logging
 
@@ -206,3 +207,25 @@ class Lexico(AnalyseText) :
         print_liste(self.dictpathout['liste_graph_afcf'],afcf_graph_list)
         print_liste(self.dictpathout['liste_graph_afct'],afct_graph_list)
         #DoConf().makeoptions(['spec'],[self.parametres], self.dictpathout['ira'])
+
+class TgenSpec(AnalyseText):
+    def __init__(self, ira, corpus, parametres):
+        self.ira = ira
+        self.corpus = corpus
+        self.parametres = parametres
+        self.pathout = PathOut(dirout = self.parametres['pathout'])
+        self.doanalyse()
+        
+    def doanalyse(self):
+        self.tgen = TGen(path = self.parametres['tgenpath'])
+        self.tgen.read(self.tgen.path)
+        tgenocc, totocc = self.corpus.make_tgen_table(self.tgen, self.parametres['etoiles'])
+        self.parametres['tgeneff'] = os.path.join(self.parametres['pathout'], 'tgeneff.csv')
+        self.tgen.writetable(self.parametres['tgeneff'], tgenocc, totocc)
+        self.parametres['tgenspec'] = os.path.join(self.parametres['pathout'], 'tgenspec.csv')
+        self.Rscript = TgenSpecScript(self)
+        self.Rscript.make_script()
+        self.Rscript.write()
+        self.doR(self.Rscript.scriptout, dlg = False, message = 'R...')
+
+    

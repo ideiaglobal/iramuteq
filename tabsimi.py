@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2009-2010 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 from chemins import ConstructPathOut, simipath, ffr, PathOut
 from functions import print_liste, exec_rcode, read_list_file, check_Rresult, indices_simi, treat_var_mod
@@ -12,10 +12,6 @@ from analysematrix import AnalyseMatrix
 from PrintRScript import PrintSimiScript
 from listlex import *
 import wx
-#if wx.__version__ >= '2.11' :
-#    import wx.lib.agw.aui as aui
-#else :
-#    import aui
 import os
 import tempfile
 import datetime
@@ -25,17 +21,26 @@ from uuid import uuid4
 
 
 class DoSimi(AnalyseMatrix):
-    def __init__(self, parent, param = None, isopen = False, fromprof = False, pathout = False, filename ='', gparent = False, wordgraph = False, listactives = False, actives = False, cmd = False, openfromprof=False, tableau = None):
+    def doanalyse(self) :
+        self.fromprof = self.parametres.get('fromprof', False)
+        self.wordgraph = self.parametres.get('wordgraph', False)
+        self.listactives = self.parametres.get('listactives', False)
+        self.actives = self.parametres.get('actives', False)
+        self.openfromprof = self.parametres.get('openfromprof', False)
+        self.cmd = self.parametres.get('cmd', False)
+        self.dirout = self.parametres.get('pathout', False)
+     #parent, matrix = None, parametres = None, isopen = False, fromprof = False, pathout = False, filename ='', gparent = False, wordgraph = False, listactives = False, actives = False, cmd = False, openfromprof=False, tableau = None):
 #------------------------------------------------------------------- 
-        self.fromprof = fromprof
-        self.wordgraph = wordgraph
-        self.listactives = listactives
-        self.actives = actives
-        self.openfromprof = openfromprof
-        self.cmd = cmd
-        self.dirout = pathout
-        if param is not None and fromprof:
-            self.paramsimi = param
+    #    self.fromprof = fromprof
+    #    self.wordgraph = wordgraph
+    #    self.listactives = listactives
+    #    self.actives = actives
+    #    self.openfromprof = openfromprof
+    #    self.cmd = cmd
+    #    self.dirout = pathout
+    #    if parametres is not None and fromprof:
+        if self.fromprof:
+            self.paramsimi = parametres
         else :
             self.paramsimi = {'coeff' : 0,
                           'layout' : 2,
@@ -75,24 +80,21 @@ class DoSimi(AnalyseMatrix):
         #    self.parent = parent.parent
         #    self.Source = parent
         #else :
-        self.parent = parent   
         self.Source = None
-        if pathout :
-            self.pathout = PathOut(dirout = pathout)
+        if self.dirout :
+            self.pathout = PathOut(dirout = self.dirout)
 
-        self.RPath = self.parent.PathPath.get('PATHS', 'rpath')
-        if not isopen :
+        #self.RPath = self.parent.PathPath.get('PATHS', 'rpath')
+        if not self.parametres.get('isopen', False) :
             #if not fromprof :
             #    self.tableau = self.parent.tableau
             #else :
             #    self.tableau = parent.tableau
-            if tableau is not None :
-                self.tableau = tableau
-            else : 
+            if self.tableau is None :
                 self.tableau = parent.tableau
-            self.tableau.parametre['mineff'] = 0
-            if not fromprof :
-                dialcol = FreqDialog(self.parent, -1, self.tableau.get_colnames(), u"Sélectionnez les colonnes", size=(600, 250))
+            self.tableau.parametres['mineff'] = 0
+            if not self.fromprof :
+                dialcol = FreqDialog(self.parent, -1, self.tableau.get_colnames(), _(u"Select columns").decode('utf8'), size=(600, 250))
                 dialcol.CenterOnParent()            
                 res = dialcol.ShowModal()
             else :
@@ -108,7 +110,7 @@ class DoSimi(AnalyseMatrix):
                     self.tableau.actives = dict(actives)
                 self.tableau.make_listactives()
                 actives = dict([[i, val] for i, val in enumerate(actives)])
-                self.dial = PrefSimi(parent, -1, self.paramsimi, self.indices, wordlist = actives)
+                self.dial = PrefSimi(self.parent, -1, self.paramsimi, self.indices, wordlist = actives)
                 self.dial.CenterOnParent()
                 self.val = self.dial.ShowModal()
                 if self.val == wx.ID_OK :
@@ -122,31 +124,39 @@ class DoSimi(AnalyseMatrix):
                     self.column = [self.tableau.listactives.index(val) for val in indexes]
                     self.column.sort()
                     self.paramsimi = self.make_param()
-                    self.parametres = self.paramsimi
-                    self.parametres['type'] = 'simimatrix'
-                    if not pathout : 
-                        self.parametres['pathout'] = ConstructPathOut(self.tableau.parametre['filename'], 'SimiMatrix')
+                    self.parametres.update(self.paramsimi)
+                    #self.parametres['type'] = 'simimatrix'
+                    if not self.pathout : 
+                        self.parametres['pathout'] = ConstructPathOut(self.parametres['pathout'], 'SimiMatrix')
+                        print self.parametres['pathout']
                     else :
                         self.parametres['pathout'] = self.dirout
-                    self.parametres['filename'] = self.tableau.parametres['filename']
+                    self.pathout.createdir(self.parametres['pathout'])
+                    self.pathout.dirout = self.parametres['pathout']
+                    #self.parametres['filename'] = self.tableau.parametres['filename']
                     self.dial.Destroy()
-                    dlg = wx.ProgressDialog("Traitements",
-                                   "Veuillez patienter...",
-                                   maximum=4,
-                                   parent=self.parent,
-                                   style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME
-                                    )
-                    dlg.Center()
-                    AnalyseMatrix.__init__(self, parent, self.tableau, self.paramsimi, dlg = dlg)
+                    self.doanalyse2()  
+                    #dlg = wx.ProgressDialog("Traitements",
+                    #               "Veuillez patienter...",
+                    #               maximum=4,
+                    #               parent=self.parent,
+                    #               style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME
+                    #                )
+                    #dlg.Center()
+                    #AnalyseMatrix.__init__(self, parent, self.tableau, self.paramsimi, dlg = dlg)
                 else :
                     self.dial.Destroy()
+                    self.parametres = None
+                    return False
             else :
                 dialcol.Destroy()
+                self.parametres = None
+                return False
 
-    def doanalyse(self) :
+    def doanalyse2(self) :
         self.pathout.basefiles(simipath)
         with open(self.pathout['selected.csv'], 'w') as f :
-             f.write('\n'.join([`val` for val in self.column]))
+            f.write('\n'.join([`val` for val in self.column]))
 
         count = 1
         keepGoing = self.dlg.Update(count)
@@ -157,7 +167,7 @@ class DoSimi(AnalyseMatrix):
     #--------------------------------------------------------
         count += 1
         #if not self.fromprof :
-            #self.pathout = ConstructPathOut(self.tableau.parametre['filename'], 'Simi')
+            #self.pathout = ConstructPathOut(self.tableau.parametres['filename'], 'Simi')
             #self.DictPathOut = construct_simipath(self.pathout)
         self.tableau.dictpathout = self.pathout
         self.dlg.Update(count, u"passage en O/1")
@@ -190,35 +200,6 @@ class DoSimi(AnalyseMatrix):
             fromprof = True
         else:
             fromprof = False
-        #OpenAnalyse(self.parent, self.DictPathOut['ira'], False, simifromprof=fromprof)
-#        else :
-#            self.tableau = gparent.tableau
-#            if 'corpus' in dir(gparent) :
-#                self.Source = gparent
-#            self.tableau.parametre['mineff'] = 0
-#            self.DictPathOut = construct_simipath(os.path.abspath(os.path.dirname(filename)))
-#            self.dolayout()
-#            self.paramsimi['first'] = False
-#            self.paramsimi['coeff'] = int(param.get('simi', 'indice'))
-#            self.paramsimi['layout'] = int(param.get('simi', 'layout'))
-#            self.paramsimi['seuil_ok'] = param.getboolean('simi', 'seuil_ok')
-#            self.paramsimi['seuil'] = int(param.get('simi', 'seuil'))
-#            if param.get('simi', 'wordgraph') == 'False' :
-#                self.wordgraph = False
-#            else :
-#                self.wordgraph = param.get('simi', 'wordgraph')
-#            if 'listet' in dir(self.tableau) :
-#                self.paramsimi['stars'] = self.tableau.listet
-#                self.paramsimi['bystar'] = False
-#                self.paramsimi['cexfromchi'] = True
-#                self.paramsimi['tvprop'] = False
-#                self.paramsimi['sfromchi'] = False
-#                self.paramsimi['coeff_te'] = True
-#                self.paramsimi['coeff_tv'] = True
-#                self.paramsimi['coeff_tv_nb'] = 0
-#                self.paramsimi['label_e'] = False
-#                self.paramsimi['width'] = 1000
-#                self.paramsimi['height'] = 1000
          
 
     def make_param(self) :
@@ -266,31 +247,14 @@ class DoSimi(AnalyseMatrix):
         if 'sfromchi' in self.paramsimi :
             paramsimi['sfromchi'] = self.dial.checki.GetValue()
         if 'vlabcolor' in self.paramsimi :
-           paramsimi['vlabcolor'] = self.paramsimi['vlabcolor']
+            paramsimi['vlabcolor'] = self.paramsimi['vlabcolor']
         if 'check_bystar' in dir(self.dial) :
             paramsimi['bystar'] = self.dial.check_bystar.GetValue()
             paramsimi['stars'] = self.paramsimi['stars']
+        if 'tmpchi' in self.paramsimi :
+            paramsimi['tmpchi'] = self.paramsimi['tmpchi']
         return paramsimi
         
-#    def make_ira(self):
-#        self.tableau.save_tableau(self.DictPathOut['db'])
-#        conf = RawConfigParser()
-#        conf.read(self.DictPathOut['ira'])
-#        if not 'simi' in conf.sections() :
-#            conf.add_section('simi')
-#        date = datetime.datetime.now().ctime()
-#        if self.fromprof :
-#            conf.set('simi', 'corpus', self.Source.corpus.parametres['uuid'])
-#        conf.set('simi', 'uuid', str(uuid4()))
-#        conf.set('simi', 'date', str(date))
-#        conf.set('simi', 'indice', self.paramsimi['coeff'])
-#        conf.set('simi','layout', self.paramsimi['layout'])
-#        conf.set('simi', 'seuil_ok', self.paramsimi['seuil_ok'])
-#        conf.set('simi', 'seuil', str(self.paramsimi['seuil']))
-#        conf.set('simi', 'wordgraph', self.wordgraph)
-#        fileout = open(self.DictPathOut['ira'], 'w')
-#        conf.write(fileout)
-#        fileout.close()
 #        
     def addgraph(self) :
         if self.parametres['type_graph'] == 1:
@@ -307,14 +271,14 @@ class DoSimi(AnalyseMatrix):
             print_liste(self.DictPathOut['liste_graph'], graph_simi)
         
     def DoR(self, dlg):
-        if self.paramsimi['type'] == 1 :
+        if self.paramsimi['type_graph'] == 1 :
             graph = False
             wait = False
         else : 
             graph = True
             wait = True
-        pid = exec_rcode(self.RPath, self.tmpfile, wait = wait, graph = graph)
-        if self.paramsimi['type'] == 1 :
+        pid = exec_rcode(self.ira.RPath, self.tmpfile, wait = wait, graph = graph)
+        if self.paramsimi['type_graph'] == 1 :
             while pid.poll() == None :
                     if not self.cmd :
                         dlg.Pulse(u'R ...')

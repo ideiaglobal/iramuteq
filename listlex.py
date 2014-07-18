@@ -26,13 +26,23 @@ from operator import itemgetter
 #---------------------------------------------------------------------------
 
 class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
-    def __init__(self, parent,gparent, dlist, first, menu = True):
+    def __init__(self, parent,gparent, dlist = {}, first = [], menu = True):
     #def  __init__(self, parent) :
         wx.ListCtrl.__init__( self, parent, -1, style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_HRULES|wx.LC_VRULES)
         self.parent=parent
         self.gparent=gparent
         self.dlist=dlist
         self.first = first
+        self.tgen = False
+        if 'etoiles' in dir(self.gparent) :
+            self.etoiles = self.gparent.etoiles
+        else :
+            self.etoiles = []
+            for val in self.first :
+                if val.startswith(u'X.') :
+                    val = val.replace(u'X.', u'*')
+                self.etoiles.append(val)
+                
         self.menu = menu
 
     #def start(self) :
@@ -54,23 +64,26 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         self.attr1.SetBackgroundColour((230, 230, 230))
         self.attr2 = wx.ListItemAttr()
         self.attr2.SetBackgroundColour("light blue")
+        self.attrselected = wx.ListItemAttr()
+        self.attrselected.SetBackgroundColour("red")
+        self.selected = {}
         
         i=0
-        for name in self.first :
+        for name in [u'formes'] + self.first :
             self.InsertColumn(i,name,wx.LIST_FORMAT_LEFT)
             i+=1
             
         self.SetColumnWidth(0, 180)
 
-        for i in range(1,len(self.first)-1):
-            self.SetColumnWidth(i, self.checkcolumnwidth(len(self.first[i]) * 10))
+        for i in range(0,len(self.first)):
+            self.SetColumnWidth(i + 1, self.checkcolumnwidth(len(self.first[i]) * 10))
         
         self.itemDataMap = self.dlist
         self.itemIndexMap = self.dlist.keys()
         self.SetItemCount(len(self.dlist))
         
         #listmix.ListCtrlAutoWidthMixin.__init__(self)
-        listmix.ColumnSorterMixin.__init__(self, len(self.first))
+        listmix.ColumnSorterMixin.__init__(self, len(self.first) + 1)
         self.SortListItems(1, 0)
         
 #-----------------------------------------------------------------------------------------    
@@ -84,6 +97,11 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         self.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
 
 #-----------------------------------------------------------------------------------------    
+    def RefreshData(self, data):
+        self.itemDataMap = data
+        self.itemIndexMap = data.keys()
+        self.SetItemCount(len(data))
+        self.Refresh()
         
     def checkcolumnwidth(self, width) :
         if width < 80 :
@@ -97,11 +115,16 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         return s
 
     def OnGetItemAttr(self, item):
-        if item % 2 :
-            return self.attr1
+        if self.getColumnText(item, 0) not in self.selected :
+            if item % 2 :
+                return self.attr1
+            else :
+                return self.attr2
         else :
-            return self.attr2
-
+            return self.attrselected
+    
+    def GetItemByWord(self, word):
+        return [ val for val in self.dlist if self.dlist[val][0] == word ][0]
 
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
     def GetListCtrl(self):
@@ -120,6 +143,12 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             self.Select(item)
 
         event.Skip()
+    
+    def GetString(self, evt):
+        return self.getselectedwords()[0]
+    
+    def GetSelections(self):
+        return self.getselectedwords()
 
     def getColumnText(self, index, col):
         item = self.GetItem(index, col)
@@ -155,28 +184,31 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
                 self.popupID2 = wx.NewId()
                 self.popupID3 = wx.NewId()
                 self.popup_Tgen_glob = wx.NewId()
+                self.onmaketgen = wx.NewId()
                 self.ID_stcaract = wx.NewId()
 
                 self.Bind(wx.EVT_MENU, self.OnPopupOne, id=self.popupID1)
                 self.Bind(wx.EVT_MENU, self.OnPopupTwo, id=self.popupID2)
                 self.Bind(wx.EVT_MENU, self.OnPopupThree, id=self.popupID3)
                 self.Bind(wx.EVT_MENU, self.OnTgen_glob, id=self.popup_Tgen_glob)
+                self.Bind(wx.EVT_MENU, self.OnMakeTgen, id=self.onmaketgen)
                 #self.Bind(wx.EVT_MENU, self.onstcaract, id = self.ID_stcaract)
             # make a menu
             menu = wx.Menu()
             # add some items
             menu.Append(self.popupID1, u"Formes associées")
             menu.Append(self.popupID2, u"Concordancier")
-            menu.Append(self.popupID3, "Graphique")
+            menu.Append(self.popupID3, u"Graphique")
             menu_stcaract = wx.Menu()
             self.menuid = {}
-            for i, et in enumerate(self.first[1:]) :
+            for i, et in enumerate(self.etoiles) :
                 nid = wx.NewId()
                 self.menuid[nid] = i
                 menu_stcaract.Append(nid, et)
                 self.Bind(wx.EVT_MENU, self.onstcaract, id = nid)
             menu.AppendMenu(-1, u"Segments de texte caractéristiques", menu_stcaract)
             #menu.Append(self.popup_Tgen_glob, "Tgen global")
+            menu.Append(self.onmaketgen, "Make Tgen")
             self.PopupMenu(menu)
             menu.Destroy()
 
@@ -185,7 +217,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         last = self.GetFirstSelected()
         while self.GetNextSelected(last) != -1:
             last = self.GetNextSelected(last)
-            words.append(self.getColumnText(last, 1))
+            words.append(self.getColumnText(last, 0))
         return words
 
     def OnPopupOne(self, event):
@@ -214,9 +246,11 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         parametres = page.parametres
         paneff = self.gparent.ListPanEff
         panchi = self.gparent.ListPan
-        et = self.first[ind+1]
-        if et.startswith(u'X.') :
-            et = et.replace(u'X.', u'*')
+        #etoiles = self.gparent.etoiles
+        et = self.etoiles[ind]
+        
+        #if et.startswith(u'X.') :
+        #    et = et.replace(u'X.', u'*')
         uces = corpus.getucesfrometoile(et)
         self.la = [panchi.dlist[i][0] for i in range(0, len(panchi.dlist)) if panchi.dlist[i][ind+1] >= minind ]
         self.lchi = [panchi.dlist[i][ind+1] for i in range(0, len(panchi.dlist)) if panchi.dlist[i][ind+1] >= minind ]
@@ -240,21 +274,28 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         ntab2 = ntab2[:limite]
         nuces = [val[1] for val in ntab2]
         ucis_txt, ucestxt = doconcorde(corpus, nuces, self.la)
-        win = message(self, u"Segments de texte caractéristiques - %s" % self.first[ind], (750, 600))
-        win.html = '<html>\n' + '<br>'.join(['<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table>' % ntab2[i][0], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
-        win.HtmlPage.SetPage(win.html)
+        items = dict([[i, '<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table><br>' % ntab2[i][0], ucestxt[i]])] for i in range(0,len(ucestxt))])
+        win = message(self, items, u"Segments de texte caractéristiques - %s" % self.first[ind], (900, 600))
+        #win.html = '<html>\n' + '<br>'.join(['<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table>' % ntab2[i][0], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
+        #win.HtmlPage.SetPage(win.html)
         win.Show(True)
         
     def OnPopupTwo(self, event):
-        activenotebook = self.parent.nb.GetSelection()
-        page = self.parent.nb.GetPage(activenotebook)
+        if 'nb' in dir(self.parent) :
+            activenotebook = self.parent.nb.GetSelection()
+            page = self.parent.nb.GetPage(activenotebook)
+            corpus = page.corpus
+        else :
+            corpus = self.parent.parent.parent.corpus
         item=self.getColumnText(self.GetFirstSelected(), 0)
-        corpus = page.corpus
         uce_ok = corpus.getlemuces(item)
-        win = message(self, u"Concordancier", (750, 600))
+        ira = wx.GetApp().GetTopWindow()
         ucis_txt, ucestxt = doconcorde(corpus, uce_ok, [item])
-        win.html = ('<html>\n<h1>%s</h1>' % item) + '<br>'.join(['<br>'.join([ucis_txt[i], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
-        win.HtmlPage.SetPage(win.html)
+        items = dict([[i, '<br><br>'.join([ucis_txt[i], ucestxt[i]])] for i in range(0,len(ucestxt))])
+        win = message(ira, items, u"Concordancier - %s" % item, (800, 500))
+        #win = message(ira, u"Concordancier", (800, 500))
+        #win.html = ('<html>\n<h1>%s</h1>' % item) + '<br>'.join(['<br>'.join([ucis_txt[i], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
+        #win.HtmlPage.SetPage(win.html)
         win.Show(True)
 
     def getinf(self, txt) :
@@ -272,7 +313,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             last = self.GetNextSelected(last)
             data = self.GetItemData(last)
             datas += [data]
-        colnames = self.first[1:]
+        colnames = self.etoiles
         table = [[self.getinf(val) for val in line[1:]] for line in datas]
         rownames = [val[0] for val in datas]
         tmpgraph = tempfile.mktemp(dir=self.parent.TEMPDIR)
@@ -320,3 +361,6 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         txt = "<img src='%s'>" % tmpgraph
         win.HtmlPage.SetPage(txt)
         win.Show(True)
+    
+    def OnMakeTgen(self, evt):
+        self.parent.tree.OnTgenEditor(self.getselectedwords())

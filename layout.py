@@ -23,6 +23,7 @@ from dialog import PrefGraph, PrefExport, PrefSimpleFile, PrefDendro, SimpleDial
 from guifunct import SelectColumn, PrepSimi, PrefSimi
 from webexport import WebExport
 from corpus import Corpus
+from sheet import MySheet
 import datetime
 import sys
 import tempfile
@@ -361,7 +362,9 @@ class OpenCHDS():
             self.corpus.make_ucecl_from_R(self.pathout['uce'])
             corpname = self.corpus.parametres['corpus_name']
         else :
-            corpname = self.corpus.parametres['name']
+            corpname = self.corpus.parametres['matrix_name']
+            if os.path.exists(self.pathout['analyse.db']) :
+                self.corpus.read_tableau(self.pathout['analyse.db'])
 
         clnb = parametres['clnb']
         dlg = progressbar(self, maxi = 4 + clnb) 
@@ -629,7 +632,27 @@ class SashList(wx.Panel) :
         self.rightwin1 = rightwin1
         winids.append(rightwin1.GetId())
 
-
+class TgenLayout :
+    def __init__(self, page):
+        self.page = page
+        parametres = self.page.parametres
+        ira = wx.GetApp().GetTopWindow()
+        self.page.tgens, etoiles =  ReadList(parametres['tgenspec'], ira.syscoding, sep="\t")
+        tgentab = False
+        for i in range(page.GetPageCount()) :
+            tab = page.GetPage(i)
+            if 'tgen' in dir(tab) :
+                if tab.tgen :
+                    tgentab = tab
+                    break
+        if tgentab :
+            self.page.tgentab.RefreshData(self.page.tgens)
+            self.page.SetSelection(i)
+        else :
+            self.page.tgentab = ListForSpec(ira, None, self.page.tgens, etoiles[1:])
+            self.page.tgentab.tgen = True
+            self.page.AddPage(self.page.tgentab, u'Tgens Specificities')
+            self.page.SetSelection(self.page.GetPageCount() - 1)
 
 class dolexlayout :
     def __init__(self, ira, corpus, parametres):
@@ -649,21 +672,21 @@ class dolexlayout :
         self.DictEffType, firstefft = ReadList(self.dictpathout['tabletypem'], self.corpus.parametres['syscoding'])
         self.DictEffRelForme, firsteffrelf = ReadList(self.dictpathout['eff_relatif_forme'], self.corpus.parametres['syscoding']) 
         self.DictEffRelType, firsteffrelt = ReadList(self.dictpathout['eff_relatif_type'], self.corpus.parametres['syscoding'])    
-        
+        self.etoiles = firsteff[1:]
         #sash = SashList(ira.nb)
         
         
         self.TabStat = aui.AuiNotebook(ira.nb, -1, wx.DefaultPosition)
         self.TabStat.parametres = parametres
-        self.ListPan = ListForSpec(ira, self, self.DictSpec, first)
+        self.ListPan = ListForSpec(ira, self, self.DictSpec, self.etoiles)
         if os.path.exists(self.pathout['banalites.csv']) :
-            self.listban = ListForSpec(ira, self, self.dictban, firstban)
+            self.listban = ListForSpec(ira, self, self.dictban, ['eff'] + self.etoiles)
         #self.ListPan2 = ListForSpec(sash.rightwin1, self, self.DictSpec, first)
-        self.ListPant = ListForSpec(ira, self, self.DictType, firstt)
-        self.ListPanEff = ListForSpec(ira, self, self.DictEff, firsteff)
-        self.ListPanEffType = ListForSpec(ira, self, self.DictEffType, firstefft)
-        self.ListPanEffRelForme = ListForSpec(ira, self, self.DictEffRelForme, firsteffrelf)
-        self.ListPanEffRelType = ListForSpec(ira, self.parent, self.DictEffRelType, firsteffrelt)
+        self.ListPant = ListForSpec(ira, self, self.DictType, self.etoiles)
+        self.ListPanEff = ListForSpec(ira, self, self.DictEff, self.etoiles)
+        self.ListPanEffType = ListForSpec(ira, self, self.DictEffType, self.etoiles)
+        self.ListPanEffRelForme = ListForSpec(ira, self, self.DictEffRelForme, self.etoiles)
+        self.ListPanEffRelType = ListForSpec(ira, self.parent, self.DictEffRelType, self.etoiles)
         
         self.TabStat.AddPage(self.ListPan, u'formes') 
         if os.path.exists(self.pathout['banalites.csv']) :
@@ -682,11 +705,20 @@ class dolexlayout :
             self.tabAFCTGraph = GraphPanelAfc(self.TabAFC, self.dictpathout, list_graph, self.parametres['clnb'], itempath ='liste_graph_afct', coding=self.encoding)
             self.TabAFC.AddPage(self.tabAFCTGraph, 'AFC type')
             self.TabStat.AddPage(self.TabAFC, 'AFC')
+        
+        
+        
            
         
         ira.nb.AddPage(self.TabStat, u'Spécificités')
+        self.ira = ira
         
         self.TabStat.corpus = self.corpus
+        self.TabStat.etoiles = self.etoiles
+        if os.path.exists(os.path.join(self.parametres['pathout'], 'tgenspec.csv')) :
+            self.parametres['tgenspec'] = os.path.join(self.parametres['pathout'], 'tgenspec.csv')
+            TgenLayout(self.TabStat)
+        self.TabStat.SetSelection(0)
         ira.nb.SetSelection(self.parent.nb.GetPageCount() - 1)
         ira.ShowAPane("Tab_content")
 
@@ -798,9 +830,9 @@ class GraphPanelDendro(wx.Panel):
         self.param['type_tclasse'] = dial.m_radioBox2.GetSelection()
 
     def make_dendro(self, dendro = 'simple') :
-        while os.path.exists(os.path.join(self.dirout, 'dendrogamme_' + str(self.graphnb)+'.png')) :
+        while os.path.exists(os.path.join(self.dirout, 'dendrogramme_' + str(self.graphnb)+'.png')) :
             self.graphnb += 1
-        fileout = ffr(os.path.join(self.dirout,'dendrogamme_' + str(self.graphnb)+'.png'))
+        fileout = ffr(os.path.join(self.dirout,'dendrogramme_' + str(self.graphnb)+'.png'))
         width = self.param['width']
         height = self.param['height']
         type_dendro = self.type_dendro[self.param['type_dendro']]
@@ -891,6 +923,25 @@ class OpenCorpus :
         #self.text.write(DoConf().totext(parametres))
         ira.nb.SetSelection(ira.nb.GetPageCount() - 1)
         ira.ShowAPane("Tab_content")
+
+class MatLayout :
+    def __init__(self, ira, matrix):
+        #self.parent.content = self.csvtable
+        self.sheet = MySheet(ira.nb)
+        ira.nb.AddPage(self.sheet, matrix.parametres['matrix_name'])
+        self.sheet.Populate(matrix.csvtable)
+        self.sheet.parametres = matrix.parametres
+        #self.ira.ShowMenu(_(u"View").decode('utf8'))
+        #self.ira.ShowMenu(_(u"Matrix analysis").decode('utf8'))
+        #self.ira.ShowMenu(_(u"Text analysis").decode('utf8'), False)
+        #self.parent.type = "Data"
+        #self.parent.DataPop = False
+        ira.nb.SetSelection(ira.nb.GetPageCount() - 1)
+        ira.ShowAPane("Tab_content")
+        #self.ira.OnViewData('')
+
+      
+        
 
 class CopusPanel(wx.Panel) :
     def __init__(self, parent, parametres) :
@@ -1119,10 +1170,36 @@ class DefaultMatLayout :
         self.parent = parent
         self.tableau = tableau
         self.parametres = parametres
+        if os.path.exists(self.pathout['analyse.db']) :
+            self.tableau.read_tableau(self.pathout['analyse.db'])
         self.dolayout()
+        self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
+        self.ira.ShowAPane("Tab_content")
 
     def dolayout(self) :
         pass
+
+class FreqLayout(DefaultMatLayout) :
+    def dolayout(self) :
+        self.tab = wx.html.HtmlWindow(self.ira.nb, -1)
+        if "gtk2" in wx.PlatformInfo:
+            self.tab.SetStandardFonts()
+        self.tab.LoadPage(self.pathout['resultats.html'])
+        self.tab.parametres = self.parametres
+        self.ira.nb.AddPage(self.tab, u"Fréquences")
+
+
+class Chi2Layout(DefaultMatLayout) :
+    def dolayout(self):
+        self.tab = wx.html.HtmlWindow(self.ira.nb, -1)
+        if "gtk2" in wx.PlatformInfo:
+            self.tab.SetStandardFonts()
+        self.tab.LoadPage(self.pathout['resultats-chi2.html'])
+        self.tab.parametres = self.parametres
+        self.ira.nb.AddPage(self.tab, ' - '.join([u"Chi2", "%s" % self.parametres['name']]))
+        #self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
+        #self.ira.ShowAPane("Tab_content")  
+
 
 class ProtoLayout(DefaultMatLayout) :
     def dolayout(self) :
@@ -1137,8 +1214,8 @@ class ProtoLayout(DefaultMatLayout) :
         #self.Tab.corpus = self.corpus
         self.TabProto.parametres = self.parametres
         self.ira.nb.AddPage(self.TabProto, 'Analyse Prototypique - %s' % self.parametres['name'])
-        self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
-        self.ira.ShowAPane("Tab_content")
+        #self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
+        #self.ira.ShowAPane("Tab_content")
 
 
 class SimiMatLayout(DefaultMatLayout) :
@@ -1159,8 +1236,8 @@ class SimiMatLayout(DefaultMatLayout) :
         self.tabsimi.AddPage(self.graphpan, 'Graph')
         self.tabsimi.parametres = self.parametres
         self.parent.nb.AddPage(self.tabsimi, 'Analyse de graph')
-        self.parent.ShowTab(True)
-        self.parent.nb.SetSelection(self.parent.nb.GetPageCount() - 1)
+        #self.parent.ShowTab(True)
+        #self.parent.nb.SetSelection(self.parent.nb.GetPageCount() - 1)
 
     def redosimi(self,evt) :
         with open(self.pathout['selected.csv'],'r') as f :

@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
 #Copyright (c) 2008 Pierre Ratinaud
-#Lisense: GNU/GPL
+#License: GNU/GPL
 
 import wx
 import os
-#from rchdng import RchdFunct
 from chemins import ffr, ConstructPathOut,ChdTxtPathOut
-#from layout import PrintRapport
-#from openanalyse import OpenAnalyse
-from ConfigParser import ConfigParser
 from functions import CreateIraFile, print_liste, exec_rcode, check_Rresult
-from dialog import CHDDialog, PrefQuestAlc, ClusterNbDialog
+from dialog import PrefQuestAlc, ClusterNbDialog
 import tempfile
 import time
 
@@ -51,9 +47,9 @@ def RchdFunct(self,parent, rep_out, CLASSIF, encode, RscriptsPath):
         time.sleep(0.2)
     check_Rresult(parent, pid)
     
-    file=open(fileout,'rU')
-    lcl=file.readlines()
-    file.close()
+    f=open(fileout,'rU')
+    lcl=f.readlines()
+    f.close()
     ListClasseOk=[line.replace('\n','').replace('"','') for line in lcl]
     ListClasseOk.pop(0)
 
@@ -171,9 +167,9 @@ def RchdFunct(self,parent, rep_out, CLASSIF, encode, RscriptsPath):
     txt += """
     PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col = TRUE, what='crl')
     """ % (rep_out['AFC2DCoulCl'])
-    file=open(Rtmp,'w')
-    file.write(txt)
-    file.close()
+    f=open(Rtmp,'w')
+    f.write(txt)
+    f.close()
     pid = exec_rcode(parent.RPath, Rtmp, wait = False)
     while pid.poll() == None :
         time.sleep(0.2)

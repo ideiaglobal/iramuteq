@@ -48,17 +48,17 @@ from tabsimi import DoSimi
 from tabrsimple import InputText
 from tabverges import Prototypical
 #from textafcuci import AfcUci
-from analysetxt import Alceste
 from textdist import AnalysePam
 from textstat import Stat
 from textaslexico import Lexico
 from textsimi import SimiTxt, SimiFromCluster
 from textwordcloud import WordCloud, ClusterCloud
+from textreinert import Reinert
 #from profile_segment import ProfileSegment
 #from textcheckcorpus import checkcorpus
 from openanalyse import OpenAnalyse
-from corpus import Builder
-from sheet import MySheet
+from corpus import Builder, SubBuilder
+#from sheet import MySheet
 from checkinstall import CreateIraDirectory, CheckRPath, FindRPAthWin32, FindRPathNix, CheckRPackages, IsNew, UpgradeConf, CopyConf, RLibsAreInstalled
 from chemins import RscriptsPath, ConstructConfigPath, ConstructDicoPath, ConstructGlobalPath, PathOut
 from parse_factiva_xml import ImportFactiva
@@ -74,11 +74,11 @@ ID_Freq = wx.NewId()
 ID_Chi2 = wx.NewId()
 ID_Student = wx.NewId()
 ID_CHDSIM = wx.NewId()
-ID_CHDAlceste = wx.NewId()
+ID_CHDReinert = wx.NewId()
 ID_TEXTAFCM = wx.NewId()
 ID_TEXTSTAT = wx.NewId()
 ID_ASLEX = wx.NewId()
-ID_TEXTALCESTE = wx.NewId()
+ID_TEXTREINERT = wx.NewId()
 ID_TEXTPAM = wx.NewId()
 ID_CHECKCORPUS = wx.NewId()
 ID_Tabcontent = wx.NewId()
@@ -216,16 +216,19 @@ class IraFrame(wx.Frame):
         menuTools = wx.Menu()
         splitvar = wx.MenuItem(menuTools, wx.ID_ANY, _(u"Split from variable").decode('utf8'))
         extractmod = wx.MenuItem(menuTools, wx.ID_ANY, _(u"Extract mods").decode('utf8'))
+        extractthem = wx.MenuItem(menuTools, wx.ID_ANY, _(u"Extract thematics").decode('utf8'))
         menuTools.AppendItem(splitvar)
         menuTools.AppendItem(extractmod)
+        menuTools.AppendItem(extractthem)
         self.ID_splitvar = splitvar.GetId()
         self.ID_extractmod = extractmod.GetId()
+        self.ID_extractthem = extractthem.GetId()
         file_menu.AppendMenu(-1, _(u"Tools"), menuTools)
 
                
-        item = wx.MenuItem(file_menu, ID_SaveTab, _(u"Save tab as...").decode('utf8'), _(u"Save tab as...").decode('utf8'))
-        item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_SAVE_AS))
-        file_menu.AppendItem(item)
+        #item = wx.MenuItem(file_menu, ID_SaveTab, _(u"Save tab as...").decode('utf8'), _(u"Save tab as...").decode('utf8'))
+        #item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_SAVE_AS))
+        #file_menu.AppendItem(item)
         
         file_menu.Append(wx.ID_EXIT, _(u"Exit").decode('utf8'))
         
@@ -243,7 +246,7 @@ class IraFrame(wx.Frame):
         analyse_menu.Append(ID_Chi2, _(u"Chi2").decode('utf8'))
         #analyse_menu.Append(ID_Student, u"t de Student")
         menu_classif = wx.Menu()
-        menu_classif.Append(ID_CHDAlceste, _(u"Reinert Method").decode('utf8'))
+        menu_classif.Append(ID_CHDReinert, _(u"Reinert's Method").decode('utf8'))
         #menu_classif.Append(ID_CHDSIM, u"Par matrice des distances")
         analyse_menu.AppendMenu(-1, _(u"Clustering").decode('utf8'), menu_classif)
         #analyse_menu.Append(ID_AFCM, u"AFCM")
@@ -258,7 +261,7 @@ class IraFrame(wx.Frame):
         text_menu.Append(ID_ASLEX, _(u"Specificities and CA").decode('utf8'))
         #text_menu.Append(ID_TEXTAFCM, u"AFC sur UCI / Vocabulaire")
         menu_classiftxt = wx.Menu()
-        menu_classiftxt.Append(ID_TEXTALCESTE, _(u"Reinert Method").decode('utf8'))
+        menu_classiftxt.Append(ID_TEXTREINERT, _(u"Reinert's Method").decode('utf8'))
         #menu_classiftxt.Append(ID_TEXTPAM, u"Par matrice des distances")
         text_menu.AppendMenu(-1, _(u"Clustering").decode('utf8'), menu_classiftxt)
         text_menu.Append(ID_SimiTxt, _(u"Similarities Analysis").decode('utf8')) 
@@ -333,9 +336,9 @@ class IraFrame(wx.Frame):
         self._mgr.AddPane(self.nb, aui.AuiPaneInfo().
                               Name("Tab_content").
                               CenterPane())        
-        self.Sheet = MySheet(self)
+        
         #self._mgr.AddPane(self.Sheet, wx.aui.AuiPaneInfo().Name("Data").CenterPane())
-        self._mgr.AddPane(self.Sheet, aui.AuiPaneInfo().Name("Data").CenterPane())
+        #self._mgr.AddPane(self.Sheet, aui.AuiPaneInfo().Name("Data").CenterPane())
         self.nb.Bind(aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self.OnCloseTab)
         self.nb.Bind(aui.EVT_AUINOTEBOOK_PAGE_CHANGED, self.OnPageChanged)
         # add the toolbars to the manager
@@ -368,11 +371,12 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.import_factiva_txt, fact_from_txt)
         self.Bind(wx.EVT_MENU, self.ExtractTools, splitvar)
         self.Bind(wx.EVT_MENU, self.ExtractTools, extractmod)
+        self.Bind(wx.EVT_MENU, self.ExtractTools, extractthem)
         self.Bind(wx.EVT_MENU, self.OnFreq, id=ID_Freq)
         self.Bind(wx.EVT_MENU, self.OnChi2, id=ID_Chi2)
         self.Bind(wx.EVT_MENU, self.OnStudent, id=ID_Student)
         self.Bind(wx.EVT_MENU, self.OnCHDSIM, id=ID_CHDSIM)
-        self.Bind(wx.EVT_MENU, self.OnCHDAlceste, id=ID_CHDAlceste)
+        self.Bind(wx.EVT_MENU, self.OnCHDReinert, id=ID_CHDReinert)
         self.Bind(wx.EVT_MENU, self.OnAFCM, id=ID_AFCM)
         self.Bind(wx.EVT_MENU, self.OnProto, id=ID_proto)
         self.Bind(wx.EVT_MENU, self.OnRCode, id=ID_RCODE)
@@ -380,13 +384,13 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnTextStat, id=ID_TEXTSTAT)
         self.Bind(wx.EVT_MENU, self.OnTextSpec, id=ID_ASLEX)
         self.Bind(wx.EVT_MENU, self.OnTextAfcm, id=ID_TEXTAFCM)
-        self.Bind(wx.EVT_MENU, self.OnTextAlceste, id=ID_TEXTALCESTE)
+        self.Bind(wx.EVT_MENU, self.OnTextReinert, id=ID_TEXTREINERT)
         self.Bind(wx.EVT_MENU, self.OnPamSimple, id=ID_TEXTPAM)
         self.Bind(wx.EVT_MENU, self.OnSimiTxt, id=ID_SimiTxt)
         self.Bind(wx.EVT_MENU, self.OnWordCloud, id=ID_WC)
-        self.Bind(wx.EVT_MENU, self.OnSimi, id=ID_SIMI)
+        self.Bind(wx.EVT_MENU, self.OnSimiTab, id=ID_SIMI)
         self.Bind(wx.EVT_MENU, self.OnExit, id=wx.ID_EXIT)
-        self.Bind(wx.EVT_MENU, self.OnSaveTabAs, id=ID_SaveTab)
+        #self.Bind(wx.EVT_MENU, self.OnSaveTabAs, id=ID_SaveTab)
         self.Bind(wx.EVT_MENU, self.OnAbout, id=wx.ID_ABOUT)
         self.Bind(wx.EVT_MENU, self.OnHelp, id=wx.ID_HELP)
         self.Bind(wx.EVT_MENU, self.OnPref, id=wx.ID_PREFERENCES)
@@ -577,11 +581,14 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
     def OnOpenData(self, event):
         inputname, self.input_path = OnOpen(self, "Data")
         if inputname:
-            self.filename = self.input_path[0]
+            #filename = self.input_path[0]
             self.tableau = Tableau(self,os.path.abspath(self.input_path[0]))
-            get_table_param(self, self.input_path[0])
-            self.tableau.make_content()
-            self.tableau.show_tab()
+            val = get_table_param(self, self.input_path[0])
+            if val == wx.ID_OK :
+                self.tableau.make_content()
+                OpenAnalyse(self, self.tableau.parametres)
+                self.tree.OnItemAppend(self.tableau.parametres)
+                #self.tableau.show_tab()
 
     def OnOpenAnalyse(self, event):
         self.AnalysePath = OnOpen(self, "Analyse")
@@ -612,7 +619,18 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
                 self.DataPop = False
             self.ShowAPane(u"Text")
         self._mgr.Update()
-        
+    
+    def OnSubText(self, corpus, parametres = None):
+        busy = wx.BusyInfo(_("Please wait...").decode('utf8'), self)
+        wx.SafeYield()
+        builder = SubBuilder(self, corpus, parametres)
+        del busy
+        if builder.res == wx.ID_OK :
+            corpus = builder.doanalyse()
+            self.history.add(corpus.parametres)
+            self.tree.OnItemAppend(corpus.parametres)
+            OpenAnalyse(self, corpus.parametres)
+            
     def OpenText(self):
         dlg = wx.ProgressDialog("Ouverture...",
                                    "Veuillez patienter...",
@@ -695,6 +713,12 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             npage = self.nb.GetPage(new)
             if 'parametres' in dir(npage) :
                 self.tree.GiveFocus(uuid=npage.parametres['uuid'])
+                if npage.parametres.get('matrix', False) :
+                    self.ShowMenu(_(u"Text analysis").decode('utf8'), False)
+                    self.ShowMenu(_(u"Matrix analysis").decode('utf8'), True)
+                elif npage.parametres.get('corpus', False) :
+                    self.ShowMenu(_(u"Text analysis").decode('utf8'))
+                    self.ShowMenu(_(u"Matrix analysis").decode('utf8'), False)
 
     def OnCloseTab(self, evt):
         #log.info('Closing tab %s' % str(evt.GetEventObject()))
@@ -708,40 +732,40 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             self.history.rmtab(page.parametres)
             self.tree.CloseItem(uuid = page.parametres['uuid'])
         TabTitle = self.nb.GetPageText(self.nb.GetSelection())
-        if self.DictTab != {} :
-            if TabTitle in self.DictTab :
-                ListFile=self.DictTab[TabTitle]
-                if False in ListFile:
-                    msg = u"""
-Certains résultats ne sont pas enregistrer.
-Voulez-vous fermer quand même ?"""
-                    dlg = wx.MessageDialog(self, msg, "Sauvegarde",wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
-
-                    dlg.CenterOnParent()
-                    if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
-                        remove = False
-                        evt.Veto()
-                        dlg.Destroy()
-                    else :
-                        for f in ListFile[1:] :
-                            print 'remove', f
-                            os.remove(f)
-                            remove = True
-                        dlg.Destroy()
-                elif True in ListFile :
-                    remove = True
-                if remove:
-                    del self.DictTab[TabTitle]
-            else : 
-                self.LastTabClose()
-        else :
-            remove = True
-        if self.nb.GetPageCount() == 1 and remove and not notebook :
+#         if self.DictTab != {} :
+#             if TabTitle in self.DictTab :
+#                 ListFile=self.DictTab[TabTitle]
+#                 if False in ListFile:
+#                     msg = u"""
+# Certains résultats ne sont pas enregistrer.
+# Voulez-vous fermer quand même ?"""
+#                     dlg = wx.MessageDialog(self, msg, "Sauvegarde",wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+# 
+#                     dlg.CenterOnParent()
+#                     if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
+#                         remove = False
+#                         evt.Veto()
+#                         dlg.Destroy()
+#                     else :
+#                         for f in ListFile[1:] :
+#                             print 'remove', f
+#                             os.remove(f)
+#                             remove = True
+#                         dlg.Destroy()
+#                 elif True in ListFile :
+#                     remove = True
+#                 if remove:
+#                     del self.DictTab[TabTitle]
+#             else : 
+#                 self.LastTabClose()
+#        else :
+#            remove = True
+        if self.nb.GetPageCount() == 1 and not notebook :
             self.LastTabClose()
     
     def LastTabClose(self) :
         if self.nb.GetPageCount() == 1 :
-            self.DisEnSaveTabAs(False)
+            #self.DisEnSaveTabAs(False)
             if self.DataTxt :
                 self.ShowAPane("Text")
             elif self.DataPop :
@@ -749,39 +773,39 @@ Voulez-vous fermer quand même ?"""
             else :
                 self.ShowAPane("Intro_Text")
 
-    def OnSaveTabAs(self, event):
-        SelectTab = self.nb.GetSelection()
-        TabTitle = self.nb.GetPageText(SelectTab)
-        FileToSave = self.DictTab[TabTitle]
-        NewListFile = []
-        dlg = wx.FileDialog(
-            self, message="Enregistrer sous...", defaultDir=os.getcwd(),
-            defaultFile="resultat.html", wildcard="Tous les fichiers|*", style=wx.SAVE | wx.OVERWRITE_PROMPT
-            )
-        dlg.SetFilterIndex(2)
-        dlg.CenterOnParent()
-        
-        if dlg.ShowModal() == wx.ID_OK:
-            Path = dlg.GetPath()
-            Dirname = os.path.dirname(Path)
-            Filename = dlg.GetFilename()
-        else :
-            Path = False
-        dlg.Destroy()
-        if Path:
-            shutil.copyfile(FileToSave[-1], Path)
-            os.remove(FileToSave[len(FileToSave) - 1])
-            NewListFile.append(True)
-            NewListFile.append(Path)
-            for f in FileToSave[1:-1] :
-                Fileout = os.path.join(Dirname, os.path.basename(f))
-                shutil.copyfile(f, Fileout)
-                NewListFile.append(Fileout)
-                os.remove(f)
-            TabText = Filename
-            self.DictTab[TabText] = NewListFile
-            del self.DictTab[TabTitle]
-            self.nb.SetPageText(SelectTab, TabText)
+#     def OnSaveTabAs(self, event):
+#         SelectTab = self.nb.GetSelection()
+#         TabTitle = self.nb.GetPageText(SelectTab)
+#         FileToSave = self.DictTab[TabTitle]
+#         NewListFile = []
+#         dlg = wx.FileDialog(
+#             self, message="Enregistrer sous...", defaultDir=os.getcwd(),
+#             defaultFile="resultat.html", wildcard="Tous les fichiers|*", style=wx.SAVE | wx.OVERWRITE_PROMPT
+#             )
+#         dlg.SetFilterIndex(2)
+#         dlg.CenterOnParent()
+#         
+#         if dlg.ShowModal() == wx.ID_OK:
+#             Path = dlg.GetPath()
+#             Dirname = os.path.dirname(Path)
+#             Filename = dlg.GetFilename()
+#         else :
+#             Path = False
+#         dlg.Destroy()
+#         if Path:
+#             shutil.copyfile(FileToSave[-1], Path)
+#             os.remove(FileToSave[len(FileToSave) - 1])
+#             NewListFile.append(True)
+#             NewListFile.append(Path)
+#             for f in FileToSave[1:-1] :
+#                 Fileout = os.path.join(Dirname, os.path.basename(f))
+#                 shutil.copyfile(f, Fileout)
+#                 NewListFile.append(Fileout)
+#                 os.remove(f)
+#             TabText = Filename
+#             self.DictTab[TabText] = NewListFile
+#             del self.DictTab[TabTitle]
+#             self.nb.SetPageText(SelectTab, TabText)
 
     def GetStartPosition(self):
 
@@ -815,20 +839,42 @@ Voulez-vous fermer quand même ?"""
 ################################################################
 #debut des analyses
 ################################################################
+    def analyse_matrix(self, evt, analyse, analyse_type = '', matrix = None, dlgnb = 1):
+        if matrix is None :
+            matrix = self.tree.getmatrix()
+        #try :
+        analyse(self, matrix, parametres = {'type' : analyse_type}, dlg = progressbar(self, dlgnb))
+        #except:
+        #    BugReport(self)           
 
-    def OnFreq(self, event):
+    def OnFreq(self, event, matrix = None):
+        self.analyse_matrix(event, Frequences, analyse_type = 'freq', matrix = matrix, dlgnb = 3)
+        #if matrix is None :
+        #    matrix = self.tree.getmatrix()
+        #try:
+        #    Frequences(self, matrix, parametres = {'type' : 'freq'}, dlg = progressbar(self, 3)) 
+        #except:
+        #    BugReport(self)
+
+    def OnChi2(self, event, matrix = None):
+        #try:
+        self.analyse_matrix(event, ChiSquare, matrix = matrix, analyse_type = 'chi2', dlgnb = 3) 
+        #except:
+        #    BugReport(self)
+
+    def OnSimiTab(self, event, matrix = None):
+        if matrix is None :
+            matrix = self.tree.getmatrix()
         try:
-            Frequences(self) 
+            DoSimi(self, matrix, parametres = {'type' : 'simimatrix'}, dlg = progressbar(self, 3)) 
         except:
             BugReport(self)
+
+    def OnCHDReinert(self, event, matrix = None):
+        if matrix is None :
+            matrix = self.tree.getmatrix()
+        AnalyseQuest(self, matrix, parametres = {'type' : 'reinertmatrix'}, dlg = progressbar(self, 3))
             
-    def OnChi2(self, event):
-        try:
-        #    print('PAS DE DEBUG SUR CHI2')
-            chi = ChiSquare(self)
-        except:
-            BugReport(self)
-    
     def OnStudent(self, event):
         try:
             MakeStudent(self) 
@@ -850,14 +896,14 @@ Voulez-vous fermer quand même ?"""
         except:
             BugReport(self)
  
-    def OnCHDAlceste(self, event):
-        try:
-         #   print('PLUS DE BUG SUR ALCESTE QUESTIONNAIRE')
-            self.quest = AnalyseQuest(self)
-            if self.quest.val == wx.ID_OK:
-                PlaySound(self)
-        except:
-            BugReport(self)
+#     def OnCHDReinert(self, event):
+#         try:
+#          #   print('PLUS DE BUG SUR ALCESTE QUESTIONNAIRE')
+#             self.quest = AnalyseQuest(self)
+#             if self.quest.val == wx.ID_OK:
+#                 PlaySound(self)
+#         except:
+#             BugReport(self)
     
     def OnProto(self, evt) :
         Prototypical(self, {'type' : 'proto'})
@@ -953,16 +999,18 @@ Voulez-vous fermer quand même ?"""
         ID = evt.GetId()
         if ID == self.ID_splitvar :
             Extract(self, 'splitvar')
-        else :
+        elif ID == self.ID_extractmod :
             Extract(self, 'mods')
+        elif ID == self.ID_extractthem :
+            Extract(self, 'them')
 
-    def OnTextAlceste(self, event, corpus = None):
+    def OnTextReinert(self, event, corpus = None):
         try:
             #print('ATTENTION : PLUS DE BUG SUR ALCESTE')
             #RunAnalyse(self, corpus, Alceste, OptAlceste)
             if corpus is None :
                 corpus = self.tree.getcorpus()            
-            self.Text = Alceste(self, corpus, parametres = {'type': 'alceste'}, dlg = progressbar(self,6))
+            self.Text = Reinert(self, corpus, parametres = {'type': 'alceste'}, dlg = progressbar(self,6))
             if self.Text.val == wx.ID_OK:
                 PlaySound(self)
         except:
@@ -979,18 +1027,18 @@ Voulez-vous fermer quand même ?"""
             BugReport(self)
 
     def SimiCluster(self, parametres = {}, fromprof = False, pathout = '', listactives = [], actives = [], tableau = None) :
-        DoSimi(self, param = parametres, fromprof =  fromprof, pathout = pathout, listactives = listactives, actives = actives, tableau = tableau)
+        DoSimi(self, param = parametres, fromprof =  fromprof, listactives = listactives, actives = actives, tableau = tableau)
     
-    def OnSimi(self,evt):
-        try :
+#    def OnSimi(self,evt):
+#        try :
             #print 'ATTENTION !!!! VERGES'
             #print 'PLUS DE BUG SUR SIMI'
-            self.res = DoSimi(self, param = None)
+#            self.res = DoSimi(self, param = None)
             #self.res = Verges(self)
-            if self.res.val == wx.ID_OK :
-                PlaySound(self)
-        except :
-            BugReport(self)
+#            if self.res.val == wx.ID_OK :
+#                PlaySound(self)
+#        except :
+#            BugReport(self)
 #################################################################
 
     def OnHelp(self, event):

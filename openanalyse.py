@@ -5,13 +5,13 @@
 #License: GNU/GPL
 
 from chemins import ChdTxtPathOut, StatTxtPathOut, PathOut
-from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout, SimiMatLayout, ProtoLayout
+from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout, SimiMatLayout, ProtoLayout, MatLayout, FreqLayout, Chi2Layout
 from corpus import Corpus, copycorpus
 from tableau import Tableau
 import os
 #import shelve
 #from tabsimi import DoSimi
-from functions import DoConf
+from functions import DoConf, ReadDicoAsDico
 from tableau import Tableau
 import logging
 
@@ -31,36 +31,46 @@ class OpenAnalyse():
         
         if self.conf['type'] == 'corpus' :
             corpus = self.opencorpus()
+        elif self.conf['type'] == 'matrix' :
+            matrix = self.openmatrix()
         elif self.conf.get('corpus', False) in self.parent.history.corpus :
             if self.conf['uuid'] in self.parent.history.analyses :
                 intree  = True
             else :
                 intree = False
             corpus = self.openanalyse()
+            
             if self.conf.get('lem',1) :
-                corpus.make_lems(True)
+                dolem = True
             else :
-                corpus.make_lems(False)
+                dolem = False
+            if self.conf.get('dictionary', False) :
+                dico = ReadDicoAsDico(self.conf['dictionary'])
+                corpus.make_lems_from_dict(dico, dolem = dolem)
+            else :
+                corpus.make_lems(lem = dolem)
             if not intree :
                 self.parent.tree.AddAnalyse(self.conf, bold = True)
             else :
                 self.parent.tree.GiveFocus(uuid = self.conf['uuid'], bold = True)
             self.doopen(corpus)
-        else :
+        elif self.conf.get('matrix', False) in self.parent.history.ordermatrix :
             corpus = None
-            if isinstance(parametres, dict) :
-                tableau = Tableau(parent, parametres['ira'])
-            else :
-                tableau = Tableau(parent, parametres)
-            tableau.parametres = self.conf 
-            tableau.dictpathout = PathOut(filename = tableau.parametres['filename'], dirout = self.conf['pathout'], analyse_type = self.conf['type'])
-            tableau.dictpathout.basefiles(ChdTxtPathOut)
-            tableau.read_tableau(tableau.dictpathout['db'])
-            if self.parent.tree.IsInTree(uuid = self.conf['uuid']) :
-                self.parent.tree.GiveFocus(uuid = self.conf['uuid'], bold = True)
-            else :
-                self.parent.tree.AddAnalyse(self.conf, bold = True)
-            self.doopen(tableau)
+            matrix = Tableau(self.parent, parametres = self.parent.history.matrix[self.parent.history.ordermatrix[self.conf['matrix']]])
+            matrix.open()
+            #if isinstance(parametres, dict) :
+            #    tableau = Tableau(parent, parametres['ira'])
+            #else :
+            #    tableau = Tableau(parent, parametres)
+            #tableau.parametres = self.conf 
+            #tableau.dictpathout = PathOut(filename = tableau.parametres['filename'], dirout = self.conf['pathout'], analyse_type = self.conf['type'])
+            #tableau.dictpathout.basefiles(ChdTxtPathOut)
+            #tableau.read_tableau(tableau.dictpathout['db'])
+            #if self.parent.tree.IsInTree(uuid = self.conf['uuid']) :
+            self.parent.tree.GiveFocus(uuid = self.conf['uuid'], bold = True)
+            self.doopen(matrix)
+        else :
+            self.parent.tree.AddAnalyse(self.conf, bold = True)
         self.parent.history.addtab(self.conf)
     
     def redopath(self, conf, path) :
@@ -87,6 +97,25 @@ class OpenAnalyse():
             self.parent.history.openedcorpus[self.conf['uuid']] = corpus
             self.opencorpus_analyses()
             self.doopen(corpus)
+    
+    def openmatrix(self):
+        log.info('open matrix')
+        if self.conf['uuid'] not in self.parent.history.ordermatrix :
+            self.parent.history.addMatrix(self.conf)
+            log.info('add matrix to history')
+            self.parent.tree.OnItemAppend(self.conf)
+        if self.conf['uuid'] in self.parent.history.openedmatrix :
+            log.info('matrix is already opened')
+            self.doopen(self.parent.history.openedmatrix[self.conf['uuid']])
+        else :
+            #dial = progressbar(2)
+            #dial.Update(1, 'Ouverture du corpus')
+            matrix = Tableau(self, parametres = self.conf)
+            matrix.open()
+            self.parent.history.openedmatrix[self.conf['uuid']] = matrix
+            self.openmatrix_analyses()
+            self.doopen(matrix)        
+            self.parent.history.addtab(self.conf)
 
     def opencorpus_analyses(self) :
         log.info('open analysis')
@@ -103,6 +132,9 @@ class OpenAnalyse():
             self.parent.history.addmultiple(analyses)
         for analyse in analyses :
             self.parent.tree.AddAnalyse(analyse, bold = False)
+    
+    def openmatrix_analyses(self):
+        pass
 
     def openanalyse(self) :
         if self.conf['corpus'] in self.parent.history.openedcorpus :
@@ -134,7 +166,7 @@ class OpenAnalyse():
         elif self.conf['type'] == 'wordcloud' or self.conf['type'] == 'clustercloud':
             self.parent.ShowMenu(_("Text analysis"))
             WordCloudLayout(self.parent, corpus, self.conf)
-        elif self.conf['type'] == 'gnepamatrix' :
+        elif self.conf['type'] == 'reinertmatrix' :
             #self.parent.ShowMenu(_("Spreadsheet analysis"))
             OpenCHDS(self.parent,  corpus, self.conf, Alceste = False)
         elif self.conf['type'] == 'simimatrix' :
@@ -142,4 +174,10 @@ class OpenAnalyse():
             SimiMatLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'proto' :
             ProtoLayout(self.parent, corpus, self.conf)
+        elif self.conf['type'] == 'matrix' :
+            MatLayout(self.parent, corpus)
+        elif self.conf['type'] == 'freq' :
+            FreqLayout(self.parent, corpus, self.conf)
+        elif self.conf['type'] == 'chi2' :
+            Chi2Layout(self.parent, corpus, self.conf)
         
