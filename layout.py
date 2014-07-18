@@ -469,7 +469,7 @@ class OpenCHDS():
             
             if os.path.exists(self.DictPathOut['afc_facteur']) :
                 dictrow, first = ReadList(self.DictPathOut['afc_facteur'], self.encoding)
-                self.TabAFC_facteur = ListForSpec(self.parent, parametres, dictrow, first)
+                self.TabAFC_facteur = ListForSpec(self.parent, parametres, dictrow, first[1:])
                 #dictrow, first = ReadList(self.DictPathOut['afc_row'], self.encoding)
                 #self.TabAFC_ligne = ListForSpec(self.parent, self.parametres, dictrow, first)
                 #dictrow, first = ReadList(self.DictPathOut['afc_col'], self.encoding)

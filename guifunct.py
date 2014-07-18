@@ -115,7 +115,7 @@ class SelectColumn :
         self.ira = parent
         if dlg :
             dial = dialog.SelectColDial(self.ira)
-            listcol = ListForSpec(dial, self, dictcol, ['forme', 'eff'])
+            listcol = ListForSpec(dial, self, dictcol, ['eff'])
             dial.bSizer2.Add( listcol, 2, wx.ALL|wx.EXPAND, 5 )
             dial.m_sdbSizer2.AddButton( dial.m_sdbSizer2OK )
             dial.m_sdbSizer2.AddButton( dial.butok)
@@ -167,7 +167,7 @@ class PrefSimi ( wx.Dialog ):
         
         bSizer16 = wx.BoxSizer( wx.HORIZONTAL )
         if wordlist is not None :
-            self.listcol = ListForSpec(self, self, wordlist, ['forme', 'eff'])
+            self.listcol = ListForSpec(self, self, wordlist, ['eff'])
             self.listcol.SetMinSize( wx.Size( 270,-1 ) )
             bSizer16.Add( self.listcol, 0, wx.ALL|wx.EXPAND, 5 )
             if selected is None :

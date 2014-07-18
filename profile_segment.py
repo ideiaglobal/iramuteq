@@ -146,7 +146,7 @@ class ProfilType() :
                 prof_seg_nb.AddPage(ntab, 'classe %i' % (i + 1))
         else :
             self.DictSpec, first = ReadList(self.outprof)
-            self.ListPan = ListForSpec(self.parent, self, self.DictSpec, first)
+            self.ListPan = ListForSpec(self.parent, self, self.DictSpec, first[1:])
             prof_seg_nb.AddPage(self.ListPan, u'Spécificités')
 
         page.AddPage(prof_seg_nb, u'Profils des types')

@@ -795,7 +795,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 class wliste(wx.Frame):
     def __init__(self, parent, id, title, d, fline, size=(600, 500)):
         wx.Frame.__init__(self, parent, id)
-        self.liste = ListForSpec(self, parent, d, fline, menu = False)
+        self.liste = ListForSpec(self, parent, d, fline[1:], menu = False)
         self.button_1 = wx.Button(self, -1, "Fermer")
         self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)

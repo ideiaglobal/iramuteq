@@ -108,7 +108,7 @@ class AfcUci():
         #self.TabAfcSplit.SetPage(txtafcsplit)
         
         dictrow, first = ReadList(self.corpus.dictpathout['afc_row'])
-        panel_list = ListForSpec(parent, self, dictrow, first)
+        panel_list = ListForSpec(parent, self, dictrow, first[1:])
 
         
         
