@@ -22,6 +22,12 @@ def istext(line) :
     else :
         return False
 
+def isthem(line):
+    if line.startswith(u'-*') :
+        return True
+    else :
+        return False
+
 def testvar(line, variable) :
     line = line.split()
     varmod = [val.split('_') for val in line[1:]]
@@ -48,8 +54,10 @@ class Extract :
             parametres = dial.make_param()
             if option == 'splitvar' :
                 SplitFromVar(parametres)
-            else :
+            elif option == 'mods' :
                 ExtractMods(parametres)
+            elif option == 'them' :
+                SplitFromThem(parametres)
         dial.Destroy()
         dial = wx.MessageDialog(parent, 'Done !', style = wx.OK)
         dial.ShowModal()
@@ -83,6 +91,43 @@ class SplitFromVar :
                     fileout.write(line.encode(self.encodeout))
         for f in filedict :
             filedict[f].close()
+
+class SplitFromThem :
+    def __init__(self, parametres) :
+        self.filein = parametres['filein']
+        self.them = parametres['them']
+        self.encodein = parametres['encodein']
+        self.encodeout = parametres['encodeout']
+        self.basepath = os.path.dirname(self.filein)
+        self.pathout = os.path.join(self.basepath, '_'.join([them.replace(u'-*','') for them in self.them]))
+        self.fileout = open(self.pathout, 'w')
+        self.doparse()
+        self.fileout.close()
+    
+    def doparse(self):
+        text = ''
+        keepline = False
+        lastet = ''
+        with codecs.open(self.filein, 'r', self.encodein) as fin :
+            for line in fin :
+                if istext(line) :
+                    self.writetext(self.fileout, lastet, text)
+                    text = ''
+                    lastet = line
+                if isthem(line) :
+                    l = line.strip().rstrip('\n\r')
+                    if l in self.them :
+                        keepline = True
+                    else :
+                        keepline = False
+                if keepline :
+                    text += line
+            self.writetext(self.fileout, lastet, text)
+    
+    def writetext(self, fileout, lastet, text):
+        if text != '' :
+            self.fileout.write(lastet.encode(self.encodeout) + text.encode(self.encodeout))
+            
 
 class ExtractMods :
     def __init__(self, parametres) :
