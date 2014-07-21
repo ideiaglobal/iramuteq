@@ -240,7 +240,6 @@ class IraFrame(wx.Frame):
         view_menu.Append(ID_VIEWDATA, _(u"Show data").decode('utf8'))
         view_menu.Append(ID_RESULT, _(u'Show results').decode('utf8'))
         #view_menu.AppendSeparator()
-
         analyse_menu = wx.Menu()
         analyse_menu.Append(ID_Freq, _(u"Frequencies").decode('utf8'))
         analyse_menu.Append(ID_Chi2, _(u"Chi2").decode('utf8'))
@@ -251,10 +250,11 @@ class IraFrame(wx.Frame):
         analyse_menu.AppendMenu(-1, _(u"Clustering").decode('utf8'), menu_classif)
         #analyse_menu.Append(ID_AFCM, u"AFCM")
         analyse_menu.Append(ID_SIMI, _(u"Similarities Analysis").decode('utf8'))
-        analyse_menu.Append(ID_proto, _(u"Prototypical analysis").decode('utf8'))
+        analyse_menu.Append(ID_proto, _(u"Prototypical Analysis").decode('utf8'))
         ID_RCODE = wx.NewId()
-        analyse_menu.Append(ID_RCODE, u"Code R...")
-
+        analyse_menu.Append(ID_RCODE, u"Code R...") 
+        self.analyse_menu = analyse_menu
+        
         text_menu = wx.Menu()
         #text_menu.Append(ID_CHECKCORPUS, u"Vérifier le corpus")
         text_menu.Append(ID_TEXTSTAT, _(u"Statistics").decode('utf8'))
@@ -267,15 +267,16 @@ class IraFrame(wx.Frame):
         text_menu.Append(ID_SimiTxt, _(u"Similarities Analysis").decode('utf8')) 
         ID_WC = wx.NewId()
         text_menu.Append(ID_WC, _(u"WordCloud").decode('utf8'))
+        self.text_menu = text_menu
         
         help_menu = wx.Menu()
         help_menu.Append(wx.ID_ABOUT, _(u"About...").decode('utf8'))
-        help_menu.Append(wx.ID_HELP, _(u"Inline help...").decode('utf8'))
+        help_menu.Append(wx.ID_HELP, _(u"Online help...").decode('utf8'))
         
         self.mb.Append(file_menu, _(u"File").decode('utf8'))
         self.mb.Append(edit_menu, _(u"Edition").decode('utf8'))
         self.mb.Append(view_menu, _(u"View").decode('utf8'))
-        self.mb.Append(analyse_menu, _("Matrix analysis").decode('utf8'))
+        self.mb.Append(analyse_menu, _(u"Matrix analysis").decode('utf8'))
         self.mb.Append(text_menu, _(u"Text analysis").decode('utf8'))
         self.mb.Append(help_menu, _(u"Help").decode('utf8'))
         
@@ -544,39 +545,9 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
         print 'onclose'
         with open(self.ConfigPath['path'], 'w') as f :
             self.PathPath.write(f)
-        if self.DictTab != {} :
-            savestates = [self.DictTab[item][0] for item in self.DictTab]
-            if False in savestates :
-                notsave = [item for item in self.DictTab if self.DictTab[item][0] == False] 
-                msg = u"""
- Certains résultats ne sont pas enregistrés.
- Voulez-vous fermer quand même ?"""
-                dlg = wx.MessageDialog(self, msg, "Sauvegarde",
-                       wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
-                dlg.CenterOnParent()
-                if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
-                    event.Veto()
-                    dlg.Destroy()
-                else:
-                    dlg.Destroy()
-                    for item in notsave :
-                        for tmpfile in self.DictTab[item][1:] :
-                            os.remove(tmpfile)
-                            print 'remove : ' + tmpfile
-                    self._mgr.UnInit()
-                    del self._mgr
-                    self.Destroy()
-            else :
-                self._mgr.UnInit()
-                del self._mgr
-                self.Destroy()
-        else :
-            self._mgr.UnInit()
-            del self._mgr
-            self.Destroy()
-            #if sys.platform == 'win32' :
-            #    os.system("taskkill /im iramuteq.exe /f")
-            #    print 'meurtre de process'
+        self._mgr.UnInit()
+        del self._mgr
+        self.Destroy()
 
     def OnOpenData(self, event):
         inputname, self.input_path = OnOpen(self, "Data")
@@ -839,7 +810,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 ################################################################
 #debut des analyses
 ################################################################
-    def analyse_matrix(self, evt, analyse, analyse_type = '', matrix = None, dlgnb = 1):
+    def analyse_matrix(self, analyse, analyse_type = '', matrix = None, dlgnb = 1):
         if matrix is None :
             matrix = self.tree.getmatrix()
         #try :
@@ -848,7 +819,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         #    BugReport(self)           
 
     def OnFreq(self, event, matrix = None):
-        self.analyse_matrix(event, Frequences, analyse_type = 'freq', matrix = matrix, dlgnb = 3)
+        self.analyse_matrix(Frequences, analyse_type = 'freq', matrix = matrix, dlgnb = 3)
         #if matrix is None :
         #    matrix = self.tree.getmatrix()
         #try:
@@ -858,7 +829,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 
     def OnChi2(self, event, matrix = None):
         #try:
-        self.analyse_matrix(event, ChiSquare, matrix = matrix, analyse_type = 'chi2', dlgnb = 3) 
+        self.analyse_matrix(ChiSquare, matrix = matrix, analyse_type = 'chi2', dlgnb = 3) 
         #except:
         #    BugReport(self)
 
@@ -1212,7 +1183,10 @@ class MySplashScreen(wx.SplashScreen):
             self.ShowMain()
 
     def ShowMain(self):
-        frame = IraFrame(None, -1, "IRaMuTeQ " + ConfigGlob.get('DEFAULT', 'version'), size=(1100, 800))
+        displaySize = wx.DisplaySize()
+        w = displaySize[0]/1.2
+        h = displaySize[1]/1.2
+        frame = IraFrame(None, -1, "IRaMuTeQ " + ConfigGlob.get('DEFAULT', 'version'), size=(w, h))
         frame.Show()
         frame.finish_init()
         frame.Upgrade()

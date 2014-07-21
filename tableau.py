@@ -71,7 +71,7 @@ class Tableau() :
     def __init__(self, parent, filename = '', filetype = 'csv', encodage = 'utf-8', parametres = None) :
         self.parent = parent
         if parametres is None :
-            self.parametres = DoConf(os.path.join(self.parent.UserConfigPath,'matrix.cfg')).getoptions('matrix')
+            self.parametres = DoConf(self.parent.ConfigPath['matrix']).getoptions('matrix')
             self.parametres['pathout'] = PathOut(filename, 'matrix').mkdirout()
             self.parametres['originalpath'] = filename
             self.parametres['filetype'] = filetype
@@ -169,7 +169,7 @@ class Tableau() :
         #datafile = xlrd.open_workbook(self.parametre['filename'], encoding_override="azerazerazer")
         datafile = xlrd.open_workbook(self.parametres['originalpath'])
         datatable = datafile.sheet_by_index(self.parametres['sheetnb']-1)
-        self.linecontent = [[str(datatable.cell_value(rowx = i, colx = j)).replace(u'"','').replace(u';','').replace(u'\n',' ').strip() for j in range(datatable.ncols)] for i in range(datatable.nrows)]
+        self.linecontent = [[str(datatable.cell_value(rowx = i, colx = j)).replace(u'"','').replace(u';',' ').replace(u'\n',' ').replace('\r', ' ').replace('\t', ' ').strip() for j in range(datatable.ncols)] for i in range(datatable.nrows)]
 
     def read_ods(self) :
         doc = ooolib.Calc(opendoc=self.parametres['originalpath'])
@@ -180,7 +180,7 @@ class Tableau() :
             for col in range(1, cols + 1):
                 data = doc.get_cell_value(col, row)
                 if data is not None :
-                    ligne.append(unescape(data[1].replace(u'"','').replace(u';','').replace(u'\n', ' ').strip()))
+                    ligne.append(unescape(data[1].replace(u'"','').replace(u';',' ').replace(u'\n', ' ').replace('\t', ' ').strip()))
                 else :
                     ligne.append('')
             self.linecontent.append(ligne)
@@ -189,7 +189,7 @@ class Tableau() :
         with codecs.open(self.parametres['originalpath'], 'r', self.parametres['encodage']) as f :
             content = f.read() 
         self.linecontent = [line.split(self.parametres['colsep']) for line in content.splitlines()]
-        self.linecontent = [[val.replace(u'"','').strip() for val in line] for line in self.linecontent]
+        self.linecontent = [[val.replace(u'"','').replace(u';',' ').replace('\t', ' ').strip() for val in line] for line in self.linecontent]
 
     def write_csvfile(self) :
         with open(self.parametres['csvfile'], 'w') as f :
@@ -222,6 +222,20 @@ class Tableau() :
             self.csvtable = [line.split('\t') for line in f.read().splitlines()]
         self.linecontent = [line[1:] for line in self.csvtable]
         self.linecontent.pop(0)
+        
+    def extractfrommod(self, col, val):
+        return ([''] + self.colnames) + [line for line in self.csvtable[1:] if line[col + 1] == val]
+
+    def splitfromvar(self, col, var):
+        newtabs = {}
+        for line in self.csvtable[1:] :
+            mod = line[col]
+            if mod in newtabs :
+                newtabs[mod].append(line)
+            else :
+                newtabs[mod] = [line]
+        return ([''] + self.colnames) + newtab
+
 
     def check_rownames(self) :
         if len(self.rownames) == len(list(set(self.rownames))) :
@@ -245,6 +259,9 @@ class Tableau() :
         dc = dict(zip(listcol, listcol))
         selcol = [[val for i, val in enumerate(row) if i in dc] for row in self.linecontent]
         return selcol
+    
+    def countmultiple(self, liscol):
+        return self.make_dico(self.select_col(liscol))
 
     def getactlistfromselection(self, listact) :
         selcol = self.select_col(listact)

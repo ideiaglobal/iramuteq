@@ -580,17 +580,17 @@ def barplot(table, rownames, colnames, rgraph, tmpgraph, intxt = False) :
     txt += """
         source("%s")
         color = rainbow(nrow(di))
-        width <- 100 + (20*length(rownames(di))) + (100 * length(colnames(di)))
+        width <- 100 + (10*length(rownames(di))) + (100 * length(colnames(di)))
         height <- nrow(di) * 15
         if (height < 400) { height <- 400}
         open_file_graph("%s",width = width, height = height)
     	par(mar=c(0,0,0,0))
 	    layout(matrix(c(1,2),1,2, byrow=TRUE),widths=c(3,lcm(7)))
-        par(mar=c(2,2,1,0))
+        par(mar=c(6,2,1,0))
         yp = ifelse(length(toinf), 0.2, 0)
         ym = ifelse(length(tominf), 0.2, 0)
         ymin <- ifelse(!length(which(di < 0)), 0, min(di) - ym)
-        coord <- barplot(as.matrix(di), beside = TRUE, col = color, space = c(0.1,0.6), ylim=c(ymin, max(di) + yp))
+        coord <- barplot(as.matrix(di), beside = TRUE, col = color, space = c(0.1,0.6), ylim=c(ymin, max(di) + yp), las = 2)
         if (length(toinf)) {
             coordinf <- coord[toinf]
             valinf <- di[toinf]

@@ -407,18 +407,25 @@ class LeftTree(CT.CustomTreeCtrl):
                 self.Bind(wx.EVT_MENU, self.OnSubTextFromMeta, subcorpusfrommeta)
                 self.Bind(wx.EVT_MENU, self.OnSubTextFromTheme, subcorpusfromtheme)
             elif 'matrix_name' in pydata :
-                freq = menu.Append(wx.ID_ANY, _(u"Frequency").decode('utf8'))
-                chi2 = menu.Append(wx.ID_ANY, _(u"Chi square").decode('utf8'))
-                chdreinert = menu.Append(wx.ID_ANY, _(u"Reinert clustering").decode('utf8'))
-                simi = menu.Append(wx.ID_ANY, _(u"Similarity analysis").decode('utf8'))
+                for i in range(self.parent.matrix_menu.GetMenuItemCount()) :
+                    item = self.parent.matrix_menu.FindItemByPosition(i)
+                    itemid = item.GetId()
+                    itemtext = item.GetText()
+                    menu.Append(itemid, itemtext)
+                    #print item, itemid, itemtext
+                #menu = self.parent.matrix_menu
+                #freq = menu.Append(wx.ID_ANY, _(u"Frequency").decode('utf8'))
+                #chi2 = menu.Append(wx.ID_ANY, _(u"Chi square").decode('utf8'))
+                #chdreinert = menu.Append(wx.ID_ANY, _(u"Reinert clustering").decode('utf8'))
+                #simi = menu.Append(wx.ID_ANY, _(u"Similarity analysis").decode('utf8'))
                 menu.AppendSeparator()
-                self.Bind(wx.EVT_MENU, self.OnFreq, freq)
-                self.Bind(wx.EVT_MENU, self.OnChiSquare, chi2)
-                self.Bind(wx.EVT_MENU, self.OnSimiTab, simi)
-                self.Bind(wx.EVT_MENU, self.OnCHDReinert, chdreinert)
+                #self.Bind(wx.EVT_MENU, self.OnFreq, freq)
+                #self.Bind(wx.EVT_MENU, self.OnChiSquare, chi2)
+                #self.Bind(wx.EVT_MENU, self.OnSimiTab, simi)
+                #self.Bind(wx.EVT_MENU, self.OnCHDReinert, chdreinert)
             elif pydata.get('type', False) == 'alceste' and pydata['uuid'] in self.parent.history.opened :
                 openmenu = wx.Menu()
-                antipro = openmenu.Append(wx.ID_ANY, _(u"antiprofiles").decode('utf8'))
+                antipro = openmenu.Append(wx.ID_ANY, _(u"Antiprofiles").decode('utf8'))
                 menu.AppendMenu(wx.ID_ANY, _(u"Open ...").decode('utf8'), openmenu)
     
                 profsr = menu.Append(wx.ID_ANY, _(u"Repeated segments profiles").decode('utf8'))
@@ -428,7 +435,7 @@ class LeftTree(CT.CustomTreeCtrl):
                 navig = menu.Append(wx.ID_ANY, _(u"Navigator").decode('utf8'))
                 statclasse = menu.Append(wx.ID_ANY, _(u"Clusters statistics").decode('utf8'))
                 rapport = menu.Append(wx.ID_ANY, _(u"Report").decode('utf8'))
-                export_classes = menu.Append(wx.ID_ANY, _(u"Exports Clusters").decode('utf8'))
+                export_classes = menu.Append(wx.ID_ANY, _(u"Export Clusters").decode('utf8'))
                 menu.AppendSeparator()
                 self.Bind(wx.EVT_MENU, self.OpenAntipro, antipro)
                 self.Bind(wx.EVT_MENU, self.OnProfSR, profsr)

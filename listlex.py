@@ -313,7 +313,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             last = self.GetNextSelected(last)
             data = self.GetItemData(last)
             datas += [data]
-        colnames = self.etoiles
+        colnames = self.first
         table = [[self.getinf(val) for val in line[1:]] for line in datas]
         rownames = [val[0] for val in datas]
         tmpgraph = tempfile.mktemp(dir=self.parent.TEMPDIR)

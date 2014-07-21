@@ -8,6 +8,8 @@ import os
 import wx
 import wx.lib.hyperlink as hl
 import wx.lib.agw.aui as aui
+import wx.lib.agw.labelbook as LB
+from wx.lib.agw.fmresources import *
 from chemins import ConstructPathOut, ChdTxtPathOut, FFF, ffr, PathOut, StatTxtPathOut, simipath
 from ConfigParser import ConfigParser
 from functions import ReadProfileAsDico, GetTxtProfile, read_list_file, ReadList, exec_rcode, print_liste, BugReport, DoConf, indices_simi, check_Rresult, progressbar
@@ -375,6 +377,14 @@ class OpenCHDS():
         DictProfile = ReadProfileAsDico(Profile, Alceste, self.encoding)
         self.DictProfile = DictProfile
         self.cluster_size = []
+        clusternames = {}
+        for i in range(0, clnb) :
+            clusternames[i] = _(u'%i Cluster %i' % (i + 1, i + 1)).decode('utf8')
+        if os.path.exists(self.pathout['classes_names.txt']) :
+            with codecs.open(self.pathout['classes_names.txt'], 'r', self.parent.syscoding) as f :
+                clusternames_ = f.read()
+            clusternames_ =  dict([[i, ' '.join([`i + 1`, line])] for i, line in enumerate(clusternames_.splitlines())])
+            clusternames.update(clusternames_)
         #print 'lecture des antiprofils'
         #DictAnti = ReadProfileAsDico(self, AntiProfile, Alceste, self.encoding)
 
@@ -414,6 +424,7 @@ class OpenCHDS():
         #self.TabChdSim = wx.aui.AuiNotebook(self.parent.nb, -1, wx.DefaultPosition)
         notebook_flags =  aui.AUI_NB_DEFAULT_STYLE | aui.AUI_NB_TAB_EXTERNAL_MOVE | aui.AUI_NB_TAB_MOVE | aui.AUI_NB_TAB_FLOAT| wx.NO_BORDER
         panel.TabChdSim = aui.AuiNotebook(panel, -1, wx.DefaultPosition)
+        #panel.TabChdSim = LB.LabelBook(panel, -1, agwStyle = INB_TOP|INB_SHOW_ONLY_TEXT|INB_FIT_LABELTEXT)
         panel.TabChdSim.SetAGWWindowStyleFlag(notebook_flags)
         panel.TabChdSim.SetArtProvider(aui.ChromeTabArt())
         sizer1.Add(panel.TabChdSim,10, wx.EXPAND, 5)
@@ -439,7 +450,12 @@ class OpenCHDS():
             panel.TabChdSim.AddPage(CHD,'CHD')
                
         panel.ProfNB = aui.AuiNotebook(panel, -1, wx.DefaultPosition)
-        panel.ProfNB.SetArtProvider(aui.ChromeTabArt())
+        notebook_flags |= aui.AUI_NB_WINDOWLIST_BUTTON
+        panel.ProfNB.SetAGWWindowStyleFlag(notebook_flags)
+        #panel.ProfNB.SetArtProvider(aui.ChromeTabArt())
+        #panel.ProfNB = LB.LabelBook(panel, -1, agwStyle = INB_LEFT|INB_SHOW_ONLY_TEXT|INB_FIT_LABELTEXT)
+        #panel.ProfNB = wx.Listbook(self.parent, -1, style = wx.BK_DEFAULT)
+        #panel.ProfNB = wx.Treebook(self.parent, -1, style = wx.BK_DEFAULT)
         #self.ProfNB.SetTabCtrlHeight(100)
         #panel.AntiProfNB = aui.AuiNotebook(panel, -1, wx.DefaultPosition)
         if os.path.exists(DictPathOut['prof_seg']) :
@@ -450,15 +466,18 @@ class OpenCHDS():
             if isinstance(self.corpus, Corpus) :
                 DictProfile[str(i + 1)][1:] = [val[0:5] + [getlemgram(self.corpus, val)] + val[6:] for val in DictProfile[str(i + 1)][1:]]
             dlg.Update(3+i, 'Classe %i' %(i+1))
-            ind = '/'.join(DictProfile[str(i + 1)][0][0:2])
-            indpour = ' - '.join([ind, DictProfile[str(i + 1)][0][2]])
+            ind = '/'.join(DictProfile[str(i + 1)][0][0:2]).strip()
+            indpour = '\n'.join([ind, DictProfile[str(i + 1)][0][2]])
             self.tabprofile = ProfListctrlPanel(self.parent, self.panel, DictProfile[str(i + 1)], Alceste, i + 1)
             #self.tabantiprofile = ProfListctrlPanel(self.parent, self, DictAnti[str(i + 1)], Alceste, i + 1)
-            panel.ProfNB.AddPage(self.tabprofile, _(u"Cluster").decode('utf8') + ' %s %s(%s%%)' % (str(i + 1), sep, indpour))
+            panel.ProfNB.AddPage(self.tabprofile, clusternames[i] + '\n%s%%' % indpour, True)
+            panel.ProfNB.SetPageTextColour(i, '#890909')
+            panel.ProfNB.SetRenamable(i, True)
             #panel.AntiProfNB.AddPage(self.tabantiprofile, 'classe %s' % str(i + 1))
             if os.path.exists(DictPathOut['prof_seg']) :
                 self.tab_prof_seg = ProfListctrlPanel(self.parent, self, prof_seg[str(i + 1)], False, i + 1)
                 self.prof_seg_nb.AddPage(self.tab_prof_seg, _(u"Cluster").decode('utf8') + ' %i' % (i + 1))
+        panel.ProfNB.SetSelection(0)
 
         if clnb > 2 :
             self.TabAFC = aui.AuiNotebook(panel.TabChdSim, -1, wx.DefaultPosition)

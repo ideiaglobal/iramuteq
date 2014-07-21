@@ -2559,9 +2559,9 @@ class ConcordList(wx.HtmlListBox):
     def OnGetItem(self, index):
         return self.concord[index] + '<br>'
 
-class message(wx.Dialog):
+class message(wx.Frame):
     def __init__(self, parent, items, title, size, save = True):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_DIALOG_STYLE|wx.STAY_ON_TOP )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_FRAME_STYLE )
         self.save = save    
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 
@@ -2584,13 +2584,13 @@ class message(wx.Dialog):
 
     def __do_layout(self):
         sizer_2 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2.Add(self.HtmlPage, 0, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
+        sizer_2.Add(self.HtmlPage, 1, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
         m_sdbSizer1 = wx.StdDialogButtonSizer()
         m_sdbSizer1.AddButton(  self.button_1 )
         if self.save :
             m_sdbSizer1.AddButton(  self.button_2 )
         m_sdbSizer1.Realize()
-        sizer_2.Add(m_sdbSizer1, 1, wx.EXPAND, 5)
+        sizer_2.Add(m_sdbSizer1, 0, wx.EXPAND, 5)
         self.SetSizer(sizer_2)
         self.Layout()
         sizer_2.Fit( self )

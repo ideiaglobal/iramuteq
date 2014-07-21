@@ -102,16 +102,21 @@ class Frequences(AnalyseMatrix) :
             content = f.read().splitlines()
         content.pop(0)
         content.pop(0)
+        content = ['\t'.join(line.split('\t')[1:]).replace('"','') for line in content]
+        content = '\n'.join(content)
+        content = content.split(u'***\t****\t****')
+        content = [[line.split('\t') for line in tab.splitlines() if line.split('\t') != ['']] for tab in content]
+        listtab = [tab for tab in content if tab != []]
         texte = ''
-        for ligne in content:
-            ligne = ligne.replace('"', '')
-            ligne = ligne.split('\t')
-            if ligne[1] == u'***' :
-                if tab != []:
-                    listtab.append(tab)
-                tab = []
-            else :
-                tab.append(ligne)
+        #for ligne in content:
+        #    ligne = ligne.replace('"', '')
+        #    ligne = ligne.split('\t')
+        #    if ligne[1] == u'***' :
+        #        if tab != []:
+        #            listtab.append(tab)
+        #        tab = []
+        #    else :
+        #        tab.append(ligne)
         pretexte = u'''<html>
         <meta http-equiv="content-Type" content="text/html; charset=%s" />
         <body>\n<h1>Fréquences</h1>
@@ -128,7 +133,7 @@ class Frequences(AnalyseMatrix) :
                 texte += '<tr>'
                 texte += """
                 <td>%s</td><td align=center>%s</td><td align=center>%s %%</td>
-                """ % (line[3], line[1], line[2])
+                """ % (line[2], line[0], line[1])
                 texte += '</tr>'
             texte += '</table></td>'
             texte += """
