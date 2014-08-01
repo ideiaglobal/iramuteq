@@ -73,7 +73,7 @@ class History :
     def __init__(self, filein, syscoding = 'utf8') :
         self.filein = filein
         self.syscoding = syscoding
-        self.corpora = {}
+        self.corpus = {}
         self.openedcorpus = {}
         self.openedmatrix = {}
         self.orph = []
@@ -102,6 +102,9 @@ class History :
     def add(self, analyse) :
         log.info('add to history %s' % analyse.get('corpus_name', 'pas un corpus'))
         tosave = {'uuid' : analyse['uuid'], 'ira': analyse['ira'], 'type' : analyse['type']}
+        if tosave['uuid'] in self.corpus :
+            log.info('problem : this uuid is already in history : %s' % tosave['uuid'])
+            return
         if analyse.get('corpus', False) :
             if analyse['uuid'] in self.analyses :
                 return
@@ -117,6 +120,8 @@ class History :
                 self.orph.append(tosave)
         else :
             tosave['corpus_name'] = analyse['corpus_name']
+            #self.ordercorpus[tosave['uuid']] = len(history)
+            #self.corpus[tosave['uuid']] = analyse
             self.history.append(tosave)
         self.write()
         self.read()
@@ -158,6 +163,7 @@ class History :
             self.history.pop(self.ordercorpus[analyse['uuid']])
             if analyse['uuid'] in self.openedcorpus :
                 del self.openedcorpus[analyse['uuid']]
+            log.info('delete corpus : %s' % analyse['uuid'])
         elif analyse['uuid'] in self.analyses :
             todel = [i for i, ana in enumerate(self.corpus[analyse['corpus']]['analyses']) if ana['uuid'] == analyse['uuid']][0]
             self.history[self.ordercorpus[analyse['corpus']]]['analyses'].pop(todel)
@@ -660,54 +666,7 @@ def read_list_file(filename, encoding = sys.getdefaultencoding()):
         ncontent=[line.replace('\n','').split(';') for line in content if line.strip() != '']
     return ncontent
         
-class MessageImage(wx.Frame):
-    def __init__(self, parent,title, size):
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_FRAME_STYLE )
-        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
-        self.imageFile = False
-        self.imagename = u"chi_classe.png"
-        self.HtmlPage = wx.html.HtmlWindow(self, -1)
-        self.HtmlPage.SetMinSize(size)
-        if "gtk2" in wx.PlatformInfo:
-            self.HtmlPage.SetStandardFonts()
-        self.HtmlPage.SetFonts('Courier', 'Courier')
-        
-        self.button_1 = wx.Button(self, wx.ID_CANCEL)
-        self.button_2 = wx.Button(self, wx.ID_SAVE)
-        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
-        self.Bind(wx.EVT_BUTTON, self.OnSaveImage, self.button_2)
-        self.do_layout()
 
-    def do_layout(self):
-        self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        self.sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.sizer_1.Add(self.HtmlPage, 2, wx.EXPAND, 0)
-
-        self.m_sdbSizer1 = wx.StdDialogButtonSizer()
-        self.m_sdbSizer1.AddButton(  self.button_2 )
-        self.m_sdbSizer1.AddButton(  self.button_1 )
-        self.m_sdbSizer1.Realize()
-        self.sizer_1.Add(self.m_sdbSizer1, 0, wx.EXPAND, 5)
-        self.SetSizer(self.sizer_1)
-        self.Layout()
-        self.sizer_1.Fit( self )
-
-    def addsaveimage(self, imageFile) :
-        self.imageFile = imageFile
-        
-    def OnCloseMe(self, event):
-        self.Destroy()
-
-    def OnSaveImage(self, event) :
-        dlg = wx.FileDialog(
-            self, message="Enregistrer sous...", defaultDir=os.getcwd(),
-            defaultFile= self.imagename, wildcard="png|*.png", style=wx.SAVE | wx.OVERWRITE_PROMPT
-            )
-        dlg.SetFilterIndex(2)
-        dlg.CenterOnParent()
-        if dlg.ShowModal() == wx.ID_OK:
-            path = dlg.GetPath()
-            copyfile(self.imageFile, path)
             
 
 def progressbar(self, maxi) :

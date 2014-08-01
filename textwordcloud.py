@@ -6,13 +6,13 @@
 
 from analysetxt import AnalyseText
 from guifunct import getPage, getCorpus, SelectColumn
-from ConfigParser import RawConfigParser
-from functions import sortedby, progressbar, CreateIraFile, exec_rcode, check_Rresult, MessageImage
+#from ConfigParser import RawConfigParser
+from functions import sortedby, progressbar 
 from dialog import StatDialog, PrefWordCloud
 from PrintRScript import WordCloudRScript
 #from ttparser import * 
 import tempfile
-from time import sleep
+#from time import sleep
 import wx
 import os
 import logging

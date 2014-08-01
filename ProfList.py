@@ -20,14 +20,14 @@ import  wx.lib.mixins.listctrl  as  listmix
 #from tabsimi import DoSimi
 from listlex import ListForSpec
 from chemins import ConstructPathOut, ffr
-from dialog import PrefExport, PrefUCECarac, SearchDial, message
+from dialog import PrefExport, PrefUCECarac, SearchDial, message, MessageImage, BarFrame
 from tableau import Tableau
 from search_tools import SearchFrame
 import webbrowser
 #import cStringIO
 import tempfile
 import codecs
-from functions import exec_rcode, MessageImage, progressbar, treat_var_mod, doconcorde
+from functions import exec_rcode, progressbar, treat_var_mod, doconcorde
 from PrintRScript import barplot
 from textclassechd import ClasseCHD
 from shutil import copyfile
@@ -444,18 +444,19 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 if word in fchistable :
                     tableout.append(vchistable[fchistable.index(word)])
                     kwords.append(word)
-            tmpgraph = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
-            txt = barplot(tableout, kwords, title, self.Source.parent.RscriptsPath['Rgraph'], tmpgraph)
-            tmpscript = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
-            file = open(tmpscript,'w')
-            file.write(txt)
-            file.close()
-            exec_rcode(self.Source.parent.RPath, tmpscript, wait = True)
-            win = MessageImage(self,u"Graphique", size=(700, 500))
-            win.addsaveimage(tmpgraph)
-            txt = "<img src='%s'>" % tmpgraph
-            win.HtmlPage.SetPage(txt)
-            win.Show(True)
+            BarFrame(self.Source.parent, tableout, title, kwords)
+#             tmpgraph = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
+#             txt = barplot(tableout, kwords, title, self.Source.parent.RscriptsPath['Rgraph'], tmpgraph)
+#             tmpscript = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
+#             file = open(tmpscript,'w')
+#             file.write(txt)
+#             file.close()
+#             exec_rcode(self.Source.parent.RPath, tmpscript, wait = True)
+#             win = MessageImage(self,u"Graphique", size=(700, 500))
+#             win.addsaveimage(tmpgraph)
+#             txt = "<img src='%s'>" % tmpgraph
+#             win.HtmlPage.SetPage(txt)
+#             win.Show(True)
         else :
             dial = wx.MessageDialog(self, u"Ce n'est pas une forme du type variable_modalité", u"Problème", wx.OK | wx.ICON_WARNING)
             dial.CenterOnParent()
@@ -625,28 +626,29 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         tmpgraph = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
         nbcl = len(title)
         nbwords = len(words)
-        txt = barplot(tableout, words, title, self.Source.parent.RscriptsPath['Rgraph'], tmpgraph)
-        #print 'ATTENTION TEST R'
-        #txt = """
-        #sink('/Users/pierre/Desktop/qdfqsdfqsdfqsdf.txt')
-        #Sys.getlocale()
-        #sink()
-        #"""
-        tmpscript = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
-        file = open(tmpscript,'w')
-        file.write(txt)
-        file.close()
-        exec_rcode(self.Source.parent.RPath, tmpscript, wait = True)
-        w = 100 + (20 * nbwords) + (100 * nbcl)
-        h = 100 + (nbwords * 15)
-        if w > 1100 : w = 1100
-        if h > 800 : h = 800
-        if h < 450 : h = 450
-        win = MessageImage(self, u"Graphique", size=(w, h))
-        win.addsaveimage(tmpgraph)
-        txt = "<img src='%s'>" % tmpgraph
-        win.HtmlPage.SetPage(txt)
-        win.Show(True)
+        BarFrame(self.Source.parent, tableout, title, words)
+#         txt = barplot(tableout, words, title, self.Source.parent.RscriptsPath['Rgraph'], tmpgraph)
+#         #print 'ATTENTION TEST R'
+#         #txt = """
+#         #sink('/Users/pierre/Desktop/qdfqsdfqsdfqsdf.txt')
+#         #Sys.getlocale()
+#         #sink()
+#         #"""
+#         tmpscript = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
+#         file = open(tmpscript,'w')
+#         file.write(txt)
+#         file.close()
+#         exec_rcode(self.Source.parent.RPath, tmpscript, wait = True)
+#         w = 100 + (20 * nbwords) + (100 * nbcl)
+#         h = 100 + (nbwords * 15)
+#         if w > 1100 : w = 1100
+#         if h > 800 : h = 800
+#         if h < 450 : h = 450
+#         win = MessageImage(self, u"Graphique", size=(w, h))
+#         win.addsaveimage(tmpgraph)
+#         txt = "<img src='%s'>" % tmpgraph
+#         win.HtmlPage.SetPage(txt)
+#         win.Show(True)
 
     def onlexdendro(self, evt):
         if 'corpus' in dir(self.Source):
@@ -662,35 +664,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         fchistable = [line[0] for line in chistable]
         words = self.getselectedwords()
         tableout = [vchistable[fchistable.index(word)] for word in words]
-        tmpgraph = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
-        txttable = 'c(' + ','.join([','.join(line) for line in tableout]) + ')'
-        rownames = 'c("' + '","'.join(words) + '")'
-        colnames = 'c("' + '","'.join(title) + '")'
-        nbcl = len(title)
-        rownb = len(words)
-        txt = """
-        load("%s")
-        di <- matrix(data=%s, nrow=%i, byrow = TRUE)
-        rownames(di)<- %s
-        colnames(di) <- %s
-        library(ape)
-        source("%s")
-        height <- (30*ncol(di)) + (15*nrow(di))
-        height <- ifelse(height <= 400, 400, height)
-        width <- 500
-        open_file_graph("%s", width=width, height=height)
-        plot.dendro.lex(tree.cut1$tree.cl, di)
-        """ % (self.Source.pathout['Rdendro'], txttable, rownb, rownames, colnames, self.Source.parent.RscriptsPath['Rgraph'], ffr(tmpgraph))
-        tmpscript = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
-        file = open(tmpscript,'w')
-        file.write(txt)
-        file.close()
-        exec_rcode(self.Source.parent.RPath, tmpscript, wait = True)
-        win = MessageImage(self, u"Graphique", size=(700, 500))
-        win.addsaveimage(tmpgraph)
-        txt = "<img src='%s'>" % tmpgraph
-        win.HtmlPage.SetPage(txt)
-        win.Show(True)
+        BarFrame(self.Source.parent, tableout, title, words, tree = self.Source.pathout['Rdendro'])
 
     def make_concord(self, uces, title, color = 'red') :
         corpus = self.Source.corpus

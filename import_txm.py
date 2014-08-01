@@ -11,7 +11,7 @@ import glob
 
 
 
-#infiledir = '/home/pierre/TXM/corpora/voeux-bin/txm/VOEUX/'
+#infiledir = '/home/pierre/TXM/corpus/voeux-bin/txm/VOEUX/'
 #fileout = 'VOEUXExportfromTXM.txt'
 
 

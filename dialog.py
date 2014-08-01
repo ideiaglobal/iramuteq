@@ -8,8 +8,11 @@ import  wx.lib.colourselect as csel
 import wx.lib.sized_controls as sc
 import wx.lib.filebrowsebutton as filebrowse
 import locale
-from functions import DoConf
+from functions import DoConf, exec_rcode
 import os
+from shutil import copyfile
+from PrintRScript import barplot
+import tempfile
 import sys
 from KeyFrame import AlcOptFrame
 #---------------------------------------------------------------------------
@@ -913,7 +916,7 @@ class PrefExport(wx.Dialog):
         sizer = wx.BoxSizer(wx.VERTICAL)
         box = wx.BoxSizer(wx.HORIZONTAL)
         box3 = wx.BoxSizer(wx.HORIZONTAL)
-        self.label_lem = wx.StaticText(self, -1, _(u"Lemmatised corpora").decode('utf8'))
+        self.label_lem = wx.StaticText(self, -1, _(u"Lemmatised corpus").decode('utf8'))
         box3.Add(self.label_lem, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT, 5)
         self.radio_lem = wx.RadioBox(self, -1, u"", choices= [ _(u"yes").decode('utf8'), _(u"no").decode('utf8') ], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
         box3.Add(self.radio_lem, 0, wx.ALIGN_RIGHT, 5)
@@ -1241,7 +1244,7 @@ class PrefSegProf(wx.Dialog) :
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
-        txt = _(u"Be carefull : computation of repeated segments profiles can be very long on large corpora").decode('utf8')
+        txt = _(u"Be carefull : computation of repeated segments profiles can be very long on large corpus").decode('utf8')
         self.label = wx.StaticText( self, wx.ID_ANY, txt, wx.DefaultPosition, wx.DefaultSize, 0 ) 
         bSizer1.Add( self.label, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
 
@@ -1249,7 +1252,7 @@ class PrefSegProf(wx.Dialog) :
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Lemmatised corpora").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Lemmatised corpus").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -2263,7 +2266,7 @@ class CorpusPref ( wx.Dialog ):
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText7 = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"Corpora").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText7 = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"corpus").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText7.Wrap( -1 )
         fgSizer1.Add( self.m_staticText7, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2557,7 +2560,7 @@ class ConcordList(wx.HtmlListBox):
         #self.Bind(wx.EVT_LISTBOX_DCLICK, self.Download)
   
     def OnGetItem(self, index):
-        return self.concord[index] + '<br>'
+        return self.concord[index] #+ '<br>'
 
 class message(wx.Frame):
     def __init__(self, parent, items, title, size, save = True):
@@ -2628,7 +2631,7 @@ class ExtractDialog ( wx.Dialog ):
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Corpora").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"corpus").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2991,7 +2994,194 @@ class SubTextFromMetaDial ( wx.Dialog ):
     def __del__( self ):
         pass
 
+class BarGraphDialog ( wx.Dialog ):
+    
+    def __init__( self, parent, width, height ):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Preferences", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        
+        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        
+        bSizer1 = wx.BoxSizer( wx.VERTICAL )
+        
+        bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
+        
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Size", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1.Wrap( -1 )
+        bSizer2.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        sizeradioChoices = [ u"automatic", u"manual" ]
+        self.sizeradio = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, sizeradioChoices, 1, wx.RA_SPECIFY_COLS )
+        self.sizeradio.SetSelection( 0 )
+        bSizer2.Add( self.sizeradio, 0, wx.ALIGN_TOP|wx.ALL, 5 )
+        
+        fgSizer1 = wx.FlexGridSizer( 0, 2, 0, 0 )
+        fgSizer1.SetFlexibleDirection( wx.BOTH )
+        fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"width", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2.Wrap( -1 )
+        fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.widthsp = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 1000000, 600 )
+        fgSizer1.Add( self.widthsp, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"height", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3.Wrap( -1 )
+        fgSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.heightsp = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 1, 10000000, 400 )
+        fgSizer1.Add( self.heightsp, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        
+        bSizer2.Add( fgSizer1, 1, wx.EXPAND, 5 )
+        
+        
+        bSizer1.Add( bSizer2, 1, wx.EXPAND, 5 )
+        
+        bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
+        
+        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, u"Image format", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4.Wrap( -1 )
+        bSizer3.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        formatChoices = [ u"png", u"svg" ]
+        self.format = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, formatChoices, 0 )
+        self.format.SetSelection( 0 )
+        bSizer3.Add( self.format, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        
+        bSizer1.Add( bSizer3, 1, wx.EXPAND, 5 )
+        
+        m_sdbSizer1 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
+        self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
+        m_sdbSizer1.Realize();
+        
+        bSizer1.Add( m_sdbSizer1, 0, wx.EXPAND, 5 )
+        
+        
+        self.SetSizer( bSizer1 )
+        self.Layout()
+        bSizer1.Fit( self )
+        
+        self.Centre( wx.BOTH )
+        
+        # Connect Events
+        self.sizeradio.Bind( wx.EVT_RADIOBOX, self.OnSizeRadio )
+        
+        self.widthsp.SetValue(width)
+        self.heightsp.SetValue(height)
+        self.widthsp.Enable(False)
+        self.heightsp.Enable(False)
+        self.m_sdbSizer1OK.SetFocus()
+    
+    def __del__( self ):
+        pass
+    
+    
+    # Virtual event handlers, overide them in your derived class
+    def OnSizeRadio( self, event ):
+        if self.sizeradio.GetSelection() == 0 :
+            self.widthsp.Enable(False)
+            self.heightsp.Enable(False)
+        else :
+            self.widthsp.Enable(True)
+            self.heightsp.Enable(True)         
+        event.Skip()
 
+class MessageImage(wx.Frame):
+    def __init__(self, parent, parametres, title, size):
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_FRAME_STYLE )
+        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        self.parametres = parametres
+        self.imageFile = self.parametres['tmpgraph']
+        if parametres['svg'] == 'TRUE' :
+            self.imagename = u"image.svg"
+        else :
+            self.imagename = u"iamge.png"
+        self.HtmlPage = wx.html.HtmlWindow(self, -1)
+        self.HtmlPage.SetMinSize(size)
+        if "gtk2" in wx.PlatformInfo:
+            self.HtmlPage.SetStandardFonts()
+        self.HtmlPage.SetFonts('Courier', 'Courier')
+        
+        self.button_1 = wx.Button(self, wx.ID_CANCEL)
+        self.button_2 = wx.Button(self, wx.ID_SAVE)
+        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
+        self.Bind(wx.EVT_BUTTON, self.OnSaveImage, self.button_2)
+        self.do_layout()
 
+    def do_layout(self):
+        self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
+        self.sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
+        self.sizer_1.Add(self.HtmlPage, 2, wx.EXPAND, 0)
 
+        self.m_sdbSizer1 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer1.AddButton(  self.button_2 )
+        self.m_sdbSizer1.AddButton(  self.button_1 )
+        self.m_sdbSizer1.Realize()
+        self.sizer_1.Add(self.m_sdbSizer1, 0, wx.EXPAND, 5)
+        self.SetSizer(self.sizer_1)
+        self.Layout()
+        self.sizer_1.Fit( self )
 
+    def OnCloseMe(self, event):
+        self.Destroy()
+
+    def OnSaveImage(self, event) :
+        dlg = wx.FileDialog(
+            self, message="Enregistrer sous...", defaultDir=os.getcwd(),
+            defaultFile= self.imagename, wildcard=self.parametres['wildcard'], style=wx.SAVE | wx.OVERWRITE_PROMPT
+            )
+        dlg.SetFilterIndex(2)
+        dlg.CenterOnParent()
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+            copyfile(self.imageFile, path)
+
+class BarFrame :
+    def __init__(self, ira, table, colnames, rownames, tree = False):
+        if not tree :
+            width = 100 + (10*len(rownames)) + (100 * len(colnames))
+            height = len(rownames) * 15
+            if height < 400 : 
+                height = 400
+        else :
+            width = 500
+            height = (35 * len(colnames)) + (15 * len(rownames))
+        dial = BarGraphDialog(ira, width, height)
+        val = dial.ShowModal()
+        if val == wx.ID_OK :
+            tmpgraph = tempfile.mktemp(dir=ira.TEMPDIR)        
+            if dial.format.GetSelection() == 0 :
+                svg = 'FALSE'
+                wildcard = "png|*.png"
+            else :
+                svg = 'TRUE'
+                wildcard = "svg|*.svg"
+            parametres = {'width' : dial.widthsp.GetValue(),
+                          'height': dial.heightsp.GetValue(),
+                          'colnames' : colnames,
+                          'rownames' : rownames,
+                          'tmpgraph' : tmpgraph,
+                          'rgraph' : ira.RscriptsPath['Rgraph'],
+                          'svg' : svg,
+                          'wildcard' : wildcard}
+            if tree :
+                parametres['tree'] = tree
+            txt = barplot(table, parametres)
+            tmpscript = tempfile.mktemp(dir=ira.TEMPDIR)
+            with open(tmpscript,'w') as f :
+                f.write(txt)
+            exec_rcode(ira.RPath, tmpscript, wait = True)
+            win = MessageImage(ira, parametres, u"Graphique", size=(700, 500))
+            if svg == 'FALSE' :
+                txt = "<img src='%s'>" % tmpgraph
+            else :
+                txt = """Copiez ce lien dans votre navigateur : <br>
+                        <a href="%s">%s</a>""" % (tmpgraph, tmpgraph)
+            win.HtmlPage.SetPage(txt)
+            win.Show(True)
+        dial.Destroy()           

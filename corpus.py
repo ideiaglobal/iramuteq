@@ -1200,7 +1200,7 @@ class BuildCorpus :
         self.cf.execute('CREATE INDEX ideff ON eff (id);')
         self.c.close()
         self.cf.close()
-        #backup corpora
+        #backup corpus
         self.conn_corpus = sqlite3.connect(self.corpus.pathout['corpus.db'])
         self.ccorpus = self.conn_corpus.cursor()
         self.ccorpus.execute('CREATE TABLE IF NOT EXISTS etoiles (uci INTEGER, et TEXT, paras TEXT);')
@@ -1428,7 +1428,7 @@ class BuildFromAlceste(BuildCorpus) :
             if iduci != -1  and iduce != -1:
                 self.backup_uce()
             else : 
-                log.info(_(u"No Text in corpora. Are you sure of the formatting ?"))
+                log.info(_(u"No Text in corpus. Are you sure of the formatting ?"))
                 raise Exception('TextBeforeTextMark %i' % linenb)
         except UnicodeDecodeError :
             raise Exception("CorpusEncoding")

@@ -535,16 +535,16 @@ def dendroandbarplot(table, rownames, colnames, rgraph, tmpgraph, intxt = False,
         """ % (ffr(dendro),ffr(rgraph),  ffr(tmpgraph))
     return txt
 
-def barplot(table, rownames, colnames, rgraph, tmpgraph, intxt = False) :
+def barplot(table, parametres, intxt = False) :
     if not intxt :
         txttable = 'c(' + ','.join([','.join(line) for line in table]) + ')'
     #width = 100 + (15 * len(rownames)) + (100 * len(colnames))
     #height =  len(rownames) * 15
-    rownb = len(rownames)
+    rownb = len(parametres['rownames'])
     #if height < 400 :
     #    height = 400
-    rownames = 'c("' + '","'.join(rownames) + '")'
-    colnames = 'c("' + '","'.join(colnames) + '")'
+    rownames = 'c("' + '","'.join(parametres['rownames']) + '")'
+    colnames = 'c("' + '","'.join(parametres['colnames']) + '")'
 
     if not intxt :
         #FIXME
@@ -577,58 +577,68 @@ def barplot(table, rownames, colnames, rgraph, tmpgraph, intxt = False) :
         """ % (txttable, rownb, rownames, colnames)
     else :
         txt = intxt
-    txt += """
-        source("%s")
-        color = rainbow(nrow(di))
-        width <- 100 + (10*length(rownames(di))) + (100 * length(colnames(di)))
-        height <- nrow(di) * 15
-        if (height < 400) { height <- 400}
-        open_file_graph("%s",width = width, height = height)
-    	par(mar=c(0,0,0,0))
-	    layout(matrix(c(1,2),1,2, byrow=TRUE),widths=c(3,lcm(7)))
-        par(mar=c(6,2,1,0))
-        yp = ifelse(length(toinf), 0.2, 0)
-        ym = ifelse(length(tominf), 0.2, 0)
-        ymin <- ifelse(!length(which(di < 0)), 0, min(di) - ym)
-        coord <- barplot(as.matrix(di), beside = TRUE, col = color, space = c(0.1,0.6), ylim=c(ymin, max(di) + yp), las = 2)
-        if (length(toinf)) {
-            coordinf <- coord[toinf]
-            valinf <- di[toinf]
-            text(x=coordinf, y=valinf + 0.1, 'i')
-        }
-        if (length(tominf)) {
-            coordinf <- coord[toinf]
-            valinf <- di[toinf]
-            text(x=coordinf, y=valinf - 0.1, 'i')
-        }            
-        c <- colMeans(coord)
-        c1 <- c[-1]
-        c2 <- c[-length(c)]
-        cc <- cbind(c1,c2)
-        lcoord <- apply(cc, 1, mean)
-        abline(v=lcoord)
-        if (min(di) < 0) {
-            amp <- abs(max(di) - min(di))
-        } else {
-            amp <- max(di)
-        }
-        if (amp < 10) {
-            d <- 2
-        } else {
-            d <- signif(amp%%/%%10,1)
-        }
-        mn <- round(min(di))
-        mx <- round(max(di))
-        for (i in mn:mx) {
-            if ((i/d) == (i%%/%%d)) { 
-                abline(h=i,lty=3)
+    if not 'tree' in parametres :
+        txt += """
+            source("%s")
+            color = rainbow(nrow(di))
+            width <- %i
+            height <- %i
+            open_file_graph("%s",width = width, height = height, svg = %s)
+        	par(mar=c(0,0,0,0))
+    	    layout(matrix(c(1,2),1,2, byrow=TRUE),widths=c(3,lcm(7)))
+            par(mar=c(8,4,1,0))
+            yp = ifelse(length(toinf), 0.2, 0)
+            ym = ifelse(length(tominf), 0.2, 0)
+            ymin <- ifelse(!length(which(di < 0)), 0, min(di) - ym)
+            coord <- barplot(as.matrix(di), beside = TRUE, col = color, space = c(0.1,0.6), ylim=c(ymin, max(di) + yp), las = 2)
+            if (length(toinf)) {
+                coordinf <- coord[toinf]
+                valinf <- di[toinf]
+                text(x=coordinf, y=valinf + 0.1, 'i')
             }
-        }
-        par(mar=c(0,0,0,0))
-        plot(0, axes = FALSE, pch = '')
-        legend(x = 'center' , rownames(di), fill = color)
-        dev.off()
-        """ % (rgraph, ffr(tmpgraph))    
+            if (length(tominf)) {
+                coordinf <- coord[toinf]
+                valinf <- di[toinf]
+                text(x=coordinf, y=valinf - 0.1, 'i')
+            }            
+            c <- colMeans(coord)
+            c1 <- c[-1]
+            c2 <- c[-length(c)]
+            cc <- cbind(c1,c2)
+            lcoord <- apply(cc, 1, mean)
+            abline(v=lcoord)
+            if (min(di) < 0) {
+                amp <- abs(max(di) - min(di))
+            } else {
+                amp <- max(di)
+            }
+            if (amp < 10) {
+                d <- 2
+            } else {
+                d <- signif(amp%%/%%10,1)
+            }
+            mn <- round(min(di))
+            mx <- round(max(di))
+            for (i in mn:mx) {
+                if ((i/d) == (i%%/%%d)) { 
+                    abline(h=i,lty=3)
+                }
+            }
+            par(mar=c(0,0,0,0))
+            plot(0, axes = FALSE, pch = '')
+            legend(x = 'center' , rownames(di), fill = color)
+            dev.off()
+            """ % (ffr(parametres['rgraph']), parametres['width'], parametres['height'], ffr(parametres['tmpgraph']), parametres['svg'])    
+    else :
+        txt += """
+        load("%s")
+        library(ape)
+        source("%s")
+        width = %i
+        height = %i
+        open_file_graph("%s", width=width, height=height, svg = %s)
+        plot.dendro.lex(tree.cut1$tree.cl, di)
+        """ % (ffr(parametres['tree']), ffr(parametres['rgraph']), parametres['width'], parametres['height'], ffr(parametres['tmpgraph']), parametres['svg'])
     return txt
 
 #def RAfcUci(DictAfcUciOut, nd=2, RscriptsPath='', PARCEX='0.8'):

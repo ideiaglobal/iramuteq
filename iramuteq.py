@@ -191,7 +191,7 @@ class IraFrame(wx.Frame):
         item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
         file_menu.AppendItem(item)
         
-        item = wx.MenuItem(file_menu, ID_OpenText, _(u"Open a text corpora").decode('utf8'), _(u"Open a text corpora").decode('utf8'))
+        item = wx.MenuItem(file_menu, ID_OpenText, _(u"Open a text corpus").decode('utf8'), _(u"Open a text corpus").decode('utf8'))
         item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
         file_menu.AppendItem(item)
         
@@ -598,6 +598,7 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
         del busy
         if builder.res == wx.ID_OK :
             corpus = builder.doanalyse()
+            print corpus.parametres['uuid']
             self.history.add(corpus.parametres)
             self.tree.OnItemAppend(corpus.parametres)
             OpenAnalyse(self, corpus.parametres)

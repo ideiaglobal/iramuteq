@@ -18,10 +18,9 @@ import  wx
 import  wx.lib.mixins.listctrl  as  listmix
 import cStringIO
 import tempfile
-from functions import exec_rcode, MessageImage
-from dialog import message
+from functions import exec_rcode
+from dialog import message, BarFrame
 from chemins import ffr
-from PrintRScript import barplot, dendroandbarplot
 #---------------------------------------------------------------------------
 
 class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin): #wx.Panel, listmix.ColumnSorterMixin):
@@ -265,17 +264,18 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         colnames = self.first[2:]
         rownames = [val[1] for val in datas]
         table = [[str(val) for val in line[2:]] for line in datas]
-        tmpgraph = tempfile.mktemp(dir=self.parent.parent.TEMPDIR)
-        txt =  barplot(table, rownames, colnames, self.parent.parent.RscriptsPath['Rgraph'], tmpgraph)
-        tmpscript = tempfile.mktemp(dir=self.parent.parent.TEMPDIR)
-        with open(tmpscript,'w') as f :
-            f.write(txt)
-        exec_rcode(self.parent.parent.RPath, tmpscript, wait = True)
-        win = MessageImage(self, u"Graphique", size=(700, 500))
-        win.addsaveimage(tmpgraph)
-        txt = "<img src='%s'>" % tmpgraph
-        win.HtmlPage.SetPage(txt)
-        win.Show(True)
+        BarFrame(self.parent.parent, table, colnames, rownames)
+#         tmpgraph = tempfile.mktemp(dir=self.parent.parent.TEMPDIR)
+#         txt =  barplot(table, rownames, colnames, self.parent.parent.RscriptsPath['Rgraph'], tmpgraph)
+#         tmpscript = tempfile.mktemp(dir=self.parent.parent.TEMPDIR)
+#         with open(tmpscript,'w') as f :
+#             f.write(txt)
+#         exec_rcode(self.parent.parent.RPath, tmpscript, wait = True)
+#         win = MessageImage(self, u"Graphique", size=(700, 500))
+#         win.addsaveimage(tmpgraph)
+#         txt = "<img src='%s'>" % tmpgraph
+#         win.HtmlPage.SetPage(txt)
+#         win.Show(True)
 
     def ongraphdendro(self, evt) :
         corpus = self.parent.corpus
@@ -289,13 +289,14 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         rownames = [val[1] for val in datas]
         table = [[str(val) for val in line[2:]] for line in datas]
         tmpgraph = tempfile.mktemp(dir=self.parent.parent.TEMPDIR)
-        txt =  dendroandbarplot(table, rownames, colnames, self.parent.parent.RscriptsPath['Rgraph'], tmpgraph, dendro=corpus.dictpathout['Rdendro'])
-        tmpscript = tempfile.mktemp(dir=self.parent.parent.TEMPDIR)
-        with open(tmpscript,'w') as f :
-            f.write(txt)
-        exec_rcode(self.parent.parent.RPath, tmpscript, wait = True)
-        win = MessageImage(self, u"Graphique", size=(700, 500))
-        win.addsaveimage(tmpgraph)
-        txt = "<img src='%s'>" % tmpgraph
-        win.HtmlPage.SetPage(txt)
-        win.Show(True)
+        BarFrame(self.parent.parent, table, colnames, rownames, tree = corpus.dictpathout['Rdendro'])
+#         txt =  dendroandbarplot(table, rownames, colnames, self.parent.parent.RscriptsPath['Rgraph'], tmpgraph, dendro=corpus.dictpathout['Rdendro'])
+#         tmpscript = tempfile.mktemp(dir=self.parent.parent.TEMPDIR)
+#         with open(tmpscript,'w') as f :
+#             f.write(txt)
+#         exec_rcode(self.parent.parent.RPath, tmpscript, wait = True)
+#         win = MessageImage(self, u"Graphique", size=(700, 500))
+#         win.addsaveimage(tmpgraph)
+#         txt = "<img src='%s'>" % tmpgraph
+#         win.HtmlPage.SetPage(txt)
+#         win.Show(True)

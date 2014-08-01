@@ -18,10 +18,10 @@ import  wx
 import  wx.lib.mixins.listctrl  as  listmix
 import cStringIO
 import tempfile
-from functions import exec_rcode, MessageImage, doconcorde
+from functions import exec_rcode, doconcorde
 from chemins import ffr
 from PrintRScript import barplot
-from dialog import SearchDial, message
+from dialog import SearchDial, message, BarGraphDialog, MessageImage, BarFrame
 from operator import itemgetter
 #---------------------------------------------------------------------------
 
@@ -230,9 +230,11 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         for forme in lems[word].formes :
             rep.append([corpus.getforme(forme).forme, corpus.getforme(forme).freq])
         rep.sort(key = itemgetter(1), reverse = True)
-        win = message(self, u"Formes associées", (300, 200))
-        win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
-        win.HtmlPage.SetPage(win.html)
+        items = dict([[i, '<font face="courier">' + '\t:\t'.join([str(val) for val in forme]) + '</font>'] for i, forme in enumerate(rep)])
+        win = message(self, items, u"Formes associées", (300, 200))
+        #win = message(self, u"Formes associées", (300, 200))
+        #win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
+        #win.HtmlPage.SetPage(win.html)
         win.Show(True)
     
     def onstcaract(self, evt) :
@@ -316,17 +318,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         colnames = self.first
         table = [[self.getinf(val) for val in line[1:]] for line in datas]
         rownames = [val[0] for val in datas]
-        tmpgraph = tempfile.mktemp(dir=self.parent.TEMPDIR)
-        txt = barplot(table, rownames, colnames, self.parent.RscriptsPath['Rgraph'], tmpgraph)
-        tmpscript = tempfile.mktemp(dir=self.parent.TEMPDIR)
-        with open(tmpscript,'w') as f :
-            f.write(txt)
-        exec_rcode(self.parent.RPath, tmpscript, wait = True)
-        win = MessageImage(self, u"Graphique", size=(700, 500))
-        win.addsaveimage(tmpgraph)
-        txt = "<img src='%s'>" % tmpgraph
-        win.HtmlPage.SetPage(txt)
-        win.Show(True)
+        BarFrame(self.parent, table, colnames, rownames)
 
     def OnTgen_glob(self, evt) :
         activenotebook = self.parent.nb.GetSelection()

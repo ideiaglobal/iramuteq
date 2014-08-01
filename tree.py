@@ -159,7 +159,7 @@ class LeftTree(CT.CustomTreeCtrl):
                     else :
                         img = 24
                     self.SetItemImage(last, img, CT.TreeItemIcon_Normal)
-                    self.SetItemImage(last, 13, CT.TreeItemIcon_Expanded)
+                    self.SetItemImage(last, img, CT.TreeItemIcon_Expanded)
 
         self.matroot = self.AppendItem(self.root, u'Matrices')
         self.SetPyData(self.matroot, {'uuid': 'matroot'})
@@ -182,7 +182,7 @@ class LeftTree(CT.CustomTreeCtrl):
                         else :
                             img = 24
                         self.SetItemImage(last, img, CT.TreeItemIcon_Normal)
-                        self.SetItemImage(last, 13, CT.TreeItemIcon_Expanded)
+                        self.SetItemImage(last, img, CT.TreeItemIcon_Expanded)
             else :
                 orphmat.append(matrix)     
 
@@ -394,9 +394,9 @@ class LeftTree(CT.CustomTreeCtrl):
                 simi = menu.Append(wx.ID_ANY, _(u"Similarities analysis").decode('utf8'))
                 wdc = menu.Append(wx.ID_ANY, _(u"Wordcloud").decode('utf8'))
                 subcorpus = wx.Menu()
-                subcorpusfrommeta = subcorpus.Append(wx.ID_ANY, _(u'Sub corpora from metadata').decode('utf8'))
-                subcorpusfromtheme = subcorpus.Append(wx.ID_ANY, _(u'Sub corpora from thematic').decode('utf8'))
-                menu.AppendMenu(-1, _(u"SubCorpora").decode('utf8'), subcorpus)
+                subcorpusfrommeta = subcorpus.Append(wx.ID_ANY, _(u'Sub corpus from metadata').decode('utf8'))
+                subcorpusfromtheme = subcorpus.Append(wx.ID_ANY, _(u'Sub corpus from thematic').decode('utf8'))
+                menu.AppendMenu(-1, _(u"Subcorpus").decode('utf8'), subcorpus)
                 menu.AppendSeparator()
                 self.Bind(wx.EVT_MENU, self.OnReinert, reinert)
                 #self.Bind(wx.EVT_MENU, self.OnPam, pam)
@@ -430,8 +430,8 @@ class LeftTree(CT.CustomTreeCtrl):
     
                 profsr = menu.Append(wx.ID_ANY, _(u"Repeated segments profiles").decode('utf8'))
                 profgram = menu.Append(wx.ID_ANY, _(u"POS profiles").decode('utf8'))
-                export_corpus = menu.Append(wx.ID_ANY, _(u"Export corpora").decode('utf8'))
-                colored = menu.Append(wx.ID_ANY, _(u"Colored corpora").decode('utf8'))
+                export_corpus = menu.Append(wx.ID_ANY, _(u"Export corpus").decode('utf8'))
+                colored = menu.Append(wx.ID_ANY, _(u"Colored corpus").decode('utf8'))
                 navig = menu.Append(wx.ID_ANY, _(u"Navigator").decode('utf8'))
                 statclasse = menu.Append(wx.ID_ANY, _(u"Clusters statistics").decode('utf8'))
                 rapport = menu.Append(wx.ID_ANY, _(u"Report").decode('utf8'))
@@ -578,7 +578,7 @@ class LeftTree(CT.CustomTreeCtrl):
             dlg.Destroy()
 
     def OnColored(self, evt) :
-        dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.html', 'title': _(u"Colored corpora").decode('utf8')})
+        dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.html', 'title': _(u"Colored corpus").decode('utf8')})
         dial.fbb.SetValue(os.path.join(os.path.dirname(self.page.dictpathout['ira']), 'corpus_couleur.html'))
         dial.CenterOnParent()
         res = dial.ShowModal()
@@ -928,7 +928,7 @@ class LeftTree(CT.CustomTreeCtrl):
         else :
             img = 24
         self.SetItemImage(child, img, CT.TreeItemIcon_Normal)
-        self.SetItemImage(child, 13, CT.TreeItemIcon_Expanded)
+        self.SetItemImage(child, img, CT.TreeItemIcon_Expanded)
         self.SetItemBold(child, True)
         
         #dlg = wx.TextEntryDialog(self, "Please Enter The New Item Name", 'Item Naming', 'Python')
