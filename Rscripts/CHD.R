@@ -26,17 +26,28 @@ find.max <- function(dtable, chitable, compte, rmax, maxinter, sc, TT) {
     lo[1:nrow(dtable)] <- 0
     for (k in 1:nrow(ln)) {lo[[ln[k,1]]]<-append(lo[[ln[k,1]]],ln[k,2])}
     for (k in 1:nrow(dtable)) {lo[[k]] <- lo[[k]][-1]}
-    lo<-lo[-c(1,length(lo))]
-    for (l in lo) {
-        compte <- compte + 1 
-        chitable[1,l]<-chitable[1,l]+1
-        chitable[2,l]<-chitable[2,l]-1
-        chi<-MyChiSq(chitable,sc,TT)
-        if (chi>maxinter) {
-            maxinter<-chi
-            rmax<-compte
-        }   
-    }
+	## lo<-lo[-c(1,length(lo))]
+	## for (l in lo) {
+	##     compte <- compte + 1 
+	##     chitable[1,l]<-chitable[1,l]+1
+	##     chitable[2,l]<-chitable[2,l]-1
+	##     chi<-MyChiSq(chitable,sc,TT)
+		## if (chi>maxinter) {
+		##     maxinter<-chi
+		##     rmax<-compte
+		## }   
+    #}
+	lo<-lo[-c(1)]
+	for (l in lo) {
+		chi<-MyChiSq(chitable,sc,TT)
+		if (chi>maxinter) {
+			maxinter<-chi
+			rmax<-compte
+		}
+		compte <- compte + 1
+		chitable[1,l]<-chitable[1,l]+1
+		chitable[2,l]<-chitable[2,l]-1
+	}	
     res <- list(maxinter=maxinter, rmax=rmax)
     res
 }  
