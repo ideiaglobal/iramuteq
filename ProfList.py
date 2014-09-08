@@ -599,9 +599,10 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             ntab2.sort(reverse = True)
             ntab2 = ntab2[:limite]
             nuces = [val[1] for val in ntab2]
+            orderuce = [[uce, i] for i, uce in enumerate(nuces)]
             dlg.Update(3, u'concordancier...')
             ucis_txt, ucestxt = doconcorde(corpus, nuces, self.la, uci = uci)
-            items = dict([[i, '<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table><br>' % ntab2[i][0], ucestxt[i]])] for i in range(0,len(ucestxt))])
+            items = dict([[uce[1], '<br>'.join([ucis_txt[uce[1]], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table><br>' % ntab2[uce[1]][0], ucestxt[uce[1]]])] for uce in orderuce])
             dlg.Update(4, u'texte...')
             win = message(self, items, u"Segments de texte caractéristiques - Classe %i" % self.cl, (750, 600))
             #win.html = '<html>\n' + '<br>'.join(['<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table>' % ntab2[i][0], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'

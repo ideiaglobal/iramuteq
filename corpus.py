@@ -214,7 +214,7 @@ class Corpus :
         return [len(uce[1].split()) for uce in res]
 
     def getconcorde(self, uces) :
-        return self.cuces.execute('select * from uces where id IN (%s);' % ', '.join([`i` for i in uces])) 
+        return self.cuces.execute('select * from uces where id IN (%s) ORDER BY id;' % ', '.join([`i` for i in uces])) 
     
     def getuciconcorde(self, ucis) :
         uces = [[val,[uce.ident for uce in self.ucis[val].uces]] for val in ucis]
@@ -1130,7 +1130,7 @@ class BuildCorpus :
         self.corpus.pathout = PathOut(filename = parametres_corpus['originalpath'], dirout = parametres_corpus['pathout'])
         self.corpus.pathout.createdir(parametres_corpus['pathout'])
         self.corpus.parametres['uuid'] = str(uuid4())
-        self.corpus.parametres['corpus_name'] = os.path.split(self.corpus.parametres['pathout'])[1]
+        self.corpus.parametres['corpus_name'] = parametres_corpus['corpus_name']#os.path.split(self.corpus.parametres['pathout'])[1]
         self.corpus.parametres['type'] = 'corpus'
         if self.corpus.parametres['keep_ponct'] :
             self.ponctuation_espace = [' ', '']
@@ -1490,6 +1490,7 @@ class Builder :
         self.dlg = dlg
         parametres = DoConf(os.path.join(self.parent.UserConfigPath,'corpus.cfg')).getoptions('corpus')
         parametres['pathout'] = PathOut(parent.filename, 'corpus').mkdirout()
+        parametres['corpus_name'] = os.path.split(parametres['pathout'])[1]
         dial = CorpusPref(parent, parametres)
         dial.CenterOnParent()
         dial.txtpath.SetLabel(parent.filename)
