@@ -1304,7 +1304,7 @@ class BuildSubCorpus(BuildCorpus):
         self.dlg = dlg
         self.ori = corpus
         self.infile = None
-        self.corpus = Corpus(self, corpus.parametres)
+        self.corpus = Corpus(self, {'type' : 'corpus', 'originalpath' : corpus.parametres['originalpath'], 'encoding' : corpus.parametres['encoding']})
         self.last = 0
         self.encoding = corpus.parametres['encoding']
         self.corpus.parametres['corpus_name'] = parametres['corpus_name']
@@ -1336,6 +1336,31 @@ class BuildSubCorpus(BuildCorpus):
                     idpara += 1  
         elif parametres.get('fromcluster', False) :
             pass
+        elif parametres.get('fromuceids', False) :
+            print 'fromuceids'
+            dictucekeep = dict(zip(parametres['uceids'], parametres['uceids']))
+            idpara = 0
+            for uci in self.ori.ucis :
+                if uci.paras == [] :
+                    keepuces = [uce for uce in uci.uces if uce.ident in dictucekeep]
+                    if keepuces != [] :
+                        uci.uces = keepuces
+                        self.corpus.ucis.append(uci)
+                    idpara += 1
+                else :
+                    newuces = []
+                    newpara = []
+                    for et in uci.paras :
+                        keepuces = [uce for uce in uci.uces if uce.para == idpara]
+                        idpara += 1
+                        if keepuces != [] :
+                            newuces += keepuces
+                            newpara.append(et)
+                    if newuces != [] :
+                        uci.uces = newuces
+                        uci.paras = newpara
+                        self.corpus.ucis.append(uci)
+                        
         #create database
         self.connect()
         self.dobuild()
@@ -1525,6 +1550,8 @@ class SubBuilder :
             parametres['meta'] = corpus.make_etoiles()
         elif parametres.get('fromtheme', False) :
             parametres['meta'] = corpus.make_themes()
+        else :
+            parametres['meta'] = []
         parametres['meta'].sort()
         dial = SubTextFromMetaDial(parent, parametres)
         self.res = dial.ShowModal()

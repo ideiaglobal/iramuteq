@@ -172,7 +172,7 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
         we.width <- NULL
     }
     if (method != 'binom') {
-        we.label <- round(E(g.toplot)$weight,1)
+        we.label <- round(E(g.toplot)$weight,2)
     } else {
         we.label <- round(E(g.toplot)$weight,3)
     }
@@ -313,6 +313,7 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
         #rgl.open()
         #par3d(cex=0.8)
         lo <- layout.norm(lo, -10, 10, -10, 10, -10, 10)
+		bg3d('white')
 		rglplot(g.toplot,vertex.label='', edge.width=we.width/10, vertex.size=0.01, vertex.color=vertex.col, vertex.label.color="black", edge.color = edge.col, layout=lo, rescale = FALSE)
         #los <- layout.norm(lo, -1, 1, -1, 1, -1, 1)
 		text3d(lo[,1], lo[,2], lo[,3], vire.nonascii(v.label), col = vertex.label.color, alpha = 1, cex = vertex.label.cex)

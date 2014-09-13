@@ -176,9 +176,10 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
         for forme in lems[word].formes :
             rep.append([corpus.getforme(forme).forme, corpus.getforme(forme).freq])
         rep.sort(key = itemgetter(1), reverse = True)
-        win = message(self, u"Formes associées", (300, 200))
-        win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
-        win.HtmlPage.SetPage(win.html)
+        items = dict([[i, '<font face="courier">' + '\t:\t'.join([str(val) for val in forme]) + '</font>'] for i, forme in enumerate(rep)])
+        win = message(self, items, _(u"Associated forms").decode('utf8'), (300, 200))
+        #win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
+        #win.HtmlPage.SetPage(win.html)
         win.Show(True)
 
     def OnPopupTwo(self, event):
@@ -187,7 +188,7 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
         uce_ok = corpus.getlemuces(item)
         ucis_txt, ucestxt = doconcorde(corpus, uce_ok, [item])
         items = dict([[i, '<br><br>'.join([ucis_txt[i], ucestxt[i]])] for i in range(0,len(ucestxt))])
-        win = message(self, items, u"Concordancier - %s" % item, (800, 500))
+        win = message(self, items, u"Concordancier - %s" % item, (800, 500), uceids = uce_ok)
         #win = message(self, u"Concordancier", (750, 600))
         #win.html = ('<html>\n<h1>%s</h1>' % item) + '<br>'.join(['<br>'.join([ucis_txt[i], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
         #win.HtmlPage.SetPage(win.html)

@@ -138,7 +138,7 @@ def install_textometrieR(self) :
     dlg.Destroy()
 
 def CheckRPackages(self):
-    listdep = ['ca', 'rgl', 'gee', 'ape', 'igraph','proxy', 'wordcloud', 'irlba', 'textometrieR']
+    listdep = ['ca', 'rgl', 'gee', 'ape', 'igraph','proxy', 'wordcloud', 'irlba', 'textometry']
     nolib = []
     i=0
     dlg = wx.ProgressDialog("Test des librairies de R", "test en cours...", maximum = len(listdep), parent=self, style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT)
@@ -159,9 +159,9 @@ def CheckRPackages(self):
     dlg.Update(len(listdep),'fini')
     dlg.Destroy()
     install_textoR = False
-    if 'textometrieR' in nolib :
-         nolib.pop(nolib.index('textometrieR'))
-         install_textoR = True
+    #if 'textometrieR' in nolib :
+    #     nolib.pop(nolib.index('textometrieR'))
+    #     install_textoR = True
     if nolib != [] :
         txt = '\n'.join(nolib)
         msg = u"""Les bibliothèques de R suivantes sont manquantes :

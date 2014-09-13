@@ -381,7 +381,8 @@ class LeftTree(CT.CustomTreeCtrl):
         
         if not item in [self.textroot, self.matroot] :
             menu = wx.Menu()
-            info = menu.Append(wx.ID_ANY, "Informations")
+            info = menu.Append(wx.ID_ANY, _(u"Informations").encode('utf8'))
+            rename = menu.Append(wx.ID_ANY, _(u"Rename").encode('utf8'))
             menu.AppendSeparator()
     
             if 'corpus_name' in pydata :
@@ -396,7 +397,7 @@ class LeftTree(CT.CustomTreeCtrl):
                 subcorpus = wx.Menu()
                 subcorpusfrommeta = subcorpus.Append(wx.ID_ANY, _(u'Sub corpus from metadata').decode('utf8'))
                 subcorpusfromtheme = subcorpus.Append(wx.ID_ANY, _(u'Sub corpus from thematic').decode('utf8'))
-                menu.AppendMenu(-1, _(u"Subcorpus").decode('utf8'), subcorpus)
+                menu.AppendMenu(-1, _(u"Sub corpus").decode('utf8'), subcorpus)
                 menu.AppendSeparator()
                 self.Bind(wx.EVT_MENU, self.OnReinert, reinert)
                 #self.Bind(wx.EVT_MENU, self.OnPam, pam)
@@ -412,6 +413,10 @@ class LeftTree(CT.CustomTreeCtrl):
                     itemid = item.GetId()
                     itemtext = item.GetText()
                     menu.Append(itemid, itemtext)
+                split = wx.Menu()
+                splitfromvar = split.Append(-1, _(u"Split from variable").decode('utf8'))
+                menu.AppendMenu(-1, _(u"Split matrix").decode('utf8'), split)
+                self.Bind(wx.EVT_MENU, self.OnSplitFromVar, splitfromvar)
                     #print item, itemid, itemtext
                 #menu = self.parent.matrix_menu
                 #freq = menu.Append(wx.ID_ANY, _(u"Frequency").decode('utf8'))
@@ -478,6 +483,7 @@ class LeftTree(CT.CustomTreeCtrl):
             #self.Bind(wx.EVT_MENU, self.OnDisableItem, item7)
             #self.Bind(wx.EVT_MENU, self.OnItemIcons, item8)
             self.Bind(wx.EVT_MENU, self.OnItemInfo, info)
+            self.Bind(wx.EVT_MENU, self.OnRename, rename)
             self.Bind(wx.EVT_MENU, self.OnItemDelete, itemdelete)
             #self.Bind(wx.EVT_MENU, self.OnItemPrepend, item11)
             #self.Bind(wx.EVT_MENU, self.OnItemAppend, item12)
@@ -539,6 +545,12 @@ class LeftTree(CT.CustomTreeCtrl):
         
     def OnSimiTab(self, evt): 
         self.parent.OnSimiTab(evt, self.getmatrix())
+    
+    def OnProto(self, evt):
+        self.parent.OnProto(evt, self.getmatrix())
+    
+    def OnSplitFromVar(self, evt):
+        self.parent.OnSplitVar(evt, self.getmatrix())
         
     def OnCHDReinert(self, evt):
         self.parent.OnCHDReinert(evt, self.getmatrix())
@@ -705,6 +717,10 @@ class LeftTree(CT.CustomTreeCtrl):
         dial = wx.MessageDialog(self, self.page.pathout['classe_x_export.txt'], u"Export", wx.OK|wx.ICON_INFORMATION)
         dial.ShowModal()
         dial.Destroy()
+    
+    def OnRename(self, event):
+        pydata = self.itemdict['pydata']
+        print pydata
 
     def OnItemBackground(self, event):
 

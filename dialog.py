@@ -79,7 +79,7 @@ class FileOptionDialog(wx.Dialog):
             grid_sizer.Add(self.choice4, 1, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
             self.choice3.SetSelection(0)
             self.choice4.SetSelection(0)
-            self.text = wx.StaticText(self, -1, _(u"Character set").decode('utf8'))
+            self.text = wx.StaticText(self, -1, _(u"Characters set").decode('utf8'))
             grid_sizer.Add(self.text, 1, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
             self.le = [enc[0].lower() for enc in encodages] 
             self.list_encodages = wx.Choice(self, -1, (25, 30), choices=[' - '.join(encodage) for encodage in encodages])
@@ -593,7 +593,7 @@ class PrefGraph(wx.Dialog):
         self.spin_f2 = wx.SpinCtrl(self, -1, '',size = (100,30), min=1, max=self.paramgraph['clnb']-1)
         self.label_f3 = wx.StaticText(self, -1, _(u"Factor z : ").decode('utf8'))
         self.spin_f3 = wx.SpinCtrl(self, -1, '',size = (100,30), min=1, max=self.paramgraph['clnb']-1)
-        self.label_sphere = wx.StaticText(self, -1, _(u"Sphere transparency").decode('utf8'))
+        self.label_sphere = wx.StaticText(self, -1, _(u"Spheres transparency").decode('utf8'))
         self.slider_sphere = wx.Slider(self, -1, 10, 1, 100, size = (255,-1), style = wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS)
 
         self.label_film = wx.StaticText(self, -1, _(u"Make a movie").decode('utf8'))
@@ -1270,7 +1270,7 @@ class PrefSegProf(wx.Dialog) :
         self.spin_min.SetValue(2)
         fgSizer1.Add( self.spin_min, 0, wx.ALL, 5 )
         
-        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, _(u"Minimum size of segments").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, _(u"Maxmum size of segments").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText4.Wrap( -1 )
         fgSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -1358,7 +1358,7 @@ class PrefQuestAlc ( wx.Dialog ):
         fgSizer1.Add( self.but_prec, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         if not sim :
-            self.lab_nbcl = wx.StaticText( self, wx.ID_ANY, _(u"Number of terminal clusters in phase 1").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.lab_nbcl = wx.StaticText( self, wx.ID_ANY, _(u"Number of terminal clusters on phase 1").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
             self.lab_nbcl.Wrap( -1 )
             fgSizer1.Add( self.lab_nbcl, 0, wx.ALL, 5 )
             
@@ -2274,7 +2274,7 @@ class CorpusPref ( wx.Dialog ):
         self.txtpath.Wrap( -1 )
         fgSizer1.Add( self.txtpath, 0, wx.ALL, 5 )
 
-        self.m_staticText18 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Corpus' name", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText18 = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"Corpus' name").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText18.Wrap( -1 )
         fgSizer1.Add( self.m_staticText18, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2299,7 +2299,7 @@ class CorpusPref ( wx.Dialog ):
         self.lang_choices.SetSelection( 0 )
         fgSizer1.Add( self.lang_choices, 0, wx.ALL, 5 )
 
-        self.m_staticText19 = wx.StaticText( self.m_panel1, wx.ID_ANY, u"Dictionary", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText19 = wx.StaticText( self.m_panel1, wx.ID_ANY, _(u"Dictionary").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText19.Wrap( -1 )
         fgSizer1.Add( self.m_staticText19, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -2309,7 +2309,7 @@ class CorpusPref ( wx.Dialog ):
         fgSizer5.SetFlexibleDirection( wx.BOTH )
         fgSizer5.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.radio_default_dict = wx.RadioButton( self.m_panel1, wx.ID_ANY, u"Default", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.radio_default_dict = wx.RadioButton( self.m_panel1, wx.ID_ANY, _(u"Default").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer5.Add( self.radio_default_dict, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         self.defaultdictpath = wx.TextCtrl( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 300,-1 ), wx.TE_READONLY )
@@ -2317,10 +2317,10 @@ class CorpusPref ( wx.Dialog ):
         
         fgSizer5.Add( self.defaultdictpath, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.radio_other_dict = wx.RadioButton( self.m_panel1, wx.ID_ANY, u"Other", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.radio_other_dict = wx.RadioButton( self.m_panel1, wx.ID_ANY, _(u"Other").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer5.Add( self.radio_other_dict, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.otherdictpath = wx.FilePickerCtrl( self.m_panel1, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.Size( 300,-1 ), wx.FLP_DEFAULT_STYLE )
+        self.otherdictpath = wx.FilePickerCtrl( self.m_panel1, wx.ID_ANY, wx.EmptyString, _(u"Select a file").decode('utf8'), u"*.*", wx.DefaultPosition, wx.Size( 300,-1 ), wx.FLP_DEFAULT_STYLE )
         fgSizer5.Add( self.otherdictpath, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         
@@ -2505,6 +2505,7 @@ class CorpusPref ( wx.Dialog ):
         self.encodage_choices.SetSelection(enc)
         self.lang_choices.SetSelection(0)
         self.repout_choices.SetValue(parametres['pathout'])
+        self.corpusname.SetValue(parametres['corpus_name'])
         self.ucimark_choices.SetSelection(parametres['ucimark'])
         self.check_expressions.SetValue(parametres['expressions'])
         self.check_makeuce.SetValue(parametres['douce'])
@@ -2523,6 +2524,7 @@ class CorpusPref ( wx.Dialog ):
         parametres['encoding'] = encodages[self.encodage_choices.GetSelection()][0]
         parametres['lang'] = self.langues[self.lang_choices.GetSelection()]
         parametres['pathout'] = self.repout_choices.GetValue()
+        parametres['corpus_name'] = self.corpusname.GetValue()
         parametres['ucimark'] = self.ucimark_choices.GetSelection()
         parametres['expressions'] = self.check_expressions.GetValue()
         parametres['douce'] =  self.check_makeuce.GetValue()
@@ -2563,9 +2565,11 @@ class ConcordList(wx.HtmlListBox):
         return self.concord[index] #+ '<br>'
 
 class message(wx.Frame):
-    def __init__(self, parent, items, title, size, save = True):
+    def __init__(self, parent, items, title, size, save = True, uceids = None):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_FRAME_STYLE )
-        self.save = save    
+        self.save = save
+        self.uceids = uceids
+        self.ira = wx.GetApp().GetTopWindow() 
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 
         self.html = ""
@@ -2582,18 +2586,24 @@ class message(wx.Frame):
         if self.save :
             self.button_2 = wx.Button(self, wx.ID_SAVE)
             self.Bind(wx.EVT_BUTTON, self.OnSavePage, self.button_2)
+        if self.uceids is not None :
+            self.butsub = wx.Button(self, -1, _(u"Build sub corpus").decode('utf8'))
+            self.Bind(wx.EVT_BUTTON, self.OnSub, self.butsub)
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
         self.__do_layout()
 
     def __do_layout(self):
         sizer_2 = wx.BoxSizer(wx.VERTICAL)
         sizer_2.Add(self.HtmlPage, 1, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
-        m_sdbSizer1 = wx.StdDialogButtonSizer()
-        m_sdbSizer1.AddButton(  self.button_1 )
+        #m_sdbSizer1 = wx.StdDialogButtonSizer()
+        m_sdbSizer1 = wx.BoxSizer(wx.HORIZONTAL)
+        m_sdbSizer1.Add(  self.button_1 , 0, wx.RIGHT | wx.EXPAND)
         if self.save :
-            m_sdbSizer1.AddButton(  self.button_2 )
-        m_sdbSizer1.Realize()
-        sizer_2.Add(m_sdbSizer1, 0, wx.EXPAND, 5)
+            m_sdbSizer1.Add(  self.button_2 , 0, wx.RIGHT | wx.EXPAND)
+        if self.uceids is not None :
+            m_sdbSizer1.Add(  self.butsub , 0, wx.RIGHT | wx.EXPAND)
+        #m_sdbSizer1.Realize()
+        sizer_2.Add(m_sdbSizer1, 0, wx.RIGHT | wx.EXPAND, 5)
         self.SetSizer(sizer_2)
         self.Layout()
         sizer_2.Fit( self )
@@ -2615,6 +2625,10 @@ class message(wx.Frame):
 
     def OnCloseWindow(self, event):
         self.Destroy()
+    
+    def OnSub(self ,evt):
+        parametres = {'fromuceids' : True, 'uceids' : self.uceids}
+        self.ira.OnSubText(None, parametres)
 
 
 
@@ -2707,7 +2721,7 @@ class ExtractDialog ( wx.Dialog ):
         m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
         self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
         m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
-        m_sdbSizer1.Realize();
+        m_sdbSizer1.Realize()
         
         fgSizer1.Add( m_sdbSizer1, 1, wx.EXPAND, 5 )
         

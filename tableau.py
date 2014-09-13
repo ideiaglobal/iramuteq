@@ -226,16 +226,17 @@ class Tableau() :
     def extractfrommod(self, col, val):
         return ([''] + self.colnames) + [line for line in self.csvtable[1:] if line[col + 1] == val]
 
-    def splitfromvar(self, col, var):
+    def splitfromvar(self, col):
         newtabs = {}
         for line in self.csvtable[1:] :
-            mod = line[col]
+            mod = line[col+1]
             if mod in newtabs :
                 newtabs[mod].append(line)
             else :
                 newtabs[mod] = [line]
-        return ([''] + self.colnames) + newtab
-
+        for mod in newtabs :
+            newtabs[mod].insert(0, [''] + self.colnames)
+        return newtabs
 
     def check_rownames(self) :
         if len(self.rownames) == len(list(set(self.rownames))) :

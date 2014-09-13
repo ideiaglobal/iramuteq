@@ -236,7 +236,7 @@ class PrefSimi ( wx.Dialog ):
         self.m_staticline295 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline295, 0, wx.EXPAND, 5 )
         
-        self.m_staticText5 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Graphical type").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText5 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Graphic type").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText5.Wrap( -1 )
         fgSizer3.Add( self.m_staticText5, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
         

@@ -19,23 +19,23 @@ from analysematrix import AnalyseMatrix
 from dialog import ProtoDial
 
 class Prototypical(AnalyseMatrix) :
-    def __init__(self, parent, parametres):
-        self.parent = parent
-        self.tableau = self.parent.tableau
-        self.parametres = parametres
-        self.parametres['filename'] = parent.tableau.parametre['filename']
-        self.parametres['pathout'] = ConstructPathOut(parent.tableau.parametre['filename'], 'proto')
-        self.parametres['type'] = 'proto'
-        dlg = progressbar(self.parent, 2)
-        self.colnames = self.tableau.get_colnames()
-        AnalyseMatrix.__init__(self, parent, parent.tableau, self.parametres, dlg = dlg)
+#     def __init__(self, parent, parametres):
+#         self.parent = parent
+#         self.tableau = self.parent.tableau
+#         self.parametres = parametres
+#         self.parametres['filename'] = parent.tableau.parametre['filename']
+#         self.parametres['pathout'] = ConstructPathOut(parent.tableau.parametre['filename'], 'proto')
+#         self.parametres['type'] = 'proto'
+#         dlg = progressbar(self.parent, 2)
+#         self.colnames = self.tableau.get_colnames()
+#         AnalyseMatrix.__init__(self, parent, parent.tableau, self.parametres, dlg = dlg)
     
     def doanalyse(self) :
         res = self.check_val()
         return res
 
     def check_val(self) :
-        self.dial = ProtoDial(self.ira, self.colnames)
+        self.dial = ProtoDial(self.ira, self.tableau.colnames)
         self.dial.CenterOnParent()
 
         self.val = self.dial.ShowModal()
@@ -84,8 +84,8 @@ class Prototypical(AnalyseMatrix) :
         res = [[word, words[word][0], float(sum(words[word][1])) / len(words[word][1])] for word in words if len(words[word][1]) != 0 and words[word][0] >= self.parametres['freqmin']]
         with open(self.pathout['table.csv'], 'w') as f :
             f.write('\n'.join(['\t'.join(['"' + val[0] +'"', `val[1]`, `val[2]`]) for val in res]))
-        self.parent.tableau.parametres = self.parent.tableau.parametre
-        self.parent.tableau.save_tableau(self.pathout['analyse.db'])
+        #self.parent.tableau.parametres = self.parent.tableau.parametre
+        #self.parent.tableau.save_tableau(self.pathout['analyse.db'])
 
     def DoR(self) :
         script = ProtoScript(self)

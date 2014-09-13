@@ -931,6 +931,9 @@ class PrintSimiScript(PrintRScript) :
             """
         txt += """
         seuil <- %s
+        if (method!='cooc') {
+            seuil <- seuil/100
+        } 
         """ % seuil
         
         txt += """

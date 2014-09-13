@@ -47,6 +47,7 @@ from tabchdalc import AnalyseQuest
 from tabsimi import DoSimi
 from tabrsimple import InputText
 from tabverges import Prototypical
+from tabsplitvar import SplitMatrixFromVar
 #from textafcuci import AfcUci
 from textdist import AnalysePam
 from textstat import Stat
@@ -223,7 +224,7 @@ class IraFrame(wx.Frame):
         self.ID_splitvar = splitvar.GetId()
         self.ID_extractmod = extractmod.GetId()
         self.ID_extractthem = extractthem.GetId()
-        file_menu.AppendMenu(-1, _(u"Tools"), menuTools)
+        file_menu.AppendMenu(-1, _(u"Tools").decode('utf8'), menuTools)
 
                
         #item = wx.MenuItem(file_menu, ID_SaveTab, _(u"Save tab as...").decode('utf8'), _(u"Save tab as...").decode('utf8'))
@@ -240,20 +241,25 @@ class IraFrame(wx.Frame):
         view_menu.Append(ID_VIEWDATA, _(u"Show data").decode('utf8'))
         view_menu.Append(ID_RESULT, _(u'Show results').decode('utf8'))
         #view_menu.AppendSeparator()
-        analyse_menu = wx.Menu()
-        analyse_menu.Append(ID_Freq, _(u"Frequencies").decode('utf8'))
-        analyse_menu.Append(ID_Chi2, _(u"Chi2").decode('utf8'))
-        #analyse_menu.Append(ID_Student, u"t de Student")
+        matrix_menu = wx.Menu()
+        matrix_menu.Append(ID_Freq, _(u"Frequencies").decode('utf8'))
+        matrix_menu.Append(ID_Chi2, _(u"Chi2").decode('utf8'))
+        #matrix_menu.Append(ID_Student, u"t de Student")
         menu_classif = wx.Menu()
         menu_classif.Append(ID_CHDReinert, _(u"Reinert's Method").decode('utf8'))
         #menu_classif.Append(ID_CHDSIM, u"Par matrice des distances")
-        analyse_menu.AppendMenu(-1, _(u"Clustering").decode('utf8'), menu_classif)
-        #analyse_menu.Append(ID_AFCM, u"AFCM")
-        analyse_menu.Append(ID_SIMI, _(u"Similarities Analysis").decode('utf8'))
-        analyse_menu.Append(ID_proto, _(u"Prototypical Analysis").decode('utf8'))
+        matrix_menu.AppendMenu(-1, _(u"Clustering").decode('utf8'), menu_classif)
+        #matrix_menu.Append(ID_AFCM, u"AFCM")
+        matrix_menu.Append(ID_SIMI, _(u"Similarities Analysis").decode('utf8'))
+        matrix_menu.Append(ID_proto, _(u"Prototypical Analysis").decode('utf8'))
         ID_RCODE = wx.NewId()
-        analyse_menu.Append(ID_RCODE, u"Code R...") 
-        self.analyse_menu = analyse_menu
+        matrix_menu.Append(ID_RCODE, u"Code R...") 
+        #menu_splittab = wx.Menu()
+        #ID_SPLITVAR = wx.NewId()
+        #splitvar = wx.MenuItem(menu_splittab, ID_SPLITVAR, _(u"Split from variable").decode('utf8'))
+        #menu_splittab.AppendItem(splitvar)
+        #matrix_menu.AppendMenu(-1, _(u"Split matrix").decode('utf8'), menu_splittab)
+        self.matrix_menu = matrix_menu
         
         text_menu = wx.Menu()
         #text_menu.Append(ID_CHECKCORPUS, u"Vérifier le corpus")
@@ -276,7 +282,7 @@ class IraFrame(wx.Frame):
         self.mb.Append(file_menu, _(u"File").decode('utf8'))
         self.mb.Append(edit_menu, _(u"Edition").decode('utf8'))
         self.mb.Append(view_menu, _(u"View").decode('utf8'))
-        self.mb.Append(analyse_menu, _(u"Matrix analysis").decode('utf8'))
+        self.mb.Append(matrix_menu, _(u"Matrix analysis").decode('utf8'))
         self.mb.Append(text_menu, _(u"Text analysis").decode('utf8'))
         self.mb.Append(help_menu, _(u"Help").decode('utf8'))
         
@@ -381,6 +387,7 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnAFCM, id=ID_AFCM)
         self.Bind(wx.EVT_MENU, self.OnProto, id=ID_proto)
         self.Bind(wx.EVT_MENU, self.OnRCode, id=ID_RCODE)
+        #self.Bind(wx.EVT_MENU, self.OnSplitVar, id=ID_SPLITVAR)
         #self.Bind(wx.EVT_MENU, self.OnCheckcorpus, id = ID_CHECKCORPUS)
         self.Bind(wx.EVT_MENU, self.OnTextStat, id=ID_TEXTSTAT)
         self.Bind(wx.EVT_MENU, self.OnTextSpec, id=ID_ASLEX)
@@ -592,6 +599,8 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
         self._mgr.Update()
     
     def OnSubText(self, corpus, parametres = None):
+        if corpus is None :
+            corpus = self.tree.getcorpus()
         busy = wx.BusyInfo(_("Please wait...").decode('utf8'), self)
         wx.SafeYield()
         builder = SubBuilder(self, corpus, parametres)
@@ -654,7 +663,7 @@ Laboratoire LERASS
 REPERE
 """
         info.WebSite = ("http://www.iramuteq.org", u"Site web IRaMuTeQ")
-        dev = ConfigGlob.get('DEFAULT', 'dev').split(';')
+        dev = ConfigGlob.get('DEFAULT', 'dev').decode('utf8').split(';')
         info.Developers = dev
         info.License = u"""Iramuteq est un logiciel libre ; vous pouvez le diffuser et/ou le modifier 
 suivant les termes de la Licence Publique Générale GNU telle que publiée 
@@ -877,8 +886,14 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 #         except:
 #             BugReport(self)
     
-    def OnProto(self, evt) :
-        Prototypical(self, {'type' : 'proto'})
+    def OnProto(self, evt, matrix = None) :
+        self.analyse_matrix(Prototypical, matrix = matrix, analyse_type = 'proto', dlgnb = 3) 
+        #Prototypical(self, {'type' : 'proto'})
+    
+    def OnSplitVar(self, evt, matrix = None):
+        self.analyse_matrix(SplitMatrixFromVar, matrix = matrix, analyse_type = 'splitvar', dlgnb = 3)
+        matrix = self.tree.getmatrix()
+        
 
     def OnSimiTxt(self, evt, corpus = None) :
         #    print 'PLUS DE BUG SUR SIMITXT'
@@ -1046,9 +1061,14 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         if truepath :
             if os.path.splitext(self.filename)[1] in ['.csv', '.xls', '.ods']:
                 self.tableau = Tableau(self, self.filename)
-                get_table_param(self, self.filename)
-                self.tableau.make_content()
-                self.tableau.show_tab()
+                val = get_table_param(self, self.filename)
+                if val == wx.ID_OK :
+                    self.tableau.make_content()
+                    OpenAnalyse(self, self.tableau.parametres)
+                    self.tree.OnItemAppend(self.tableau.parametres)
+                #get_table_param(self, self.filename)
+                #self.tableau.make_content()
+                #self.tableau.show_tab()
                 #open_data(self, self.filename)
             elif os.path.splitext(self.filename)[1] == '.txt':
                 self.OpenText()
