@@ -51,7 +51,7 @@ class TGen :
         if path is None :
             path = self.path
         with open(path, 'w') as f :
-            f.write('\n'.join(['\t'.join([val] + self.tgen[val]) for val in self.tgen]))
+            f.write('\n'.join(['\t'.join([val] + self.tgen[val]) for val in self.tgen]).encode(self.encoding))
     
     def writetable(self, pathout, tgens, totocc):
         etoiles = totocc.keys()
