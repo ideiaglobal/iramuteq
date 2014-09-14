@@ -217,7 +217,7 @@ class TgenSpec(AnalyseText):
         self.doanalyse()
         
     def doanalyse(self):
-        self.tgen = TGen(path = self.parametres['tgenpath'])
+        self.tgen = TGen(path = self.parametres['tgenpath'], encoding = self.ira.syscoding)
         self.tgen.read(self.tgen.path)
         tgenocc, totocc = self.corpus.make_tgen_table(self.tgen, self.parametres['etoiles'])
         self.parametres['tgeneff'] = os.path.join(self.parametres['pathout'], 'tgeneff.csv')
