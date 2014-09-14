@@ -1189,7 +1189,7 @@ class TgenSpecScript(PrintRScript):
         self.packages(['textometry'])
         txt = """
         tgen <- read.csv2("%s", row.names = 1, sep = '\\t')
-        """ % self.parametres['tgeneff']
+        """ % ffr(self.parametres['tgeneff'])
         txt += """
         tot <- tgen[nrow(tgen), ]
         result <- NULL
