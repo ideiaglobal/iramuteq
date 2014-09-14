@@ -379,7 +379,7 @@ class OpenCHDS():
         self.cluster_size = []
         clusternames = {}
         for i in range(0, clnb) :
-            clusternames[i] = ' '.join(['%i' % i + 1, _(u'Cluster').decode('utf8'),  '%i' % i + 1])
+            clusternames[i] = ' '.join([u'%i' % (i + 1), _(u'Cluster').decode('utf8'),  u'%i' % (i + 1)])
         if os.path.exists(self.pathout['classes_names.txt']) :
             with codecs.open(self.pathout['classes_names.txt'], 'r', self.parent.syscoding) as f :
                 clusternames_ = f.read()
