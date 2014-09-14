@@ -1545,6 +1545,9 @@ class SubBuilder :
         self.ori = corpus
         self.dlg = dlg
         corpus_name = 'Sub' + corpus.parametres['corpus_name']
+        if dlg is not None :
+            busy = wx.BusyInfo(_("Please wait...").decode('utf8'), self)
+            wx.SafeYield()
         parametres['corpus_name'] = corpus_name
         if parametres.get('frommeta', False) :
             parametres['meta'] = corpus.make_etoiles()
@@ -1553,6 +1556,8 @@ class SubBuilder :
         else :
             parametres['meta'] = []
         parametres['meta'].sort()
+        if dlg is not None :
+            del busy
         dial = SubTextFromMetaDial(parent, parametres)
         self.res = dial.ShowModal()
         if self.res == 5100 :

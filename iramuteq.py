@@ -601,16 +601,15 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
     def OnSubText(self, corpus, parametres = None):
         if corpus is None :
             corpus = self.tree.getcorpus()
-        busy = wx.BusyInfo(_("Please wait...").decode('utf8'), self)
-        wx.SafeYield()
         builder = SubBuilder(self, corpus, parametres)
-        del busy
         if builder.res == wx.ID_OK :
+            busy = wx.BusyInfo(_("Please wait...").decode('utf8'), self)
+            wx.SafeYield()
             corpus = builder.doanalyse()
-            print corpus.parametres['uuid']
             self.history.add(corpus.parametres)
             self.tree.OnItemAppend(corpus.parametres)
             OpenAnalyse(self, corpus.parametres)
+            del busy
             
     def OpenText(self):
         dlg = wx.ProgressDialog("Ouverture...",
