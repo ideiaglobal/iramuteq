@@ -5,7 +5,7 @@
 
 import logging
 from chemins import PathOut
-from functions import exec_rcode, check_Rresult, DoConf, ReadDicoAsDico
+from functions import exec_rcode, check_Rresult, DoConf, ReadDicoAsDico, progressbar
 from shutil import copy
 from time import time, sleep
 from uuid import uuid4
@@ -31,6 +31,7 @@ class AnalyseText :
         else :
             self.pathout = PathOut(filename=corpus.parametres['originalpath'], dirout=self.parametres['pathout'], analyse_type=self.parametres['type'])
         self.parametres = self.lemparam()
+
         if self.parametres is not None :
             self.parametres = self.make_config(parametres)
         log.info(self.pathout.dirout)
@@ -57,6 +58,8 @@ class AnalyseText :
                 copy(self.parametres['dictionary'], dictpath)
                 self.parametres['dictionary'] = dictpath
             self.corpus.parse_active(gramact, gramsup)
+            if dlg :
+                self.dlg = progressbar(self.ira, dlg)
             result_analyse = self.doanalyse()
             if result_analyse is None :
                 self.time = time() - self.t1
@@ -67,17 +70,17 @@ class AnalyseText :
                 DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
                 self.ira.history.add(self.parametres)
                 if dlg :
-                    dlg.Destroy()
+                    self.dlg.Destroy()
                     OpenAnalyse(self.parent, self.parametres['ira'])
                     self.ira.tree.AddAnalyse(self.parametres)
                     self.val = 5100
             else :
                 self.val = False
                 if dlg :
-                    dlg.Destroy()
+                    self.dlg.Destroy()
         else :
             if dlg :
-                dlg.Destroy()
+                self.dlg.Destroy()
             self.val = False
 
     def doanalyse(self) :

@@ -901,7 +901,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             #self.Text = SimiTxt(self)
             if corpus is None :
                 corpus = self.tree.getcorpus()            
-            self.Text = SimiTxt(self, corpus, parametres = {'type': 'simitxt'}, dlg = progressbar(self, 3))
+            self.Text = SimiTxt(self, corpus, parametres = {'type': 'simitxt'}, dlg = 3)
             if self.Text.val == wx.ID_OK :
                 PlaySound(self)
         except :
@@ -912,14 +912,14 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         try :
             if corpus is None :
                 corpus = self.tree.getcorpus()            
-            self.Text = WordCloud(self, corpus, parametres = {'type' : 'wordcloud'}, dlg = progressbar(self, 3))
+            self.Text = WordCloud(self, corpus, parametres = {'type' : 'wordcloud'}, dlg = 3)
             if self.Text.val == wx.ID_OK :
                 PlaySound(self)
         except :
             BugReport(self)
 
     def OnClusterCloud(self, corpus, parametres = None) :
-        self.Text = ClusterCloud(self, corpus, parametres = parametres, dlg = progressbar(self, 3))
+        self.Text = ClusterCloud(self, corpus, parametres = parametres, dlg = 3)
 
     def OnAFCM(self, event):
         try:
@@ -932,7 +932,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         try:
             if corpus is None :
                 corpus = self.tree.getcorpus()
-            self.Text = Stat(self, corpus, parametres = {'type': 'stat'}, dlg = progressbar(self, 7))
+            self.Text = Stat(self, corpus, parametres = {'type': 'stat'}, dlg = 7)
             
             if self.Text.val == wx.ID_OK :
                 PlaySound(self)
@@ -945,7 +945,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             #print('ATTENTION : PLUS DE BUG SUR LEXICO')
             if corpus is None :
                 corpus = self.tree.getcorpus()
-            self.Text = Lexico(self, corpus, parametres = {'type' : 'spec'}, dlg = progressbar(self, 3))
+            self.Text = Lexico(self, corpus, parametres = {'type' : 'spec'}, dlg = 3)
             if self.Text.val == wx.ID_OK :
                 PlaySound(self)
         except:
@@ -997,7 +997,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             #RunAnalyse(self, corpus, Alceste, OptAlceste)
             if corpus is None :
                 corpus = self.tree.getcorpus()            
-            self.Text = Reinert(self, corpus, parametres = {'type': 'alceste'}, dlg = progressbar(self,6))
+            self.Text = Reinert(self, corpus, parametres = {'type': 'alceste'}, dlg = 6)
             if self.Text.val == wx.ID_OK:
                 PlaySound(self)
         except:
@@ -1007,7 +1007,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         try:
             if corpus is None :
                 corpus = self.tree.getcorpus()
-            self.Text = AnalysePam(self, corpus, parametres = {'type' : 'pamtxt'}, dlg = progressbar(self,6))
+            self.Text = AnalysePam(self, corpus, parametres = {'type' : 'pamtxt'}, dlg = 6)
             if self.Text.val == wx.ID_OK:
                 PlaySound(self)
         except:
