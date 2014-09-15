@@ -31,7 +31,6 @@ class AnalyseText :
         else :
             self.pathout = PathOut(filename=corpus.parametres['originalpath'], dirout=self.parametres['pathout'], analyse_type=self.parametres['type'])
         self.parametres = self.lemparam()
-
         if self.parametres is not None :
             self.parametres = self.make_config(parametres)
         log.info(self.pathout.dirout)
@@ -79,8 +78,8 @@ class AnalyseText :
                 if dlg :
                     self.dlg.Destroy()
         else :
-            if dlg :
-                self.dlg.Destroy()
+            #if dlg :
+            #    self.dlg.Destroy()
             self.val = False
 
     def doanalyse(self) :
