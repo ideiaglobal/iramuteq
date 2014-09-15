@@ -1309,6 +1309,7 @@ class BuildCorpus :
 
 class BuildSubCorpus(BuildCorpus):
     def __init__(self, corpus, parametres, dlg = None) :
+        print parametres
         log.info('begin subcorpus...')
         self.dlg = dlg
         self.ori = corpus
@@ -1362,7 +1363,7 @@ class BuildSubCorpus(BuildCorpus):
                     newuces = []
                     newpara = []
                     for et in uci.paras :
-                        keepuces = [CopyUce(uce) for uce in uci.uces if uce.para == idpara]
+                        keepuces = [CopyUce(uce) for uce in uci.uces if uce.ident in dictucekeep]
                         idpara += 1
                         if keepuces != [] :
                             newuces += keepuces
