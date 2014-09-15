@@ -106,7 +106,6 @@ def FindRPAthWin32():
                         for j in range(0,20):
                             for poss in ['', 'i386', 'x64'] :
                                 path=os.path.join(rpath,"R-%i.%i.%i" % (maj, i, j),'bin',poss,'R.exe')
-                                print path
                                 if os.path.exists(path):
                                     BestPath=path
     return BestPath
