@@ -17,6 +17,7 @@ from operator import itemgetter
 from uuid import uuid4
 from chemins import PathOut
 from dialog import CorpusPref, SubTextFromMetaDial
+from copy import copy
 from colors import colors
 import datetime
 
@@ -33,6 +34,16 @@ def copycorpus(corpus) :
     copy_corpus.conn_all()
     return copy_corpus
 
+def CopyUce(uce) :
+    return Uce(uce.ident, uce.para, uce.uci)
+    
+
+def CopyUci(uci):
+    nuci = Uci(uci.ident, '')
+    nuci.etoiles = copy(uci.etoiles)
+    nuci.uces = [CopyUce(uce) for uce in uci.uces]
+    return nuci
+    
 
 
 class Corpus :
@@ -94,9 +105,7 @@ class Corpus :
             else :
                 self.idformesuces[self.formes[word.forme].ident] = {stident: 1}
         else :
-            self.formes[word.forme] = word
-            self.formes[word.forme].ident = len(self.formes)
-            self.formes[word.forme].freq = 1
+            self.formes[word.forme] = Word(word.forme, word.gram, len(self.formes), word.lem)
             self.idformesuces[self.formes[word.forme].ident] = {stident : 1}       
 
     def conn_all(self): 
@@ -1315,7 +1324,7 @@ class BuildSubCorpus(BuildCorpus):
         self.corpus.parametres['uuid'] = str(uuid4())
         if parametres.get('frommeta', False) :
             print 'make subtexts'
-            self.corpus.ucis = [uci for uci in self.ori.ucis if set(parametres['meta']).intersection(uci.etoiles) != set()]
+            self.corpus.ucis = [CopyUci(uci) for uci in self.ori.ucis if set(parametres['meta']).intersection(uci.etoiles) != set()]
         elif parametres.get('fromtheme', False) :
             print 'make subtexts from theme'
             idpara = 0
@@ -1325,13 +1334,14 @@ class BuildSubCorpus(BuildCorpus):
                     newpara = []
                     for et in uci.paras :
                         if et in parametres['meta'] :
-                            newuce += [uce for uce in uci.uces if uce.para == idpara]
+                            newuce += [CopyUce(uce) for uce in uci.uces if uce.para == idpara]
                             newpara.append(et)
                         idpara += 1
                     if newuce != [] :
-                        uci.uces = newuce
-                        uci.paras = newpara
-                        self.corpus.ucis.append(uci)
+                        nuci = CopyUci(uci)
+                        nuci.uces = newuce
+                        nuci.paras = newpara
+                        self.corpus.ucis.append(nuci)
                 else :
                     idpara += 1  
         elif parametres.get('fromcluster', False) :
@@ -1342,24 +1352,26 @@ class BuildSubCorpus(BuildCorpus):
             idpara = 0
             for uci in self.ori.ucis :
                 if uci.paras == [] :
-                    keepuces = [uce for uce in uci.uces if uce.ident in dictucekeep]
+                    keepuces = [CopyUce(uce) for uce in uci.uces if uce.ident in dictucekeep]
                     if keepuces != [] :
-                        uci.uces = keepuces
-                        self.corpus.ucis.append(uci)
+                        nuci = CopyUci(uci)
+                        nuci.uces = keepuces
+                        self.corpus.ucis.append(nuci)
                     idpara += 1
                 else :
                     newuces = []
                     newpara = []
                     for et in uci.paras :
-                        keepuces = [uce for uce in uci.uces if uce.para == idpara]
+                        keepuces = [CopyUce(uce) for uce in uci.uces if uce.para == idpara]
                         idpara += 1
                         if keepuces != [] :
                             newuces += keepuces
                             newpara.append(et)
                     if newuces != [] :
-                        uci.uces = newuces
-                        uci.paras = newpara
-                        self.corpus.ucis.append(uci)
+                        nuci = CopyUci(uci)
+                        nuci.uces = newuces
+                        nuci.paras = newpara
+                        self.corpus.ucis.append(nuci)
                         
         #create database
         self.connect()
