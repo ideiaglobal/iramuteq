@@ -100,15 +100,15 @@ def FindRPAthWin32():
     if progpaths != [] :
         for progpath in progpaths :
             rpath = os.path.join(progpath, "R")
-        if os.path.exists(rpath) :
-            for amj in range(2,6) :
-                for i in range(0,50):
-                    for j in range(0,50):
-                        for poss in ['', 'i386', 'x64'] :
-                            path=os.path.join(rpath,"R-3."+str(i)+"."+str(j),'bin',poss,'R.exe')
-                            print path
-                            if os.path.exists(path):
-                                BestPath=path
+            if os.path.exists(rpath) :
+                for maj in range(2,4) :
+                    for i in range(0,30):
+                        for j in range(0,20):
+                            for poss in ['', 'i386', 'x64'] :
+                                path=os.path.join(rpath,"R-%i.%i.%i" % (maj, i, j),'bin',poss,'R.exe')
+                                print path
+                                if os.path.exists(path):
+                                    BestPath=path
     return BestPath
 
 def FindRPathNix():
