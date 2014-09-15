@@ -101,11 +101,14 @@ def FindRPAthWin32():
         for progpath in progpaths :
             rpath = os.path.join(progpath, "R")
         if os.path.exists(rpath) :
-            for i in range(13,20):
-                for j in range(0,15):
-                    path=os.path.join(rpath,"R-2."+str(i)+"."+str(j),'bin','R.exe')
-                    if os.path.exists(path):
-                        BestPath=path
+            for amj in range(2,6) :
+                for i in range(0,50):
+                    for j in range(0,50):
+                        for poss in ['', 'i386', 'x64'] :
+                            path=os.path.join(rpath,"R-3."+str(i)+"."+str(j),'bin',poss,'R.exe')
+                            print path
+                            if os.path.exists(path):
+                                BestPath=path
     return BestPath
 
 def FindRPathNix():
@@ -122,20 +125,6 @@ def RLibsAreInstalled(self) :
         return False
     else :
         return True
-
-def install_textometrieR(self) :
-    dlg = wx.ProgressDialog("Installation de textometrieR",
-    "Veuillez patientez...",
-    maximum= 2,
-    parent=self,
-    style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT
-    )
-    dlg.Center()
-    dlg.Update(1, 'Installation de textometrieR')
-    path = os.path.join(self.AppliPath, 'Rlib', 'textometrieR')
-    exec_RCMD(self.RPath, path)
-    dlg.Update(2,'fini')
-    dlg.Destroy()
 
 def CheckRPackages(self):
     listdep = ['ca', 'rgl', 'gee', 'ape', 'igraph','proxy', 'wordcloud', 'irlba', 'textometry']
@@ -158,10 +147,6 @@ def CheckRPackages(self):
             log.info('packages %s : OK' % bib)
     dlg.Update(len(listdep),'fini')
     dlg.Destroy()
-    install_textoR = False
-    #if 'textometrieR' in nolib :
-    #     nolib.pop(nolib.index('textometrieR'))
-    #     install_textoR = True
     if nolib != [] :
         txt = '\n'.join(nolib)
         msg = u"""Les bibliothèques de R suivantes sont manquantes :
@@ -218,10 +203,8 @@ Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
             dlg.Update(len(nolib) + 1, 'fin')
             dlg.Destroy()
         dial.Destroy()
-    if install_textoR :
-         install_textometrieR(self)
-    if nolib == [] and not install_textoR :
-        self.pref.set('iramuteq', 'rlibs', True)
+    if nolib == [] : 
+        #self.pref.set('iramuteq', 'rlibs', True)
         with open(self.ConfigPath['preferences'], 'w') as f :
             self.pref.write(f)
         return True
