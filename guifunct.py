@@ -1145,6 +1145,7 @@ class TGenFrame ( wx.Frame ):
             self.dial = CreateTgenDialog(self, dict([[i, [lem, self.corpus.lems[lem].freq]] for i, lem in enumerate(self.corpus.lems.keys())]), tgens = self.Tgen.tgen)
         else :
             self.dial = CreateTgenDialog(self, dict([[i, [lem, self.corpus.lems[lem].freq]] for i, lem in enumerate(self.corpus.lems.keys())]), tgen = tgen, tgens = self.Tgen.tgen)
+            self.dial.ip._source.selected = dict(zip(self.Tgen.tgen[tgen], self.Tgen.tgen[tgen]))
             self.activetgen = tgen
         self.dial.Show()
         self.dial.Bind(wx.EVT_CLOSE, self.OnDialClose)

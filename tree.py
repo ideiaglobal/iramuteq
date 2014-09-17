@@ -903,6 +903,7 @@ class LeftTree(CT.CustomTreeCtrl):
         self.SetItemImage(item, img, CT.TreeItemIcon_Normal)
         self.SetItemImage(item, 13, CT.TreeItemIcon_Expanded)
         self.SetItemBold(item, bold)
+        self.SelectItem(item)
     
     def AddMatAnalyse(self, parametres, itemParent = None, bold = True) :
         uuid = parametres.get('matrix', None)
@@ -930,7 +931,8 @@ class LeftTree(CT.CustomTreeCtrl):
             img = 24
         self.SetItemImage(item, img, CT.TreeItemIcon_Normal)
         self.SetItemImage(item, 13, CT.TreeItemIcon_Expanded)
-        self.SetItemBold(item, bold)    
+        self.SetItemBold(item, bold)
+        self.SelectItem(item)  
         
     def OnItemAppend(self, item):
         if 'corpus_name' in item :

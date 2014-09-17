@@ -180,6 +180,7 @@ The items are displayed in the selection part of the widget'''
             #          if i in selections]
             
             for item in selections :
+                print item
                 del self._source.selected[item]
             tokeep = [self._destData[i][0] for i in self._destData if self._destData[i][0] not in selections]
             self._destData = dict([[i, [word, '']] for i, word in enumerate(tokeep)])

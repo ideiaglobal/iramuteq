@@ -674,6 +674,11 @@ def progressbar(self, maxi) :
         parent = self.parent
     else :
         parent = self
+    try :
+        print '###horrible hack progressbar'
+        maxi = int(maxi)
+    except :
+        maxi = 1
     return wx.ProgressDialog("Traitements",
                              "Veuillez patienter...",
                              maximum=maxi,

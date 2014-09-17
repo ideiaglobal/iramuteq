@@ -175,6 +175,9 @@ class IraFrame(wx.Frame):
         self.SimiFromCluster = SimiFromCluster
         #langues
         gettext.install('iramuteq',  os.path.join(AppliPath,'locale'), unicode=True)
+        #langues = ['fr_FR', 'en', 'pt_PT']
+        #for l in langues :
+        #    pass
         self.presLan_fr = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['fr_FR'])
         self.presLan_en = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['en'])
         self.setlangue()
@@ -513,6 +516,8 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
             guilangue = self.pref.get('iramuteq', 'guilanguage')
             if guilangue == 'french' :
                 self.presLan_fr.install()
+            elif guilangue == 'portuguese' :
+                self.presLan_pt.install()
             else :
                 self.presLan_en.install()
             mylocale = wx.Locale(langues[guilangue])

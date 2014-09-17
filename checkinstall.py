@@ -203,7 +203,7 @@ Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
             dlg.Destroy()
         dial.Destroy()
     if nolib == [] : 
-        #self.pref.set('iramuteq', 'rlibs', True)
+        self.pref.set('iramuteq', 'rlibs', True)
         with open(self.ConfigPath['preferences'], 'w') as f :
             self.pref.write(f)
         return True
