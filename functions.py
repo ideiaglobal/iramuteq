@@ -66,7 +66,7 @@ class TGen :
             while totname + `i` in tgens :
                 i += 1
             totname = totname + `i`
-            line = '\t'.join([totname] + [`totocc[et]` for et in etoiles])
+            line = '\t'.join([totname] + [`totocc[et]` for et in etoiles]) + '\n'
             f.write(line.encode(self.encoding))
 
 class History :
