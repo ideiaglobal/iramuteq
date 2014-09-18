@@ -240,29 +240,3 @@ The items are displayed in the selection part of the widget'''
             self._OnAdd(e)
         else:
             self._OnRemove(e)
-
-
-        
-
-if __name__ == '__main__':
-    print 'ezerzerzer'
-    test = wx.App(0)
-    frame = wx.Frame(None, -1)
-    d = wx.Dialog(frame, style = wx.RESIZE_BORDER|wx.DEFAULT_DIALOG_STYLE)
-    
-    d.sizer = wx.BoxSizer(wx.VERTICAL)
-    d.sizer.Add(wx.StaticText(d, -1, label = 'Example of the ItemsPicker'),
-                 0, wx.ALL, 10)
-    ip = ItemsPicker(d, -1, ['pop', 'cool', 'lame'],
-                      'Stuff:', 'Selected stuff:',IP_SORT_SELECTED|IP_SORT_CHOICES|IP_REMOVE_FROM_CHOICES)
-    ip.add_button_label = u'left -> right'
-    ip.remove_button_label = u'right -> left'
-    d.sizer.Add(ip, 1, wx.EXPAND, 1)
-    d.SetSizer(d.sizer)
-    test.SetTopWindow(frame)
-    def callback(e):
-        print 'selected items', e.GetItems()
-    d.Bind(EVT_IP_SELECTION_CHANGED, callback)
-    d.ShowModal()
-    d.Destroy()
-    frame.Close()

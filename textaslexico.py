@@ -162,6 +162,7 @@ class Lexico(AnalyseText) :
             else :
                 ListEt = variables[var[dial.list_box_1.GetSelections()[0]]]
             self.listet = ListEt
+            self.listet.sort()
             self.parametres['mineff'] = dial.spin.GetValue()
             if dial.choice_indice.GetSelection() == 0 :
                 self.parametres['indice'] = 'hypergeo'
@@ -219,6 +220,7 @@ class TgenSpec(AnalyseText):
     def doanalyse(self):
         self.tgen = TGen(path = self.parametres['tgenpath'], encoding = self.ira.syscoding)
         self.tgen.read(self.tgen.path)
+        self.parametres['etoiles'].sort()
         tgenocc, totocc = self.corpus.make_tgen_table(self.tgen, self.parametres['etoiles'])
         self.parametres['tgeneff'] = os.path.join(self.parametres['pathout'], 'tgeneff.csv')
         self.tgen.writetable(self.parametres['tgeneff'], tgenocc, totocc)

@@ -55,6 +55,7 @@ class TGen :
     
     def writetable(self, pathout, tgens, totocc):
         etoiles = totocc.keys()
+        etoiles.sort()
         with open(pathout, 'w') as f :
             line = '\t'.join([u'tgens'] + etoiles) + '\n'
             f.write(line.encode(self.encoding))

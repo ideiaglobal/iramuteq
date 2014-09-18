@@ -697,11 +697,16 @@ class LeftTree(CT.CustomTreeCtrl):
     def OnTgenCompute(self, evt):
         corpus = self.page.corpus
         tgenpath = os.path.join(self.page.parametres['pathout'], 'tgen.csv')        
-        self.page.parametres['tgenpath'] = tgenpath
-        tgen = TGen(path = tgenpath, encoding = self.parent.syscoding)
-        self.page.parametres['etoiles'] = self.page.etoiles
-        TgenSpec(self.parent, corpus, self.page.parametres)
-        TgenLayout(self.page)
+        if not os.path.exists(tgenpath) :
+            message = wx.MessageDialog(self.parent, _(u"No TGen yet !"), style = wx.ICON_EXCLAMATION | wx.OK) 
+            message.ShowModal()
+            message.Destroy()
+        else :
+            self.page.parametres['tgenpath'] = tgenpath
+            tgen = TGen(path = tgenpath, encoding = self.parent.syscoding)
+            self.page.parametres['etoiles'] = self.page.etoiles
+            TgenSpec(self.parent, corpus, self.page.parametres)
+            TgenLayout(self.page)
     
     def OnExportClasses(self, event):
         corpus = self.page.corpus

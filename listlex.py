@@ -42,7 +42,6 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
                 if val.startswith(u'X.') :
                     val = val.replace(u'X.', u'*')
                 self.etoiles.append(val)
-                
         self.menu = menu
 
     #def start(self) :
@@ -69,7 +68,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         self.selected = {}
         
         i=0
-        for name in [u'formes'] + self.first :
+        for name in [u'formes'] + self.etoiles :
             self.InsertColumn(i,name,wx.LIST_FORMAT_LEFT)
             i+=1
             
