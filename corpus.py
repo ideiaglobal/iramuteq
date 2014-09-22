@@ -1309,13 +1309,13 @@ class BuildCorpus :
 
 class BuildSubCorpus(BuildCorpus):
     def __init__(self, corpus, parametres, dlg = None) :
-        print parametres
         log.info('begin subcorpus...')
         self.dlg = dlg
         self.ori = corpus
         self.infile = None
         self.corpus = Corpus(self, {'type' : 'corpus', 'originalpath' : corpus.parametres['originalpath'], 'encoding' : corpus.parametres['encoding']})
         self.last = 0
+        self.parametres = parametres
         self.encoding = corpus.parametres['encoding']
         self.corpus.parametres['corpus_name'] = parametres['corpus_name']
         self.corpus.pathout = PathOut(filename = corpus.parametres['originalpath'], dirout = parametres['pathout'])
@@ -1345,38 +1345,41 @@ class BuildSubCorpus(BuildCorpus):
                         self.corpus.ucis.append(nuci)
                 else :
                     idpara += 1  
-        elif parametres.get('fromcluster', False) :
-            pass
+        elif parametres.get('fromclusters', False) :
+            self.parametres['uceids'] = [st for i in self.parametres['meta'] for st in self.parametres['lc'][i]]
+            self.fromuceids()
         elif parametres.get('fromuceids', False) :
-            print 'fromuceids'
-            dictucekeep = dict(zip(parametres['uceids'], parametres['uceids']))
-            idpara = 0
-            for uci in self.ori.ucis :
-                if uci.paras == [] :
-                    keepuces = [CopyUce(uce) for uce in uci.uces if uce.ident in dictucekeep]
-                    if keepuces != [] :
-                        nuci = CopyUci(uci)
-                        nuci.uces = keepuces
-                        self.corpus.ucis.append(nuci)
-                    idpara += 1
-                else :
-                    newuces = []
-                    newpara = []
-                    for et in uci.paras :
-                        keepuces = [CopyUce(uce) for uce in uci.uces if uce.ident in dictucekeep]
-                        idpara += 1
-                        if keepuces != [] :
-                            newuces += keepuces
-                            newpara.append(et)
-                    if newuces != [] :
-                        nuci = CopyUci(uci)
-                        nuci.uces = newuces
-                        nuci.paras = newpara
-                        self.corpus.ucis.append(nuci)
-                        
+            self.fromuceids()
         #create database
         self.connect()
         self.dobuild()
+
+    def fromuceids(self):
+        print 'fromuceids'
+        dictucekeep = dict(zip(self.parametres['uceids'], self.parametres['uceids']))
+        idpara = 0
+        for uci in self.ori.ucis :
+            if uci.paras == [] :
+                keepuces = [CopyUce(uce) for uce in uci.uces if uce.ident in dictucekeep]
+                if keepuces != [] :
+                    nuci = CopyUci(uci)
+                    nuci.uces = keepuces
+                    self.corpus.ucis.append(nuci)
+                idpara += 1
+            else :
+                newuces = []
+                newpara = []
+                for et in uci.paras :
+                    keepuces = [CopyUce(uce) for uce in uci.uces if uce.ident in dictucekeep]
+                    idpara += 1
+                    if keepuces != [] :
+                        newuces += keepuces
+                        newpara.append(et)
+                if newuces != [] :
+                    nuci = CopyUci(uci)
+                    nuci.uces = newuces
+                    nuci.paras = newpara
+                    self.corpus.ucis.append(nuci)       
     
     def read_corpus(self, infile = None):
         self.olduceid = [uce.ident for uci in self.corpus.ucis for uce in uci.uces]
@@ -1566,9 +1569,12 @@ class SubBuilder :
             parametres['meta'] = corpus.make_etoiles()
         elif parametres.get('fromtheme', False) :
             parametres['meta'] = corpus.make_themes()
+        elif parametres.get('fromclusters', False) :
+            parametres['meta'] = [' '.join(['classe', `i`]) for i in range(1,parametres['clnb'] + 1)]
         else :
             parametres['meta'] = []
-        parametres['meta'].sort()
+        if 'fromclusters' not in parametres :
+            parametres['meta'].sort()
         if dlg is not None :
             del busy
         dial = SubTextFromMetaDial(parent, parametres)
@@ -1586,7 +1592,10 @@ class SubBuilder :
                 i += 1
             parametres['pathout'] = pathout + '_%i' % i
             meta = dial.m_listBox1.GetSelections()
-            parametres['meta'] = [parametres['meta'][val] for val in meta]
+            if not 'fromclusters' in parametres :
+                parametres['meta'] = [parametres['meta'][val] for val in meta]
+            else :
+                parametres['meta'] = meta
             self.parametres = parametres
             dial.Destroy()
         else :
@@ -1594,9 +1603,3 @@ class SubBuilder :
     
     def doanalyse(self):
         return BuildSubCorpus(self.ori, parametres = self.parametres, dlg = self.dlg).corpus
-
-if __name__ == '__main__' :
-    t1 = time()
-    parametres = {'formesdb':'formes.db', 'ucesdb': 'uces.db', 'corpusdb' : 'corpus.db', 'syscoding' : 'utf-8', 'encoding' : 'utf8'}
-    intro = BuildCorpus(infile, parametres)#, tar_in, tar_infouce)#, tar_formes)
-    print time() - t1

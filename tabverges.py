@@ -56,6 +56,14 @@ class Prototypical(AnalyseMatrix) :
                     else :
                         self.parametres['limrang'] = self.dial.ranglim.GetValue()
                     self.parametres['freqmin'] = int(self.dial.m_textCtrl4.GetValue())
+                    if self.dial.typegraph.GetSelection() == 0 :
+                        self.parametres['typegraph'] = 'classical'
+                        self.parametres['cloud'] = False
+                    elif self.dial.typegraph.GetSelection() == 1 :
+                        self.parametres['typegraph'] = 'classical'
+                        self.parametres['cloud'] = True
+                    else :
+                        self.parametres['typegraph'] = 'plan'      
                     table_assoc, table_rank = self.dotable()
                     self.makedatas(table_assoc, table_rank)
                     self.DoR()
