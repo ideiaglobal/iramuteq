@@ -440,7 +440,8 @@ class LeftTree(CT.CustomTreeCtrl):
                 navig = menu.Append(wx.ID_ANY, _(u"Navigator").decode('utf8'))
                 statclasse = menu.Append(wx.ID_ANY, _(u"Clusters statistics").decode('utf8'))
                 rapport = menu.Append(wx.ID_ANY, _(u"Report").decode('utf8'))
-                export_classes = menu.Append(wx.ID_ANY, _(u"Export Clusters").decode('utf8'))
+                export_classes = menu.Append(wx.ID_ANY, _(u"Export clusters").decode('utf8'))
+                subcorpusfromcl = menu.Append(wx.ID_ANY, _(u"Sub corpus from clusters").decode('utf8'))
                 menu.AppendSeparator()
                 self.Bind(wx.EVT_MENU, self.OpenAntipro, antipro)
                 self.Bind(wx.EVT_MENU, self.OnProfSR, profsr)
@@ -451,6 +452,7 @@ class LeftTree(CT.CustomTreeCtrl):
                 self.Bind(wx.EVT_MENU, self.StatClasse, statclasse)
                 self.Bind(wx.EVT_MENU, self.OnRapport, rapport)
                 self.Bind(wx.EVT_MENU, self.OnExportClasses, export_classes)
+                self.Bind(wx.EVT_MENU, self.OnSubCorpusFromClusters, subcorpusfromcl)
             elif pydata.get('type', False) == 'stat'  and pydata['uuid'] in self.parent.history.opened :
                 export_dictionary =  menu.Append(wx.ID_ANY, _(u"Export dictionary").decode('utf8'))
                 export_lems =  menu.Append(wx.ID_ANY, _(u"Export lemma dictionary").decode('utf8'))
@@ -722,6 +724,9 @@ class LeftTree(CT.CustomTreeCtrl):
         dial = wx.MessageDialog(self, self.page.pathout['classe_x_export.txt'], u"Export", wx.OK|wx.ICON_INFORMATION)
         dial.ShowModal()
         dial.Destroy()
+    
+    def OnSubCorpusFromClusters(self, evt):
+        self.parent.OnSubText(self.getcorpus(), parametres = {'fromclusters' : True, 'clnb': self.page.parametres['clnb'], 'lc' : self.page.corpus.lc})
     
     def OnRename(self, event):
         pydata = self.itemdict['pydata']

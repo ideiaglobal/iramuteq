@@ -2800,7 +2800,7 @@ class ProtoDial ( wx.Dialog ):
     def __init__( self, parent, headers ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Settings").decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         
-        self.SetSizeHintsSz( wx.Size( 200,300 ), wx.DefaultSize )
+        self.SetSizeHintsSz( wx.Size( -1,-1 ), wx.DefaultSize )
         
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
         
@@ -2817,19 +2817,19 @@ class ProtoDial ( wx.Dialog ):
         fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
         
         variablesChoices = headers
-        self.variables = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, variablesChoices, wx.LB_MULTIPLE )
-        self.variables.SetMinSize( wx.Size( 150,-1 ) )
+        self.variables = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, variablesChoices, wx.LB_HSCROLL|wx.LB_MULTIPLE )
+        self.variables.SetMinSize( wx.Size( 350,-1 ) )
         
-        fgSizer1.Add( self.variables, 0, wx.ALL|wx.EXPAND, 5 )
+        fgSizer1.Add( self.variables, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
         
         rangsChoices = headers
-        self.rangs = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, rangsChoices, wx.LB_MULTIPLE )
-        self.rangs.SetMinSize( wx.Size( 150,-1 ) )
+        self.rangs = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, rangsChoices, wx.LB_HSCROLL|wx.LB_MULTIPLE )
+        self.rangs.SetMinSize( wx.Size( 350,-1 ) )
         
-        fgSizer1.Add( self.rangs, 0, wx.ALL|wx.EXPAND, 5 )
+        fgSizer1.Add( self.rangs, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
         
         
-        bSizer1.Add( fgSizer1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 5 )
+        bSizer1.Add( fgSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL, 5 )
         
         fgSizer3 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer3.SetFlexibleDirection( wx.BOTH )
@@ -2882,8 +2882,16 @@ class ProtoDial ( wx.Dialog ):
         self.m_textCtrl4 = wx.TextCtrl( self, wx.ID_ANY, u"2", wx.DefaultPosition, wx.DefaultSize, wx.TE_CENTRE )
         fgSizer3.Add( self.m_textCtrl4, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
         
+        self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, u"Type de représentation", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText6.Wrap( -1 )
+        fgSizer3.Add( self.m_staticText6, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        bSizer1.Add( fgSizer3, 1, wx.EXPAND, 5 )
+        m_choice3Choices = [ u"Classical - List", u"Classical - Cloud", u"Plan" ]
+        self.typegraph = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_choice3Choices, 0 )
+        self.typegraph.SetSelection( 0 )
+        fgSizer3.Add( self.typegraph, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+        
+        bSizer1.Add( fgSizer3, 0, wx.ALIGN_CENTER_HORIZONTAL, 5 )
         
         m_sdbSizer1 = wx.StdDialogButtonSizer()
         self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
