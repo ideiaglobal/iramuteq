@@ -21,3 +21,8 @@ gee
 ape
 igraph
 proxy
+textometry
+
+
+pour gui2exe :
+mettre le manifeste directement dans Constants.py

@@ -1203,7 +1203,7 @@ class FreqLayout(DefaultMatLayout) :
         self.tab = wx.html.HtmlWindow(self.ira.nb, -1)
         if "gtk2" in wx.PlatformInfo:
             self.tab.SetStandardFonts()
-        self.tab.LoadPage(self.pathout['resultats.html'])
+        self.tab.LoadPage(self.pathout['resultats.html'].replace('\\\\','/'))
         self.tab.parametres = self.parametres
         self.ira.nb.AddPage(self.tab, u"Fréquences")
 
