@@ -94,7 +94,7 @@ class DoSimi(AnalyseMatrix):
                 self.tableau = parent.tableau
             self.tableau.parametres['mineff'] = 0
             if not self.fromprof :
-                dialcol = FreqDialog(self.parent, -1, self.tableau.get_colnames(), _(u"Select columns").decode('utf8'), size=(600, 250))
+                dialcol = FreqDialog(self.parent, self.tableau.get_colnames(), _(u"Select columns").decode('utf8'), size=(600, 250), showNA = False)
                 dialcol.CenterOnParent()            
                 res = dialcol.ShowModal()
             else :

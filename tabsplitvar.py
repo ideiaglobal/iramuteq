@@ -19,7 +19,7 @@ class SplitMatrixFromVar(AnalyseMatrix):
         if dlg is None :
             return
         else :
-            dial = FreqDialog(self.parent, -1, self.tableau.get_colnames(), u"Column", size=(350, 200))
+            dial = FreqDialog(self.parent, self.tableau.get_colnames(), u"Column", size=(350, 200), showNA = False)
             dial.CenterOnParent()
             val = dial.ShowModal()
             if val == wx.ID_OK :

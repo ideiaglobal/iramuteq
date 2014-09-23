@@ -211,7 +211,7 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
 #    open_file_graph("%s", widt = 600, height=400)
 #    plot(tree.tot1$tree.cl)
 #    dev.off()
-    """%DicoPath['arbre1']
+    """ % DicoPath['arbre1']
     
     if classif_mode == 0:
         txt += """

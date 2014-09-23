@@ -20,12 +20,13 @@ class Frequences(AnalyseMatrix) :
         if dlg is None :
             return
         else :
-            dial = FreqDialog(self.parent, -1, self.tableau.get_colnames(), u"Fréquences", size=(350, 200))
+            dial = FreqDialog(self.parent, self.tableau.get_colnames(), u"Fréquences")
             dial.CenterOnParent()
             val = dial.ShowModal()
             if val == wx.ID_OK :
-                self.parametres['colsel'] = dial.list_box_1.GetSelections()
+                self.parametres['colsel'] = dial.m_listBox1.GetSelections()
                 self.parametres['header'] = dial.header
+                self.parametres['NA'] = dial.includeNA.GetValue()
             else :
                 self.parametres = None
             dial.Destroy()
@@ -55,12 +56,26 @@ class Frequences(AnalyseMatrix) :
         compteur <- 1
         """ % (sel, listfiles, titles)
         
+        if self.parametres['NA'] :
+            txt += """
+            countNA <- TRUE
+            """
+        else :
+            txt += """
+            countNA <- FALSE
+            """
+        
         txt += """
         for (i in select) {
-            freq <- table(dm[,i])
+            if (countNA) {
+                freq <- table(dm[,i], useNA = 'ifany')
+            } else {
+                freq <- table(dm[,i])
+            }
             sumfreq <- sum(freq)
             pour <- prop.table(as.matrix(freq), 2) * 100
             sumpour <- sum(pour)
+            pour <- round(pour, 2)
             ntable <- cbind(as.matrix(freq), pour)
             graphout <- listfiles[compteur]  
             if (Sys.info()["sysname"]=='Darwin') {

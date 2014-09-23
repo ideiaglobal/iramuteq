@@ -2758,42 +2758,94 @@ class ExtractDialog ( wx.Dialog ):
     def __del__( self ):
         pass
 
-class FreqDialog(wx.Dialog):
-    def __init__(self, parent, ID, listcol, title, size) :
-        wx.Dialog.__init__(self, parent, ID, title, size=size, pos=wx.DefaultPosition,style=wx.DEFAULT_DIALOG_STYLE | wx.CANCEL | wx.OK )
-        pre = wx.PreDialog()
-        pre.SetExtraStyle(wx.DIALOG_EX_CONTEXTHELP)
-        pre.Create(parent, ID, title, wx.DefaultPosition, size, wx.DEFAULT_DIALOG_STYLE | wx.CANCEL | wx.OK)
-        self.PostCreate(pre)
-        self.parent = parent 
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        #self.content = parent.content
-        self.header = listcol
-        #LABELLIST = []
-        #for i in self.header:
-        #    forme = i
-        #    if len(forme) > 60 :
-        #        LABELLIST.append(i[0:60])
-        #    else:
-        #        LABELLIST.append(i)
-        self.list_box_1 = wx.ListBox(self, -1, choices=self.header, style=wx.LB_EXTENDED | wx.LB_HSCROLL)
-        sizer.Add(self.list_box_1, 0, 5)
-        
-        btnsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
-        btn = wx.Button(self, wx.ID_CANCEL)
-        btnsizer.Add(btn)
-        
-        btn = wx.Button(self, wx.ID_OK)
-        btn.SetDefault()
-        btnsizer.Add(btn)
-        
-        sizer.Add(btnsizer, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_HORIZONTAL, 5)
-        self.SetSizer(sizer)
-        sizer.Fit(self)
-        self.SetTitle(_(u"Selection").decode('utf8'))
-  
+# class FreqDialog(wx.Dialog):
+#     def __init__(self, parent, ID, listcol, title, size) :
+#         wx.Dialog.__init__(self, parent, ID, title, size=size, pos=wx.DefaultPosition,style=wx.DEFAULT_DIALOG_STYLE | wx.CANCEL | wx.OK )
+#         pre = wx.PreDialog()
+#         pre.SetExtraStyle(wx.DIALOG_EX_CONTEXTHELP)
+#         pre.Create(parent, ID, title, wx.DefaultPosition, size, wx.DEFAULT_DIALOG_STYLE | wx.CANCEL | wx.OK)
+#         self.PostCreate(pre)
+#         self.parent = parent 
+#         sizer = wx.BoxSizer(wx.VERTICAL)
+#         #self.content = parent.content
+#         self.header = listcol
+#         #LABELLIST = []
+#         #for i in self.header:
+#         #    forme = i
+#         #    if len(forme) > 60 :
+#         #        LABELLIST.append(i[0:60])
+#         #    else:
+#         #        LABELLIST.append(i)
+#         self.list_box_1 = wx.ListBox(self, -1, choices=self.header, style=wx.LB_EXTENDED | wx.LB_HSCROLL)
+#         sizer.Add(self.list_box_1, 0, 5)
+#         
+#         btnsizer = wx.BoxSizer(wx.HORIZONTAL)
+#         
+#         btn = wx.Button(self, wx.ID_CANCEL)
+#         btnsizer.Add(btn)
+#         
+#         btn = wx.Button(self, wx.ID_OK)
+#         btn.SetDefault()
+#         btnsizer.Add(btn)
+#         
+#         sizer.Add(btnsizer, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_HORIZONTAL, 5)
+#         self.SetSizer(sizer)
+#         sizer.Fit(self)
+#         self.SetTitle(_(u"Selection").decode('utf8'))
+#   
         # end wxGlade
+
+
+class FreqDialog ( wx.Dialog ):
+    
+    def __init__( self, parent, listcol, title, size =  wx.Size( -1,-1 ), showNA = True):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.DEFAULT_DIALOG_STYLE )
+        
+        self.header = listcol
+        
+        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        
+        bSizer1 = wx.BoxSizer( wx.VERTICAL )
+        
+        m_listBox1Choices = self.header
+        self.m_listBox1 = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_listBox1Choices, wx.LB_EXTENDED|wx.LB_HSCROLL|wx.LB_MULTIPLE )
+        self.m_listBox1.SetMinSize( wx.Size( 500,-1 ) )
+        bSizer1.Add( self.m_listBox1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        if showNA :
+            fgSizer1 = wx.FlexGridSizer( 0, 2, 0, 0 )
+            fgSizer1.SetFlexibleDirection( wx.BOTH )
+            fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        
+            self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Include empty cells (NA)").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_staticText1.Wrap( -1 )
+            fgSizer1.Add( self.m_staticText1, 0, wx.ALL, 5 )
+        
+            self.includeNA = wx.CheckBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+            fgSizer1.Add( self.includeNA, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+            bSizer1.Add( fgSizer1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 5 )
+        
+        m_sdbSizer1 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
+        self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
+        m_sdbSizer1.Realize();
+        
+        bSizer1.Add( m_sdbSizer1, 0, wx.EXPAND, 5 )
+        
+        
+        self.SetSizer( bSizer1 )
+        self.Layout()
+        bSizer1.Fit( self )
+        
+        self.Centre( wx.BOTH )
+    
+    def __del__( self ):
+        pass
+    
+
 
 class ProtoDial ( wx.Dialog ):
     
