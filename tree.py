@@ -468,8 +468,10 @@ class LeftTree(CT.CustomTreeCtrl):
             elif pydata.get('type', False) == 'reinertmatrix' and pydata['uuid'] in self.parent.history.opened :
                 openmenu = wx.Menu()
                 antipro = openmenu.Append(wx.ID_ANY, _(u"antiprofiles").decode('utf8'))
+                rapport = menu.Append(wx.ID_ANY, _(u"Report").decode('utf8'))
                 menu.AppendMenu(wx.ID_ANY, _(u"Open ...").decode('utf8'), openmenu)
                 self.Bind(wx.EVT_MENU, self.OpenAntipro, antipro)
+                self.Bind(wx.EVT_MENU, self.OnRapport, rapport)
     
     
             itemdelete = menu.Append(wx.ID_ANY, _(u"Delete from history").decode('utf8'))
