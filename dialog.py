@@ -1852,6 +1852,21 @@ class PrefDendro ( wx.Dialog ):
         
         self.m_staticline4 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline4, 0, wx.EXPAND |wx.ALL, 5 )
+    
+        self.text_format_image = wx.StaticText( self, wx.ID_ANY, _(u"Image format").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.text_format_image.Wrap( -1 )
+        fgSizer1.Add( self.text_format_image, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.choice_format = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ['png', 'svg'], 0 )
+        self.choice_format.SetSelection( 0 )
+        fgSizer1.Add( self.choice_format, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
+        
+        self.m_staticline31 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        fgSizer1.Add( self.m_staticline31, 0, wx.EXPAND |wx.ALL, 5 )
+        
+        self.m_staticline41 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        fgSizer1.Add( self.m_staticline41, 0, wx.EXPAND |wx.ALL, 5 )        
+        
         
         self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, _(u"Color or black and white").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText5.Wrap( -1 )
@@ -1916,6 +1931,7 @@ class PrefDendro ( wx.Dialog ):
         self.m_radioBox1.SetSelection(self.param['color_nb'])
         self.m_checkBox1.SetValue(self.param['taille_classe'])
         self.m_radioBox2.SetSelection(self.param['type_tclasse'])
+        self.choice_format.SetSelection(self.param['svg'])
     
     def __del__( self ):
         pass
@@ -2571,7 +2587,7 @@ class message(wx.Frame):
         self.uceids = uceids
         self.ira = wx.GetApp().GetTopWindow() 
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
-
+        self.items = items
         self.html = ""
         #self.HtmlPage=wx.html.HtmlWindow(self, -1)
         self.HtmlPage = ConcordList(self, items)
@@ -2615,6 +2631,7 @@ class message(wx.Frame):
             )
         dlg.SetFilterIndex(2)
         dlg.CenterOnParent()
+        self.html = '<br>'.join([self.items[i] for i in range(0,len(self.items))])
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             with open(path, 'w') as f :

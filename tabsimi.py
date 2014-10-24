@@ -101,7 +101,7 @@ class DoSimi(AnalyseMatrix):
                 res = wx.ID_OK
             if res == wx.ID_OK :
                 if not self.actives :
-                    self.tableau.selected_col = dialcol.list_box_1.GetSelections()
+                    self.tableau.selected_col = dialcol.m_listBox1.GetSelections()
                     actives = self.tableau.getactlistfromselection(self.tableau.selected_col)
                 else :
                     actives = self.actives

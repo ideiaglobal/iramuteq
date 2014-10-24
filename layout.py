@@ -164,7 +164,10 @@ class GraphPanelAfc(wx.Panel):
             else :
                 svg = 1
             typegraph = dial.choicetype.GetSelection()
-            typefile = '.png'
+            if svg :
+                typefile = '.svg'
+            else :
+                typefile = '.png'
             if self.clnb <= 3 and typegraph == 1 :
                 typegraph = 2
             if typegraph == 2:
@@ -658,8 +661,12 @@ class TgenLayout :
         ira = wx.GetApp().GetTopWindow()
         self.page.tgens, etoiles =  ReadList(parametres['tgenspec'], ira.syscoding, sep="\t")
         tgentab = False
+        gparent = None
         for i in range(page.GetPageCount()) :
             tab = page.GetPage(i)
+            if 'gparent' in dir(tab) :
+                if tab.gparent is not None :
+                    gparent = tab.gparent
             if 'tgen' in dir(tab) :
                 if tab.tgen :
                     tgentab = tab
@@ -668,7 +675,7 @@ class TgenLayout :
             self.page.tgentab.RefreshData(self.page.tgens)
             self.page.SetSelection(i)
         else :
-            self.page.tgentab = ListForSpec(ira, None, self.page.tgens, etoiles[1:])
+            self.page.tgentab = ListForSpec(ira, gparent, self.page.tgens, etoiles[1:])
             self.page.tgentab.tgen = True
             self.page.AddPage(self.page.tgentab, u'Tgens Specificities')
             self.page.SetSelection(self.page.GetPageCount() - 1)
@@ -705,7 +712,7 @@ class dolexlayout :
         self.ListPanEff = ListForSpec(ira, self, self.DictEff, self.etoiles)
         self.ListPanEffType = ListForSpec(ira, self, self.DictEffType, self.etoiles)
         self.ListPanEffRelForme = ListForSpec(ira, self, self.DictEffRelForme, self.etoiles)
-        self.ListPanEffRelType = ListForSpec(ira, self.parent, self.DictEffRelType, self.etoiles)
+        self.ListPanEffRelType = ListForSpec(ira, self, self.DictEffRelType, self.etoiles)
         
         self.TabStat.AddPage(self.ListPan, u'formes') 
         if os.path.exists(self.pathout['banalites.csv']) :
@@ -800,7 +807,11 @@ class GraphPanelDendro(wx.Panel):
         
         for i in range(0,len(list_graph)):
             if os.path.exists(os.path.join(self.dirout,list_graph[i][0])) :
-                self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
+                filename, ext = os.path.splitext(list_graph[i][0])
+                if ext == '.svg' :
+                    self.listimg.append(hl.HyperLinkCtrl(self.panel_1, -1, os.path.join(self.dirout,list_graph[i][0]), URL=os.path.join(self.dirout,list_graph[i][0])))
+                else :
+                    self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
                 self.labels.append(wx.StaticText(self.panel_1, -1, list_graph[i][1]))
                 
         self.__set_properties()
@@ -819,7 +830,8 @@ class GraphPanelDendro(wx.Panel):
                        'type_dendro': 0,
                        'color_nb': 0,
                        'taille_classe' : True,
-                       'type_tclasse' : 0
+                       'type_tclasse' : 0,
+                       'svg' : 0
                      }
         self.type_dendro = [ u"phylogram", u"cladogram", u"fan", u"unrooted", u"radial" ]
 
@@ -847,11 +859,16 @@ class GraphPanelDendro(wx.Panel):
         self.param['color_nb'] = dial.m_radioBox1.GetSelection()
         self.param['taille_classe'] = dial.m_checkBox1.GetValue()
         self.param['type_tclasse'] = dial.m_radioBox2.GetSelection()
+        self.param['svg'] = dial.choice_format.GetSelection()
 
     def make_dendro(self, dendro = 'simple') :
-        while os.path.exists(os.path.join(self.dirout, 'dendrogramme_' + str(self.graphnb)+'.png')) :
+        if self.param['svg'] :
+            typefile = '.svg'
+        else :
+            typefile = '.png'
+        while os.path.exists(os.path.join(self.dirout, 'dendrogramme_' + str(self.graphnb)+typefile)) :
             self.graphnb += 1
-        fileout = ffr(os.path.join(self.dirout,'dendrogramme_' + str(self.graphnb)+'.png'))
+        fileout = ffr(os.path.join(self.dirout,'dendrogramme_' + str(self.graphnb)+typefile))
         width = self.param['width']
         height = self.param['height']
         type_dendro = self.type_dendro[self.param['type_dendro']]
@@ -867,6 +884,10 @@ class GraphPanelDendro(wx.Panel):
             histo='FALSE'
         else :
             histo = 'TRUE'
+        if self.param['svg'] :
+            svg = 'TRUE'
+        else :
+            svg = 'FALSE'
         dendro_path = self.dictpathout['Rdendro']
         classe_path = self.dictpathout['uce']
         txt = """
@@ -886,17 +907,17 @@ class GraphPanelDendro(wx.Panel):
             load("%s")
             source("%s")
             chistable <- chistabletot[1:(debsup-1),]
-            open_file_graph("%s", width=%i, height=%i)
+            open_file_graph("%s", width=%i, height=%i, svg = %s)
             plot.dendro.prof(tree.cut1$tree.cl, classes, chistable, nbbycl = 60, type.dendro="%s", bw=%s, lab=NULL)
-            """ % (ffr(self.dictpathout['RData.RData']), ffr(self.ira.RscriptsPath['Rgraph']), ffr(fileout), width, height, type_dendro, bw)
+            """ % (ffr(self.dictpathout['RData.RData']), ffr(self.ira.RscriptsPath['Rgraph']), ffr(fileout), width, height, svg, type_dendro, bw)
         elif dendro == 'cloud' :
             txt += """
             load("%s")
             source("%s")
             chistable <- chistabletot[1:(debsup-1),]
-            open_file_graph("%s", width=%i, height=%i)
+            open_file_graph("%s", width=%i, height=%i, svg=%s)
             plot.dendro.cloud(tree.cut1$tree.cl, classes, chistable, nbbycl = 300, type.dendro="%s", bw=%s, lab=NULL)
-            """ % (ffr(self.dictpathout['RData.RData']), ffr(self.ira.RscriptsPath['Rgraph']), ffr(fileout), width, height, type_dendro, bw)
+            """ % (ffr(self.dictpathout['RData.RData']), ffr(self.ira.RscriptsPath['Rgraph']), ffr(fileout), width, height, svg, type_dendro, bw)
 
 
         tmpfile = tempfile.mktemp()
@@ -906,7 +927,10 @@ class GraphPanelDendro(wx.Panel):
         check_Rresult(self.ira, error)
         self.list_graph.append([fileout, 'Dendrogramme CHD1 - %s' %  type_dendro])
         print_liste(self.dictpathout['liste_graph_chd'], self.list_graph)
-        self.sizer_3.Add(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(fileout, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+        if self.param['svg'] :
+            self.sizer_3.Add(hl.HyperLinkCtrl(self.panel_1, -1, fileout, URL=fileout), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+        else :
+            self.sizer_3.Add(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(fileout, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
         self.sizer_3.Add(wx.StaticText(self.panel_1,-1, 'Dendrogramme CHD1 - %s' %  type_dendro), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
         self.sizer_3.Fit(self.panel_1)
         self.Layout()

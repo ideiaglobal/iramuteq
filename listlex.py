@@ -207,7 +207,8 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
                 self.Bind(wx.EVT_MENU, self.onstcaract, id = nid)
             menu.AppendMenu(-1, u"Segments de texte caractéristiques", menu_stcaract)
             #menu.Append(self.popup_Tgen_glob, "Tgen global")
-            menu.Append(self.onmaketgen, "Make Tgen")
+            if not self.tgen :
+                menu.Append(self.onmaketgen, "Make Tgen")
             self.PopupMenu(menu)
             menu.Destroy()
 

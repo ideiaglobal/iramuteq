@@ -169,7 +169,16 @@ class PrefSimi ( wx.Dialog ):
         if wordlist is not None :
             self.listcol = ListForSpec(self, self, wordlist, ['eff'])
             self.listcol.SetMinSize( wx.Size( 270,-1 ) )
-            bSizer16.Add( self.listcol, 0, wx.ALL|wx.EXPAND, 5 )
+            listsizer = wx.BoxSizer( wx.VERTICAL )
+            countsizer = wx.BoxSizer( wx.HORIZONTAL )
+            self.butcount = wx.Button(self, -1, "count")
+            self.textcount = wx.TextCtrl(self, -1, "", wx.DefaultPosition, wx.Size( 100,-1 ), wx.TE_READONLY )
+            countsizer.Add(self.butcount, 0, wx.ALL, 5)
+            countsizer.Add(self.textcount, 0, wx.ALL, 5 )
+            listsizer.Add(countsizer, 0, wx.ALL, 5)
+            listsizer.Add(self.listcol, 2, wx.ALL|wx.EXPAND, 5 )
+            #bSizer16.Add( self.listcol, 0, wx.ALL|wx.EXPAND, 5 )
+            bSizer16.Add( listsizer, 0, wx.ALL|wx.EXPAND, 5)
             if selected is None :
                 for row in xrange(self.listcol.GetItemCount()):
                     self.listcol.Select(row)
@@ -725,6 +734,11 @@ class PrefSimi ( wx.Dialog ):
             self.checki.Bind( wx.EVT_CHECKBOX, self.OnChecki )
         self.check_vcex.Bind( wx.EVT_CHECKBOX, self.OnCheck_vcex )
         self.check_s_size.Bind( wx.EVT_CHECKBOX, self.OnCheck_s_size )
+        self.listcol.Bind( wx.EVT_LIST_ITEM_SELECTED, self.ChangeCount)
+        self.listcol.Bind( wx.EVT_LIST_ITEM_DESELECTED, self.ChangeCount)
+        self.butcount.Bind( wx.EVT_BUTTON, self.ChangeCount)
+        self.ChangeCount(wx.EVT_BUTTON)
+        
 
     def __set_properties(self):
         self.choice1.SetSelection(self.paramsimi['coeff'])
@@ -772,6 +786,9 @@ class PrefSimi ( wx.Dialog ):
         self.comcheck.SetValue(self.paramsimi['com'])
         self.choix_com.SetSelection(self.paramsimi['communities'])
         self.halo.SetValue(self.paramsimi['halo'])
+    
+    def ChangeCount(self, evt) :
+        self.textcount.SetValue('%i' % self.listcol.GetSelectedItemCount())
 
     def OnCheck_s_size(self, evt):
         if self.check_s_size.GetValue() :
