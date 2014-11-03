@@ -253,8 +253,8 @@ class DoConf :
                     txt += '%s = %s\n' % (option, `parametres[i][option]`)
         if outfile is None :
             outfile = self.configfile
-        with codecs.open(outfile, 'w', 'utf8') as f :
-            f.write(txt)
+        with open(outfile, 'w') as f :
+            f.write(txt.encode('utf8'))
             #self.conf.write(f)
 
     def totext(self, parametres) :
