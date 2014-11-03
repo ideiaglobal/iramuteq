@@ -9,16 +9,14 @@
 import logging
 import os
 from uuid import uuid4
-
-
 from chemins import PathOut
-from functions import exec_rcode, check_Rresult, DoConf
+from functions import exec_rcode, check_Rresult, DoConf, progressbar
 from time import time, sleep
 from openanalyse import OpenAnalyse
 
 
 class AnalyseMatrix :
-    def __init__(self, ira, tableau, parametres = None, dlg = False) :
+    def __init__(self, ira, tableau, parametres = None, dlg = None) :
         self.tableau = tableau
         if self.tableau.csvtable is None :
             self.tableau.open()
@@ -40,6 +38,8 @@ class AnalyseMatrix :
         self.parametres['matrix'] = self.tableau.parametres['uuid']
         self.tableau.pathout.dirout = self.parametres['pathout']
         self.doparametres(dlg = dlg)
+        if self.dlg is not None :
+            self.dlg = progressbar(self.ira, self.dlg)
         if self.parametres is not None :
             self.t1 = time()
             if not os.path.exists(self.parametres['pathout']) :
@@ -55,15 +55,15 @@ class AnalyseMatrix :
             self.parametres['ira'] = self.pathout['Analyse.ira']
             DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
             self.ira.history.addMatrixAnalyse(self.parametres)
-            if dlg :
-                dlg.Destroy()
+            if self.dlg is not None :
+                self.dlg.Destroy()
                 OpenAnalyse(self.parent, self.parametres['ira'])
                 self.ira.tree.AddMatAnalyse(self.parametres)
                 self.val = 5100
         else :
             self.val = False
-            if dlg :
-                dlg.Destroy()
+            if self.dlg is not None :
+                self.dlg.Destroy()
  
     def doanalyse(self) :
         pass

@@ -125,6 +125,7 @@ class LeftTree(CT.CustomTreeCtrl):
         self.ild['chi2'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'chi2.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
         self.ild['reinertmatrix'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'reinertmatrix.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
         self.ild['simimatrix'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'simimatrix.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
+        self.ild['proto'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'proto.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
         self.SetImageList(self.il)
         
         self.count = 0

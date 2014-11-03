@@ -95,9 +95,10 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
 	classeuce1<-AssignClasseToUce(listuce1,chd1$n1)
 	if (classif_mode==0) {
 		classeuce2<-AssignClasseToUce(listuce2,chd2$n1)
-    } else {
-		classeuce2<-classeuce1
-    }
+	}
+	#} else {
+	#	classeuce2<-classeuce1
+    #}
 
 	#calcul des poids (effectifs)
 
@@ -129,9 +130,9 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
 	if (classif_mode==0) {
 		poids2<-vector(mode='integer',length = tcl)
 		poids2<-makepoids(classeuce2,poids2)
-	} else {
-		poids2<-poids1
-	}
+	}# else {
+	#	poids2<-poids1
+	#}
     
     print('croisement classif')
 
@@ -156,7 +157,11 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
 #    	}
 #        croise
 #    }
-    croise <- croiseeff( matrix(ncol=tcl,nrow=tcl), classeuce1, classeuce2)
+	if (classif_mode==0) {
+    	croise <- croiseeff( matrix(ncol=tcl,nrow=tcl), classeuce1, classeuce2)
+	} else {
+		croise <- croiseeff( matrix(ncol=tcl,nrow=tcl), classeuce1, classeuce1)
+	}
     print(croise)
     if (classif_mode == 0) {ind <- (nbcl * 2)} else {ind <- nbcl}
 	if (mincl==0){
@@ -217,7 +222,39 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
 	    }
         chicroise
     }
-    chicroise <- dochicroise(croise, mincl)
+
+	dochicroisesimple <- function(croise, mincl) {
+		chicroise <- croise
+		for (i in 1:nrow(croise)) {
+			for (j in 1:ncol(croise)) {
+				if (croise[i,j]==0) {
+					chicroise[i,j]<-0
+				} else if (croise[i,j]<mincl) { 
+					chicroise[i,j]<-0
+				} else {
+					chitable<-matrix(ncol=2,nrow=2)
+					chitable[1,1]<-croise[i,j]
+					chitable[1,2]<-poids1[i]-chitable[1,1]
+					chitable[2,1]<-poids1[j]-chitable[1,1]
+					chitable[2,2]<-nrow(classeuce1)-poids1[j]-chitable[1,2]
+					chitest<-chisq.test(chitable,correct=FALSE)
+					if ((chitable[1,1]-chitest$expected[1,1])<0) {
+						chicroise[i,j]<--round(chitest$statistic,digits=7)
+					} else {
+						chicroise[i,j]<-round(chitest$statistic,digits=7)
+						#print(chitest)
+					}
+				}
+			}   
+		}
+		chicroise
+	}
+	if (classif_mode == 0) {
+		chicroise <- dochicroise(croise, mincl)
+	} else {
+		chicroise <- dochicroisesimple(croise, mincl)
+	}
+    
     print('fin croise')
 	#print(chicroise)
 	#determination des chi2 les plus fort
@@ -482,7 +519,9 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
 	}
     print('listfille')
 	listfille1<-lfilletot(classeuce1,1)
-	listfille2<-lfilletot(classeuce2,2)
+	if (classif_mode == 0) {
+		listfille2<-lfilletot(classeuce2,2)
+	}
 
 	#utiliser rownames comme coordonnees dans un tableau de 0
 	Assignclasse<-function(classeuce,x) {
@@ -498,20 +537,24 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
 	nchd1<-Assignclasse(classeuce1,1)
 	if (classif_mode==0) {
 		nchd2<-Assignclasse(classeuce2,2)
-	} else {
-		nchd2<-nchd1
-    }
+	}
 	print('fini assign new classe')
 	#croisep<-matrix(ncol=nrow(coordok),nrow=nrow(coordok))
-    nchd2[which(nchd1[,ncol(nchd1)]==0),] <- 0
-    nchd2[which(nchd1[,ncol(nchd1)]!=nchd2[,ncol(nchd2)]),] <- 0
-    nchd1[which(nchd2[,ncol(nchd2)]==0),] <- 0
+	if (classif_mode==0) {
+    	nchd2[which(nchd1[,ncol(nchd1)]==0),] <- 0
+    	nchd2[which(nchd1[,ncol(nchd1)]!=nchd2[,ncol(nchd2)]),] <- 0
+    	nchd1[which(nchd2[,ncol(nchd2)]==0),] <- 0
+	}
 
 	print('fini croise')
 	elim<-which(nchd1[,ncol(nchd1)]==0)
 	keep<-which(nchd1[,ncol(nchd1)]!=0)
 	n1<-nchd1[nchd1[,ncol(nchd1)]!=0,]
-	n2<-nchd2[nchd2[,ncol(nchd2)]!=0,]
+	if (classif_mode==0) {
+		n2<-nchd2[nchd2[,ncol(nchd2)]!=0,]
+	} else {
+		classeuce2 <- NULL
+	}
 	#clnb<-nrow(coordok)
 	print('fini')
 	write.csv2(nchd1[,ncol(nchd1)],uceout)

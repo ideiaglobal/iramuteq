@@ -82,7 +82,7 @@ def parsetxtpaste(txt):
         else :
             pass
         if keepline and line.strip() not in ['LP', 'TD', ''] :
-            ucis[-1][1] = '\n'.join([ucis[-1][1],line])
+            ucis[-1][1] = '\n'.join([ucis[-1][1],line.replace(u'*', ' ')])
     return ucis
 
 
@@ -94,13 +94,14 @@ def print_ucis(ucis, ofile, encodage) :
 
 class ParseFactivaPaste :
     def __init__(self, txtdir, fileout, encodage_in, encodage_out) :
-        files = os.listdir(txtdir) 
-        files = [f for f in files if f.split('.')[-1] == 'txt']
+        files = []
+        for root, subfolders, subfiles in os.walk(txtdir) :
+            nf = [os.path.join(root, f) for f in subfiles if f.split('.')[-1] == 'txt']
+            nf.sort()
+            files += nf
         tot = 0
         with open(fileout,'w') as outf : 
             for f in files : 
-                print f
-                f = os.path.join(txtdir, f) 
                 print f
                 with codecs.open(f, 'rU', encodage_in) as infile : 
                     content = infile.read() 

@@ -23,7 +23,7 @@ class SplitMatrixFromVar(AnalyseMatrix):
             dial.CenterOnParent()
             val = dial.ShowModal()
             if val == wx.ID_OK :
-                self.parametres['colsel'] = dial.list_box_1.GetSelections()
+                self.parametres['colsel'] = dial.m_listBox1.GetSelections()
                 self.parametres['header'] = dial.header
             else :
                 self.parametres = None

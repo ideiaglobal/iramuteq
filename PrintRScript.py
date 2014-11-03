@@ -33,7 +33,7 @@ class PrintRScript :
 
     def sources(self, lsources) :
         for source in lsources :
-            self.add('source("%s", encoding = \'utf8\')' % source)
+            self.add('source("%s", encoding = \'utf8\')' % ffr(source))
 
     def packages(self, lpks) :
         for pk in lpks :
@@ -41,7 +41,7 @@ class PrintRScript :
 
     def load(self, l) :
         for val in l :
-            self.add('load("%s")' % val)
+            self.add('load("%s")' % ffr(val))
 
     def write(self) :
         with open(self.scriptout, 'w') as f :
@@ -169,10 +169,6 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         txt += """
     chd2<-CHD(data2, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)
     """
-    else:
-        txt += """
-    chd2<-chd1
-    """    
     
     txt += """
     #lecture des uce
@@ -203,8 +199,10 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     }
     n1 <- chd.result$n1
     classeuce1 <- chd.result$cuce1
-    classeuce2 <- chd.result$cuce2
-    """ % (classif_mode, mincl, DicoPath['uce'])
+    classes<-n1[,ncol(n1)]
+    write.csv2(n1, file="%s")
+    rm(n1)
+    """ % (classif_mode, mincl, DicoPath['uce'], DicoPath['n1.csv'])
     
     txt += """
     tree.tot1 <- make_tree_tot(chd1)
@@ -215,6 +213,7 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     
     if classif_mode == 0:
         txt += """
+        classeuce2 <- chd.result$cuce2
         tree.tot2 <- make_tree_tot(chd2)
 #        open_file_graph("%s", width = 600, height=400)
 #        plot(tree.tot2$tree.cl)
@@ -224,7 +223,7 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     txt += """
     tree.cut1 <- make_dendro_cut_tuple(tree.tot1$dendro_tuple, chd.result$coord_ok, classeuce1, 1, nbt)
     save(tree.cut1, file="%s")
-    classes<-n1[,ncol(n1)]
+    
     open_file_graph("%s", width = 600, height=400)
     plot.dendropr(tree.cut1$tree.cl,classes, histo=TRUE)
     open_file_graph("%s", width = 600, height=400)
@@ -244,8 +243,10 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         """ % (DicoPath['dendro2'], DicoPath['arbre2'])
         
     txt += """
-    save.image(file="%s")
-    """ % DicoPath['RData']
+    
+    #save.image(file="%s")
+    """ % (DicoPath['RData'])
+    
     fileout = open(DicoPath['Rchdtxt'], 'w')
     fileout.write(txt)
     fileout.close()
@@ -322,8 +323,9 @@ def AlcesteTxtProf(DictChdTxtOut, RscriptsPath, clnb, taillecar):
     txt = "clnb<-%i\n" % clnb
     txt += """
 source("%s")
-load("%s")
-""" % (RscriptsPath['chdfunct'], DictChdTxtOut['RData'])
+#load("%s")
+n1 <- read.csv2("%s")
+""" % (RscriptsPath['chdfunct'], DictChdTxtOut['RData'], DictChdTxtOut['n1.csv'])
     txt += """
 dataact<-read.csv2("%s", header = FALSE, sep = ';',quote = '\"', row.names = 1, na.strings = 'NA')
 datasup<-read.csv2("%s", header = FALSE, sep = ';',quote = '\"', row.names = 1, na.strings = 'NA')
@@ -707,7 +709,7 @@ class PrintSimiScript(PrintRScript) :
             dm.path <- "%s"
             cn.path <- "%s"
             selected.col <- "%s"
-            """ % (self.pathout['mat01.csv'], self.pathout['actives.csv'], self.pathout['selected.csv'])
+            """ % (ffr(self.pathout['mat01.csv']), ffr(self.pathout['actives.csv']), ffr(self.pathout['selected.csv']))
             if 'word' in self.parametres :
                 txt += """
                 word <- TRUE
@@ -742,7 +744,7 @@ class PrintSimiScript(PrintRScript) :
             txt += """
             dm.path <- "%s"
             selected.col <- "%s"
-            """ % (self.pathout['mat01.csv'], self.pathout['selected.csv'])
+            """ % (ffr(self.pathout['mat01.csv']), ffr(self.pathout['selected.csv']))
             if 'word' in self.parametres :
                 txt += """
                 word <- TRUE
@@ -775,7 +777,7 @@ class PrintSimiScript(PrintRScript) :
         else :
             txt += """
             load("%s")
-            """ % self.pathout['RData.RData']
+            """ % ffr(self.pathout['RData.RData'])
         
         if self.parametres['coeff'] == 0 :
             method = 'cooc'
@@ -931,9 +933,11 @@ class PrintSimiScript(PrintRScript) :
             """
         txt += """
         seuil <- %s
-        if (method!='cooc') {
-            seuil <- seuil/100
-        } 
+        if (!is.null(seuil)) {
+            if (method!='cooc') {
+                seuil <- seuil/100
+            } 
+        }
         """ % seuil
         
         txt += """
@@ -1001,7 +1005,7 @@ class PrintSimiScript(PrintRScript) :
             cols <- vertex.label.color
             chivertex.size <- norm.vec(toblack, vcexminmax[1],  vcexminmax[2])
             
-            """ % (self.analyse.parent.RscriptsPath['chdfunct'])
+            """ % (ffr(self.analyse.parent.RscriptsPath['chdfunct']))
         else :
             txt += """
             vertex.label.color <- 'black' 
@@ -1121,7 +1125,7 @@ class PrintSimiScript(PrintRScript) :
         }
         coords <- plot.simi(graph.simi, p.type='%s',filename="%s", vertex.label = label.v, edge.label = label.e, vertex.col = vertex.col, vertex.label.color = vertex.label.color, vertex.label.cex=label.cex, vertex.size = vertex.size, edge.col = cola, leg=leg, width = width, height = height, alpha = alpha, movie = film, svg = svg)
         save.image(file="%s")
-        """ % (type, self.filename, self.pathout['RData'])
+        """ % (type, self.filename, ffr(self.pathout['RData']))
         
         self.add(txt)
         self.write()

@@ -38,10 +38,12 @@ class SimiTxt(AnalyseText):
             self.stars = copy(self.listet)
             self.parametres['stars'] = copy(self.listet)
             self.parametres['sfromchi'] = False
+            self.dlg.Destroy()
             prep = PrepSimi(self.ira, self, self.parametres, self.pathout['selected.csv'], self.actives, indices_simi, wordlist=dictcol)
             if prep.val == wx.ID_OK :
                 continu = True
                 self.parametres = prep.parametres
+                self.dlg = progressbar(self.ira, 4)
         else :
             continu = True
         if continu :

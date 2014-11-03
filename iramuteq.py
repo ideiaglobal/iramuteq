@@ -827,33 +827,19 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
     def analyse_matrix(self, analyse, analyse_type = '', matrix = None, dlgnb = 1):
         if matrix is None :
             matrix = self.tree.getmatrix()
-        #try :
-        analyse(self, matrix, parametres = {'type' : analyse_type}, dlg = progressbar(self, dlgnb))
-        #except:
-        #    BugReport(self)           
+        try :
+            analyse(self, matrix, parametres = {'type' : analyse_type}, dlg = dlgnb)
+        except:
+            BugReport(self)           
 
     def OnFreq(self, event, matrix = None):
         self.analyse_matrix(Frequences, analyse_type = 'freq', matrix = matrix, dlgnb = 3)
-        #if matrix is None :
-        #    matrix = self.tree.getmatrix()
-        #try:
-        #    Frequences(self, matrix, parametres = {'type' : 'freq'}, dlg = progressbar(self, 3)) 
-        #except:
-        #    BugReport(self)
 
     def OnChi2(self, event, matrix = None):
-        #try:
         self.analyse_matrix(ChiSquare, matrix = matrix, analyse_type = 'chi2', dlgnb = 3) 
-        #except:
-        #    BugReport(self)
 
     def OnSimiTab(self, event, matrix = None):
-        if matrix is None :
-            matrix = self.tree.getmatrix()
-        try:
-            DoSimi(self, matrix, parametres = {'type' : 'simimatrix'}, dlg = progressbar(self, 3)) 
-        except:
-            BugReport(self)
+        self.analyse_matrix(DoSimi, matrix = matrix, analyse_type = 'simimatrix', dlgnb = 5)
 
     def OnCHDReinert(self, event, matrix = None):
         if matrix is None :

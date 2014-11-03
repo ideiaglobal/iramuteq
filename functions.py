@@ -30,6 +30,15 @@ log = logging.getLogger('iramuteq')
 indices_simi = [u'cooccurrence' ,'pourcentage de cooccurrence',u'Russel',u'Jaccard', 'Kulczynski1', 'Kulczynski2', 'Mountford', 'Fager', 'simple matching', 'Hamman', 'Faith', 'Tanimoto', 'Dice', 'Phi', 'Stiles', 'Michael', 'Mozley', 'Yule', 'Yule2', 'Ochiai', 'Simpson', 'Braun-Blanquet','Chi-squared', 'Phi-squared', 'Tschuprow', 'Cramer', 'Pearson', 'binomial']
 
 
+def normpath_win32(path) :
+    if not sys.platform == 'win32' :
+        return path
+    while '\\\\' in path :
+        path = path.replace('\\\\', '\\')
+    if sys.platform == 'win32' and path.startswith('\\') and not path.startswith('\\\\') :
+        path = '\\' + path
+    return path
+
 class TGen :
     def __init__(self, path = None, encoding = 'utf8'):
         self.path = path
@@ -197,7 +206,9 @@ class DoConf :
     def __init__(self, configfile=None, diff = None, parametres = None) :
         self.configfile = configfile
         self.conf = ConfigParser()
+        
         if configfile is not None :
+            configfile = normpath_win32(configfile)
             self.conf.readfp(codecs.open(configfile, 'r', 'utf8'))
         self.parametres = {}
         if parametres is not None :
@@ -253,8 +264,9 @@ class DoConf :
                     txt += '%s = %s\n' % (option, `parametres[i][option]`)
         if outfile is None :
             outfile = self.configfile
-        with codecs.open(outfile, 'w', 'utf8') as f :
-            f.write(txt)
+        outfile = normpath_win32(outfile)
+        with open(outfile, 'w') as f :
+            f.write(txt.encode('utf8'))
             #self.conf.write(f)
 
     def totext(self, parametres) :
