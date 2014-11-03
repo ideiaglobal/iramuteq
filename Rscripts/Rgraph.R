@@ -559,7 +559,7 @@ del.yellow <- function(colors) {
     tochange <- apply(rgbs, 2, is.yellow)
     tochange <- which(tochange)
     if (length(tochange)) {
-        gr.col <- grey.colors(length(tochange), start = 0.5)
+        gr.col <- grey.colors(length(tochange), start = 0.5, end = 0.8)
     }
     compt <- 1
     for (val in tochange) {
@@ -574,22 +574,23 @@ make_afc_graph <- function(toplot, classes, clnb, xlab, ylab, cex.txt = NULL, le
     rain <- rainbow(clnb)
     compt <- 1
     tochange <- NULL
-    for (my.color in rain) {
-        my.color <- col2rgb(my.color)
-        if ((my.color[1] > 200) & (my.color[2] > 200) & (my.color[3] < 20)) {
-           tochange <- append(tochange, compt)   
-        }
-        compt <- compt + 1
-    }
-    if (!is.null(tochange)) {
-        gr.col <- grey.colors(length(tochange))
-        compt <- 1
-        for (val in tochange) {
-            rain[val] <- gr.col[compt]
-            compt <- compt + 1
-        }
-    }
-	cl.color <- rain[classes]
+    #for (my.color in rain) {
+    #    my.color <- col2rgb(my.color)
+    #    if ((my.color[1] > 200) & (my.color[2] > 200) & (my.color[3] < 20)) {
+    #       tochange <- append(tochange, compt)   
+    #    }
+    #    compt <- compt + 1
+    #}
+    #if (!is.null(tochange)) {
+    #    gr.col <- grey.colors(length(tochange))
+    #    compt <- 1
+    #    for (val in tochange) {
+    #        rain[val] <- gr.col[compt]
+    #        compt <- compt + 1
+    #    }
+    #}
+	rain <- del.yellow(rain)
+    cl.color <- rain[classes]
     if (black) {
         cl.color <- 'black'
     }
@@ -637,8 +638,9 @@ plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro
     vec.mat[3,] <- 3:(length(sum.cl)+2)
     layout(matrix(vec.mat, nrow=3, ncol=length(sum.cl)),heights=c(2,1,6))
     if (! bw) {
-        col <- rainbow(length(sum.cl))[as.numeric(tree$tip.label)]
+        col <- rainbow(length(sum.cl))
         col <- del.yellow(col)
+        col <- col[as.numeric(tree$tip.label)]
         colcloud <- rainbow(length(sum.cl))
         colcloud <- del.yellow(colcloud)
     }
@@ -658,7 +660,7 @@ plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro
         #wordcloud(names(lclasses[[i]]), lclasses[[i]], scale = c(1.5, 0.2), random.order=FALSE, colors = colcloud[i])
         yval <- 1.1
         plot(0,0,pch='', axes = FALSE)
-        vcex <- norm.vec(lclasses[[i]], 1.5, 2.5)
+        vcex <- norm.vec(lclasses[[i]], 1.5, 1.5)
         for (j in 1:length(lclasses[[i]])) {
             yval <- yval-(strheight( names(lclasses[[i]])[j],cex=vcex[j])+0.02)
             text(-0.9, yval, names(lclasses[[i]])[j], cex = vcex[j], col = colcloud[i], adj=0)
@@ -796,15 +798,15 @@ plot.dendro.lex <- function(tree, to.plot, bw=FALSE, lab=NULL, lay.width=c(3,3,2
     par(mar=c(0,0,0,0))
 	if (!is.null(classes)) {
 		matlay <- matrix(c(1,2,3,4),1,byrow=TRUE)
-		lay.width <- c(3,1,3,2)
+		lay.width <- c(3,2,3,2)
 	} else {
 		matlay <- matrix(c(1,2,3),1,byrow=TRUE)
 	}
     layout(matlay, widths=lay.width,TRUE)
-	par(mar=c(3,0,2,0),cex=1)
+	par(mar=c(3,0,2,4),cex=1)
 	label.ori<-tree[[2]]
     if (!is.null(lab)) {
-        tree$tip.label <- lab
+        tree$tip.label <- lab[tree.order]
     } else {
 	    tree[[2]]<-paste('classe ',tree[[2]])
     }
@@ -823,7 +825,7 @@ plot.dendro.lex <- function(tree, to.plot, bw=FALSE, lab=NULL, lay.width=c(3,3,2
         col.bars <- grey.colors(nrow(to.plot),0,0.8)
     }
     col <- col[tree.order]
-	plot.phylo(tree,label.offset=0.1,tip.col=col)
+	plot.phylo(tree,label.offset=0.2,tip.col=col)
 	if (!is.null(classes)) {
 		par(cex=0.7)
 		par(mar=c(3,0,2,1))
