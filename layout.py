@@ -12,7 +12,7 @@ import wx.lib.agw.labelbook as LB
 from wx.lib.agw.fmresources import *
 from chemins import ConstructPathOut, ChdTxtPathOut, FFF, ffr, PathOut, StatTxtPathOut, simipath
 from ConfigParser import ConfigParser
-from functions import ReadProfileAsDico, GetTxtProfile, read_list_file, ReadList, exec_rcode, print_liste, BugReport, DoConf, indices_simi, check_Rresult, progressbar
+from functions import ReadProfileAsDico, GetTxtProfile, read_list_file, ReadList, exec_rcode, print_liste, BugReport, DoConf, indices_simi, check_Rresult, progressbar, normpath_win32
 from ProfList import ProfListctrlPanel
 from guiparam3d import param3d, simi3d
 from PrintRScript import write_afc_graph, print_simi3d, PrintSimiScript
@@ -1225,9 +1225,8 @@ class DefaultMatLayout :
 class FreqLayout(DefaultMatLayout) :
     def dolayout(self) :
         self.tab = wx.html.HtmlWindow(self.ira.nb, -1)
-        if "gtk2" in wx.PlatformInfo:
-            self.tab.SetStandardFonts()
-        self.tab.LoadPage(self.pathout['resultats.html'].replace('\\\\','/'))
+        res = normpath_win32(self.pathout['resultats.html']).replace('\\','/')
+        self.tab.LoadPage(res)
         self.tab.parametres = self.parametres
         self.ira.nb.AddPage(self.tab, u"Fréquences")
 
@@ -1237,7 +1236,8 @@ class Chi2Layout(DefaultMatLayout) :
         self.tab = wx.html.HtmlWindow(self.ira.nb, -1)
         if "gtk2" in wx.PlatformInfo:
             self.tab.SetStandardFonts()
-        self.tab.LoadPage(self.pathout['resultats-chi2.html'])
+        res = normpath_win32(self.pathout['resultats-chi2.html']).replace('\\','/')
+        self.tab.LoadPage(res)
         self.tab.parametres = self.parametres
         self.ira.nb.AddPage(self.tab, ' - '.join([u"Chi2", "%s" % self.parametres['name']]))
         #self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
@@ -1327,6 +1327,7 @@ class SimiMatLayout(DefaultMatLayout) :
                     fileout = filename + '.svg'
                 else :
                     fileout = self.script.filename
+                fileout = normpath_win32(fileout)
                 if os.path.exists(self.pathout['liste_graph']):
                     graph_simi = read_list_file(self.pathout['liste_graph'])
                     graph_simi.append([os.path.basename(fileout), self.script.txtgraph])
@@ -1338,7 +1339,7 @@ class SimiMatLayout(DefaultMatLayout) :
                 if self.parametres['svg'] :
                     self.graphpan.sizer_3.Add(hl.HyperLinkCtrl(self.graphpan.panel_1, -1, fileout, URL = fileout), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
                 else :
-                    self.graphpan.sizer_3.Add(wx.StaticBitmap(self.graphpan.panel_1, -1, wx.Bitmap(self.script.filename, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+                    self.graphpan.sizer_3.Add(wx.StaticBitmap(self.graphpan.panel_1, -1, wx.Bitmap(fileout, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
                 self.graphpan.sizer_3.Add(wx.StaticText(self.graphpan.panel_1,-1, self.script.txtgraph), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
                 self.graphpan.sizer_3.Fit(self.graphpan.panel_1)
                 self.graphpan.Layout()

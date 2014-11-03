@@ -33,7 +33,7 @@ class PrintRScript :
 
     def sources(self, lsources) :
         for source in lsources :
-            self.add('source("%s", encoding = \'utf8\')' % source)
+            self.add('source("%s", encoding = \'utf8\')' % ffr(source))
 
     def packages(self, lpks) :
         for pk in lpks :
@@ -41,7 +41,7 @@ class PrintRScript :
 
     def load(self, l) :
         for val in l :
-            self.add('load("%s")' % val)
+            self.add('load("%s")' % ffr(val))
 
     def write(self) :
         with open(self.scriptout, 'w') as f :
@@ -709,7 +709,7 @@ class PrintSimiScript(PrintRScript) :
             dm.path <- "%s"
             cn.path <- "%s"
             selected.col <- "%s"
-            """ % (self.pathout['mat01.csv'], self.pathout['actives.csv'], self.pathout['selected.csv'])
+            """ % (ffr(self.pathout['mat01.csv']), ffr(self.pathout['actives.csv']), ffr(self.pathout['selected.csv']))
             if 'word' in self.parametres :
                 txt += """
                 word <- TRUE
@@ -744,7 +744,7 @@ class PrintSimiScript(PrintRScript) :
             txt += """
             dm.path <- "%s"
             selected.col <- "%s"
-            """ % (self.pathout['mat01.csv'], self.pathout['selected.csv'])
+            """ % (ffr(self.pathout['mat01.csv']), ffr(self.pathout['selected.csv']))
             if 'word' in self.parametres :
                 txt += """
                 word <- TRUE
@@ -777,7 +777,7 @@ class PrintSimiScript(PrintRScript) :
         else :
             txt += """
             load("%s")
-            """ % self.pathout['RData.RData']
+            """ % ffr(self.pathout['RData.RData'])
         
         if self.parametres['coeff'] == 0 :
             method = 'cooc'
@@ -1005,7 +1005,7 @@ class PrintSimiScript(PrintRScript) :
             cols <- vertex.label.color
             chivertex.size <- norm.vec(toblack, vcexminmax[1],  vcexminmax[2])
             
-            """ % (self.analyse.parent.RscriptsPath['chdfunct'])
+            """ % (ffr(self.analyse.parent.RscriptsPath['chdfunct']))
         else :
             txt += """
             vertex.label.color <- 'black' 
@@ -1125,7 +1125,7 @@ class PrintSimiScript(PrintRScript) :
         }
         coords <- plot.simi(graph.simi, p.type='%s',filename="%s", vertex.label = label.v, edge.label = label.e, vertex.col = vertex.col, vertex.label.color = vertex.label.color, vertex.label.cex=label.cex, vertex.size = vertex.size, edge.col = cola, leg=leg, width = width, height = height, alpha = alpha, movie = film, svg = svg)
         save.image(file="%s")
-        """ % (type, self.filename, self.pathout['RData'])
+        """ % (type, self.filename, ffr(self.pathout['RData']))
         
         self.add(txt)
         self.write()

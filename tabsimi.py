@@ -5,7 +5,7 @@
 #License: GNU/GPL
 
 from chemins import ConstructPathOut, simipath, ffr, PathOut
-from functions import print_liste, exec_rcode, read_list_file, check_Rresult, indices_simi, treat_var_mod
+from functions import print_liste, exec_rcode, read_list_file, check_Rresult, indices_simi, treat_var_mod, normpath_win32
 from dialog import SelectColDial, FreqDialog
 from guifunct import PrefSimi
 from analysematrix import AnalyseMatrix
@@ -21,7 +21,7 @@ from uuid import uuid4
 
 
 class DoSimi(AnalyseMatrix):
-    def doanalyse(self) :
+    def doparametres(self, dlg = None) :
         self.fromprof = self.parametres.get('fromprof', False)
         self.wordgraph = self.parametres.get('wordgraph', False)
         self.listactives = self.parametres.get('listactives', False)
@@ -29,16 +29,6 @@ class DoSimi(AnalyseMatrix):
         self.openfromprof = self.parametres.get('openfromprof', False)
         self.cmd = self.parametres.get('cmd', False)
         self.dirout = self.parametres.get('pathout', False)
-     #parent, matrix = None, parametres = None, isopen = False, fromprof = False, pathout = False, filename ='', gparent = False, wordgraph = False, listactives = False, actives = False, cmd = False, openfromprof=False, tableau = None):
-#------------------------------------------------------------------- 
-    #    self.fromprof = fromprof
-    #    self.wordgraph = wordgraph
-    #    self.listactives = listactives
-    #    self.actives = actives
-    #    self.openfromprof = openfromprof
-    #    self.cmd = cmd
-    #    self.dirout = pathout
-    #    if parametres is not None and fromprof:
         if self.fromprof:
             self.paramsimi = parametres
         else :
@@ -76,20 +66,11 @@ class DoSimi(AnalyseMatrix):
                           'communities' : 0,
                           }
         self.indices = indices_simi
-        #if fromprof :
-        #    self.parent = parent.parent
-        #    self.Source = parent
-        #else :
         self.Source = None
         if self.dirout :
             self.pathout = PathOut(dirout = self.dirout)
 
-        #self.RPath = self.parent.PathPath.get('PATHS', 'rpath')
         if not self.parametres.get('isopen', False) :
-            #if not fromprof :
-            #    self.tableau = self.parent.tableau
-            #else :
-            #    self.tableau = parent.tableau
             if self.tableau is None :
                 self.tableau = parent.tableau
             self.tableau.parametres['mineff'] = 0
@@ -133,17 +114,8 @@ class DoSimi(AnalyseMatrix):
                         self.parametres['pathout'] = self.dirout
                     self.pathout.createdir(self.parametres['pathout'])
                     self.pathout.dirout = self.parametres['pathout']
-                    #self.parametres['filename'] = self.tableau.parametres['filename']
                     self.dial.Destroy()
-                    self.doanalyse2()  
-                    #dlg = wx.ProgressDialog("Traitements",
-                    #               "Veuillez patienter...",
-                    #               maximum=4,
-                    #               parent=self.parent,
-                    #               style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME
-                    #                )
-                    #dlg.Center()
-                    #AnalyseMatrix.__init__(self, parent, self.tableau, self.paramsimi, dlg = dlg)
+                    #self.doanalyse2()  
                 else :
                     self.dial.Destroy()
                     self.parametres = None
@@ -153,9 +125,9 @@ class DoSimi(AnalyseMatrix):
                 self.parametres = None
                 return False
 
-    def doanalyse2(self) :
+    def doanalyse(self) :
         self.pathout.basefiles(simipath)
-        with open(self.pathout['selected.csv'], 'w') as f :
+        with open(normpath_win32(self.pathout['selected.csv']), 'w') as f :
             f.write('\n'.join([`val` for val in self.column]))
 
         count = 1
@@ -191,8 +163,8 @@ class DoSimi(AnalyseMatrix):
         self.addgraph()
         self.tableau.save_tableau(self.pathout['db'])
         #self.make_ira()
-        count += 1
-        self.dlg.Update(count, u"") 
+        #count += 1
+        #self.dlg.Update(count, u"") 
         self.dlg.Destroy()
         #self.dial.Destroy()
         #self.dolayout()

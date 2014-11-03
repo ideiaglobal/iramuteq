@@ -25,6 +25,7 @@ class WordCloud(AnalyseText):
         self.parametres['type'] = 'wordcloud'
         #FIXME
         limit = 3
+        self.dlg.Destroy()
         res = self.make_option()
         if res == wx.ID_OK :
             if self.parametres['mode'] == 2 :
@@ -36,6 +37,7 @@ class WordCloud(AnalyseText):
                 self.actives = self.corpus.make_actives_limit(limit, 2)
             dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)]) 
             SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], dlg = True)
+            self.dlg = progressbar(self.ira, 2)
             self.make_wordcloud()
             script = WordCloudRScript(self)
             script.make_script()

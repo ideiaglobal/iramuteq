@@ -5,12 +5,22 @@
 #License: GNU/GPL
 
 import os
+import sys
 import tempfile
 import logging
 
 log = logging.getLogger('iramuteq.chemins')
 
 
+def normpath_win32(path) :
+    if not sys.platform == 'win32' :
+        return path
+    while '\\\\' in path :
+        path = path.replace('\\\\', '\\')
+    if sys.platform == 'win32' and path.startswith('\\') and not path.startswith('\\\\') :
+        path = '\\' + path
+    return path
+    
 class PathOut :
     def __init__(self, filename = None, analyse_type = '', dirout = None) :
         if filename is not None :
@@ -48,9 +58,13 @@ class PathOut :
             self.temp = tempfile.mkstemp(prefix='iramuteq')[1].replace('\\', '\\\\')
             return self.temp
         elif key not in self.d :
-            return os.path.join(self.dirout, key).replace('\\', '\\\\')
+            f = os.path.join(self.dirout, key).replace('\\', '\\\\')
+            return normpath_win32(f)
+            #return os.path.join(self.dirout, key).replace('\\', '\\\\')
         else :
-            return os.path.join(self.dirout, self.d[key]).replace('\\', '\\\\')
+            f = os.path.join(self.dirout, self.d[key]).replace('\\', '\\\\')
+            return normpath_win32(f)
+            #return os.path.join(self.dirout, self.d[key]).replace('\\', '\\\\')
     
     def getF(self, key) :
         return self.__getitem__(key).replace('\\', '/')

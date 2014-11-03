@@ -57,314 +57,6 @@ chioption = { 'valobs' : True,
               'bw' : False,
               }
 
-
-class MakeChi2():
-    def __init__(self, parent, select1, select2, chioption, tableau):
-        self.tableau = tableau
-        self.OutFrame=tempfile.mktemp(dir=parent.TEMPDIR)
-        print self.OutFrame
-        self.parent=parent
-        self.encode=self.parent.encode
-        self.TEMPDIR=parent.TEMPDIR
-        self.RPath=parent.PathPath.get('PATHS','rpath')
-        self.TextCroise=[]
-        for i in select1 :
-            for j in select2 :
-                self.TextCroise.append(self.tableau.colnames[i] + ' / ' + self.tableau.colnames[j])
-        rchioption = {}
-        for val in chioption :
-            if chioption[val]:
-                rchioption[val] = 'TRUE'
-            else :
-                rchioption[val] = 'FALSE'
-        txt="""
-        source("%s")
-        """%self.parent.RscriptsPath['Rfunct']
-#        if parent.tableau.: rownames=1
-#        else : rownames='NULL'
-#        if parent.g_header : header = 'TRUE'
-#        else : header = 'FALSE'
-        txt += """
-        source("%s")
-        """ % ffr(self.parent.RscriptsPath['Rgraph'])
-        txt += """
-        doobs <- %s
-        doexp <- %s
-        docontrib <- %s
-        doresi <- %s
-        dopr <- %s
-        doprl <- %s
-        doprc <- %s
-        dograph <- %s
-        bw <- %s
-        """ % (rchioption['valobs'], rchioption['valtheo'], rchioption['contrib'], rchioption['resi'], rchioption['pourcent'], rchioption['pourcentl'], rchioption['pourcentc'], rchioption['graph'], rchioption['bw'])
-        txt+="""
-        datadm <- read.csv2("%s", encoding="%s", header = TRUE, row.names = 1, sep='\\t', quote = '"', na.string = '')
-        listres<-list()
-        listcol<-list()
-        cont<-1
-        """%(ffr(self.tableau.parametres['csvfile']), self.tableau.parametres['syscoding'])
-        if len(select1)==1:
-            strsel1=str(select1).replace(',','')
-        else:
-            strsel1=str(select1)
-        if len(select2)==1:
-            strsel2=str(select2).replace(',','')
-        else:
-            strsel2=str(select2)
-        txt+="""
-        for (i in c%s) {"""%strsel1
-        txt+="""
-            for (j in c%s) {"""%strsel2
-        txt+="""
-                tab<-table(datadm[,i+1],datadm[,j+1])
-                if (min(dim(tab)) != 1) {
-                    chi<-chisq.test(tab)
-                    CS<-colSums(tab)
-                    RS<-rowSums(tab)
-                    GT<-sum(tab)
-                    chi$contrib<-(tab-chi$expected)/sqrt(chi$expected * ((1 - RS/GT) %%*%% t(1 - CS/GT)))
-                    listres[[cont]]<-chi
-                    listcol[[cont]]<-ncol(tab)
-                    cont<-cont+1
-                } else {
-                    chi <- list(observed = tab, residuals = tab, contrib = tab, statistic = 0, p.value = 1, expected = tab, message = 'pas de calcul')
-                    listres[[cont]] <- chi
-                    listcol[[cont]]<-ncol(tab)
-                    cont <- cont + 1
-                }
-            }
-        }
-        maxcol<-max(unlist(listcol))+1
-        if (maxcol<7) {maxcol<-7}
-        frameout<-matrix('*',1,maxcol)
-        count<-0
-        for (chi in listres) {
-            if (min(chi$expected)<5) {
-                att<-"warning"
-            } else {
-                att<-""
-            }
-            if ('message' %%in%% attributes(chi)$names) {
-                att <- "Ce chi2 n\'a pas été calculé"
-                nom_colresi<-colnames(chi$observed)
-                chi$prl <- chi$expected
-                chi$prc <- chi$expected
-                st <- sum(chi$observed)
-            } else {
-                nom_colresi<-colnames(chi$observed)
-                st <- sum(chi$observed)
-                sc <- colSums(chi$observed)
-                sr <- rowSums(chi$observed)
-                chi$prl <- round((chi$observed/sr)*100,2)
-                chi$prc <- t(round((t(chi$observed)/sc)*100,2))
-            }
-            fileout<-paste('histo_',count,sep='')
-            fileout<-paste(fileout,'.png',sep='')
-            count<-count+1
-            fileout<-file.path("%s",fileout)
-            if (max(nchar(colnames(chi$observed)))>15) {
-                leg <- 1:length(colnames(chi$observed))
-            } else {
-                leg <- colnames(chi$observed)
-            }
-            if (dograph) {
-                width<-ncol(chi$observed)*100
-                if (width < 350) {width <- 350}
-                open_file_graph(fileout,width = width, height = 300)
-                par(mar=c(0,0,0,0))
-                layout(matrix(c(1,2),1,2, byrow=TRUE),widths=c(3,1))
-                par(mar=c(2,2,1,0))
-                par(cex=0.8)
-                if (!bw) colors <- rainbow(length(rownames(chi$observed)))
-                else colors <- gray.colors(length(rownames(chi$observed)))
-                barplot(chi$prl,names.arg = leg, beside=TRUE,border=NA, col=colors)
-                par(mar=c(0,0,0,0))
-                par(cex=0.8)
-                plot(0, axes = FALSE, pch = '')
-                legend(x = 'center' , rownames(chi$observed), fill = colors)
-                dev.off()
-            }
-            chi$prl <- cbind(chi$prl, total = rowSums(chi$prl))
-            chi$prc <- rbind(chi$prc, total = colSums(chi$prc))
-            chi$observed<-rbind(chi$observed,total=colSums(chi$observed))
-            chi$observed<-cbind(chi$observed,total=rowSums(chi$observed))
-            chi$pr <- round((chi$observed/st)*100,2)
-            chi$expected<-rbind(chi$expected,total=colSums(chi$expected))
-            chi$expected<-cbind(chi$expected,total=rowSums(chi$expected))
-            chi$expected<-round(chi$expected,digits=2)
-            chi$residuals<-round(chi$residuals,digits=2)
-            chi$contrib<-round(chi$contrib, digits=2)
-            nom_col<-colnames(chi$observed)
-           
-            if (ncol(chi$observed)<maxcol) {
-                for (i in 1:(maxcol-ncol(chi$observed))) {
-                    chi$observed<-cbind(chi$observed,'**')
-                    chi$pr<-cbind(chi$pr,'**')
-                    chi$prl<-cbind(chi$prl,'**')
-                    chi$prc<-cbind(chi$prc,'**')
-                    chi$expected<-cbind(chi$expected,'**')
-                    chi$residuals<-cbind(chi$residuals,'**')
-                    chi$contrib<-cbind(chi$contrib,'**')
-                    nom_col<-append(nom_col,'**')
-                    nom_colresi<-append(nom_colresi,'**')
-                }
-                chi$residuals<-cbind(chi$residuals,'**')
-                chi$contrib<-cbind(chi$contrib,'**')
-                nom_colresi<-append(nom_colresi,'**')
-                chi$prc<-cbind(chi$prc,'**')
-            } else if (ncol(chi$observed)==maxcol) {
-                chi$residuals<-cbind(chi$residuals,'**')
-                chi$contrib<-cbind(chi$contrib,'**')
-                nom_colresi<-append(nom_colresi,'**')
-                chi$prc<-cbind(chi$prc,'**')
-            }
-            if (doobs) {
-                li<-matrix('*obs*',1,maxcol)
-                frameout<-rbind(frameout,li)
-                frameout<-rbind(frameout,nom_col)
-                frameout<-rbind(frameout,chi$observed)
-            }
-            if (doexp) {
-                li<-matrix('*exp*',1,maxcol)
-                frameout<-rbind(frameout,li)
-                frameout<-rbind(frameout,nom_col)
-                frameout<-rbind(frameout,chi$expected)
-            }
-            if (doresi) {
-                li<-matrix('*resi*',1,maxcol)
-                frameout<-rbind(frameout,li)
-                frameout<-rbind(frameout,nom_colresi)
-                frameout<-rbind(frameout,chi$residuals)
-            }
-            if (docontrib) {
-                li<-matrix('*contrib*',1,maxcol)
-                frameout<-rbind(frameout,li)
-                frameout<-rbind(frameout,nom_colresi)
-                frameout<-rbind(frameout,chi$contrib)
-            }
-            if (dopr) {
-                li<-matrix('*pr*', 1, maxcol)
-                frameout<-rbind(frameout,li)
-                frameout<-rbind(frameout,nom_col)
-                frameout<-rbind(frameout,chi$pr)
-            }
-            if (doprl) {
-                li<-matrix('*prl*', 1, maxcol)
-                frameout<-rbind(frameout,li)
-                frameout<-rbind(frameout,nom_col)
-                frameout<-rbind(frameout,chi$prl)
-            }
-            if (doprc) {
-                li<-matrix('*prc*', 1, maxcol)
-                frameout<-rbind(frameout,li)
-                frameout<-rbind(frameout,nom_colresi)
-                frameout<-rbind(frameout,chi$prc)
-            }
-            res<-c('****','chi',chi$statistic,'p',chi$p.value,att,fileout)
-            frameout<-rbind(frameout,res)
-        }
-        li<-matrix('fin_analyse',1,maxcol)
-        frameout<-rbind(frameout,li)
-        write.csv2(frameout,file="%s")
-        """ % (ffr(parent.TEMPDIR),ffr(self.OutFrame))
-        tmpfile=tempfile.mktemp(dir=self.TEMPDIR)
-        print tmpfile
-        tmpscript=open(tmpfile,'w')
-        tmpscript.write(txt)
-        tmpscript.close()
-        pid = exec_rcode(self.RPath, tmpfile, wait = False)
-        while pid.poll() == None :
-            sleep(0.2)
-        check_Rresult(self.parent, pid)
-
-    def dolayout(self, option):
-        ListFile=[False]
-        file=open(self.OutFrame,'rU')
-        content=file.readlines()
-        file.close()
-        lcont = [line.replace('"','').replace('\n','').split(';') for line in content]
-    
-        lcont.pop(0)
-        lcont.pop(0)
-        
-        allcoord = []
-        names = []
-
-        res = [chi for chi in lcont if chi[0]=='res']
-        res = [make_res(line) for line in res]
-        coord_res = [i for i,chi in enumerate(lcont) if chi[0]=='res']
-        if option['valobs']:
-            allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*obs*'])
-            names.append(u'Valeurs observées')
-        if option['valtheo'] :
-            allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*exp*'])
-            names.append(u'Valeurs théoriques')
-        if option['resi'] :
-            allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*resi*'])
-            names.append(u'Residuals')
-        if option['contrib'] :
-            allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*contrib*'])
-            names.append(u'Contributions a posteriori')
-        if option['pourcent'] : 
-            allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*pr*'])
-            names.append(u'Pourcentages')
-        if option['pourcentl'] :
-            allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*prl*'])
-            names.append(u'Pourcentages en ligne')
-        if option['pourcentc'] :
-            allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*prc*'])
-            names.append(u'Pourcentages en colonne')
-    
-        allcoord.append(coord_res)
-        allhtml = [[clean_line(lcont[allcoord[i][j]+1:allcoord[i+1][j]]) for j, line in enumerate(allcoord[i])] for i, tab in enumerate(allcoord) if i!=len(allcoord)-1]
-    
-        allhtml = [make_table(val,names[i],res) for i,val in enumerate(allhtml)]
-    
-        links = make_link_list(res, self.TextCroise)
-        #colors = [line[-1] for line in res]
-    
-    #    good = [i for i,chi in enumerate(res) if chi[-1] == 'green' or chi[-1] == 'blue']
-        #select_good = [[val[i] for i in good] for val in tout]
-    
-    
-        html_res = make_restab(res)
-        allhtml.insert(0,html_res)
-
-        titles = make_title(res, self.TextCroise)
-        allhtml.insert(0,titles)
-        
-        if option['graph'] :
-            graphs = [line[7] for line in res]
-            ListFile += graphs
-            html_graphs = make_htmlgraphs(graphs)
-            allhtml.append(html_graphs)
-
-        header=u"""
-        <html>\n
-        <meta http-equiv="content-Type" content="text/html; charset=%s" />\n
-        <body>\n
-        <h1>Test du Chi2</h1>\n
-        <br>
-        <table border=1><tr><td>
-        Légende : <br>
-        <font color=green>p &lt;= 0.05</font><br>
-        <font color=blue>p &lt;= 0.05 mais il y a des valeurs théoriques &lt; 5</font><br>
-        <font color=red>p &gt; 0.05</font>
-        </td></tr></table><br><br>
-        """%self.parent.SysEncoding
-
-    
-        pretxt = '<br>\n'.join(links)+'<br><hr><br>\n'
-        txt = '<br><hr><br>\n'.join(['<br><br>'.join([tab[i] for tab in allhtml]) for i,val in enumerate(res)])
-        txt = header + pretxt + txt + '\n</body></html>'
-
-        fileout=os.path.join(self.parametres['pathout'],'resultats-chi2.html')
-        with open(fileout, 'w') as f :
-            f.write(txt)
-        ListFile.append(fileout)         
-        return ListFile
-
 class ChiSquare(AnalyseMatrix):
     def doparametres(self, dlg = None):
         if dlg is None :
@@ -374,11 +66,7 @@ class ChiSquare(AnalyseMatrix):
                      )
         dial.CenterOnParent()
         val = dial.ShowModal()
-        if val==wx.ID_OK : 
-            dlg.Center()
-            self.count = 1
-            keepGoing = dlg.Update(self.count)
-            
+        if val==wx.ID_OK :     
             self.colsel1 = dial.list_box_1.GetSelections()
             self.colsel2 = dial.list_box_2.GetSelections()
             if dial.chiopt :
@@ -435,7 +123,7 @@ class ChiSquare(AnalyseMatrix):
                 rchioption[val] = 'FALSE'
         txt="""
         source("%s")
-        """%self.parent.RscriptsPath['Rfunct']
+        """%ffr(self.parent.RscriptsPath['Rfunct'])
 #        if parent.tableau.: rownames=1
 #        else : rownames='NULL'
 #        if parent.g_header : header = 'TRUE'
@@ -648,8 +336,8 @@ class ChiSquare(AnalyseMatrix):
 #             parent.nb.SetSelection(parent.nb.GetPageCount()-1)
 #             parent.ShowTab(wx.EVT_BUTTON)
 #             parent.DisEnSaveTabAs(True)
-        self.count += 1
-        keepGoing = self.dlg.Update(self.count,u"Fini")
+#        self.count += 1
+#        keepGoing = self.dlg.Update(self.count,u"Fini")
 
     def dolayout(self, option):
         ListFile=[False]
@@ -691,19 +379,10 @@ class ChiSquare(AnalyseMatrix):
     
         allcoord.append(coord_res)
         allhtml = [[clean_line(lcont[allcoord[i][j]+1:allcoord[i+1][j]]) for j, line in enumerate(allcoord[i])] for i, tab in enumerate(allcoord) if i!=len(allcoord)-1]
-    
         allhtml = [make_table(val,names[i],res) for i,val in enumerate(allhtml)]
-    
         links = make_link_list(res, self.TextCroise)
-        #colors = [line[-1] for line in res]
-    
-    #    good = [i for i,chi in enumerate(res) if chi[-1] == 'green' or chi[-1] == 'blue']
-        #select_good = [[val[i] for i in good] for val in tout]
-    
-    
         html_res = make_restab(res)
         allhtml.insert(0,html_res)
-
         titles = make_title(res, self.TextCroise)
         allhtml.insert(0,titles)
         
@@ -727,7 +406,6 @@ class ChiSquare(AnalyseMatrix):
         </td></tr></table><br><br>
         """%self.parent.SysEncoding
 
-    
         pretxt = '<br>\n'.join(links)+'<br><hr><br>\n'
         txt = '<br><hr><br>\n'.join(['<br><br>'.join([tab[i] for tab in allhtml]) for i,val in enumerate(res)])
         txt = header + pretxt + txt + '\n</body></html>'
