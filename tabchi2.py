@@ -90,24 +90,9 @@ class ChiSquare(AnalyseMatrix):
             self.parametres = None
             
     def doanalyse(self):
-
-
-            #self.dlg=wx.ProgressDialog("Traitements",
-            #           "Veuillez patienter...",
-            #           maximum = 4,
-            #           parent=parent,
-            #           style = wx.PD_APP_MODAL|wx.PD_AUTO_HIDE|wx.PD_ELAPSED_TIME
-            #            )
-
-
-            
-        self.count += 1
+        self.count = 1
         keepGoing = self.dlg.Update(self.count,u"Analyse dans R...")
-        #analyse=MakeChi2(self.parent, self.colsel1, self.colsel2, self.chioption, self.tableau)
-        #self.tableau = tableau
         self.OutFrame=tempfile.mktemp(dir=self.parent.TEMPDIR)
-        print self.OutFrame
-        #self.parent=parent
         self.encode=self.parent.encode
         self.TEMPDIR=self.parent.TEMPDIR
         self.RPath=self.parent.PathPath.get('PATHS','rpath')
@@ -124,10 +109,6 @@ class ChiSquare(AnalyseMatrix):
         txt="""
         source("%s")
         """%ffr(self.parent.RscriptsPath['Rfunct'])
-#        if parent.tableau.: rownames=1
-#        else : rownames='NULL'
-#        if parent.g_header : header = 'TRUE'
-#        else : header = 'FALSE'
         txt += """
         source("%s")
         """ % ffr(self.parent.RscriptsPath['Rgraph'])
