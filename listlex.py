@@ -16,7 +16,6 @@ import os
 import sys
 import  wx
 import  wx.lib.mixins.listctrl  as  listmix
-import cStringIO
 import tempfile
 from functions import exec_rcode, doconcorde
 from chemins import ffr
@@ -74,8 +73,8 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             
         self.SetColumnWidth(0, 180)
 
-        for i in range(0,len(self.first)):
-            self.SetColumnWidth(i + 1, self.checkcolumnwidth(len(self.first[i]) * 10))
+        for i in range(0,len(self.etoiles)):
+            self.SetColumnWidth(i + 1, self.checkcolumnwidth(len(self.etoiles[i]) * 10))
         
         self.itemDataMap = self.dlist
         self.itemIndexMap = self.dlist.keys()
