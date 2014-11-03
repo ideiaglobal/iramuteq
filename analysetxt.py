@@ -69,6 +69,8 @@ class AnalyseText :
                 DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
                 self.ira.history.add(self.parametres)
                 if dlg :
+                    if not isinstance(dlg, int) :
+                        dlg.Destroy()
                     self.dlg.Destroy()
                     OpenAnalyse(self.parent, self.parametres['ira'])
                     self.ira.tree.AddAnalyse(self.parametres)
@@ -78,7 +80,7 @@ class AnalyseText :
                 if dlg :
                     self.dlg.Destroy()
         else :
-            #if dlg :
+            #if isinstance(dlg, wx.ProgressDialog) :
             #    self.dlg.Destroy()
             self.val = False
 
