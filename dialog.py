@@ -2825,7 +2825,7 @@ class FreqDialog ( wx.Dialog ):
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
         
         m_listBox1Choices = self.header
-        self.m_listBox1 = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_listBox1Choices, wx.LB_EXTENDED|wx.LB_HSCROLL|wx.LB_MULTIPLE )
+        self.m_listBox1 = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_listBox1Choices, wx.LB_EXTENDED|wx.LB_HSCROLL )
         self.m_listBox1.SetMinSize( wx.Size( 500,-1 ) )
         bSizer1.Add( self.m_listBox1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
