@@ -21,9 +21,9 @@ class PathOut :
         self.analyse = analyse_type
         #self.dirout = self.mkdirout(dirout)
         if dirout is not None: 
-            self.dirout = dirout
+            self.dirout = os.path.abspath(dirout)
         elif filename is not None and dirout is None:
-            self.dirout = self.directory
+            self.dirout = os.path.abspath(self.directory)
         self.d = {} 
 
     def mkdirout(self) :
