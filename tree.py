@@ -413,7 +413,13 @@ class LeftTree(CT.CustomTreeCtrl):
                     item = self.parent.matrix_menu.FindItemByPosition(i)
                     itemid = item.GetId()
                     itemtext = item.GetText()
-                    menu.Append(itemid, itemtext)
+                    if item.IsSubMenu() :
+                        nmenu = wx.Menu()
+                        for val in item.GetSubMenu().GetMenuItems() :
+                            nmenu.Append(val.GetId(), val.GetText())
+                        menu.AppendMenu(itemid, itemtext, nmenu)
+                    else :
+                        menu.Append(itemid, itemtext)
                 split = wx.Menu()
                 splitfromvar = split.Append(-1, _(u"Split from variable").decode('utf8'))
                 menu.AppendMenu(-1, _(u"Split matrix").decode('utf8'), split)
