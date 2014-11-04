@@ -206,7 +206,7 @@ class GraphPanelAfc(wx.Panel):
             self.RscriptsPath = self.ira.RscriptsPath
             txt = """
             load("%s")
-            """ % self.DictPathOut['RData']
+            """ % ffr(self.DictPathOut['RData'])
             if self.itempath == 'liste_graph_afcf' :
                 txt += """
                 afc <- afcf

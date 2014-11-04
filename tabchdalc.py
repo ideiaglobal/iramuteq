@@ -134,16 +134,16 @@ class AnalyseQuest(AnalyseMatrix):
         txt = ''
         txt += """
         source("%s")
-        """ % self.parent.RscriptsPath['chdfunct']
+        """ % ffr(self.parent.RscriptsPath['chdfunct'])
         txt += """
         load("%s")
-        """ % self.pathout['RData']
+        """ % ffr(self.pathout['RData'])
         txt += """
         dataact<-read.csv2("%s", header = FALSE, sep = ';',quote = '\"', row.names = 1, na.strings = 'NA')
-        """ % self.pathout['Contout']
+        """ % ffr(self.pathout['Contout'])
         txt += """
         dataet<-read.csv2("%s", header = FALSE, sep = ';',quote = '\"', row.names = 1, na.strings = 'NA')
-        """ % self.pathout['ContEtOut']
+        """ % ffr(self.pathout['ContEtOut'])
         txt += """
         clnb<-%i
         """ % self.clnb
@@ -151,7 +151,7 @@ class AnalyseQuest(AnalyseMatrix):
         tablesqrpact<-BuildProf(as.matrix(dataact),n1,clnb)
         tablesqrpet<-BuildProf(as.matrix(dataet),n1,clnb)
         PrintProfile(n1,tablesqrpact[4],tablesqrpet[4],tablesqrpact[5],tablesqrpet[5],%i,"%s","%s")
-        """ % (self.clnb, self.pathout['PROFILE_OUT'], self.pathout['ANTIPRO_OUT'])
+        """ % (self.clnb, ffr(self.pathout['PROFILE_OUT']), ffr(self.pathout['ANTIPRO_OUT']))
         txt += """
         colnames(tablesqrpact[[2]])<-paste('classe',1:clnb,sep=' ')
         colnames(tablesqrpact[[1]])<-paste('classe',1:clnb,sep=' ')
@@ -161,13 +161,13 @@ class AnalyseQuest(AnalyseMatrix):
         ptabletot<-rbind(as.data.frame(tablesqrpact[1]),as.data.frame(tablesqrpet[1]))
         gbcluster<-n1
         write.csv2(chistabletot,file="%s")
-        """ % self.pathout['chisqtable']
+        """ % ffr(self.pathout['chisqtable'])
         txt += """
         write.csv2(ptabletot,file="%s")
-        """ % self.pathout['ptable']
+        """ % ffr(self.pathout['ptable'])
         txt += """
         write.csv2(gbcluster,file="%s")
-        """ % self.pathout['SbyClasseOut']
+        """ % ffr(self.pathout['SbyClasseOut'])
         if self.clnb > 2 :
             txt += """
             library(ca)
@@ -180,7 +180,7 @@ class AnalyseQuest(AnalyseMatrix):
             fin<-rowtot
             afc<-AddCorrelationOk(afc)
             source("%s")
-            """ % self.parent.RscriptsPath['Rgraph']
+            """ % ffr(self.parent.RscriptsPath['Rgraph'])
     
             txt += """
             afc <- summary.ca.dm(afc)
@@ -188,7 +188,7 @@ class AnalyseQuest(AnalyseMatrix):
             write.csv2(afc_table$facteur, file = "%s")
             write.csv2(afc_table$colonne, file = "%s")
             write.csv2(afc_table$ligne, file = "%s")
-            """ % (self.pathout['afc_facteur'], self.pathout['afc_col'], self.pathout['afc_row'])
+            """ % (ffr(self.pathout['afc_facteur']), ffr(self.pathout['afc_col']), ffr(self.pathout['afc_row']))
             
             txt += """
             xlab <- paste('facteur 1 - ', round(afc$facteur[1,2],2), sep = '')
@@ -202,16 +202,16 @@ class AnalyseQuest(AnalyseMatrix):
             """ % "0.9"
             txt += """
             xyminmax <- PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=1, fin=(debet-1), xlab = xlab, ylab = ylab)
-            """ % (self.pathout['AFC2DL_OUT'])
+            """ % (ffr(self.pathout['AFC2DL_OUT']))
             txt += """
             PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debet, fin=fin, xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2])
-            """ % (self.pathout['AFC2DSL_OUT'])
+            """ % (ffr(self.pathout['AFC2DSL_OUT']))
             txt += """
             PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col = TRUE, what='coord', xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2])
-            """ % (self.pathout['AFC2DCL_OUT'])
+            """ % (ffr(self.pathout['AFC2DCL_OUT']))
         txt += """
         save.image(file="%s")
-        """ % self.pathout['RData']
+        """ % ffr(self.pathout['RData'])
         tmpfile = tempfile.mktemp(dir=self.parent.TEMPDIR)
         tmpscript = open(tmpfile, 'w')
         tmpscript.write(txt)
