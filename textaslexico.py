@@ -3,7 +3,7 @@
 #Copyright (c) 2008-2011 Pierre Ratinaud
 #License: GNU/GPL
 
-from chemins import ConstructPathOut, StatTxtPathOut, PathOut
+from chemins import ConstructPathOut, StatTxtPathOut, PathOut, ffr
 #from corpus import Corpus
 from analysetxt import AnalyseText
 import wx
@@ -40,13 +40,13 @@ class Lexico(AnalyseText) :
         txt = """
         source("%s")
         source("%s")
-        """ % (self.parent.RscriptsPath['chdfunct'], self.parent.RscriptsPath['Rgraph'])
+        """ % (ffr(self.parent.RscriptsPath['chdfunct']), ffr(self.parent.RscriptsPath['Rgraph']))
         txt += """
         dmf<-read.csv2("%s",row.names=1)
-        """ % self.dictpathout['tableafcm']
+        """ % ffr(self.dictpathout['tableafcm'])
         txt += """
         dmt<-read.csv2("%s",row.names=1)
-        """ % self.dictpathout['tabletypem']
+        """ % ffr(self.dictpathout['tabletypem'])
         txt += """
         indice <- "%s"
         """ % self.parametres['indice']
@@ -72,21 +72,21 @@ class Lexico(AnalyseText) :
         banalspec <- specf<-outf[[1]][banal,]
         banal <- cbind(banalfreq, banalspec)
         write.csv2(banal,file="%s")
-        """ % self.pathout['banalites.csv']
+        """ % ffr(self.pathout['banalites.csv'])
         txt += """
         specf<-outf[[1]]
         spect<-outt[[1]]
         write.csv2(specf,file="%s")
-        """ % self.dictpathout['tablespecf']
+        """ % ffr(self.dictpathout['tablespecf'])
         txt += """
         write.csv2(spect,file="%s")
-        """ % self.dictpathout['tablespect']
+        """ % ffr(self.dictpathout['tablespect'])
         txt += """
         write.csv2(outf[[3]],file="%s")
-        """ % self.dictpathout['eff_relatif_forme']
+        """ % ffr(self.dictpathout['eff_relatif_forme'])
         txt += """
         write.csv2(outt[[3]],file="%s")
-        """ % self.dictpathout['eff_relatif_type']
+        """ % ffr(self.dictpathout['eff_relatif_type'])
         if self.parametres['clnb'] > 2 :
             txt += """
             library(ca)
@@ -133,11 +133,11 @@ class Lexico(AnalyseText) :
             debsup <- NULL
             debet <- NULL
             clnb <-  ncol(specf)
-            """ % (self.dictpathout['afcf_row'], self.dictpathout['afcf_col'], self.dictpathout['afct_row'], self.dictpathout['afct_col'], self.dictpathout['afcf_facteur_csv'], self.dictpathout['afcf_col_csv'], self.dictpathout['afcf_row_csv'], self.dictpathout['afct_facteur_csv'], self.dictpathout['afct_col_csv'], self.dictpathout['afct_row_csv'])
+            """ % (ffr(self.dictpathout['afcf_row']), ffr(self.dictpathout['afcf_col']), ffr(self.dictpathout['afct_row']), ffr(self.dictpathout['afct_col']), ffr(self.dictpathout['afcf_facteur_csv']), ffr(self.dictpathout['afcf_col_csv']), ffr(self.dictpathout['afcf_row_csv']), ffr(self.dictpathout['afct_facteur_csv']), ffr(self.dictpathout['afct_col_csv']), ffr(self.dictpathout['afct_row_csv']))
 
         txt += """
         save.image("%s")
-        """ % self.dictpathout['RData']
+        """ % ffr(self.dictpathout['RData'])
         tmpfile = tempfile.mktemp(dir=self.parent.TEMPDIR)
         tmpscript = open(tmpfile, 'w')
         tmpscript.write(txt)

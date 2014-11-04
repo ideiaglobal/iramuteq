@@ -115,7 +115,7 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     source("%s")
     source("%s")
     source("%s")
-    """ % (RscriptPath['CHD'], RscriptPath['chdtxt'], RscriptPath['anacor'], RscriptPath['Rgraph'])
+    """ % (ffr(RscriptPath['CHD']), ffr(RscriptPath['chdtxt']), ffr(RscriptPath['anacor']), ffr(RscriptPath['Rgraph']))
     if R_max_mem :
         txt += """
     memory.limit(%i)
@@ -153,14 +153,14 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     data1 <- readMM("%s")
     data1 <- as(data1, "dgCMatrix")
     row.names(data1) <- 1:nrow(data1)
-    """ % DicoPath['TableUc1']
+    """ % ffr(DicoPath['TableUc1'])
     
     if classif_mode == 0:
         txt += """
         data2 <- readMM("%s")
         data2 <- as(data2, "dgCMatrix")
         row.names(data2) <- 1:nrow(data2)
-        """ % DicoPath['TableUc2']
+        """ % ffr(DicoPath['TableUc2'])
     txt += """
     chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)
     """
@@ -173,12 +173,12 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     txt += """
     #lecture des uce
     listuce1<-read.csv2("%s")
-    """ % DicoPath['listeuce1']
+    """ % ffr(DicoPath['listeuce1'])
     
     if classif_mode == 0:
         txt += """
         listuce2<-read.csv2("%s")
-        """ % DicoPath['listeuce2']
+        """ % ffr(DicoPath['listeuce2'])
         
     txt += """
     rm(data1)
@@ -202,14 +202,14 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     classes<-n1[,ncol(n1)]
     write.csv2(n1, file="%s")
     rm(n1)
-    """ % (classif_mode, mincl, DicoPath['uce'], DicoPath['n1.csv'])
+    """ % (classif_mode, mincl, ffr(DicoPath['uce']), ffr(DicoPath['n1.csv']))
     
     txt += """
     tree.tot1 <- make_tree_tot(chd1)
 #    open_file_graph("%s", widt = 600, height=400)
 #    plot(tree.tot1$tree.cl)
 #    dev.off()
-    """ % DicoPath['arbre1']
+    """ % ffr(DicoPath['arbre1'])
     
     if classif_mode == 0:
         txt += """
@@ -218,7 +218,7 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
 #        open_file_graph("%s", width = 600, height=400)
 #        plot(tree.tot2$tree.cl)
 #        dev.off()
-        """ % DicoPath['arbre2']  
+        """ % ffr(DicoPath['arbre2'] ) 
               
     txt += """
     tree.cut1 <- make_dendro_cut_tuple(tree.tot1$dendro_tuple, chd.result$coord_ok, classeuce1, 1, nbt)
@@ -229,7 +229,7 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     open_file_graph("%s", width = 600, height=400)
     plot(tree.cut1$dendro_tot_cl)
     dev.off()
-    """ % (DicoPath['Rdendro'], DicoPath['dendro1'], DicoPath['arbre1'])
+    """ % (ffr(DicoPath['Rdendro']), ffr(DicoPath['dendro1']), ffr(DicoPath['arbre1']))
     
     if classif_mode == 0:
         txt += """
@@ -240,12 +240,12 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         open_file_graph("%s", width = 600, height=400)
         plot(tree.cut1$dendro_tot_cl)
         dev.off()
-        """ % (DicoPath['dendro2'], DicoPath['arbre2'])
+        """ % (ffr(DicoPath['dendro2']), ffr(DicoPath['arbre2']))
         
     txt += """
     
     #save.image(file="%s")
-    """ % (DicoPath['RData'])
+    """ % (ffr(DicoPath['RData']))
     
     fileout = open(DicoPath['Rchdtxt'], 'w')
     fileout.write(txt)
@@ -283,7 +283,7 @@ def RchdQuest(DicoPath, RscriptPath, nbcl = 10, mincl = 10):
     source("%s")
     source("%s")
     source("%s")
-    """ % (RscriptPath['CHD'], RscriptPath['chdquest'], RscriptPath['anacor'],RscriptPath['Rgraph'])
+    """ % (ffr(RscriptPath['CHD']), ffr(RscriptPath['chdquest']), ffr(RscriptPath['anacor']),ffr(RscriptPath['Rgraph']))
 
     txt += """
     nbt <- %i - 1
@@ -294,14 +294,14 @@ def RchdQuest(DicoPath, RscriptPath, nbcl = 10, mincl = 10):
     chd.result<-Rchdquest("%s","%s","%s", nbt = nbt, mincl = mincl)
     n1 <- chd.result$n1
     classeuce1 <- chd.result$cuce1
-    """ % (DicoPath['mat01.csv'], DicoPath['listeuce1'], DicoPath['uce'])
+    """ % (ffr(DicoPath['mat01.csv']), ffr(DicoPath['listeuce1']), ffr(DicoPath['uce']))
     
     txt += """
     tree_tot1 <- make_tree_tot(chd.result$chd)
     open_file_graph("%s", width = 600, height=400)
     plot(tree_tot1$tree.cl)
     dev.off()
-    """%DicoPath['arbre1']
+    """ % ffr(DicoPath['arbre1'])
     
     txt += """
     tree_cut1 <- make_dendro_cut_tuple(tree_tot1$dendro_tuple, chd.result$coord_ok, classeuce1, 1, nbt)
@@ -310,11 +310,11 @@ def RchdQuest(DicoPath, RscriptPath, nbcl = 10, mincl = 10):
     open_file_graph("%s", width = 600, height=400)
     classes<-n1[,ncol(n1)]
     plot.dendropr(tree_cut1$tree.cl,classes, histo = TRUE)
-    """ % (DicoPath['Rdendro'],DicoPath['dendro1'])
+    """ % (ffr(DicoPath['Rdendro']), ffr(DicoPath['dendro1']))
     
     txt += """
     save.image(file="%s")
-    """ % DicoPath['RData']
+    """ % ffr(DicoPath['RData'])
     fileout = open(DicoPath['Rchdquest'], 'w')
     fileout.write(txt)
     fileout.close()
@@ -325,12 +325,12 @@ def AlcesteTxtProf(DictChdTxtOut, RscriptsPath, clnb, taillecar):
 source("%s")
 #load("%s")
 n1 <- read.csv2("%s")
-""" % (RscriptsPath['chdfunct'], DictChdTxtOut['RData'], DictChdTxtOut['n1.csv'])
+""" % (ffr(RscriptsPath['chdfunct']), ffr(DictChdTxtOut['RData']), ffr(DictChdTxtOut['n1.csv']))
     txt += """
 dataact<-read.csv2("%s", header = FALSE, sep = ';',quote = '\"', row.names = 1, na.strings = 'NA')
 datasup<-read.csv2("%s", header = FALSE, sep = ';',quote = '\"', row.names = 1, na.strings = 'NA')
 dataet<-read.csv2("%s", header = FALSE, sep = ';',quote = '\"', row.names = 1, na.strings = 'NA')
-""" % (DictChdTxtOut['Contout'], DictChdTxtOut['ContSupOut'], DictChdTxtOut['ContEtOut'])
+""" % (ffr(DictChdTxtOut['Contout']), ffr(DictChdTxtOut['ContSupOut']), ffr(DictChdTxtOut['ContEtOut']))
     txt += """
 tablesqrpact<-BuildProf(as.matrix(dataact),n1,clnb)
 tablesqrpsup<-BuildProf(as.matrix(datasup),n1,clnb)
@@ -338,7 +338,7 @@ tablesqrpet<-BuildProf(as.matrix(dataet),n1,clnb)
 """
     txt += """
 PrintProfile(n1,tablesqrpact[4],tablesqrpet[4],tablesqrpact[5],tablesqrpet[5],clnb,"%s","%s",tablesqrpsup[4],tablesqrpsup[5])
-""" % (DictChdTxtOut['PROFILE_OUT'], DictChdTxtOut['ANTIPRO_OUT'])
+""" % (ffr(DictChdTxtOut['PROFILE_OUT']), ffr(DictChdTxtOut['ANTIPRO_OUT']))
     txt += """
 colnames(tablesqrpact[[2]])<-paste('classe',1:clnb,sep=' ')
 colnames(tablesqrpact[[1]])<-paste('classe',1:clnb,sep=' ')
@@ -355,7 +355,7 @@ write.csv2(chistabletot,file="%s")
 write.csv2(ptabletot,file="%s")
 gbcluster<-n1
 write.csv2(gbcluster,file="%s")
-""" % (DictChdTxtOut['chisqtable'], DictChdTxtOut['ptable'], DictChdTxtOut['SbyClasseOut'])
+""" % (ffr(DictChdTxtOut['chisqtable']), ffr(DictChdTxtOut['ptable']), ffr(DictChdTxtOut['SbyClasseOut']))
     if clnb > 2 :
         txt += """
     library(ca)
@@ -375,7 +375,7 @@ write.csv2(gbcluster,file="%s")
     #FIXME : split this!!!
         txt += """
     source("%s")
-    """ % RscriptsPath['Rgraph']
+    """ % ffr(RscriptsPath['Rgraph'])
     
         txt += """
         afc <- summary.ca.dm(afc)
@@ -383,25 +383,25 @@ write.csv2(gbcluster,file="%s")
         write.csv2(afc_table$facteur, file = "%s")
         write.csv2(afc_table$colonne, file = "%s")
         write.csv2(afc_table$ligne, file = "%s")
-        """ % (DictChdTxtOut['afc_facteur'], DictChdTxtOut['afc_col'], DictChdTxtOut['afc_row'])
+        """ % (ffr(DictChdTxtOut['afc_facteur']), ffr(DictChdTxtOut['afc_col']), ffr(DictChdTxtOut['afc_row']))
     
         txt += """
     PARCEX<-%s
     """ % taillecar
         txt += """
     xyminmax <- PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab)
-    """ % (DictChdTxtOut['AFC2DL_OUT'])
+    """ % (ffr(DictChdTxtOut['AFC2DL_OUT']))
         txt += """
     PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debsup, fin=(debet-1), xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2], active=FALSE)
-    """ % (DictChdTxtOut['AFC2DSL_OUT'])
+    """ % (ffr(DictChdTxtOut['AFC2DSL_OUT']))
         txt += """
         if ((fin - debet) > 2) {
     PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='coord', deb=debet, fin=fin, xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2], active = FALSE)
         }
-    """ % (DictChdTxtOut['AFC2DEL_OUT'])
+    """ % (ffr(DictChdTxtOut['AFC2DEL_OUT']))
         txt += """
     PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", col=TRUE, what='coord', xlab = xlab, ylab = ylab, xmin = xyminmax$xminmax[1], xmax = xyminmax$xminmax[2], ymin = xyminmax$yminmax[1], ymax = xyminmax$yminmax[2], active=FALSE)
-    """ % (DictChdTxtOut['AFC2DCL_OUT'])
+    """ % (ffr(DictChdTxtOut['AFC2DCL_OUT']))
 #        txt += """
  #   PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='crl', deb=1, fin=(debsup-1), xlab = xlab, ylab = ylab)
  #   PlotAfc2dCoul(afc, as.data.frame(chistabletot), "%s", what='crl', deb=debsup, fin=(debet-1), xlab = xlab, ylab = ylab)
@@ -417,7 +417,7 @@ rm(tablesqrpact)
 rm(tablesqrpsup)
 rm(tablesqrpet)
 save.image(file="%s")
-""" % DictChdTxtOut['RData']
+""" % ffr(DictChdTxtOut['RData'])
     file = open(DictChdTxtOut['RTxtProfGraph'], 'w')
     file.write(txt)
     file.close()
@@ -449,7 +449,7 @@ def write_afc_graph(self):
         txt = f.read()
 
 #    self.DictPathOut['RData'], \
-    scripts = txt % (self.RscriptsPath['Rgraph'],\
+    scripts = txt % (ffr(self.RscriptsPath['Rgraph']),\
     self.param['typegraph'], \
     self.param['what'], \
     self.param['facteur'][0],\

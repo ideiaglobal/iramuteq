@@ -842,9 +842,10 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         self.analyse_matrix(DoSimi, matrix = matrix, analyse_type = 'simimatrix', dlgnb = 5)
 
     def OnCHDReinert(self, event, matrix = None):
-        if matrix is None :
-            matrix = self.tree.getmatrix()
-        AnalyseQuest(self, matrix, parametres = {'type' : 'reinertmatrix'}, dlg = progressbar(self, 3))
+        #if matrix is None :
+        #    matrix = self.tree.getmatrix()
+        #AnalyseQuest(self, matrix, parametres = {'type' : 'reinertmatrix'}, dlg = 3)
+        self.analyse_matrix(AnalyseQuest, matrix = matrix, analyse_type = 'reinertmatrix', dlgnb = 5)
             
     def OnStudent(self, event):
         try:
