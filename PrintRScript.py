@@ -238,7 +238,7 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         plot(tree.cut2$tree.cl)
         dev.off()
         open_file_graph("%s", width = 600, height=400)
-        plot(tree.cut1$dendro_tot_cl)
+        plot(tree.cut2$dendro_tot_cl)
         dev.off()
         """ % (ffr(DicoPath['dendro2']), ffr(DicoPath['arbre2']))
         
