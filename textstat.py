@@ -4,7 +4,7 @@
 #Copyright (c) 2008-2012 Pierre Ratinaud
 #License: GNU/GPL
 
-#from chemins import ConstructPathOut, StatTxtPathOut, ffr
+from chemins import ffr
 from chemins import PathOut
 from analysetxt import AnalyseText
 #from corpus import Corpus
@@ -73,17 +73,17 @@ class Stat(AnalyseText) :
         txt = """
         source("%s")
         tot <- read.csv2("%s", header = FALSE, row.names = 1)
-        """ % (self.parent.RscriptsPath['Rgraph'], self.pathout['total.csv'])
+        """ % (ffr(self.parent.RscriptsPath['Rgraph']), ffr(self.pathout['total.csv']))
         if len(hapax) :
             txt += """
             hapax <- read.csv2("%s", header = FALSE, row.names = 1)
             tot <- rbind(tot, hapax)
-            """ % self.pathout['hapax.csv']
+            """ % ffr(self.pathout['hapax.csv'])
         txt += """
         open_file_graph("%s", width = 400, height = 400)
         plot(tot[,1], log = 'xy', xlab='log(rangs)', ylab = 'log(frequences)', col = 'red', pch=16)
         dev.off()
-        """ % (self.pathout['zipf.png'])
+        """ % (ffr(self.pathout['zipf.png']))
         tmpscript = tempfile.mktemp(dir=self.parent.TEMPDIR)
         with open(tmpscript, 'w') as f :
             f.write(txt)
