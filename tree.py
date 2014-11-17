@@ -953,20 +953,21 @@ class LeftTree(CT.CustomTreeCtrl):
         self.SetItemBold(item, bold)
         self.SelectItem(item)  
         
-    def OnItemAppend(self, item):
+    def OnItemAppend(self, item, select = True):
         if 'corpus_name' in item :
             child = self.InsertItem(self.textroot, 0, item['corpus_name'])
         else :
             child = self.InsertItem(self.matroot, 0, item['matrix_name'])
         self.SetPyData(child, item)
-        self.history.addtab(item)
         if item['type'] in self.ild :
             img = self.ild[item['type']]
         else :
             img = 24
         self.SetItemImage(child, img, CT.TreeItemIcon_Normal)
         self.SetItemImage(child, img, CT.TreeItemIcon_Expanded)
-        self.SetItemBold(child, True)
+        if select :
+            self.history.addtab(item)
+            self.SetItemBold(child, True)
         
         #dlg = wx.TextEntryDialog(self, "Please Enter The New Item Name", 'Item Naming', 'Python')
 

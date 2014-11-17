@@ -31,8 +31,9 @@ class Reinert(AnalyseText) :
             self.corpus.make_and_write_sparse_matrix_from_uci(self.actives, self.pathout['TableUc1'], self.pathout['listeuce1'])
             uci = True
         Rscript = self.printRscript()
-        self.doR(Rscript, dlg=self.dlg, message='CHD...')
-
+        result = self.doR(Rscript, dlg=self.dlg, message='CHD...')
+        if not result :
+            return 'NOK'
         self.corpus.make_ucecl_from_R(self.pathout['uce'])
         self.corpus.make_and_write_profile(self.actives, self.corpus.lc, self.pathout['Contout'], uci = uci)
         self.sup, lim = self.corpus.make_actives_nb(self.parametres['max_actives'], 2)

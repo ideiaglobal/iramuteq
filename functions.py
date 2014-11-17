@@ -519,7 +519,7 @@ def BugReport(parent, error = None):
         txt += u'*************************************\n'
         txt += '\n'.join(excTb).replace('    ', ' ')
         txt += excName + '\n'
-        txt += exc
+        txt += `exc`
         title = "Bug"
 
     dial = BugDialog(parent, **{'title' : title})
@@ -556,7 +556,10 @@ def ReadLexique(parent, lang = 'french', filein = None):
         else :
             parent.lexique = ReadDicoAsDico(filein)
     else :
-        parent.lexique = {}
+        if filein is None :
+            parent.lexique = {}
+        else :
+            parent.lexique = ReadDicoAsDico(filein)
 
 def ReadList(filein, encoding = sys.getdefaultencoding(), sep = ';'):
     #file = open(filein)
