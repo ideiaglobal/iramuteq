@@ -1541,7 +1541,11 @@ class Builder :
             parametres = dial.doparametres()
             parametres['originalpath'] = parent.filename
             PathOut().createdir(parametres['pathout'])
-            ReadLexique(self.parent, lang = parametres['lang'])
+            if parametres.get('dictionary', False) :
+                filein = parametres['dictionary']
+            else :
+                filein = None
+            ReadLexique(self.parent, lang = parametres['lang'], filein = filein)
             if parametres['lang'] != 'other' and  os.path.exists(self.parent.DictPath.get(parametres['lang']+'_exp', 'french_exp')):
                 self.parent.expressions = ReadDicoAsDico(self.parent.DictPath.get(parametres['lang']+'_exp', 'french_exp'))
             else :
