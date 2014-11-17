@@ -25,9 +25,12 @@ class AnalyseMatrix :
         self.dlg = dlg
         self.parametres = parametres
         self.val = False
-        self.parametres['pathout'] = PathOut(tableau.parametres['originalpath'], analyse_type = self.parametres['type'], dirout = tableau.parametres['pathout']).mkdirout()
+        print self.parametres
         if not 'pathout' in self.parametres :
-            self.pathout = PathOut(tableau.parametres['originalpath'], analyse_type = self.parametres['type'], dirout = tableau.parametres['pathout'])
+            self.parametres['pathout'] = PathOut(tableau.parametres['originalpath'], analyse_type = self.parametres['type'], dirout = tableau.parametres['pathout']).mkdirout()
+            print self.parametres
+            self.pathout = PathOut(analyse_type = self.parametres['type'], dirout = self.parametres['pathout'])
+            print self.pathout.dirout
         else :
             self.pathout = PathOut(filename = tableau.parametres['originalpath'], dirout = self.parametres['pathout'], analyse_type = self.parametres['type'])
 
@@ -48,17 +51,19 @@ class AnalyseMatrix :
         else :
             result_analyse = False
         if result_analyse is None :
-            self.time = time() - self.t1
-            minutes, seconds = divmod(self.time, 60)
-            hours, minutes = divmod(minutes, 60)            
-            self.parametres['time'] = '%.0fh %.0fm %.0fs' % (hours, minutes, seconds)
-            self.parametres['ira'] = self.pathout['Analyse.ira']
-            DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
-            self.ira.history.addMatrixAnalyse(self.parametres)
+            if self.parametres.get('tohistory', True) :
+                self.time = time() - self.t1
+                minutes, seconds = divmod(self.time, 60)
+                hours, minutes = divmod(minutes, 60)            
+                self.parametres['time'] = '%.0fh %.0fm %.0fs' % (hours, minutes, seconds)
+                self.parametres['ira'] = self.pathout['Analyse.ira']
+                DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
+                self.ira.history.addMatrixAnalyse(self.parametres)
             if self.dlg is not None :
                 self.dlg.Destroy()
-                OpenAnalyse(self.parent, self.parametres['ira'])
-                self.ira.tree.AddMatAnalyse(self.parametres)
+                if self.parametres.get('tohistory', True) :
+                    OpenAnalyse(self.parent, self.parametres['ira'])
+                    self.ira.tree.AddMatAnalyse(self.parametres)
                 self.val = 5100
         else :
             self.val = False
