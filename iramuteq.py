@@ -149,7 +149,17 @@ sys.stdout = printer()
 ConfigPath = ConstructConfigPath(UserConfigPath)
 
 langues = {'french' : wx.LANGUAGE_FRENCH,
-            'english' : wx.LANGUAGE_ENGLISH,}
+            'english' : wx.LANGUAGE_ENGLISH,
+            'portuguese' : wx.LANGUAGE_PORTUGUESE,
+            'italian' : wx.LANGUAGE_ITALIAN,
+            'spanish' : wx.LANGUAGE_SPANISH}
+
+code_langues = {'french' : 'fr_FR',
+             'english' : 'en',
+            'portuguese' : 'pt_PT',
+            'italian' : 'it_IT',
+            'spanish' : 'es_ES'
+            }
 #####################################################################
 
 class IraFrame(wx.Frame):
@@ -178,8 +188,12 @@ class IraFrame(wx.Frame):
         #langues = ['fr_FR', 'en', 'pt_PT']
         #for l in langues :
         #    pass
-        self.presLan_fr = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['fr_FR'])
-        self.presLan_en = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['en'])
+        self.preslangue = {}
+        for langue in code_langues :
+            self.preslangue[langue] = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=[code_langues[langue]])
+        
+        #self.presLan_fr = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['fr_FR'])
+        #self.presLan_en = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['en'])
         self.setlangue()
         # tell FrameManager to manage this frame        
         #self._mgr = wx.aui.AuiManager()
@@ -511,24 +525,9 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
 
 
     def setlangue(self) :
-        try :
-            self.pref.read(self.ConfigPath['preferences'])
-            guilangue = self.pref.get('iramuteq', 'guilanguage')
-            if guilangue == 'french' :
-                self.presLan_fr.install()
-            elif guilangue == 'portuguese' :
-                self.presLan_pt.install()
-            else :
-                self.presLan_en.install()
-            mylocale = wx.Locale(langues[guilangue])
-            mylocale.AddCatalogLookupPathPrefix(os.path.join(AppliPath,'locale'))
-            mylocale.AddCatalog('iramuteq')
-        except :
-            self.presLan_fr.install()
-            mylocale = wx.Locale(langues['french'])
-            mylocale.AddCatalogLookupPathPrefix(os.path.join(AppliPath,'locale'))
-            mylocale.AddCatalog('iramuteq')
-
+        self.pref.read(self.ConfigPath['preferences'])
+        guilangue = self.pref.get('iramuteq', 'guilanguage')
+        self.preslangue.get(guilangue, 'english').install()
 
     def OnVerif(self, evt) :
         pack = CheckRPackages(self)
@@ -824,13 +823,18 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 ################################################################
 #debut des analyses
 ################################################################
-    def analyse_matrix(self, analyse, analyse_type = '', matrix = None, dlgnb = 1):
+    def analyse_matrix(self, analyse, analyse_type = '', matrix = None, parametres = None, dlgnb = 1):
         if matrix is None :
             matrix = self.tree.getmatrix()
-        try :
-            analyse(self, matrix, parametres = {'type' : analyse_type}, dlg = dlgnb)
-        except:
-            BugReport(self)           
+        if parametres is not None :
+            parametres['type'] = analyse_type
+        else :
+            parametres = {'type' : analyse_type}
+        #try :
+        print 'plus de bug@@@@@@@@@@@@@@@@@@@@@@'
+        analyse(self, matrix, parametres = parametres, dlg = dlgnb)
+        #except:
+        #    BugReport(self)           
 
     def OnFreq(self, event, matrix = None):
         self.analyse_matrix(Frequences, analyse_type = 'freq', matrix = matrix, dlgnb = 3)
@@ -882,7 +886,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         #Prototypical(self, {'type' : 'proto'})
     
     def OnSplitVar(self, evt, matrix = None):
-        self.analyse_matrix(SplitMatrixFromVar, matrix = matrix, analyse_type = 'splitvar', dlgnb = 3)
+        self.analyse_matrix(SplitMatrixFromVar, matrix = matrix, analyse_type = 'splitvar', parametres = {'pathout': matrix.pathout.dirout}, dlgnb = 3)
         matrix = self.tree.getmatrix()
         
 
