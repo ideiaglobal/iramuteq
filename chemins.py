@@ -159,6 +159,7 @@ def ConstructGlobalPath(AppliPath):
     ConfigPath = os.path.join(AppliPath, 'configuration')
     DictConfigPath = {
             'global': os.path.join(ConfigPath, 'global.cfg'),
+            'preferences': os.path.join(ConfigPath, 'iramuteq.cfg'),
             }
     return DictConfigPath
 

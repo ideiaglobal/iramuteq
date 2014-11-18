@@ -113,6 +113,8 @@ ImagePath = os.path.join(AppliPath, 'images')
 DictConfigPath = ConstructGlobalPath(AppliPath)
 ConfigGlob = ConfigParser()
 ConfigGlob.read(DictConfigPath['global'])
+DefaultConf = ConfigParser()
+DefaultConf.read(DictConfigPath['preferences'])
 #repertoire de l'utilisateur
 if os.getenv('HOME') != None:
     user_home = os.getenv('HOME')
@@ -191,10 +193,9 @@ class IraFrame(wx.Frame):
         self.preslangue = {}
         for langue in code_langues :
             self.preslangue[langue] = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=[code_langues[langue]])
-        
+        self.setlangue()
         #self.presLan_fr = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['fr_FR'])
         #self.presLan_en = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['en'])
-        self.setlangue()
         # tell FrameManager to manage this frame        
         #self._mgr = wx.aui.AuiManager()
         self._mgr = aui.AuiManager()
@@ -525,7 +526,10 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
 
     def setlangue(self) :
         self.pref.read(self.ConfigPath['preferences'])
-        guilangue = self.pref.get('iramuteq', 'guilanguage')
+        try :
+            guilangue = self.pref.get('iramuteq', 'guilanguage')
+        except :
+            guilangue = DefaultConf.get('iramuteq', 'guilanguage')
         self.preslangue.get(guilangue, 'english').install()
 
     def OnVerif(self, evt) :
