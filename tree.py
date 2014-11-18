@@ -1087,10 +1087,10 @@ class LeftTree(CT.CustomTreeCtrl):
             pydata = self.GetPyData(item)
 
         if pydata is not None :
-            if 'corpus_name' in pydata :
+            if 'corpus_name' in pydata or 'corpus' in pydata :
                 self.ira.ShowMenu('text', True)
                 self.ira.ShowMenu('matrix', False)
-            if 'matrix_name' in pydata :
+            if 'matrix_name' in pydata or 'matrix' in pydata:
                 self.ira.ShowMenu('text', False)
                 self.ira.ShowMenu('matrix', True)                
             self.pydata = pydata

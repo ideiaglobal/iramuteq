@@ -974,17 +974,8 @@ class MatLayout :
         ira.nb.AddPage(self.sheet, matrix.parametres['matrix_name'])
         self.sheet.Populate(matrix.csvtable)
         self.sheet.parametres = matrix.parametres
-        #self.ira.ShowMenu(_(u"View").decode('utf8'))
-        #self.ira.ShowMenu(_(u"Matrix analysis").decode('utf8'))
-        #self.ira.ShowMenu(_(u"Text analysis").decode('utf8'), False)
-        #self.parent.type = "Data"
-        #self.parent.DataPop = False
         ira.nb.SetSelection(ira.nb.GetPageCount() - 1)
         ira.ShowAPane("Tab_content")
-        #self.ira.OnViewData('')
-
-      
-        
 
 class CopusPanel(wx.Panel) :
     def __init__(self, parent, parametres) :

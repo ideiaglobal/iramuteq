@@ -149,22 +149,22 @@ class OpenAnalyse():
 
     def doopen(self, corpus) :
         if self.conf['type'] == 'corpus' :
-            self.parent.ShowMenu(_("Text analysis"))
+            #self.parent.ShowMenu(_("Text analysis"))
             OpenCorpus(self.parent, self.conf) 
         elif self.conf['type'] == 'stat' :
-            self.parent.ShowMenu(_("Text analysis"))
+            #self.parent.ShowMenu(_("Text analysis"))
             StatLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'spec' :
-            self.parent.ShowMenu(_("Text analysis"))
+            #self.parent.ShowMenu(_("Text analysis"))
             dolexlayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'alceste' :
-            self.parent.ShowMenu(_("Text analysis"))
+            #self.parent.ShowMenu(_("Text analysis"))
             OpenCHDS(self.parent,  corpus, self.conf, Alceste = True)
         elif self.conf['type'] == 'simitxt' or self.conf['type'] == 'clustersimitxt' :
-            self.parent.ShowMenu(_("Text analysis"))
+            #self.parent.ShowMenu(_("Text analysis"))
             SimiLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'wordcloud' or self.conf['type'] == 'clustercloud':
-            self.parent.ShowMenu(_("Text analysis"))
+            #self.parent.ShowMenu(_("Text analysis"))
             WordCloudLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'reinertmatrix' :
             #self.parent.ShowMenu(_("Spreadsheet analysis"))
