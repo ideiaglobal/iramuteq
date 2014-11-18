@@ -1545,6 +1545,7 @@ class Builder :
                 filein = parametres['dictionary']
             else :
                 filein = None
+            dial.Destroy()
             ReadLexique(self.parent, lang = parametres['lang'], filein = filein)
             if parametres['lang'] != 'other' and  os.path.exists(self.parent.DictPath.get(parametres['lang']+'_exp', 'french_exp')):
                 self.parent.expressions = ReadDicoAsDico(self.parent.DictPath.get(parametres['lang']+'_exp', 'french_exp'))
@@ -1552,9 +1553,9 @@ class Builder :
                 self.parent.expressions = {}
             self.parametres = parametres
         else :
+            dial.Destroy()
             if self.dlg is not None :
                 self.dlg.Destroy()
-        dial.Destroy()
 
     def doanalyse(self) :
         return BuildFromAlceste(self.parent.filename, self.parametres, self.parent.lexique, self.parent.expressions, dlg = self.dlg).corpus
