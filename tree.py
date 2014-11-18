@@ -383,8 +383,8 @@ class LeftTree(CT.CustomTreeCtrl):
         
         if not item in [self.textroot, self.matroot] :
             menu = wx.Menu()
-            info = menu.Append(wx.ID_ANY, _(u"Informations").encode('utf8'))
-            rename = menu.Append(wx.ID_ANY, _(u"Rename").encode('utf8'))
+            info = menu.Append(wx.ID_ANY, _(u"Informations").decode('utf8'))
+            rename = menu.Append(wx.ID_ANY, _(u"Rename").decode('utf8'))
             menu.AppendSeparator()
     
             if 'corpus_name' in pydata :
