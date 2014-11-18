@@ -104,6 +104,7 @@ class LeftTree(CT.CustomTreeCtrl):
             elif data.startswith("EVT_"):
                 events.append(data)
         self.parent = parent
+        self.ira = parent
         self.events = events
         self.styles = treestyles
         self.item = None
@@ -1084,7 +1085,14 @@ class LeftTree(CT.CustomTreeCtrl):
         if event is not None :
             item = event.GetItem()
             pydata = self.GetPyData(item)
+
         if pydata is not None :
+            if 'corpus_name' in pydata :
+                self.ira.ShowMenu('text', True)
+                self.ira.ShowMenu('matrix', False)
+            if 'matrix_name' in pydata :
+                self.ira.ShowMenu('text', False)
+                self.ira.ShowMenu('matrix', True)                
             self.pydata = pydata
             if pydata['uuid'] in self.parent.history.opened :
                 for i in range(self.parent.nb.GetPageCount()) :

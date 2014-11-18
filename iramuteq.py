@@ -459,9 +459,9 @@ class IraFrame(wx.Frame):
 
 ##############################################################@
         self.DisEnSaveTabAs(False)
-        self.ShowMenu(_("View").decode('utf8'), False)
-        self.ShowMenu(_("Matrix analysis").decode('utf8'), False)
-        self.ShowMenu(_("Text analysis").decode('utf8'), False)
+        self.ShowMenu('view', False)
+        self.ShowMenu('matrix', False)
+        self.ShowMenu('text', False)
    
         self._mgr.Update()
 
@@ -523,7 +523,6 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
                 pass
             dlg.Destroy()
 
-
     def setlangue(self) :
         self.pref.read(self.ConfigPath['preferences'])
         guilangue = self.pref.get('iramuteq', 'guilanguage')
@@ -546,9 +545,19 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
                 item.Enable(DISEN)
     
     def ShowMenu(self, menu, Show=True):
-        menu_pos = self.mb.FindMenu(menu)
-        self.mb.EnableTop(menu_pos, Show)
-        self.mb.UpdateMenus()
+        if menu == 'text' :
+            menu_pos = 4
+        elif menu == 'matrix' :
+            menu_pos = 3
+        elif menu == 'view' :
+            menu_pos = 2
+        else :
+            menu_pos = None
+            
+        #menu_pos = self.mb.FindMenu(menu)
+        if not menu_pos is None :
+            self.mb.EnableTop(menu_pos, Show)
+            self.mb.UpdateMenus()
 
 
 #--------------------------------------------------------------------
@@ -575,7 +584,7 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
     def OnOpenAnalyse(self, event):
         self.AnalysePath = OnOpen(self, "Analyse")
         OpenAnalyse(self, self.AnalysePath[1][0], True)
-        self.ShowMenu(_("View"))
+        self.ShowMenu('view')
 
     def OnOpenText(self, event):
         inputname, self.input_path = OnOpen(self, "Texte")
@@ -635,9 +644,9 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
             else :
                 count = 1
                 keepGoing = dlg.Update(count, u"Lecture du fichier")
-                self.ShowMenu(_(u"View").decode('utf8'))
-                self.ShowMenu(_(u"Text analysis").decode('utf8'))
-                self.ShowMenu(_(u"Matrix analysis").decode('utf8'), False)
+                self.ShowMenu('view')
+                self.ShowMenu('text')
+                self.ShowMenu('matrix', False)
                 self.type = "Texte"
                 self.DataTxt = False
                 self.Text = ''
@@ -698,11 +707,11 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             if 'parametres' in dir(npage) :
                 self.tree.GiveFocus(uuid=npage.parametres['uuid'])
                 if npage.parametres.get('matrix', False) :
-                    self.ShowMenu(_(u"Text analysis").decode('utf8'), False)
-                    self.ShowMenu(_(u"Matrix analysis").decode('utf8'), True)
+                    self.ShowMenu('text', False)
+                    self.ShowMenu('matrix', True)
                 elif npage.parametres.get('corpus', False) :
-                    self.ShowMenu(_(u"Text analysis").decode('utf8'))
-                    self.ShowMenu(_(u"Matrix analysis").decode('utf8'), False)
+                    self.ShowMenu('text')
+                    self.ShowMenu('matrix', False)
 
     def OnCloseTab(self, evt):
         #log.info('Closing tab %s' % str(evt.GetEventObject()))
