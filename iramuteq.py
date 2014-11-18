@@ -593,8 +593,6 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
             self.OpenText()
    
     def OnViewData(self, event):
-        print self.type
-        print self.DataTxt
         if self.type == "Data":
             if not self.DataPop :
                 self.Sheet.Populate(self.content)
@@ -640,6 +638,7 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
                 self.tree.OnItemAppend(corpus.parametres)
                 OpenAnalyse(self, corpus.parametres)
             except :
+                dlg.Destroy()
                 BugReport(self)
             else :
                 count = 1
@@ -725,34 +724,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             self.history.rmtab(page.parametres)
             self.tree.CloseItem(uuid = page.parametres['uuid'])
         TabTitle = self.nb.GetPageText(self.nb.GetSelection())
-#         if self.DictTab != {} :
-#             if TabTitle in self.DictTab :
-#                 ListFile=self.DictTab[TabTitle]
-#                 if False in ListFile:
-#                     msg = u"""
-# Certains résultats ne sont pas enregistrer.
-# Voulez-vous fermer quand même ?"""
-#                     dlg = wx.MessageDialog(self, msg, "Sauvegarde",wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
-# 
-#                     dlg.CenterOnParent()
-#                     if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
-#                         remove = False
-#                         evt.Veto()
-#                         dlg.Destroy()
-#                     else :
-#                         for f in ListFile[1:] :
-#                             print 'remove', f
-#                             os.remove(f)
-#                             remove = True
-#                         dlg.Destroy()
-#                 elif True in ListFile :
-#                     remove = True
-#                 if remove:
-#                     del self.DictTab[TabTitle]
-#             else : 
-#                 self.LastTabClose()
-#        else :
-#            remove = True
+
         if self.nb.GetPageCount() == 1 and not notebook :
             self.LastTabClose()
     
@@ -765,40 +737,6 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
                 self.ShowAPane("Data")
             else :
                 self.ShowAPane("Intro_Text")
-
-#     def OnSaveTabAs(self, event):
-#         SelectTab = self.nb.GetSelection()
-#         TabTitle = self.nb.GetPageText(SelectTab)
-#         FileToSave = self.DictTab[TabTitle]
-#         NewListFile = []
-#         dlg = wx.FileDialog(
-#             self, message="Enregistrer sous...", defaultDir=os.getcwd(),
-#             defaultFile="resultat.html", wildcard="Tous les fichiers|*", style=wx.SAVE | wx.OVERWRITE_PROMPT
-#             )
-#         dlg.SetFilterIndex(2)
-#         dlg.CenterOnParent()
-#         
-#         if dlg.ShowModal() == wx.ID_OK:
-#             Path = dlg.GetPath()
-#             Dirname = os.path.dirname(Path)
-#             Filename = dlg.GetFilename()
-#         else :
-#             Path = False
-#         dlg.Destroy()
-#         if Path:
-#             shutil.copyfile(FileToSave[-1], Path)
-#             os.remove(FileToSave[len(FileToSave) - 1])
-#             NewListFile.append(True)
-#             NewListFile.append(Path)
-#             for f in FileToSave[1:-1] :
-#                 Fileout = os.path.join(Dirname, os.path.basename(f))
-#                 shutil.copyfile(f, Fileout)
-#                 NewListFile.append(Fileout)
-#                 os.remove(f)
-#             TabText = Filename
-#             self.DictTab[TabText] = NewListFile
-#             del self.DictTab[TabTitle]
-#             self.nb.SetPageText(SelectTab, TabText)
 
     def GetStartPosition(self):
 
@@ -839,11 +777,11 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             parametres['type'] = analyse_type
         else :
             parametres = {'type' : analyse_type}
-        #try :
-        print 'plus de bug@@@@@@@@@@@@@@@@@@@@@@'
-        analyse(self, matrix, parametres = parametres, dlg = dlgnb)
-        #except:
-        #    BugReport(self)           
+        try :
+        #print 'plus de bug@@@@@@@@@@@@@@@@@@@@@@'
+            analyse(self, matrix, parametres = parametres, dlg = dlgnb)
+        except:
+            BugReport(self)           
 
     def OnFreq(self, event, matrix = None):
         self.analyse_matrix(Frequences, analyse_type = 'freq', matrix = matrix, dlgnb = 3)
