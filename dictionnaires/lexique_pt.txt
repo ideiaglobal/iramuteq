@@ -2195,7 +2195,9 @@ acomodavam	acomodar	ver
 acomodação	acomodação	nom
 acomodações	acomodação	nom
 acomode	acomodar	ver
+acomodei	acomodar	ver
 acomodem	acomodar	ver
+acomodo	acomodar	ver
 acomodou	acomodar	ver
 acompanha	acompanhar	ver
 acompanhada	acompanhar	ver
@@ -3403,6 +3405,7 @@ admiraria	admirar	ver
 admirarmos	admirar	ver
 admiras	admirar	ver
 admirasse	admirar	ver
+admirassem	admirar	ver
 admirativo	admirativo	adj
 admirava	admirar	ver
 admiravam	admirar	ver
@@ -5475,6 +5478,7 @@ aiara	aiar	ver
 aias	aia	nom
 aida	aida	nom
 aidar	aidar	nom
+aids	aids	nom
 aidéticas	aidético	adj
 aidético	aidético	adj
 aidéticos	aidético	adj
@@ -8651,6 +8655,8 @@ analógica	analógico	adj
 analógicas	analógico	adj
 analógico	analógico	adj
 analógicos	analógico	adj
+anamnese	anamnese	nom
+anamneses	anamnese	nom
 anamorfose	anamorfose	nom
 anamorfoses	anamorfose	nom
 ananases	ananás	nom
@@ -10494,6 +10500,7 @@ apavorante	apavorante	adj
 apavorantes	apavorante	adj
 apavorar	apavorar	ver
 apavoraram	apavorar	ver
+apavorarei	apavorar	ver
 apavoravam	apavorar	ver
 apavorou	apavorar	ver
 apazigua	apaziguar	ver
@@ -11341,6 +11348,7 @@ apreenderam	apreender	ver
 apreenderem	apreender	ver
 apreendesse	apreender	ver
 apreendeu	apreender	ver
+apreendi	apreender	ver
 apreendia	apreender	ver
 apreendiam	apreender	ver
 apreendida	apreender	ver
@@ -15464,6 +15472,8 @@ atomistas	atomista	nom
 atomizada	atomizar	ver
 atomizadas	atomizar	ver
 atomizado	atomizar	ver
+atomizador	atomizador	nom
+atomizadores	atomizador	nom
 atomizados	atomizar	ver
 atomizam	atomizar	ver
 atomizar	atomizar	ver
@@ -16251,6 +16261,7 @@ autismo	autismo	nom
 autista	autista	adj
 autistas	autista	adj
 auto	auto	nom
+autoajuda	autoajuda	nom
 autobiografado	autobiografar	ver
 autobiografia	autobiografia	nom
 autobiografias	autobiografia	nom
@@ -16322,6 +16333,7 @@ autodifusão	autodifusão	nom
 autodigestão	autodigestão	nom
 autodisciplina	autodisciplina	nom
 autodomínio	autodomínio	nom
+autoestima	autoestima	nom
 autoestrada	auto-estrada	nom
 autofagia	autofagia	nom
 autofalência	autofalência	nom
@@ -16769,6 +16781,7 @@ avassalamento	avassalamento	nom
 avassalar	avassalar	ver
 avassalavam	avassalar	ver
 avassalou	avassalar	ver
+avatar	avatar	nom
 ave	ave	nom
 avecer	avecer	ver
 aveia	aveia	nom
@@ -17787,6 +17800,8 @@ baku	baku	nom
 bala	bala	nom
 balada	balada	nom
 baladas	balada	nom
+baladeira	baladeiro	adj
+baladeiro	baladeiro	adj
 balado	balar	ver
 balai	balar	ver
 balaiada	balaiada	nom
@@ -19263,6 +19278,7 @@ belíssimas	belo	adj
 belíssimo	belo	adj
 belíssimos	belo	adj
 bem	bem	adv
+bem-estar	bem-estar	nom
 bem-vindo	bem-vindo	adj
 bem-vindos	bem-vindo	adj
 bemol	bemol	adj
@@ -19549,6 +19565,7 @@ berrar	berrar	ver
 berrarei	berrar	ver
 berrava	berrar	ver
 berre	berrar	ver
+berrei	berrar	ver
 berreiro	berreiro	nom
 berreiros	berreiro	nom
 berreis	berrar	ver
@@ -20576,6 +20593,7 @@ boiadeiro	boiadeiro	nom
 boiadeiros	boiadeiro	nom
 boiado	boiar	ver
 boiados	boiar	ver
+boiam	boiar	ver
 boiando	boiar	ver
 boiar	boiar	ver
 boiarem	boiar	ver
@@ -21820,6 +21838,9 @@ browniano	browniano	adj
 brownianos	browniano	adj
 broxa	broxa	nom
 broxante	broxante	nom
+broxei	broxar	ver
+broxo	broxar	ver
+broxou	broxar	ver
 bruaca	bruaca	nom
 bruacas	bruaca	nom
 brucelose	brucelose	nom
@@ -22044,6 +22065,8 @@ buliçoso	buliçoso	adj
 bull	bull	nom
 bulo	bular	ver
 bulício	bulício	nom
+bulímica	bulímico	adj
+bulímico	bulimia	adj
 bum	bum	ono
 bumba	bumba	nom
 bumbar	bumbar	ver
@@ -22425,6 +22448,7 @@ cabeluda	cabeludo	adj
 cabeludas	cabeludo	adj
 cabeludo	cabeludo	adj
 cabeludos	cabeludo	adj
+cabelão	cabelo	nom
 cabem	caber	ver
 cabemos	caber	ver
 cabendo	caber	ver
@@ -29711,6 +29735,7 @@ cocu	cocu	nom
 cocula	cocular	ver
 cocuruto	cocuruto	nom
 cocção	cocção	nom
+cocô	cocô	nom
 codajaense	codajaense	adj
 codeara	codear	ver
 codeína	codeína	nom
@@ -30165,6 +30190,7 @@ colegial	colegial	nom
 colegienses	colegiense	adj
 coleguinha	colega	nom
 coleguismo	coleguismo	nom
+coleguismos	coleguismo	nom
 colei	colar	ver
 coleira	coleira	nom
 coleiras	coleira	nom
@@ -31265,6 +31291,7 @@ compartimentada	compartimentar	ver
 compartimentadas	compartimentar	ver
 compartimentado	compartimentar	ver
 compartimentados	compartimentar	ver
+compartimentalização	compartimentalização	nom
 compartimentando	compartimentar	ver
 compartimentar	compartimentar	ver
 compartimento	compartimento	nom
@@ -36969,6 +36996,7 @@ coíbe	coibir	ver
 coíbem	coibir	ver
 crachá	crachá	nom
 crachás	crachá	nom
+crack	crack	nom
 cracoviana	cracoviana	nom
 cracídea	cracídeo	adj
 cracídeo	cracídeo	adj
@@ -37867,6 +37895,10 @@ cuida	cuidar	ver
 cuidada	cuidado	adj
 cuidadas	cuidado	adj
 cuidado	cuidado	nom
+cuidador	cuidador	nom
+cuidadora	cuidador	nom
+cuidadoras	cuidador	nom
+cuidadores	cuidador	nom
 cuidados	cuidado	nom
 cuidadosa	cuidadoso	adj
 cuidadosamente	cuidadosamente	adv
@@ -39553,6 +39585,7 @@ declamava	declamar	ver
 declamavam	declamar	ver
 declamação	declamação	nom
 declamações	declamação	nom
+declamo	declamar	ver
 declamou	declamar	ver
 declara	declarar	ver
 declarada	declarar	ver
@@ -44150,8 +44183,20 @@ desestabilizou	desestabilizar	ver
 desestatização	desestatização	nom
 desestimada	desestimar	ver
 desestimou	desestimar	ver
+desestimula	desestimular	ver
+desestimulamos	desestimular	ver
+desestimulando	desestimular	ver
 desestimulante	desestimulante	adj
 desestimulantes	desestimulante	adj
+desestimularam	desestimular	ver
+desestimularei	desestimular	ver
+desestimularemos	desestimular	ver
+desestimulará	desestimular	ver
+desestimularão	desestimular	ver
+desestimulas	desestimular	ver
+desestimulei	desestimular	ver
+desestimulo	desestimular	ver
+desestimulou	desestimular	ver
 desestruturação	desestruturação	nom
 desestímulo	desestímulo	nom
 desestímulos	desestímulo	nom
@@ -44519,6 +44564,7 @@ designações	designação	nom
 designe	designar	ver
 designem	designar	ver
 designer	designer	nom
+designers	designer	nom
 designes	designar	ver
 designo	designar	ver
 designou	designar	ver
@@ -46326,6 +46372,7 @@ desvalorizavam	desvalorizar	ver
 desvalorização	desvalorização	nom
 desvalorizações	desvalorização	nom
 desvalorize	desvalorizar	ver
+desvalorizei	desvalorizar	ver
 desvalorizem	desvalorizar	ver
 desvalorizo	desvalorizar	ver
 desvalorizou	desvalorizar	ver
@@ -47945,12 +47992,28 @@ direccionem	direccionar	ver
 direcciones	direccionar	ver
 direccionou	direccionar	ver
 direccionáveis	direccionar	ver
+direciona	direcionar	ver
+direcionada	direcionar	adj
+direcionadas	direcionar	adj
+direcionado	direcionar	adj
 direcionador	direcionador	adj
 direcionadores	direcionador	adj
-direcionais	direcional	adj
-direcional	direcional	adj
+direcionados	direcionar	adj
+direcionais	direcionar	adj
+direcional	direcionar	adj
+direcionam	direcionar	ver
 direcionamento	direcionamento	nom
 direcionamentos	direcionamento	nom
+direcionando	direcionar	ver
+direcionar	direcionar	ver
+direcionaram	direcionar	ver
+direcionará	direcionar	ver
+direcionava	direcionar	ver
+direcionavam	direcionar	ver
+direcione	direcionar	ver
+direcionem	direcionar	ver
+direciones	direcionar	ver
+direcionou	direcionar	ver
 directa	directo	adj
 directamente	directamente	adv
 directas	directo	adj
@@ -48756,6 +48819,7 @@ dissociava	dissociar	ver
 dissociação	dissociação	nom
 dissociações	dissociação	nom
 dissociem	dissociar	ver
+dissocio	dissociar	ver
 dissociou	dissociar	ver
 dissociável	dissociável	adj
 dissoluta	dissoluto	adj
@@ -49283,6 +49347,7 @@ divorciariam	divorciar	ver
 divorciará	divorciar	ver
 divorciasse	divorciar	ver
 divorciassem	divorciar	ver
+divorciava	divorciar	ver
 divorcie	divorciar	ver
 divorciei	divorciar	ver
 divorcio	divorciar	ver
@@ -50130,6 +50195,7 @@ drogados	drogado	nom
 drogam	drogar	ver
 drogando	drogar	ver
 drogar	drogar	ver
+drogarem	drogar	ver
 drogaria	drogaria	nom
 drogarias	drogaria	nom
 drogas	droga	nom
@@ -50920,6 +50986,7 @@ educações	educação	nom
 educo	educar	ver
 educou	educar	ver
 eduque	educar	ver
+eduquei	educar	ver
 eduquem	educar	ver
 edusp	edusp	nom
 eduz	eduzir	ver
@@ -51445,6 +51512,8 @@ eletrocardiograma	eletrocardiograma	nom
 eletrocardiogramas	eletrocardiograma	nom
 eletrocardiógrafo	eletrocardiógrafo	nom
 eletrocardiógrafos	eletrocardiógrafo	nom
+eletrochoque	eletrochoque	nom
+eletrochoques	eletrochoque	nom
 eletrocrômica	eletrocrômico	adj
 eletrocrômicas	eletrocrômico	adj
 eletrocrômico	eletrocrômico	adj
@@ -51816,6 +51885,7 @@ emagrecidas	emagrecer	ver
 emagrecido	emagrecer	ver
 emagrecimento	emagrecimento	nom
 emagreça	emagrecer	ver
+emagreço	emagrecer	ver
 emalhados	emalhar	ver
 emalhar	emalhar	ver
 emalhe	emalhar	ver
@@ -54702,6 +54772,7 @@ engatam	engatar	ver
 engatando	engatar	ver
 engatar	engatar	ver
 engataram	engatar	ver
+engataria	engatar	ver
 engatava	engatar	ver
 engatavam	engatar	ver
 engate	engate	nom
@@ -55256,6 +55327,7 @@ enrolasse	enrolar	ver
 enrolassem	enrolar	ver
 enrolava	enrolar	ver
 enrolavam	enrolar	ver
+enrolação	enrolação	nom
 enrole	enrolar	ver
 enrolei	enrolar	ver
 enrolo	enrolar	ver
@@ -55995,6 +56067,7 @@ entrosadas	entrosar	ver
 entrosado	entrosar	ver
 entrosados	entrosar	ver
 entrosamento	entrosamento	nom
+entrosando	entrosar	ver
 entrosar	entrosar	ver
 entrosaram	entrosar	ver
 entrosarem	entrosar	ver
@@ -56033,7 +56106,9 @@ entupimento	entupimento	nom
 entupimentos	entupimento	nom
 entupindo	entupir	ver
 entupir	entupir	ver
+entupiram	entupir	ver
 entupiu	entupir	ver
+enturma	enturmar	ver
 enturmado	enturmar	ver
 enturmados	enturmar	ver
 enturmar	enturmar	ver
@@ -65636,6 +65711,7 @@ ficais	ficar	ver
 ficam	ficar	ver
 ficamos	ficar	ver
 ficando	ficar	ver
+ficante	ficante	nom
 ficar	ficar	ver
 ficara	ficar	ver
 ficaram	ficar	ver
@@ -68071,6 +68147,7 @@ fraldas	fralda	nom
 fraldinha	fralda	nom
 fraldinhas	fralda	nom
 fraldo	fraldar	ver
+fraldão	fralda	nom
 framboesa	framboesa	nom
 framboesas	framboesa	nom
 frame	frame	nom
@@ -70713,6 +70790,8 @@ geri	gerir	ver
 geria	gerir	ver
 geriam	gerir	ver
 gerias	gerir	ver
+geriatra	geriatra	nom
+geriatras	geriatra	nom
 geriatria	geriatria	nom
 gerida	gerir	ver
 geridas	gerir	ver
@@ -75623,6 +75702,7 @@ imediata	imediato	adj
 imediatamente	imediatamente	adv
 imediatas	imediato	adj
 imediatismo	imediatismo	nom
+imediatista	imediatista	adj
 imediato	imediato	adj
 imediatos	imediato	adj
 imediação	imediação	nom
@@ -82452,6 +82532,7 @@ isolaram	isolar	ver
 isolarem	isolar	ver
 isolaria	isolar	ver
 isolariam	isolar	ver
+isolarmos	isolar	ver
 isolas	isolar	ver
 isolasse	isolar	ver
 isolassem	isolar	ver
@@ -88868,6 +88949,8 @@ maniam	manir	ver
 manias	mania	nom
 maniates	maniatar	ver
 manicura	manicura	nom
+manicure	manicure	nom
+manicures	manicure	nom
 manicuro	manicuro	nom
 manicuros	manicuro	nom
 manicómio	manicómio	nom
@@ -90225,6 +90308,7 @@ matriculassem	matricular	ver
 matriculava	matricular	ver
 matriculavam	matricular	ver
 matricule	matricular	ver
+matriculei	matricular	ver
 matriculem	matricular	ver
 matriculou	matricular	ver
 matricídio	matricídio	nom
@@ -93250,7 +93334,7 @@ moleirão	moleirão	adj
 molejo	molejo	nom
 molemente	molemente	adv
 molenga	molenga	adj
-molengas	molenga	nom
+molengas	molenga	adj
 molengo	molengar	ver
 molengue	molengar	ver
 moleque	moleque	nom
@@ -94152,6 +94236,7 @@ mosqueada	mosquear	ver
 mosqueadas	mosquear	ver
 mosqueado	mosquear	ver
 mosqueados	mosquear	ver
+mosqueira	mosqueira	nom
 mosques	moscar	ver
 mosqueta	mosquete	nom
 mosquetas	mosquete	nom
@@ -95085,11 +95170,11 @@ mãozinhas	mão	nom
 mãozita	mão	nom
 média	médio	adj
 médias	médio	adj
-médica	médico	adj
-médicas	médico	adj
+médica	médico	nom
+médicas	médico	nom
 médici	médici	nom
-médico	médico	adj
-médicos	médico	adj
+médico	médico	nom
+médicos	médico	nom
 médio	médio	adj
 médios	médio	adj
 médium	médium	nom
@@ -95668,6 +95753,8 @@ nações	nação	nom
 neblina	neblina	nom
 neblinas	neblina	nom
 nebraska	nebraska	nom
+nebulizador	nebulizador	nom
+nebulizadores	nebulizador	nom
 nebulizar	nebulizar	ver
 nebulosa	nebuloso	nom
 nebulosas	nebuloso	adj
@@ -96648,6 +96735,9 @@ normativamente	normativamente	adv
 normativas	normativo	adj
 normativo	normativo	adj
 normativos	normativo	adj
+normatiza	normatizar	ver
+normatizar	normatizar	ver
+normatizou	normatizar	ver
 norminha	norma	nom
 noroesta	noroestar	ver
 noroeste	noroeste	nom
@@ -97737,6 +97827,7 @@ ociosas	ocioso	adj
 ociosidade	ociosidade	nom
 ocioso	ocioso	adj
 ociosos	ocioso	adj
+ocitocina 	ocitocina 	nom
 oclui	ocluir	ver
 ocluindo	ocluir	ver
 ocluir	ocluir	ver
@@ -99919,9 +100010,9 @@ pacenses	pacense	adj
 pacheco	pacheco	nom
 pachola	pachola	nom
 pachorra	pachorra	nom
-paciente	paciente	adj
+paciente	paciente	nom
 pacientemente	pacientemente	adv
-pacientes	paciente	adj
+pacientes	paciente	nom
 pacifica	pacificar	ver
 pacificada	pacificado	adj
 pacificadas	pacificar	ver
@@ -100313,6 +100404,7 @@ paleóloga	paleólogo	adj
 paleólogo	paleólogo	adj
 paleólogos	paleólogo	nom
 palha	palha	nom
+palhada	palhada	nom
 palhares	palhares	nom
 palhas	palha	nom
 palhaça	palhaço	nom
@@ -100975,6 +101067,7 @@ parapente	parapente	nom
 paraplegia	paraplegia	nom
 paraplegias	paraplegia	nom
 paraplégica	paraplégico	adj
+paraplégicas	paraplégico	nom
 paraplégico	paraplégico	adj
 paraplégicos	paraplégico	nom
 parapsicologia	parapsicologia	nom
@@ -105579,6 +105672,7 @@ plastifica	plastificar	ver
 plastificada	plastificado	adj
 plastificado	plastificado	adj
 plastificados	plastificado	adj
+plastificando	plastificar	ver
 plastificante	plastificante	adj
 plastificantes	plastificante	adj
 plastídio	plastídio	nom
@@ -107999,6 +108093,7 @@ prejudicaram	prejudicar	ver
 prejudicarem	prejudicar	ver
 prejudicaria	prejudicar	ver
 prejudicariam	prejudicar	ver
+prejudicarmos	prejudicar	ver
 prejudicará	prejudicar	ver
 prejudicarão	prejudicar	ver
 prejudicaríamos	prejudicar	ver
@@ -108750,6 +108845,7 @@ pretenderá	pretender	ver
 pretendes	pretender	ver
 pretendesse	pretender	ver
 pretendessem	pretender	ver
+pretendestes	pretender	ver
 pretendeu	pretender	ver
 pretendi	pretender	ver
 pretendia	pretender	ver
@@ -109092,8 +109188,16 @@ prioritária	prioritário	adj
 prioritárias	prioritário	adj
 prioritário	prioritário	adj
 prioritários	prioritário	adj
+priorizamos	priorizar	ver
+priorizando	priorizar	ver
+priorizar	priorizar	ver
+priorizaram	priorizar	ver
+priorizarei	priorizar	ver
+priorizaremos	priorizar	ver
+priorizarão	priorizar	ver
 priorização	priorização	nom
 priorizações	priorização	nom
+priorizei	priorizar	ver
 prisca	priscar	ver
 priscas	priscar	ver
 priscila	priscila	nom
@@ -111570,6 +111674,8 @@ punhal	punhal	nom
 punhalada	punhalada	nom
 punhaladas	punhalada	nom
 punham	pôr	ver
+punheta	punheta	nom
+punhetas	punheta	nom
 punho	punho	nom
 punhos	punho	nom
 puni	punir	ver
@@ -113243,6 +113349,7 @@ rale	ralar	ver
 ralei	ralar	ver
 rales	ralar	ver
 ralha	ralhar	ver
+ralham	ralhar	ver
 ralhar	ralhar	ver
 ralharem	ralhar	ver
 ralhava	ralhar	ver
@@ -113372,6 +113479,7 @@ ranja	ranger	ver
 ranking	ranking	nom
 ranunculáceas	ranunculáceo	nom
 ranzinza	ranzinza	adj
+ranzinzas	ranzinza	adj
 ranário	ranário	nom
 rança	ranço	adj
 ranço	ranço	nom
@@ -113633,6 +113741,7 @@ rastreando	rastrear	ver
 rastrear	rastrear	ver
 rastrearam	rastrear	ver
 rastrearem	rastrear	ver
+rastrearmos	rastrear	ver
 rastreavam	rastrear	ver
 rastreia	rastrear	ver
 rastreiam	rastrear	ver
@@ -120840,6 +120949,7 @@ revalorizando	revalorizar	ver
 revalorizar	revalorizar	ver
 revalorizaram	revalorizar	ver
 revalorização	revalorização	nom
+revalorizei	revalorizar	ver
 revalorizou	revalorizar	ver
 revanche	revanche	nom
 revanches	revanche	nom
@@ -123331,6 +123441,7 @@ said	said	nom
 saidinha	saída	nom
 saidinho	saído	adj
 saido	sair	ver
+saimos	sair	ver
 saindo	sair	ver
 sainete	sainete	nom
 sainha	saia	nom
@@ -125746,6 +125857,7 @@ serosa	seroso	adj
 serosas	seroso	adj
 seroso	seroso	adj
 serosos	seroso	adj
+serotonina	serotonina	nom
 serpa	serpa	nom
 serpe	serpe	nom
 serpenta	serpentar	ver
@@ -127116,6 +127228,7 @@ sobreditas	sobredito	adj
 sobredito	sobredito	adj
 sobreditos	sobredito	adj
 sobreelevada	sobreelevar	ver
+sobrei	sobrar	ver
 sobreira	sobreiro	nom
 sobreirais	sobreiral	nom
 sobreiral	sobreiral	nom
@@ -130009,7 +130122,14 @@ supersônica	supersônico	adj
 supersônicas	supersônico	adj
 supersônico	supersônico	adj
 supersônicos	supersônico	adj
+supervalorizam	supervalorizar	ver
+supervalorizamos	supervalorizar	ver
+supervalorizando	supervalorizar	ver
+supervalorizar	supervalorizar	ver
+supervalorizaram	supervalorizar	ver
 supervalorização	supervalorização	nom
+supervalorizei	supervalorizar	ver
+supervalorizo	supervalorizar	ver
 superveniente	superveniente	adj
 supervenientes	superveniente	adj
 superveniência	superveniência	nom
@@ -130483,6 +130603,7 @@ suspeitado	suspeitar	ver
 suspeitados	suspeitar	ver
 suspeitam	suspeitar	ver
 suspeitamente	suspeitamente	adv
+suspeitamos	suspeitar	ver
 suspeitando	suspeitar	ver
 suspeitar	suspeitar	ver
 suspeitara	suspeitar	ver
@@ -130835,7 +130956,7 @@ sítio	sítio	nom
 sítios	sítio	nom
 sòmente	somente	adv
 sòzinho	sozinho	adj
-só	só	adv
+só	só	adj
 sóbria	sóbrio	adj
 sóbrias	sóbrio	adj
 sóbrio	sóbrio	adj
@@ -134235,6 +134356,7 @@ trabalharam	trabalhar	ver
 trabalharei	trabalhar	ver
 trabalharem	trabalhar	ver
 trabalharemos	trabalhar	ver
+trabalhares	trabalhar	ver
 trabalharia	trabalhar	ver
 trabalhariam	trabalhar	ver
 trabalharmos	trabalhar	ver
@@ -134639,6 +134761,7 @@ transalpino	transalpino	adj
 transalpinos	transalpino	adj
 transam	transar	ver
 transamazônica	transamazônico	adj
+transamos	transar	ver
 transamérica	transamérica	nom
 transandina	transandino	adj
 transandino	transandino	adj
@@ -134646,11 +134769,13 @@ transando	transar	ver
 transar	transar	ver
 transaram	transar	ver
 transarem	transar	ver
+transaria	transar	ver
 transas	transa	nom
 transatlântica	transatlântico	adj
 transatlânticas	transatlântico	adj
 transatlântico	transatlântico	adj
 transatlânticos	transatlântico	adj
+transava	transar	ver
 transação	transação	nom
 transações	transação	nom
 transborda	transbordar	ver
@@ -134890,6 +135015,10 @@ transgrida	transgredir	ver
 transgride	transgredir	ver
 transgridem	transgredir	ver
 transgénico	transgénico	adj
+transgênica	transgênico	nom
+transgênicas	transgênico	nom
+transgênico	transgênico	nom
+transgênicos	transgênico	nom
 transi	transir	ver
 transia	transir	ver
 transiberiano	transiberiano	nom
@@ -136838,8 +136967,8 @@ tântalo	tântalo	nom
 tão	tão	adv
 técnica	técnica	nom
 técnicas	técnica	nom
-técnico	técnico	adj
-técnicos	técnico	adj
+técnico	técnico	nom
+técnicos	técnico	nom
 tédio	tédio	nom
 tédios	tédio	nom
 tégmina	tégmina	nom
@@ -137164,6 +137293,7 @@ ultrapassou	ultrapassar	ver
 ultrapassáveis	ultrapassável	adj
 ultrapassável	ultrapassável	adj
 ultras	ultra	nom
+ultrasonografia	ultrasonografia	nom
 ultravioleta	ultravioleta	adj
 ultravioletas	ultravioleta	adj
 ulula	ulular	ver
@@ -137935,6 +138065,7 @@ vacas	vaca	nom
 vacatura	vacatura	nom
 vacaturas	vacatura	nom
 vacila	vacilar	ver
+vacilada  	vacilada  	nom
 vacilado	vacilar	ver
 vacilam	vacilar	ver
 vacilamos	vacilar	ver
@@ -138273,6 +138404,7 @@ valorizavam	valorizar	ver
 valorização	valorização	nom
 valorizações	valorização	nom
 valorize	valorizar	ver
+valorizei	valorizar	ver
 valorizem	valorizar	ver
 valorizo	valorizar	ver
 valorizou	valorizar	ver
@@ -139161,6 +139293,7 @@ verbalizada	verbalizar	ver
 verbalizadas	verbalizar	ver
 verbalizado	verbalizar	ver
 verbalizados	verbalizar	ver
+verbalizam	verbalizar	ver
 verbalizando	verbalizar	ver
 verbalizar	verbalizar	ver
 verbalização	verbalização	nom
@@ -141347,11 +141480,13 @@ vívida	vívido	adj
 vívidas	vívido	adj
 vívido	vívido	adj
 vívidos	vívido	adj
+vó	avô	nom
 vómito	vómito	nom
 vómitos	vómito	nom
 vórtice	vórtice	nom
 vórtices	vórtice	nom
 vós	vós	pro_per
+vô	avô	nom
 vôlei	vôlei	nom
 vômer	vômer	nom
 vômito	vômito	nom
@@ -141874,6 +142009,7 @@ zoar	zoar	ver
 zoara	zoar	ver
 zoaram	zoar	ver
 zoava	zoar	ver
+zoação	zoação	nom
 zodiacais	zodiacal	adj
 zodiacal	zodiacal	adj
 zodíaco	zodíaco	nom

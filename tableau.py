@@ -8,7 +8,7 @@ import sys
 import xlrd
 import ooolib
 import os
-import tempfile
+from copy import copy
 import re
 import htmlentitydefs
 import shelve
@@ -57,12 +57,12 @@ def UpdateDico(Dico, word, line):
 def copymatrix(tableau):
     log.info('copy matrix')
     copymat = Tableau(tableau.parent, parametres = tableau.parametres)
-    copymat.linecontent = tableau.linecontent
-    copymat.csvtable = tableau.csvtable
-    copymat.pathout = tableau.pathout
-    copymat.colnames = tableau.colnames
-    copymat.rownb = tableau.rownb
-    copymat.colnb = tableau.colnb
+    copymat.linecontent = copy(tableau.linecontent)
+    copymat.csvtable = copy(tableau.csvtable)
+    copymat.pathout = copy(tableau.pathout)
+    copymat.colnames = copy(tableau.colnames)
+    copymat.rownb = copy(tableau.rownb)
+    copymat.colnb = copy(tableau.colnb)
     if copymat.csvtable is None :
         copymat.open()
     return copymat
@@ -160,8 +160,15 @@ class Tableau() :
             self.read_ods()
         self.parametres['csvfile'] = os.path.join(self.parametres['pathout'], 'csvfile.csv')
         self.make_tmpfile()
+        print self.parametres
         DoConf().makeoptions(['matrix'],[self.parametres], self.parametres['ira'])
         self.parent.history.addMatrix(self.parametres)
+    
+    def make_content_simple(self):
+        self.parametres['csvfile'] = os.path.join(self.parametres['pathout'], 'csvfile.csv')
+        self.make_tmpfile()
+        DoConf().makeoptions(['matrix'],[self.parametres], self.parametres['ira'])
+        self.parent.history.addMatrix(self.parametres)        
 
     def read_xls(self) :
         #FIXME : encodage

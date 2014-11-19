@@ -38,7 +38,7 @@ from checkversion import NewVersion
 from guifunct import *
 from tableau import Tableau
 from dialog import PrefDialog, CorpusPref
-from tabfrequence import Frequences
+from tabfrequence import Frequences, FreqMultiple
 from tabchi2 import ChiSquare
 #from tabstudent import MakeStudent
 from tabchddist import ChdCluster
@@ -95,6 +95,7 @@ ID_HTMLcontent = wx.NewId()
 ID_SimiTxt = wx.NewId()
 ID_proto = wx.NewId()
 ID_ImportTXM = wx.NewId()
+ID_FreqMulti = wx.NewId()
 ##########################################################
 #elements de configuration
 ##########################################################
@@ -113,6 +114,8 @@ ImagePath = os.path.join(AppliPath, 'images')
 DictConfigPath = ConstructGlobalPath(AppliPath)
 ConfigGlob = ConfigParser()
 ConfigGlob.read(DictConfigPath['global'])
+DefaultConf = ConfigParser()
+DefaultConf.read(DictConfigPath['preferences'])
 #repertoire de l'utilisateur
 if os.getenv('HOME') != None:
     user_home = os.getenv('HOME')
@@ -149,7 +152,17 @@ sys.stdout = printer()
 ConfigPath = ConstructConfigPath(UserConfigPath)
 
 langues = {'french' : wx.LANGUAGE_FRENCH,
-            'english' : wx.LANGUAGE_ENGLISH,}
+            'english' : wx.LANGUAGE_ENGLISH,
+            'portuguese' : wx.LANGUAGE_PORTUGUESE,
+            'italian' : wx.LANGUAGE_ITALIAN,
+            'spanish' : wx.LANGUAGE_SPANISH}
+
+code_langues = {'french' : 'fr_FR',
+             'english' : 'en',
+            'portuguese' : 'pt_PT',
+            'italian' : 'it_IT',
+            'spanish' : 'es_ES'
+            }
 #####################################################################
 
 class IraFrame(wx.Frame):
@@ -178,9 +191,12 @@ class IraFrame(wx.Frame):
         #langues = ['fr_FR', 'en', 'pt_PT']
         #for l in langues :
         #    pass
-        self.presLan_fr = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['fr_FR'])
-        self.presLan_en = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['en'])
+        self.preslangue = {}
+        for langue in code_langues :
+            self.preslangue[langue] = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=[code_langues[langue]])
         self.setlangue()
+        #self.presLan_fr = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['fr_FR'])
+        #self.presLan_en = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['en'])
         # tell FrameManager to manage this frame        
         #self._mgr = wx.aui.AuiManager()
         self._mgr = aui.AuiManager()
@@ -246,6 +262,7 @@ class IraFrame(wx.Frame):
         #view_menu.AppendSeparator()
         matrix_menu = wx.Menu()
         matrix_menu.Append(ID_Freq, _(u"Frequencies").decode('utf8'))
+        matrix_menu.Append(ID_FreqMulti, _(u'Multiple frequencies').decode('utf8'))
         matrix_menu.Append(ID_Chi2, _(u"Chi2").decode('utf8'))
         #matrix_menu.Append(ID_Student, u"t de Student")
         menu_classif = wx.Menu()
@@ -383,6 +400,7 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.ExtractTools, extractmod)
         self.Bind(wx.EVT_MENU, self.ExtractTools, extractthem)
         self.Bind(wx.EVT_MENU, self.OnFreq, id=ID_Freq)
+        self.Bind(wx.EVT_MENU, self.OnFreqMulti, id=ID_FreqMulti)
         self.Bind(wx.EVT_MENU, self.OnChi2, id=ID_Chi2)
         self.Bind(wx.EVT_MENU, self.OnStudent, id=ID_Student)
         self.Bind(wx.EVT_MENU, self.OnCHDSIM, id=ID_CHDSIM)
@@ -445,9 +463,9 @@ class IraFrame(wx.Frame):
 
 ##############################################################@
         self.DisEnSaveTabAs(False)
-        self.ShowMenu(_("View").decode('utf8'), False)
-        self.ShowMenu(_("Matrix analysis").decode('utf8'), False)
-        self.ShowMenu(_("Text analysis").decode('utf8'), False)
+        self.ShowMenu('view', False)
+        self.ShowMenu('matrix', False)
+        self.ShowMenu('text', False)
    
         self._mgr.Update()
 
@@ -509,26 +527,13 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
                 pass
             dlg.Destroy()
 
-
     def setlangue(self) :
+        self.pref.read(self.ConfigPath['preferences'])
         try :
-            self.pref.read(self.ConfigPath['preferences'])
             guilangue = self.pref.get('iramuteq', 'guilanguage')
-            if guilangue == 'french' :
-                self.presLan_fr.install()
-            elif guilangue == 'portuguese' :
-                self.presLan_pt.install()
-            else :
-                self.presLan_en.install()
-            mylocale = wx.Locale(langues[guilangue])
-            mylocale.AddCatalogLookupPathPrefix(os.path.join(AppliPath,'locale'))
-            mylocale.AddCatalog('iramuteq')
         except :
-            self.presLan_fr.install()
-            mylocale = wx.Locale(langues['french'])
-            mylocale.AddCatalogLookupPathPrefix(os.path.join(AppliPath,'locale'))
-            mylocale.AddCatalog('iramuteq')
-
+            guilangue = DefaultConf.get('iramuteq', 'guilanguage')
+        self.preslangue.get(guilangue, 'english').install()
 
     def OnVerif(self, evt) :
         pack = CheckRPackages(self)
@@ -547,9 +552,19 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
                 item.Enable(DISEN)
     
     def ShowMenu(self, menu, Show=True):
-        menu_pos = self.mb.FindMenu(menu)
-        self.mb.EnableTop(menu_pos, Show)
-        self.mb.UpdateMenus()
+        if menu == 'text' :
+            menu_pos = 4
+        elif menu == 'matrix' :
+            menu_pos = 3
+        elif menu == 'view' :
+            menu_pos = 2
+        else :
+            menu_pos = None
+            
+        #menu_pos = self.mb.FindMenu(menu)
+        if not menu_pos is None :
+            self.mb.EnableTop(menu_pos, Show)
+            self.mb.UpdateMenus()
 
 
 #--------------------------------------------------------------------
@@ -576,7 +591,7 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
     def OnOpenAnalyse(self, event):
         self.AnalysePath = OnOpen(self, "Analyse")
         OpenAnalyse(self, self.AnalysePath[1][0], True)
-        self.ShowMenu(_("View"))
+        self.ShowMenu('view')
 
     def OnOpenText(self, event):
         inputname, self.input_path = OnOpen(self, "Texte")
@@ -585,8 +600,6 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
             self.OpenText()
    
     def OnViewData(self, event):
-        print self.type
-        print self.DataTxt
         if self.type == "Data":
             if not self.DataPop :
                 self.Sheet.Populate(self.content)
@@ -632,13 +645,14 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
                 self.tree.OnItemAppend(corpus.parametres)
                 OpenAnalyse(self, corpus.parametres)
             except :
+                dlg.Destroy()
                 BugReport(self)
             else :
                 count = 1
                 keepGoing = dlg.Update(count, u"Lecture du fichier")
-                self.ShowMenu(_(u"View").decode('utf8'))
-                self.ShowMenu(_(u"Text analysis").decode('utf8'))
-                self.ShowMenu(_(u"Matrix analysis").decode('utf8'), False)
+                self.ShowMenu('view')
+                self.ShowMenu('text')
+                self.ShowMenu('matrix', False)
                 self.type = "Texte"
                 self.DataTxt = False
                 self.Text = ''
@@ -699,11 +713,11 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             if 'parametres' in dir(npage) :
                 self.tree.GiveFocus(uuid=npage.parametres['uuid'])
                 if npage.parametres.get('matrix', False) :
-                    self.ShowMenu(_(u"Text analysis").decode('utf8'), False)
-                    self.ShowMenu(_(u"Matrix analysis").decode('utf8'), True)
+                    self.ShowMenu('text', False)
+                    self.ShowMenu('matrix', True)
                 elif npage.parametres.get('corpus', False) :
-                    self.ShowMenu(_(u"Text analysis").decode('utf8'))
-                    self.ShowMenu(_(u"Matrix analysis").decode('utf8'), False)
+                    self.ShowMenu('text')
+                    self.ShowMenu('matrix', False)
 
     def OnCloseTab(self, evt):
         #log.info('Closing tab %s' % str(evt.GetEventObject()))
@@ -717,34 +731,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             self.history.rmtab(page.parametres)
             self.tree.CloseItem(uuid = page.parametres['uuid'])
         TabTitle = self.nb.GetPageText(self.nb.GetSelection())
-#         if self.DictTab != {} :
-#             if TabTitle in self.DictTab :
-#                 ListFile=self.DictTab[TabTitle]
-#                 if False in ListFile:
-#                     msg = u"""
-# Certains résultats ne sont pas enregistrer.
-# Voulez-vous fermer quand même ?"""
-#                     dlg = wx.MessageDialog(self, msg, "Sauvegarde",wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
-# 
-#                     dlg.CenterOnParent()
-#                     if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
-#                         remove = False
-#                         evt.Veto()
-#                         dlg.Destroy()
-#                     else :
-#                         for f in ListFile[1:] :
-#                             print 'remove', f
-#                             os.remove(f)
-#                             remove = True
-#                         dlg.Destroy()
-#                 elif True in ListFile :
-#                     remove = True
-#                 if remove:
-#                     del self.DictTab[TabTitle]
-#             else : 
-#                 self.LastTabClose()
-#        else :
-#            remove = True
+
         if self.nb.GetPageCount() == 1 and not notebook :
             self.LastTabClose()
     
@@ -757,40 +744,6 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
                 self.ShowAPane("Data")
             else :
                 self.ShowAPane("Intro_Text")
-
-#     def OnSaveTabAs(self, event):
-#         SelectTab = self.nb.GetSelection()
-#         TabTitle = self.nb.GetPageText(SelectTab)
-#         FileToSave = self.DictTab[TabTitle]
-#         NewListFile = []
-#         dlg = wx.FileDialog(
-#             self, message="Enregistrer sous...", defaultDir=os.getcwd(),
-#             defaultFile="resultat.html", wildcard="Tous les fichiers|*", style=wx.SAVE | wx.OVERWRITE_PROMPT
-#             )
-#         dlg.SetFilterIndex(2)
-#         dlg.CenterOnParent()
-#         
-#         if dlg.ShowModal() == wx.ID_OK:
-#             Path = dlg.GetPath()
-#             Dirname = os.path.dirname(Path)
-#             Filename = dlg.GetFilename()
-#         else :
-#             Path = False
-#         dlg.Destroy()
-#         if Path:
-#             shutil.copyfile(FileToSave[-1], Path)
-#             os.remove(FileToSave[len(FileToSave) - 1])
-#             NewListFile.append(True)
-#             NewListFile.append(Path)
-#             for f in FileToSave[1:-1] :
-#                 Fileout = os.path.join(Dirname, os.path.basename(f))
-#                 shutil.copyfile(f, Fileout)
-#                 NewListFile.append(Fileout)
-#                 os.remove(f)
-#             TabText = Filename
-#             self.DictTab[TabText] = NewListFile
-#             del self.DictTab[TabTitle]
-#             self.nb.SetPageText(SelectTab, TabText)
 
     def GetStartPosition(self):
 
@@ -824,16 +777,24 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 ################################################################
 #debut des analyses
 ################################################################
-    def analyse_matrix(self, analyse, analyse_type = '', matrix = None, dlgnb = 1):
+    def analyse_matrix(self, analyse, analyse_type = '', matrix = None, parametres = None, dlgnb = 1):
         if matrix is None :
             matrix = self.tree.getmatrix()
+        if parametres is not None :
+            parametres['type'] = analyse_type
+        else :
+            parametres = {'type' : analyse_type}
         try :
-            analyse(self, matrix, parametres = {'type' : analyse_type}, dlg = dlgnb)
+        #print 'plus de bug@@@@@@@@@@@@@@@@@@@@@@'
+            analyse(self, matrix, parametres = parametres, dlg = dlgnb)
         except:
             BugReport(self)           
 
     def OnFreq(self, event, matrix = None):
         self.analyse_matrix(Frequences, analyse_type = 'freq', matrix = matrix, dlgnb = 3)
+    
+    def OnFreqMulti(self, event, matrix = None):
+        self.analyse_matrix(FreqMultiple, analyse_type = 'freqmulti', matrix = matrix, dlgnb = 3)
 
     def OnChi2(self, event, matrix = None):
         self.analyse_matrix(ChiSquare, matrix = matrix, analyse_type = 'chi2', dlgnb = 3) 
@@ -882,7 +843,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         #Prototypical(self, {'type' : 'proto'})
     
     def OnSplitVar(self, evt, matrix = None):
-        self.analyse_matrix(SplitMatrixFromVar, matrix = matrix, analyse_type = 'splitvar', dlgnb = 3)
+        self.analyse_matrix(SplitMatrixFromVar, matrix = matrix, analyse_type = 'splitvar', parametres = {'pathout': matrix.pathout.dirout}, dlgnb = 3)
         matrix = self.tree.getmatrix()
         
 

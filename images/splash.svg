@@ -15,7 +15,7 @@
    height="400"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.48.5 r10040"
    sodipodi:docname="splash.svg"
    inkscape:export-filename="/home/pierre/workspace/iramuteq/images/splash.png"
    inkscape:export-xdpi="100"
@@ -161,16 +161,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="240.01838"
-     inkscape:cy="170.0922"
+     inkscape:zoom="2.8"
+     inkscape:cx="299.60036"
+     inkscape:cy="128.09472"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1631"
-     inkscape:window-height="1026"
-     inkscape:window-x="49"
-     inkscape:window-y="24"
+     inkscape:window-width="2878"
+     inkscape:window-height="1778"
+     inkscape:window-x="0"
+     inkscape:window-y="20"
      inkscape:window-maximized="1"
      showguides="true"
      inkscape:guide-bbox="true">
@@ -186,7 +186,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -301,8 +301,8 @@
            height="16.162449"
            x="109.09647"
            y="248.47711"
-           style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#1d0e0e;font-family:FreeSans;-inkscape-font-specification:FreeSans;fill-opacity:1" /></flowRegion><flowPara
-         id="flowPara3039">(c) 2008-2013 Pierre Ratinaud</flowPara></flowRoot>    <flowRoot
+           style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#1d0e0e;fill-opacity:1;font-family:FreeSans;-inkscape-font-specification:FreeSans" /></flowRegion><flowPara
+         id="flowPara3039">(c) 2008-2014 Pierre Ratinaud</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3041"
        style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#1a1b20;fill-opacity:1;stroke:none;font-family:FreeSans;-inkscape-font-specification:FreeSans"
@@ -327,15 +327,18 @@
        inkscape:export-ydpi="100"><flowRegion
          id="flowRegion3862"><rect
            id="rect3864"
-           width="136.37061"
-           height="19.192894"
+           width="141.72775"
+           height="18.478601"
            x="110.10663"
            y="146.45171"
            style="font-size:14px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#1c1010;fill-opacity:1;font-family:gargi;-inkscape-font-specification:gargi Medium" /></flowRegion><flowPara
-         id="flowPara3866">Version 0.6 alpha 4</flowPara></flowRoot>    <flowRoot
+         id="flowPara3866">Version 0.6 alpha 10</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3868"
-       style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Bitstream Vera Sans;font-style:normal;font-weight:normal;font-size:40px;line-height:125%;letter-spacing:0px;word-spacing:0px"><flowRegion
+       style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Bitstream Vera Sans;font-style:normal;font-weight:normal;font-size:40px;line-height:125%;letter-spacing:0px;word-spacing:0px"
+       inkscape:export-filename="/home/pierre/workspace/iramuteq/images/splash.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100"><flowRegion
          id="flowRegion3870"><rect
            id="rect3872"
            width="600.03064"

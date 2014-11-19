@@ -13,7 +13,8 @@ from time import sleep
 from analysematrix import AnalyseMatrix
 from functions import exec_rcode, check_Rresult
 from dialog import FreqDialog
-from PrintRScript import PrintRScript
+from PrintRScript import PrintRScript, FreqMultiScript
+from operator import itemgetter
 
 class Frequences(AnalyseMatrix) :
     def doparametres(self, dlg=None) :
@@ -159,4 +160,44 @@ class Frequences(AnalyseMatrix) :
         with open(fileout, 'w') as f :
             f.write(pretexte + texte)
         #return fileout
+
+class FreqMultiple(Frequences): 
+    def doanalyse(self):
+        select = self.parametres['colsel']
+        freq = self.tableau.countmultiple(select)
+        tot = sum([freq[forme][0] for forme in freq])
+        freq = [[forme, freq[forme][0], `round((float(freq[forme][0])/tot)*100, 2)`,`len(list(set(freq[forme][1])))`, `round((float(len(list(set(freq[forme][1]))))/self.tableau.rownb)*100,2)`] for forme in freq]
+        freq = sorted(freq, key=itemgetter(1), reverse=True)
+        freq = [[line[0], `line[1]`, line[2], line[3], line[4]] for line in freq]
+        freq.insert(0, [u'mod', 'freq', 'percent of total', 'row number', 'percent of rows'])
+        self.freq = freq
+        with open(self.pathout['frequences.csv'], 'w') as f :
+            f.write('\n'.join(['\t'.join(line) for line in freq]))
+        self.rscript = FreqMultiScript(self)
+        self.rscript.make_script()
+        self.doR(self.rscript.scriptout)
+        self.dolayout()
+    
+    def dolayout(self):
+        pretexte = u'''<html>
+        <meta http-equiv="content-Type" content="text/html; charset=%s" />
+        <body>\n<h1>Fréquences</h1>
+        <a name="deb"></a><br>
+        ''' % self.parent.SysEncoding       
+        txt = """
+        <table>\n<tr><td>\n
+        <table border=1><tr><td>
+        """
+        txt += '</td></tr><tr><td>'.join(['</td><td>'.join(line) for line in self.freq]) + '</td></tr></table></td></tr>'
+        txt += '<tr><td><img src="%s" alt="graph"/></td><td><img src="%s" alt="graph"/></td></tr></table>' % (os.path.basename(self.pathout['barplotfreq.png']), os.path.basename(self.pathout['barplotrow.png']))
+        txt += "</body>\n</html>"
+        with open(self.pathout['resultats.html'], 'w') as f :
+            f.write(pretexte + txt)
+        
+        
+        
+        
+        
+        
+        
         

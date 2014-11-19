@@ -149,34 +149,26 @@ class OpenAnalyse():
 
     def doopen(self, corpus) :
         if self.conf['type'] == 'corpus' :
-            self.parent.ShowMenu(_("Text analysis"))
             OpenCorpus(self.parent, self.conf) 
         elif self.conf['type'] == 'stat' :
-            self.parent.ShowMenu(_("Text analysis"))
             StatLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'spec' :
-            self.parent.ShowMenu(_("Text analysis"))
             dolexlayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'alceste' :
-            self.parent.ShowMenu(_("Text analysis"))
             OpenCHDS(self.parent,  corpus, self.conf, Alceste = True)
         elif self.conf['type'] == 'simitxt' or self.conf['type'] == 'clustersimitxt' :
-            self.parent.ShowMenu(_("Text analysis"))
             SimiLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'wordcloud' or self.conf['type'] == 'clustercloud':
-            self.parent.ShowMenu(_("Text analysis"))
             WordCloudLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'reinertmatrix' :
-            #self.parent.ShowMenu(_("Spreadsheet analysis"))
             OpenCHDS(self.parent,  corpus, self.conf, Alceste = False)
         elif self.conf['type'] == 'simimatrix' :
-            #self.parent.ShowMenu(_("Spreadsheet analysis"))
             SimiMatLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'proto' :
             ProtoLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'matrix' :
             MatLayout(self.parent, corpus)
-        elif self.conf['type'] == 'freq' :
+        elif self.conf['type'] == 'freq' or self.conf['type'] == 'freqmulti':
             FreqLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'chi2' :
             Chi2Layout(self.parent, corpus, self.conf)

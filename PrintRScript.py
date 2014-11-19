@@ -238,7 +238,7 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         plot(tree.cut2$tree.cl)
         dev.off()
         open_file_graph("%s", width = 600, height=400)
-        plot(tree.cut1$dendro_tot_cl)
+        plot(tree.cut2$dendro_tot_cl)
         dev.off()
         """ % (ffr(DicoPath['dendro2']), ffr(DicoPath['arbre2']))
         
@@ -1210,6 +1210,31 @@ class TgenSpecScript(PrintRScript):
         colnames(result) <- colnames(tgen)
         row.names(result) <- rownames(tgen)
         write.table(result, file = "%s", sep='\\t', col.names = NA)
-        """ % self.pathout['tgenspec.csv']
+        """ % ffr(self.pathout['tgenspec.csv'])
         self.add(txt)
         
+class FreqMultiScript(PrintRScript):
+    def make_script(self):
+        self.sources([self.analyse.parent.RscriptsPath['Rgraph']])
+        txt = """
+        freq <- read.csv2("%s", row.names=1, sep='\\t', dec='.')
+        """ % ffr(self.pathout['frequences.csv'])
+        txt += """
+        toplot <- freq[order(freq[,2]) ,2]
+        toplot.names = rownames(freq)[order(freq[,2])]
+        h <- 80 + (20 * nrow(freq))
+        open_file_graph("%s",height=h, width=500)
+        par(mar=c(3,20,3,3))
+        barplot(toplot, names = toplot.names, horiz=TRUE, las =1, col = rainbow(nrow(freq)))
+        dev.off()
+        """ % ffr(self.pathout['barplotfreq.png'])
+        txt += """
+        toplot <- freq[order(freq[,4]) ,4]
+        toplot.names = rownames(freq)[order(freq[,4])]
+        open_file_graph("%s",height=h, width=500)
+        par(mar=c(3,20,3,3))
+        barplot(toplot, names = toplot.names, horiz=TRUE, las =1, col = rainbow(nrow(freq)))
+        dev.off()
+        """ % ffr(self.pathout['barplotrow.png'])
+        self.add(txt)
+        self.write()  

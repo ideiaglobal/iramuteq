@@ -11,7 +11,7 @@ import logging
 from openanalyse import OpenAnalyse
 from corpus import Corpus, copycorpus
 from tableau import Tableau, copymatrix
-from functions import DoConf, GetTxtProfile, TGen
+from functions import DoConf, GetTxtProfile, TGen, BugReport
 from profile_segment import ProfileSegment, ProfilType
 from search_tools import SearchFrame
 from dialog import PrefSimpleFile, PrefExport
@@ -104,6 +104,7 @@ class LeftTree(CT.CustomTreeCtrl):
             elif data.startswith("EVT_"):
                 events.append(data)
         self.parent = parent
+        self.ira = parent
         self.events = events
         self.styles = treestyles
         self.item = None
@@ -122,6 +123,7 @@ class LeftTree(CT.CustomTreeCtrl):
         imgmatroot = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'matroot.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
         self.ild['matrix'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'matrix.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
         self.ild['freq'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'frequences.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
+        self.ild['freqmulti'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'frequences.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
         self.ild['chi2'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'chi2.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
         self.ild['reinertmatrix'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'reinertmatrix.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
         self.ild['simimatrix'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'simimatrix.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
@@ -382,8 +384,8 @@ class LeftTree(CT.CustomTreeCtrl):
         
         if not item in [self.textroot, self.matroot] :
             menu = wx.Menu()
-            info = menu.Append(wx.ID_ANY, _(u"Informations").encode('utf8'))
-            rename = menu.Append(wx.ID_ANY, _(u"Rename").encode('utf8'))
+            info = menu.Append(wx.ID_ANY, _(u"Informations").decode('utf8'))
+            rename = menu.Append(wx.ID_ANY, _(u"Rename").decode('utf8'))
             menu.AppendSeparator()
     
             if 'corpus_name' in pydata :
@@ -953,20 +955,21 @@ class LeftTree(CT.CustomTreeCtrl):
         self.SetItemBold(item, bold)
         self.SelectItem(item)  
         
-    def OnItemAppend(self, item):
+    def OnItemAppend(self, item, select = True):
         if 'corpus_name' in item :
             child = self.InsertItem(self.textroot, 0, item['corpus_name'])
         else :
             child = self.InsertItem(self.matroot, 0, item['matrix_name'])
         self.SetPyData(child, item)
-        self.history.addtab(item)
         if item['type'] in self.ild :
             img = self.ild[item['type']]
         else :
             img = 24
         self.SetItemImage(child, img, CT.TreeItemIcon_Normal)
         self.SetItemImage(child, img, CT.TreeItemIcon_Expanded)
-        self.SetItemBold(child, True)
+        if select :
+            self.history.addtab(item)
+            self.SetItemBold(child, True)
         
         #dlg = wx.TextEntryDialog(self, "Please Enter The New Item Name", 'Item Naming', 'Python')
 
@@ -1028,12 +1031,19 @@ class LeftTree(CT.CustomTreeCtrl):
             elif pydata['uuid'] in ['textroot', 'matroot'] :
                 pass
             else :
-                busy = wx.BusyInfo(_("Please wait..."), self.parent)
-                wx.SafeYield()
-                OpenAnalyse(self.parent, pydata)
-                del busy
-                self.SetItemBold(item, True)
-                self.OnSelChanged(pydata = pydata)
+                if os.path.exists(pydata['ira']) :
+                    busy = wx.BusyInfo(_("Please wait..."), self.parent)
+                    wx.SafeYield()
+                    try :
+                        OpenAnalyse(self.parent, pydata)
+                        del busy
+                        self.SetItemBold(item, True)
+                        self.OnSelChanged(pydata = pydata)
+                    except :
+                        del busy
+                        BugReport(self.ira)
+                else :
+                    wx.MessageBox(_(u"This file does not exist : %s" % pydata['ira']).decode('utf8'), 'Information', wx.ICON_EXCLAMATION | wx.STAY_ON_TOP )
         #if item and (flags & CT.TREE_HITTEST_ONITEMLABEL):
         #    if self.GetAGWWindowStyleFlag() & CT.TR_EDIT_LABELS:
         #        self.log.info("OnLeftDClick: %s (manually starting label edit)"% self.GetItemText(item) + "\n")
@@ -1083,7 +1093,14 @@ class LeftTree(CT.CustomTreeCtrl):
         if event is not None :
             item = event.GetItem()
             pydata = self.GetPyData(item)
+
         if pydata is not None :
+            if 'corpus_name' in pydata or 'corpus' in pydata :
+                self.ira.ShowMenu('text', True)
+                self.ira.ShowMenu('matrix', False)
+            if 'matrix_name' in pydata or 'matrix' in pydata:
+                self.ira.ShowMenu('text', False)
+                self.ira.ShowMenu('matrix', True)                
             self.pydata = pydata
             if pydata['uuid'] in self.parent.history.opened :
                 for i in range(self.parent.nb.GetPageCount()) :

@@ -2263,9 +2263,9 @@ class ChiDialog(wx.Dialog):
 class CorpusPref ( wx.Dialog ):
     
     def __init__( self, parent, parametres ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Settings").decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Settings").decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE | wx.STAY_ON_TOP )
         self.parent = parent 
-        langues_n = [u'français', u'english', u'german (expérimentale)', u'italian', u'swedish (expérimentale)', u'portuguese (expérimentale)', u'spanish (expérimentale)', u'greek (expériementale)', u'galician (expérimentale)', u'autre...']
+        langues_n = [u'français', u'english', u'german (expérimentale)', u'italian', u'swedish (expérimentale)', u'portuguese', u'spanish (expérimentale)', u'greek (expériementale)', u'galician (expérimentale)', u'autre...']
         self.langues = [u'french', u'english', u'german', u'italian', u'swedish', u'portuguese', u'spanish', u'greek', u'galician', u'other']
         self.encodages = [enc[0].lower() for enc in encodages]
 
@@ -2337,7 +2337,9 @@ class CorpusPref ( wx.Dialog ):
         fgSizer5.Add( self.radio_other_dict, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         self.otherdictpath = wx.FilePickerCtrl( self.m_panel1, wx.ID_ANY, wx.EmptyString, _(u"Select a file").decode('utf8'), u"*.*", wx.DefaultPosition, wx.Size( 300,-1 ), wx.FLP_DEFAULT_STYLE )
+        self.otherdictpath.SetMinSize(wx.Size(300, -1))
         fgSizer5.Add( self.otherdictpath, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        self.otherdictpath.Enable( False )
         
         
         bSizer2.Add( fgSizer5, 1, wx.EXPAND, 5 )
@@ -2493,7 +2495,9 @@ class CorpusPref ( wx.Dialog ):
         # Connect Events
         self.Bind(wx.EVT_BUTTON, self.OnChangeDir, self.m_button1)
         self.lang_choices.Bind( wx.EVT_CHOICE, self.OnChangeLangage )
-        self.radio_other_dict.Bind( wx.EVT_RADIOBUTTON, self.changedictchoice )        
+        self.radio_other_dict.Bind( wx.EVT_RADIOBUTTON, self.changedictchoice )
+        self.radio_default_dict.Bind( wx.EVT_RADIOBUTTON, self.changedictchoice )
+        self.otherdictpath.Bind( wx.EVT_FILEPICKER_CHANGED, self.selectdict) 
 
         self.setparametres(parametres) 
         self.SetSizer( bSizer1 )
@@ -2534,6 +2538,7 @@ class CorpusPref ( wx.Dialog ):
         self.check_tirets.SetValue(parametres['tiret'])
         self.check_tolist.SetValue(parametres['tolist'])
         self.check_ponct.SetValue(parametres['keep_ponct'])
+        self.defaultdictpath.SetValue(self.langues[0])
 
     def doparametres(self) :
         parametres = {}
@@ -2553,6 +2558,8 @@ class CorpusPref ( wx.Dialog ):
         parametres['tiret'] = self.check_tirets.GetValue()
         parametres['tolist'] = self.check_tolist.GetValue()
         parametres['keep_ponct'] = self.check_ponct.GetValue()
+        if self.radio_other_dict.GetValue() :
+            parametres['dictionary'] = self.otherdictpath.GetPath()
         for val in parametres :
             if isinstance(parametres[val], bool) :
                 if parametres[val] :
@@ -2562,10 +2569,21 @@ class CorpusPref ( wx.Dialog ):
         return parametres
     
     def OnChangeLangage(self, evt):
-        pass
+        self.defaultdictpath.SetValue(self.langues[self.lang_choices.GetSelection()])
     
     def changedictchoice(self, evt):
-        pass
+        if self.radio_default_dict.GetValue() :
+            self.otherdictpath.Enable( False )
+            self.m_sdbSizer1OK.Enable( True )
+        else :
+            self.otherdictpath.Enable( True )
+            if self.otherdictpath.GetPath() == '' :
+                self.m_sdbSizer1OK.Enable( False )
+    
+    def selectdict(self, evt):
+        if self.otherdictpath.GetPath() != '' :
+            self.m_sdbSizer1OK.Enable( True )
+        
 
 
 class ConcordList(wx.HtmlListBox):

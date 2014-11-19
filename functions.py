@@ -493,6 +493,7 @@ exceptions = {'paragrapheOT' : u"Un problème de formatage (présence d'un marqu
               'EmptyText' : u"Texte vide (probablement un problème de formatage du corpus). Le problème est apparu à la ligne ",
               'CorpusEncoding' : u"Problème d'encodage.",
               'TextBeforeTextMark' : u"Problème de formatage : du texte avant le premier marqueur de texte (****). Le problème est survenu à la ligne ",
+              'MissingAnalyse' : u'Aucun fichier à cet emplacement :\n', 
 }
 
 def BugReport(parent, error = None):
@@ -519,7 +520,7 @@ def BugReport(parent, error = None):
         txt += u'*************************************\n'
         txt += '\n'.join(excTb).replace('    ', ' ')
         txt += excName + '\n'
-        txt += exc
+        txt += `exc`
         title = "Bug"
 
     dial = BugDialog(parent, **{'title' : title})
@@ -556,7 +557,10 @@ def ReadLexique(parent, lang = 'french', filein = None):
         else :
             parent.lexique = ReadDicoAsDico(filein)
     else :
-        parent.lexique = {}
+        if filein is None :
+            parent.lexique = {}
+        else :
+            parent.lexique = ReadDicoAsDico(filein)
 
 def ReadList(filein, encoding = sys.getdefaultencoding(), sep = ';'):
     #file = open(filein)
