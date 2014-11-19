@@ -11,7 +11,7 @@ import logging
 from openanalyse import OpenAnalyse
 from corpus import Corpus, copycorpus
 from tableau import Tableau, copymatrix
-from functions import DoConf, GetTxtProfile, TGen
+from functions import DoConf, GetTxtProfile, TGen, BugReport
 from profile_segment import ProfileSegment, ProfilType
 from search_tools import SearchFrame
 from dialog import PrefSimpleFile, PrefExport
@@ -1030,12 +1030,19 @@ class LeftTree(CT.CustomTreeCtrl):
             elif pydata['uuid'] in ['textroot', 'matroot'] :
                 pass
             else :
-                busy = wx.BusyInfo(_("Please wait..."), self.parent)
-                wx.SafeYield()
-                OpenAnalyse(self.parent, pydata)
-                del busy
-                self.SetItemBold(item, True)
-                self.OnSelChanged(pydata = pydata)
+                if os.path.exists(pydata['ira']) :
+                    busy = wx.BusyInfo(_("Please wait..."), self.parent)
+                    wx.SafeYield()
+                    try :
+                        OpenAnalyse(self.parent, pydata)
+                        del busy
+                        self.SetItemBold(item, True)
+                        self.OnSelChanged(pydata = pydata)
+                    except :
+                        del busy
+                        BugReport(self.ira)
+                else :
+                    wx.MessageBox(_(u"This file does not exist : %s" % pydata['ira']).decode('utf8'), 'Information', wx.ICON_EXCLAMATION | wx.STAY_ON_TOP )
         #if item and (flags & CT.TREE_HITTEST_ONITEMLABEL):
         #    if self.GetAGWWindowStyleFlag() & CT.TR_EDIT_LABELS:
         #        self.log.info("OnLeftDClick: %s (manually starting label edit)"% self.GetItemText(item) + "\n")

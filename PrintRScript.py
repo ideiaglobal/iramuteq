@@ -1210,6 +1210,6 @@ class TgenSpecScript(PrintRScript):
         colnames(result) <- colnames(tgen)
         row.names(result) <- rownames(tgen)
         write.table(result, file = "%s", sep='\\t', col.names = NA)
-        """ % self.pathout['tgenspec.csv']
+        """ % ffr(self.pathout['tgenspec.csv'])
         self.add(txt)
         
