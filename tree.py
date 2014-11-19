@@ -123,6 +123,7 @@ class LeftTree(CT.CustomTreeCtrl):
         imgmatroot = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'matroot.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
         self.ild['matrix'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'matrix.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
         self.ild['freq'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'frequences.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
+        self.ild['freqmulti'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'frequences.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
         self.ild['chi2'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'chi2.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
         self.ild['reinertmatrix'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'reinertmatrix.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
         self.ild['simimatrix'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'simimatrix.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())

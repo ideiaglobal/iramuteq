@@ -493,6 +493,7 @@ exceptions = {'paragrapheOT' : u"Un problème de formatage (présence d'un marqu
               'EmptyText' : u"Texte vide (probablement un problème de formatage du corpus). Le problème est apparu à la ligne ",
               'CorpusEncoding' : u"Problème d'encodage.",
               'TextBeforeTextMark' : u"Problème de formatage : du texte avant le premier marqueur de texte (****). Le problème est survenu à la ligne ",
+              'MissingAnalyse' : u'Aucun fichier à cet emplacement :\n', 
 }
 
 def BugReport(parent, error = None):

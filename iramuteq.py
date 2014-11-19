@@ -38,7 +38,7 @@ from checkversion import NewVersion
 from guifunct import *
 from tableau import Tableau
 from dialog import PrefDialog, CorpusPref
-from tabfrequence import Frequences
+from tabfrequence import Frequences, FreqMultiple
 from tabchi2 import ChiSquare
 #from tabstudent import MakeStudent
 from tabchddist import ChdCluster
@@ -95,6 +95,7 @@ ID_HTMLcontent = wx.NewId()
 ID_SimiTxt = wx.NewId()
 ID_proto = wx.NewId()
 ID_ImportTXM = wx.NewId()
+ID_FreqMulti = wx.NewId()
 ##########################################################
 #elements de configuration
 ##########################################################
@@ -261,6 +262,7 @@ class IraFrame(wx.Frame):
         #view_menu.AppendSeparator()
         matrix_menu = wx.Menu()
         matrix_menu.Append(ID_Freq, _(u"Frequencies").decode('utf8'))
+        matrix_menu.Append(ID_FreqMulti, _(u'Multiple frequencies').decode('utf8'))
         matrix_menu.Append(ID_Chi2, _(u"Chi2").decode('utf8'))
         #matrix_menu.Append(ID_Student, u"t de Student")
         menu_classif = wx.Menu()
@@ -398,6 +400,7 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.ExtractTools, extractmod)
         self.Bind(wx.EVT_MENU, self.ExtractTools, extractthem)
         self.Bind(wx.EVT_MENU, self.OnFreq, id=ID_Freq)
+        self.Bind(wx.EVT_MENU, self.OnFreqMulti, id=ID_FreqMulti)
         self.Bind(wx.EVT_MENU, self.OnChi2, id=ID_Chi2)
         self.Bind(wx.EVT_MENU, self.OnStudent, id=ID_Student)
         self.Bind(wx.EVT_MENU, self.OnCHDSIM, id=ID_CHDSIM)
@@ -789,6 +792,9 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 
     def OnFreq(self, event, matrix = None):
         self.analyse_matrix(Frequences, analyse_type = 'freq', matrix = matrix, dlgnb = 3)
+    
+    def OnFreqMulti(self, event, matrix = None):
+        self.analyse_matrix(FreqMultiple, analyse_type = 'freqmulti', matrix = matrix, dlgnb = 3)
 
     def OnChi2(self, event, matrix = None):
         self.analyse_matrix(ChiSquare, matrix = matrix, analyse_type = 'chi2', dlgnb = 3) 

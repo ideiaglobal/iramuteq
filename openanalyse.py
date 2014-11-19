@@ -168,7 +168,7 @@ class OpenAnalyse():
             ProtoLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'matrix' :
             MatLayout(self.parent, corpus)
-        elif self.conf['type'] == 'freq' :
+        elif self.conf['type'] == 'freq' or self.conf['type'] == 'freqmulti':
             FreqLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'chi2' :
             Chi2Layout(self.parent, corpus, self.conf)
