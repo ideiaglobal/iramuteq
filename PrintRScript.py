@@ -1213,3 +1213,28 @@ class TgenSpecScript(PrintRScript):
         """ % ffr(self.pathout['tgenspec.csv'])
         self.add(txt)
         
+class FreqMultiScript(PrintRScript):
+    def make_script(self):
+        self.sources([self.analyse.parent.RscriptsPath['Rgraph']])
+        txt = """
+        freq <- read.csv2("%s", row.names=1, sep='\\t', dec='.')
+        """ % ffr(self.pathout['frequences.csv'])
+        txt += """
+        toplot <- freq[order(freq[,2]) ,2]
+        toplot.names = rownames(freq)[order(freq[,2])]
+        h <- 80 + (20 * nrow(freq))
+        open_file_graph("%s",height=h, width=500)
+        par(mar=c(3,20,3,3))
+        barplot(toplot, names = toplot.names, horiz=TRUE, las =1, col = rainbow(nrow(freq)))
+        dev.off()
+        """ % ffr(self.pathout['barplotfreq.png'])
+        txt += """
+        toplot <- freq[order(freq[,4]) ,4]
+        toplot.names = rownames(freq)[order(freq[,4])]
+        open_file_graph("%s",height=h, width=500)
+        par(mar=c(3,20,3,3))
+        barplot(toplot, names = toplot.names, horiz=TRUE, las =1, col = rainbow(nrow(freq)))
+        dev.off()
+        """ % ffr(self.pathout['barplotrow.png'])
+        self.add(txt)
+        self.write()  
