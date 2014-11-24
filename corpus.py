@@ -172,6 +172,12 @@ class Corpus :
         res = self.cformes.execute(query)
         return list(set(list(itertools.chain(*[[int(val) for val in row[0].split()] if not isinstance(row[0], int) else [row[0]] for row in res]))))
 
+    def gettgenst(self, tgen):
+        formesid = ', '.join([`val` for lem in tgen for val in self.lems[lem].formes if lem in self.lems])
+        query = 'SELECT uces FROM uces where id IN (%s) ORDER BY id' % formesid
+        res = self.cformes.execute(query)
+        return list(set(list(itertools.chain(*[[int(val) for val in row[0].split()] if not isinstance(row[0], int) else [row[0]] for row in res]))))
+
     def getlemucis(self, lem) :
         uces = self.getlemuces(lem)
         return list(set([self.getucefromid(val).uci for val in uces]))
@@ -755,6 +761,28 @@ class Corpus :
                     det[et[0]] = {etoile :1}
                 except IndexError :
                     det[et[0]] = 1
+        return det
+    
+    def make_theme_dict(self):
+        themes = [val for uci in self.ucis for val in uci.paras]
+        det = {}
+        for theme in themes :
+            th = theme.split('_')
+            if th[0] in det :
+                try :
+                    endth = '_'.join(th[1:])
+                    if theme in det[th[0]] :
+                        det[th[0]][theme] += 1
+                    else :
+                        det[th[0]][theme] = 1
+                except IndexError :
+                    det[th[0]] += 1
+            else :
+                try :
+                    endth = '_'.join(th[1:])
+                    det[th[0]] = {theme:1}
+                except IndexError :
+                    det[th[0]] = 1
         return det
 
     def make_etline(self, listet) :

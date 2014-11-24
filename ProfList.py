@@ -21,7 +21,7 @@ import  wx.lib.mixins.listctrl  as  listmix
 from listlex import ListForSpec
 from chemins import ConstructPathOut, ffr
 from dialog import PrefExport, PrefUCECarac, SearchDial, message, MessageImage, BarFrame
-from tableau import Tableau
+from tableau import Tableau, copymatrix
 from search_tools import SearchFrame
 import webbrowser
 #import cStringIO
@@ -32,6 +32,7 @@ from PrintRScript import barplot
 from textclassechd import ClasseCHD
 from shutil import copyfile
 from operator import itemgetter
+from copy import copy
 
 #---------------------------------------------------------------------------
 class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
@@ -43,6 +44,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         self.Source = gparent
         self.cl = cl
         self.var_mod = {}
+        self.them_mod = {}
 
         line1 = profclasse.pop(0)
         classen = [line for line in profclasse if line[0] != '*' and line[0] != '*****']
@@ -361,7 +363,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         if 'corpus' in dir(self.Source):
             corpus = self.Source.corpus
         prof = [[self.la[i], self.lchi[i], self.lfreq[i]] for i, val in enumerate(self.la)]
-        parametres = self.Source.parametres
+        parametres = copy(self.Source.parametres)
         parametres['clusterprof'] = prof
         parametres['type'] = 'clustercloud'
         parametres['prof'] = self.Source.pathout['actprof_classe_%i.csv' % self.cl]
@@ -416,15 +418,30 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             words.append(self.getColumnText(last, 6))
         return words
 
-    def quest_var_mod(self, evt) :
+    def quest_var_mod(self, evt) :  
+        word = self.getselectedwords()[0]
+        if len(word.split('_')) <= 1 :
+            dial = wx.MessageDialog(self, u"Ce n'est pas une forme du type variable_modalité", u"Problème", wx.OK | wx.ICON_WARNING)
+            dial.CenterOnParent()
+            dial.ShowModal()
+            dial.Destroy()
+            return
+            
         if 'corpus' in dir(self.Source):
             corpus = self.Source.corpus
-            if self.var_mod == {} :
-                self.var_mod = self.Source.corpus.make_etoiles_dict()
+            if word.startswith(u'-*') :
+                if self.them_mod == {} :
+                    self.them_mod = self.Source.corpus.make_theme_dict()
+                var_mod = self.them_mod
+            else :
+                if self.var_mod == {} :
+                    self.var_mod = self.Source.corpus.make_etoiles_dict()
+                var_mod = self.var_mod
         else :
             corpus = self.Source.tableau
             if self.var_mod == {} :
                 self.var_mod = treat_var_mod([val for val in corpus.actives] + [val for val in corpus.sups])
+            var_mod = self.var_mod
         with codecs.open(self.Source.pathout['chisqtable'], 'r', corpus.parametres['syscoding']) as f :
             chistable = [line.replace('\n','').replace('\r','').replace('"','').replace(',','.').split(';') for line in f]
         title = chistable[0]
@@ -432,36 +449,25 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         chistable.pop(0)
         vchistable = [line[1:] for line in chistable]
         fchistable = [line[0] for line in chistable]
-        word = self.getselectedwords()[0]
-        if len(word.split('_')) > 1 :
-            var = word.split('_')
-            #words = ['_'.join([var[0],word]) for word in self.var_mod[var[0]]]
-            words = [word for word in self.var_mod[var[0]]]
-            words.sort()
-            tableout = []
-            kwords = []
-            for word in words :
-                if word in fchistable :
-                    tableout.append(vchistable[fchistable.index(word)])
-                    kwords.append(word)
-            BarFrame(self.Source.parent, tableout, title, kwords)
-#             tmpgraph = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
-#             txt = barplot(tableout, kwords, title, self.Source.parent.RscriptsPath['Rgraph'], tmpgraph)
-#             tmpscript = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
-#             file = open(tmpscript,'w')
-#             file.write(txt)
-#             file.close()
-#             exec_rcode(self.Source.parent.RPath, tmpscript, wait = True)
-#             win = MessageImage(self,u"Graphique", size=(700, 500))
-#             win.addsaveimage(tmpgraph)
-#             txt = "<img src='%s'>" % tmpgraph
-#             win.HtmlPage.SetPage(txt)
-#             win.Show(True)
-        else :
-            dial = wx.MessageDialog(self, u"Ce n'est pas une forme du type variable_modalité", u"Problème", wx.OK | wx.ICON_WARNING)
+
+        var = word.split('_')
+        #words = ['_'.join([var[0],word]) for word in self.var_mod[var[0]]]
+        try :
+            words = [word for word in var_mod[var[0]]]
+        except KeyError:
+            dial = wx.MessageDialog(self, _(u"This is not a meta-data"), u"Problème", wx.OK | wx.ICON_WARNING)
             dial.CenterOnParent()
             dial.ShowModal()
             dial.Destroy()
+            return            
+        words.sort()
+        tableout = []
+        kwords = []
+        for word in words :
+            if word in fchistable :
+                tableout.append(vchistable[fchistable.index(word)])
+                kwords.append(word)
+        BarFrame(self.Source.parent, tableout, title, kwords)
 
     def quest_simi(self, evt) :
         tableau = self.Source.tableau
@@ -507,16 +513,21 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                           'com' : 0,
                           'communities' : 0,
                           'halo' : 0,
-                          'tmpchi': self.tmpchi
+                          'tmpchi': self.tmpchi,
+                          'fromprof' : True,
                           }
         act = {}
+        tableau = copymatrix(tableau)
         tableau.chi = {}
         tableau.lchi = self.lchi
-        tableau.parametres['fromprof'] = True
+        #tableau.parametres['fromprof'] = True
         for i, val in enumerate(self.la) :
             act[val] = [self.lfreq[i]]
             tableau.chi[val] = [self.lchi[i]]
-        self.parent.SimiCluster(parametres = paramsimi, fromprof = ffr(self.filename), pathout = pathout, listactives = self.la, actives = act, tableau = tableau)
+        paramsimi['listactives'] = copy(self.la)
+        paramsimi['actives'] = copy(act)
+        paramsimi['pathout'] = pathout
+        self.parent.SimiCluster(parametres = paramsimi, fromprof = ffr(self.filename), tableau = tableau)
 
     def onwordgraph(self, evt):
         word = self.getColumnText(self.GetFirstSelected(), 6)
@@ -685,9 +696,6 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         ucis_txt, ucestxt = doconcorde(corpus, ucef, ListWord, uci = uci)
         items = dict([[i, '<br><br>'.join([ucis_txt[i], ucestxt[i]])] for i in range(0,len(ucestxt))])
         win = message(self, items, title, (800, 500))
-        #win = message(self, title, size=(750, 600))
-        #win.html = ('<html>\n<h1>%s</h1>' % ' '.join(ListWord)) + '<br>'.join(['<br>'.join([ucis_txt[i], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
-        #win.HtmlPage.SetPage(win.html)
         return win
 
     def OnPopupTwo(self, event):

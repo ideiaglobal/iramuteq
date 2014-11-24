@@ -704,7 +704,7 @@ class PrintSimiScript(PrintRScript) :
         self.packages(['igraph', 'proxy', 'Matrix'])
         self.sources([self.analyse.parent.RscriptsPath['simi'], self.analyse.parent.RscriptsPath['Rgraph']])
         txt = ''
-        if not self.parametres['keep_coord'] and not self.parametres['type'] == 'simimatrix':
+        if not self.parametres['keep_coord'] and not (self.parametres['type'] == 'simimatrix' or self.parametres['type'] == 'simiclustermatrix') :
             txt += """
             dm.path <- "%s"
             cn.path <- "%s"
@@ -740,7 +740,7 @@ class PrintSimiScript(PrintRScript) :
                 index <- which(colnames(dm) == forme)
             }
             """
-        elif not self.parametres['keep_coord'] and self.parametres['type'] == 'simimatrix' :
+        elif not self.parametres['keep_coord'] and (self.parametres['type'] == 'simimatrix' or self.parametres['type'] == 'simiclustermatrix'):
             txt += """
             dm.path <- "%s"
             selected.col <- "%s"
@@ -1072,7 +1072,7 @@ class PrintSimiScript(PrintRScript) :
                 """
         else :
             #print self.parametres
-            if (self.parametres['type'] == 'clustersimitxt' and self.parametres.get('tmpchi', False)) or (self.parametres['type'] == 'simimatrix' and 'tmpchi' in self.parametres): 
+            if (self.parametres['type'] == 'clustersimitxt' and self.parametres.get('tmpchi', False)) or (self.parametres['type'] in ['simimatrix','simiclustermatrix'] and 'tmpchi' in self.parametres): 
                 txt += """
                 lchi <- read.table("%s")
                 lchi <- lchi[,1]
@@ -1080,7 +1080,7 @@ class PrintSimiScript(PrintRScript) :
                 txt += """
                     lchi <- lchi[sel.col]
                     """
-            if self.parametres['type'] == 'clustersimitxt' and self.parametres.get('cexfromchi', False) :
+            if self.parametres['type'] in ['clustersimitxt', 'simimatrix', 'simiclustermatrix'] and self.parametres.get('cexfromchi', False) :
                 txt += """ 
                 label.cex <- norm.vec(lchi, vcexminmax[1], vcexminmax[2])
                 """
@@ -1092,7 +1092,7 @@ class PrintSimiScript(PrintRScript) :
                 label.cex <- graph.simi$label.cex
             }
             """
-            if (self.parametres['type'] == 'clustersimitxt' or self.parametres['type'] == 'simimatrix') and self.parametres.get('sfromchi', False):
+            if (self.parametres['type'] in ['clustersimitxt', 'simimatrix', 'simiclustermatrix']) and self.parametres.get('sfromchi', False):
                 txt += """ 
                 vertex.size <- norm.vec(lchi, minmaxeff[1], minmaxeff[2])
                 if (!length(vertex.size)) vertex.size <- 0
