@@ -628,7 +628,10 @@ plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro
        names(ntoplot) <- rownames(toplot)
        ntoplot <- ntoplot[order(ntoplot, decreasing = TRUE)]
        ntoplot <- round(ntoplot, 0)
-       ntoplot <- ntoplot[1:nbbycl]
+       if (length(toplot) > nbbycl) {
+           ntoplot <- ntoplot[1:nbbycl]
+       }       
+       ntoplot <- ntoplot[which(ntoplot > 0)]
        #ntoplot <- ntoplot[order(ntoplot)]
        #ntoplot <- ifelse(length(ntoplot) > nbbycl, ntoplot[1:nbbycl], ntoplot)
        lclasses[[classe]] <- ntoplot
@@ -696,7 +699,7 @@ plot.dendro.cloud <- function(tree, classes, chisqtable, nbbycl = 60, type.dendr
             ntoplot <- ntoplot[1:nbbycl]
        }
        ntoplot <- ntoplot[order(ntoplot)]
-       ntoplot <- which(ntoplot > 0)
+       ntoplot <- ntoplot[which(ntoplot > 0)]
        #ntoplot <- ifelse(length(ntoplot) > nbbycl, ntoplot[1:nbbycl], ntoplot)
        lclasses[[classe]] <- ntoplot
     }
