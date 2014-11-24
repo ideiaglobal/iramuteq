@@ -48,7 +48,9 @@ class TGen :
     def __getitem__(self, key):
         return self.tgen[key]
     
-    def read(self, path):
+    def read(self, path = None):
+        if path is None :
+            path = self.path
         with codecs.open(path, 'r', self.encoding) as f :
             tgen = f.read()
         tgen = [line.split('\t') for line in tgen.splitlines()]
@@ -376,15 +378,8 @@ def treat_line_alceste(i, line) :
     return [i, int(line[0]), int(line[1]), float(line[2]), float(line[3]), line[6], line[4], line[5]]
 
 def ReadProfileAsDico(File, Alceste=False, encoding = sys.getdefaultencoding()):
-    #print 'lecture des profils : ReadProfileAsDico'
-    #if Alceste :
-    #    print 'lecture du dictionnaire de type'
-    #    dictlem = {}
-    #    for line in parent.corpus.lem_type_list :
-    #        dictlem[line[0]] = line[1]
     dictlem = {}
     print 'lecture des profiles'
-    #encoding = sys.getdefaultencoding()
     FileReader = codecs.open(File, 'r', encoding)
     Filecontent = FileReader.readlines()
     FileReader.close()
@@ -418,17 +413,17 @@ def GetTxtProfile(dictprofile, cluster_size) :
     return '\n\n'.join(proflist)
 
 def formatExceptionInfo(maxTBlevel=5):
-         cla, exc, trbk = sys.exc_info()
-         try :
-            excName = cla.__name__
-         except :
-            excName = 'None'
-         try:
-             excArgs = exc.args[0]
-         except :
-             excArgs = "<no args>"
-         excTb = traceback.format_tb(trbk, maxTBlevel)
-         return (excName, excArgs, excTb)
+    cla, exc, trbk = sys.exc_info()
+    try :
+        excName = cla.__name__
+    except :
+        excName = 'None'
+    try:
+        excArgs = exc.args[0]
+    except :
+        excArgs = "<no args>"
+    excTb = traceback.format_tb(trbk, maxTBlevel)
+    return (excName, excArgs, excTb)
 
 
 #fonction des etudiants de l'iut
@@ -692,7 +687,6 @@ def progressbar(self, maxi) :
     else :
         parent = self
     try :
-        print '###horrible hack progressbar'
         maxi = int(maxi)
     except :
         maxi = 1

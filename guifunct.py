@@ -58,6 +58,7 @@ def get_table_param(self, filename) :
             if self.tableau.parametres['colsep'] == 'tabulation' :
                 self.tableau.parametres['colsep'] = '\t'
             self.tableau.parametres['filetype'] = 'csv'
+            self.tableau.parametres['encodage'] = dlg.le[dlg.list_encodages.GetSelection()]
     elif  getfileextension(filename) == '.xls' :
         dlg = dialog.FileOptionDialog(self, -1, _(u"File format").decode('utf8'), sep=False, sheet = True, size=(350, 200),
                      style=wx.DEFAULT_DIALOG_STYLE)
@@ -967,7 +968,6 @@ class PrepSimi :
             param['cexfromchi'] = self.dial.checkit.GetValue()
         if 'sfromchi' in self.parametres :
             param['sfromchi'] = self.dial.checki.GetValue()
-            print param
         if 'vlabcolor' in self.parametres :
             param['vlabcolor'] = self.parametres['vlabcolor']
         if 'check_bystar' in dir(self.dial) :

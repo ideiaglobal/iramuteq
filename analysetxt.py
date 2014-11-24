@@ -78,7 +78,10 @@ class AnalyseText :
             else :
                 self.val = False
                 if dlg :
-                    self.dlg.Destroy()
+                    try :
+                        self.dlg.Destroy()
+                    except :
+                        pass
         else :
             #if isinstance(dlg, wx.ProgressDialog) :
             #    self.dlg.Destroy()

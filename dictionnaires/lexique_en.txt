@@ -96476,7 +96476,7 @@ willowwares	willowware	nom
 willowy	willowy	adj
 willpower	willpower	nom
 willpowers	willpower	nom
-wills	will	nom
+wills	wills	nom
 wilt	wilt	nom
 wilted	wilt	ver
 wilting	wilt	ver
@@ -97652,7 +97652,7 @@ your	your	sw
 yours	yours	sw
 yourself	yourself	sw
 yourselves	yourselves	sw
-yous	you	nom
+yous	yous	nom
 youth	youth	nom
 youthfulness	youthfulness	nom
 youthfulnesses	youthfulness	nom
