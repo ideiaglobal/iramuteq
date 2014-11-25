@@ -1397,6 +1397,7 @@ class SimiMatLayout(DefaultMatLayout) :
                           'halo' : self.dial.halo.GetValue(),
                           'com' : self.dial.comcheck.GetValue(),
                           'communities' : self.dial.choix_com.GetSelection(),
+                          'edgecurved' : self.dial.check_curved.GetValue(),
                           }        
         if 'cexfromchi' in self.parametres :
             paramsimi['cexfromchi'] = self.dial.checkit.GetValue()
