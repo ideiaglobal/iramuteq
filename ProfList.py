@@ -518,6 +518,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                           'halo' : 0,
                           'tmpchi': self.tmpchi,
                           'fromprof' : True,
+                          'edge.curved' : True,
                           }
         act = {}
         tableau = copymatrix(tableau)

@@ -909,7 +909,16 @@ class PrintSimiScript(PrintRScript) :
         
         if self.parametres['seuil_ok'] : seuil = str(self.parametres['seuil'])
         else : seuil = 'NULL'
-            
+        
+        if not self.parametres.get('edgecurved', False) :
+            ec = 'FALSE'
+        else :
+            ec = 'TRUE'
+        
+        txt += """
+        edge.curved <- %s
+        """ % ec
+        
         cols = str(self.parametres['cols']).replace(')',', max=255)')
         cola = str(self.parametres['cola']).replace(')',',max=255)')
 
@@ -1123,7 +1132,7 @@ class PrintSimiScript(PrintRScript) :
                 vertex.label.color <- colm[membership(com)]
             }
         }
-        coords <- plot.simi(graph.simi, p.type='%s',filename="%s", vertex.label = label.v, edge.label = label.e, vertex.col = vertex.col, vertex.label.color = vertex.label.color, vertex.label.cex=label.cex, vertex.size = vertex.size, edge.col = cola, leg=leg, width = width, height = height, alpha = alpha, movie = film, svg = svg)
+        coords <- plot.simi(graph.simi, p.type='%s',filename="%s", vertex.label = label.v, edge.label = label.e, vertex.col = vertex.col, vertex.label.color = vertex.label.color, vertex.label.cex=label.cex, vertex.size = vertex.size, edge.col = cola, leg=leg, width = width, height = height, alpha = alpha, movie = film, edge.curved = edge.curved, svg = svg)
         save.image(file="%s")
         """ % (type, self.filename, ffr(self.pathout['RData']))
         

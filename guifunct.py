@@ -323,6 +323,19 @@ class PrefSimi ( wx.Dialog ):
         self.check_elab = wx.CheckBox( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer3.Add( self.check_elab, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
         
+        self.m_staticline39 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        fgSizer3.Add( self.m_staticline39, 0, wx.EXPAND |wx.ALL, 5 )
+        
+        self.m_staticline40 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        fgSizer3.Add( self.m_staticline40, 0, wx.EXPAND |wx.ALL, 5 )
+        
+        self.m_staticText321 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Edge curved"), wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText321.Wrap( -1 )
+        fgSizer3.Add( self.m_staticText321, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.check_curved = wx.CheckBox( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        fgSizer3.Add( self.check_curved, 0, wx.ALL, 5 )        
+        
         self.m_staticline2914 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline2914, 0, wx.EXPAND, 5 )
         
@@ -787,6 +800,7 @@ class PrefSimi ( wx.Dialog ):
         self.comcheck.SetValue(self.paramsimi['com'])
         self.choix_com.SetSelection(self.paramsimi['communities'])
         self.halo.SetValue(self.paramsimi['halo'])
+        self.check_curved.SetValue(self.paramsimi.get('edgecurved', True))
     
     def ChangeCount(self, evt) :
         self.textcount.SetValue('%i' % self.listcol.GetSelectedItemCount())
@@ -963,6 +977,7 @@ class PrepSimi :
                           'com'  :self.dial.comcheck.GetValue(),
                           'communities' : self.dial.choix_com.GetSelection(),
                           'halo' : self.dial.halo.GetValue(),
+                          'edgecurved' : self.dial.check_curved.GetValue(),
                           }
         if 'cexfromchi' in self.parametres :
             param['cexfromchi'] = self.dial.checkit.GetValue()
