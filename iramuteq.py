@@ -968,7 +968,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             BugReport(self)
 
     def SimiCluster(self, parametres = {}, fromprof = False, tableau = None) :
-        self.analyse_matrix(DoSimi, parametres = parametres, analyse_type = 'simiclustermatrix', matrix = tableau)
+        self.analyse_matrix(DoSimi, parametres = parametres, analyse_type = 'simiclustermatrix', matrix = tableau, dlg = 5)
     
 #    def OnSimi(self,evt):
 #        try :
