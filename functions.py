@@ -35,7 +35,7 @@ def normpath_win32(path) :
         return path
     while '\\\\' in path :
         path = path.replace('\\\\', '\\')
-    if sys.platform == 'win32' and path.startswith('\\') and not path.startswith('\\\\') :
+    if path.startswith('\\') and not path.startswith('\\\\') :
         path = '\\' + path
     return path
 

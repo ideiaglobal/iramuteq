@@ -519,6 +519,10 @@ class OpenCHDS():
             panel.TabChdSim.AddPage(self.prof_seg_nb, _(u"Repeated segments profiles").decode('utf8'))
   
 #       panel.Bind(wx.EVT_BUTTON, self.ongetrapport, id = self.ID_rapport)
+        if os.path.exists(os.path.join(self.parametres['pathout'], 'tgenchi2.csv')) :
+            self.parametres['tgenspec'] = os.path.join(self.parametres['pathout'], 'tgenchi2.csv')
+            TgenLayout(panel)
+        panel.TabChdSim.SetSelection(0)
         self.parent.nb.AddPage(panel, _(u"Clustering").decode('utf8') + ' - %s' % corpname)
         self.parent.ShowTab(True)
         self.parent.nb.SetSelection(self.parent.nb.GetPageCount() - 1)     
@@ -665,6 +669,8 @@ class TgenLayout :
         tgen.read()
         tgentab = False
         gparent = None
+        if 'TabChdSim' in dir(page) :
+            page = page.TabChdSim
         for i in range(page.GetPageCount()) :
             tab = page.GetPage(i)
             if 'gparent' in dir(tab) :
@@ -674,16 +680,17 @@ class TgenLayout :
                 if tab.tgen :
                     tgentab = tab
                     break
+                
         if tgentab :
             self.page.tgentab.RefreshData(self.page.tgens)
             self.page.tgentab.tgens = tgen.tgen
-            self.page.SetSelection(i)
+            page.SetSelection(i)
         else :
             self.page.tgentab = ListForSpec(ira, gparent, self.page.tgens, etoiles[1:])
             self.page.tgentab.tgen = True
             self.page.tgentab.tgens = tgen.tgen
-            self.page.AddPage(self.page.tgentab, u'Tgens Specificities')
-            self.page.SetSelection(self.page.GetPageCount() - 1)
+            page.AddPage(self.page.tgentab, u'Tgens Specificities')
+            page.SetSelection(page.GetPageCount() - 1)
 
 class dolexlayout :
     def __init__(self, ira, corpus, parametres):

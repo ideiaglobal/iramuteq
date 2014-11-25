@@ -45,7 +45,7 @@ from tabsimi import DoSimi
 from tabrsimple import InputText
 from tabverges import Prototypical
 from tabsplitvar import SplitMatrixFromVar
-from textdist import AnalysePam
+#from textdist import AnalysePam
 from textstat import Stat
 from textaslexico import Lexico
 from textsimi import SimiTxt, SimiFromCluster
@@ -340,7 +340,7 @@ class IraFrame(wx.Frame):
         #        f.write('')
         self.history = History(os.path.join(UserConfigPath, 'history.db'))
         self.tree = LeftTree(self)
-        self._mgr.AddPane(self.tree, aui.AuiPaneInfo().Name("lefttree").Caption(_(u"Navigator").decode('utf8')).
+        self._mgr.AddPane(self.tree, aui.AuiPaneInfo().Name("lefttree").Caption(_(u"Historic").decode('utf8')).
                           Left().MinSize(wx.Size(200,500)).Layer(1).Position(1).CloseButton(False).MaximizeButton(True).
                           MinimizeButton(True))
         

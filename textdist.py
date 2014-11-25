@@ -14,7 +14,7 @@ from ConfigParser import *
 import sys
 from functions import print_liste, exec_rcode, CreateIraFile, progressbar, check_Rresult, BugDialog
 from layout import PrintRapport
-from PrintRScript import AlcesteTxtProf, RPamTxt
+from PrintRScript import ReinertTxtProf, RPamTxt
 from openanalyse import OpenAnalyse
 from time import time, sleep
 

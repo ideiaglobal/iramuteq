@@ -7,10 +7,10 @@ import os
 from time import time
 from analysetxt import AnalyseText
 from OptionAlceste import OptionAlc 
-from PrintRScript import RchdTxt, AlcesteTxtProf
+from PrintRScript import RchdTxt, ReinertTxtProf, TgenProfScript
 from layout import PrintRapport
-from chemins import ChdTxtPathOut
-from functions import DoConf, print_liste
+from chemins import ChdTxtPathOut, PathOut
+from functions import DoConf, print_liste, TGen
 
 
 class Reinert(AnalyseText) :
@@ -81,7 +81,7 @@ class Reinert(AnalyseText) :
         return self.pathout['Rchdtxt']
 
     def printRscript2(self) :
-        AlcesteTxtProf(self.pathout, self.parent.RscriptsPath, self.clnb, 0.9)
+        ReinertTxtProf(self.pathout, self.parent.RscriptsPath, self.clnb, 0.9)
         return self.pathout['RTxtProfGraph']
 
     def print_graph_files(self) :
@@ -99,3 +99,35 @@ class Reinert(AnalyseText) :
         print_liste(self.pathout['liste_graph_afc'], afc_graph_list)
         print_liste(self.pathout['liste_graph_chd'], chd_graph_list)
         PrintRapport(self, self.corpus, self.parametres)
+
+class TgenProf(AnalyseText):
+    def __init__(self, ira, corpus, parametres, cluster_size):
+        self.ira = ira
+        self.corpus = corpus
+        self.parametres = parametres
+        self.pathout = PathOut(dirout = self.parametres['pathout'])
+        self.cluster_size = [len(classe) for classe in corpus.lc]
+        print cluster_size
+        self.doanalyse()
+        
+    def doanalyse(self):    
+        self.tgen = TGen(path = self.parametres['tgenpath'], encoding = self.ira.syscoding)
+        self.tgen.read(self.tgen.path)
+        #self.parametres['etoiles'].sort()
+        self.parametres['tgeneff'] = os.path.join(self.parametres['pathout'], 'tgeneff.csv') 
+        tgenst = self.corpus.make_tgen_profile(self.tgen.tgen, self.corpus.lc)
+        clnames = ['cluster_%03d' % i for i in range(1, len(self.cluster_size) + 1)]
+        et = dict(zip(clnames, self.cluster_size))
+        tgenst = dict([[line[0], dict(zip(clnames, line[1:]))] for line in tgenst]) 
+        self.tgen.writetable(self.parametres['tgeneff'], tgenst, et)
+        self.parametres['tgenspec'] = os.path.join(self.parametres['pathout'], 'tgenchi2.csv')
+        self.Rscript = TgenProfScript(self)
+        self.Rscript.make_script()
+        self.Rscript.write()
+        self.doR(self.Rscript.scriptout, dlg = False, message = 'R...')
+        
+        
+        
+        
+        
+        

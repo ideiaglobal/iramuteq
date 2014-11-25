@@ -319,7 +319,7 @@ def RchdQuest(DicoPath, RscriptPath, nbcl = 10, mincl = 10):
     fileout.write(txt)
     fileout.close()
     
-def AlcesteTxtProf(DictChdTxtOut, RscriptsPath, clnb, taillecar):
+def ReinertTxtProf(DictChdTxtOut, RscriptsPath, clnb, taillecar):
     txt = "clnb<-%i\n" % clnb
     txt += """
 source("%s")
@@ -1211,6 +1211,19 @@ class TgenSpecScript(PrintRScript):
         row.names(result) <- rownames(tgen)
         write.table(result, file = "%s", sep='\\t', col.names = NA)
         """ % ffr(self.pathout['tgenspec.csv'])
+        self.add(txt)
+        
+class TgenProfScript(PrintRScript):
+    def make_script(self):
+        self.sources([self.analyse.ira.RscriptsPath['chdfunct']])
+        txt = """
+        tgen <- read.csv2("%s", row.names = 1, sep = '\\t')
+        """ % ffr(self.parametres['tgeneff'])
+        txt += """
+        res <- build.prof.tgen(tgen)
+        write.table(res$chi2, file = "%s", sep='\\t', col.names = NA)
+        write.table(res$pchi2, file = "%s", sep='\\t', col.names = NA)
+        """ % (ffr(self.pathout['tgenchi2.csv']), ffr(self.pathout['tgenpchi2.csv']))
         self.add(txt)
         
 class FreqMultiScript(PrintRScript):

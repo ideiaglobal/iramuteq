@@ -278,6 +278,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 self.idexport = wx.NewId()
                 self.idexporttropes = wx.NewId()
                 self.idexportowledge = wx.NewId()
+                self.onmaketgen = wx.NewId()
             #    self.export_classes = wx.NewId()
    
                 self.Bind(wx.EVT_MENU, self.OnPopupOne, id=self.popupID1)
@@ -302,6 +303,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 self.Bind(wx.EVT_MENU, self.onexport, id = self.idexport)
                 self.Bind(wx.EVT_MENU, self.onexporttropes, id = self.idexporttropes)
                 self.Bind(wx.EVT_MENU, self.onexportowledge, id = self.idexportowledge)
+                self.Bind(wx.EVT_MENU, self.OnMakeTgen, id=self.onmaketgen)
              #  self.Bind(wx.EVT_MENU, self.on_export_classes, id = self.export_classes)
    #            self.Bind(wx.EVT_MENU, self.OnPopupThree, id=self.popupID3)
     
@@ -320,7 +322,8 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             menu_conc.Append(self.popupID2, u"dans les segments de texte de la classe")
             menu_conc.Append(self.popupID3, u"dans les segments de texte classés")
             menu_conc.Append(self.popupID4, u"dans tous les segments de texte")
-            menu.AppendMenu(-1, u"Concordancier", menu_conc) 
+            menu.AppendMenu(-1, u"Concordancier", menu_conc)
+            menu.Append(self.onmaketgen, _(u"Make Tgen").decode('utf8'))
             menu_cnrtl = wx.Menu()      
             menu_cnrtl.Append(self.popupID5, u"Définition")
             menu_cnrtl.Append(self.popupID6, u"Etymologie")
@@ -355,7 +358,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             menu.Append(self.pop2, u"Chi2 par classe")
             menu.Append(self.pop3, u"Chi2 modalités de la variable")
             menu.AppendSeparator()
-            menu.Append(self.pop1, u"Graph de la classe")
+            menu.Append(self.pop1, u"Graphe de la classe")
             self.PopupMenu(menu)
             menu.Destroy()
 
@@ -772,6 +775,9 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         #win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
         #win.HtmlPage.SetPage(win.html)
         win.Show(True)
+    
+    def OnMakeTgen(self, evt):
+        self.parent.tree.OnTgenEditor(self.getselectedwords())    
 
 
 class wliste(wx.Frame):

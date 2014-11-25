@@ -177,6 +177,10 @@ class Corpus :
         query = 'SELECT uces FROM uces where id IN (%s) ORDER BY id' % formesid
         res = self.cformes.execute(query)
         return list(set(list(itertools.chain(*[[int(val) for val in row[0].split()] if not isinstance(row[0], int) else [row[0]] for row in res]))))
+    
+    def gettgentxt(self, tgen):
+        sts = self.gettgenst(tgen)
+        return list(set([self.getucefromid(val).uci for val in sts]))
 
     def getlemucis(self, lem) :
         uces = self.getlemuces(lem)
@@ -396,6 +400,26 @@ class Corpus :
                     if len(concern) :
                         tgenoccurrences[t][etoiles[i]] += sum([lemuceeff[uce] for uce in concern])
         return tgenoccurrences, totoccurrences
+    
+    def make_tgen_profile(self, tgen, ucecl, uci = False) :
+        log.info('tgen/classes')
+        if uci :
+            tab = [[lem] + [len(set(self.gettgentxt(tgen[lem])).intersection(classe)) for classe in ucecl] for lem in tgen]
+        else :
+            tab = [[lem] + [len(set(self.gettgenst(tgen[lem])).intersection(classe)) for classe in ucecl] for lem in tgen]
+        tab = [[line[0]] + [val for val in line[1:]] for line in tab if sum(line[1:]) >= 3]
+        return tab
+        #i = 0
+        #nam = 'total'
+        #while nam + `i` in tgen :
+        #    i += 1
+        #nam = nam + `i`
+        #last = [nam] + [`len(classe)` for classe in ucecl]
+        #tab += [last]
+        #line0 = ['tgen'] + ['_'.join(['cluster', `i+1`]) for i in range(len(ucecl))]
+        #tab = [line0] + tab
+        #with open(fileout, 'w') as f :
+        #    f.write('\n'.join(['\t'.join(line) for line in tab]).encode(self.parametres['syscoding']))        
     
     def make_efftype_from_etoiles(self, etoiles) :
         dtype = {}

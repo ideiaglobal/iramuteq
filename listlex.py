@@ -200,15 +200,14 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             menu.Append(self.popupID3, u"Graphique")
             menu_stcaract = wx.Menu()
             self.menuid = {}
-            for i, et in enumerate(self.etoiles) :
-                nid = wx.NewId()
-                self.menuid[nid] = i
-                menu_stcaract.Append(nid, et)
-                self.Bind(wx.EVT_MENU, self.onstcaract, id = nid)
-            menu.AppendMenu(-1, u"Segments de texte caractéristiques", menu_stcaract)
-            #menu.Append(self.popup_Tgen_glob, "Tgen global")
             if not self.tgen :
-                menu.Append(self.onmaketgen, "Make Tgen")
+                for i, et in enumerate(self.etoiles) :
+                    nid = wx.NewId()
+                    self.menuid[nid] = i
+                    menu_stcaract.Append(nid, et)
+                    self.Bind(wx.EVT_MENU, self.onstcaract, id = nid)
+                menu.AppendMenu(-1, u"Segments de texte caractéristiques", menu_stcaract)
+                menu.Append(self.onmaketgen, _(u"Make Tgen").decode('utf8'))
             self.PopupMenu(menu)
             menu.Destroy()
 
