@@ -18,6 +18,7 @@ from dialog import PrefSimpleFile, PrefExport
 from layout import open_antiprofil, TgenLayout
 from guifunct import TGenFrame
 from textaslexico import TgenSpec
+from textreinert import TgenProf
 
 log = logging.getLogger('iramuteq.tree')
 
@@ -143,7 +144,7 @@ class LeftTree(CT.CustomTreeCtrl):
             self.SetItemImage(self.root, 24, CT.TreeItemIcon_Normal)
             self.SetItemImage(self.root, 13, CT.TreeItemIcon_Expanded)
         
-        self.textroot = self.AppendItem(self.root, u'Corpus texte')
+        self.textroot = self.AppendItem(self.root, _(u'Textual corpus'))
         self.SetPyData(self.textroot, {'uuid': 'textroot'})
         self.SetItemImage(self.textroot, imgtextroot, CT.TreeItemIcon_Normal)
         self.SetItemImage(self.textroot, imgtextroot, CT.TreeItemIcon_Expanded)     
@@ -165,7 +166,7 @@ class LeftTree(CT.CustomTreeCtrl):
                     self.SetItemImage(last, img, CT.TreeItemIcon_Normal)
                     self.SetItemImage(last, img, CT.TreeItemIcon_Expanded)
 
-        self.matroot = self.AppendItem(self.root, u'Matrices')
+        self.matroot = self.AppendItem(self.root, _(u'Matrix'))
         self.SetPyData(self.matroot, {'uuid': 'matroot'})
         self.SetItemImage(self.matroot, imgmatroot, CT.TreeItemIcon_Normal)
         self.SetItemImage(self.matroot, imgmatroot, CT.TreeItemIcon_Expanded)
@@ -445,6 +446,8 @@ class LeftTree(CT.CustomTreeCtrl):
     
                 profsr = menu.Append(wx.ID_ANY, _(u"Repeated segments profiles").decode('utf8'))
                 profgram = menu.Append(wx.ID_ANY, _(u"POS profiles").decode('utf8'))
+                tgen = menu.Append(wx.ID_ANY, _(u"Tgen Editor").decode('utf8'))
+                computetgen = menu.Append(wx.ID_ANY, _(u"Compute Tgen").decode('utf8'))
                 export_corpus = menu.Append(wx.ID_ANY, _(u"Export corpus").decode('utf8'))
                 colored = menu.Append(wx.ID_ANY, _(u"Colored corpus").decode('utf8'))
                 navig = menu.Append(wx.ID_ANY, _(u"Navigator").decode('utf8'))
@@ -456,6 +459,8 @@ class LeftTree(CT.CustomTreeCtrl):
                 self.Bind(wx.EVT_MENU, self.OpenAntipro, antipro)
                 self.Bind(wx.EVT_MENU, self.OnProfSR, profsr)
                 self.Bind(wx.EVT_MENU, self.OnProfGram, profgram)
+                self.Bind(wx.EVT_MENU, self.OnTgenEditor, tgen)
+                self.Bind(wx.EVT_MENU, self.OnTgenCompute, computetgen)
                 self.Bind(wx.EVT_MENU, self.OnExportCorpus, export_corpus)
                 self.Bind(wx.EVT_MENU, self.OnColored, colored)
                 self.Bind(wx.EVT_MENU, self.OnNavig, navig)
@@ -718,8 +723,11 @@ class LeftTree(CT.CustomTreeCtrl):
         else :
             self.page.parametres['tgenpath'] = tgenpath
             tgen = TGen(path = tgenpath, encoding = self.parent.syscoding)
-            self.page.parametres['etoiles'] = self.page.etoiles
-            TgenSpec(self.parent, corpus, self.page.parametres)
+            if self.page.parametres['type'] == 'spec' :
+                self.page.parametres['etoiles'] = self.page.etoiles
+                TgenSpec(self.parent, corpus, self.page.parametres)
+            elif self.page.parametres['type'] == 'alceste' :
+                TgenProf(self.parent, corpus, self.page.parametres, self.page.cluster_size)
             TgenLayout(self.page)
     
     def OnExportClasses(self, event):

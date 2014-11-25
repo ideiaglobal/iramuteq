@@ -617,7 +617,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             ucis_txt, ucestxt = doconcorde(corpus, nuces, self.la, uci = uci)
             items = dict([[i, '<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table><br>' % ntab2[i][0], ucestxt[i]])] for i, uce in enumerate(nuces)])
             dlg.Update(4, u'texte...')
-            win = message(self, items, u"Segments de texte caractéristiques - Classe %i" % self.cl, (750, 600))
+            win = message(self, items, u"Segments de texte caractéristiques - Classe %i" % self.cl, (750, 600), uceids = nuces)
             #win.html = '<html>\n' + '<br>'.join(['<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table>' % ntab2[i][0], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
             #win.HtmlPage.SetPage(win.html)
             dlg.Destroy()
@@ -641,28 +641,6 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         nbcl = len(title)
         nbwords = len(words)
         BarFrame(self.Source.parent, tableout, title, words)
-#         txt = barplot(tableout, words, title, self.Source.parent.RscriptsPath['Rgraph'], tmpgraph)
-#         #print 'ATTENTION TEST R'
-#         #txt = """
-#         #sink('/Users/pierre/Desktop/qdfqsdfqsdfqsdf.txt')
-#         #Sys.getlocale()
-#         #sink()
-#         #"""
-#         tmpscript = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
-#         file = open(tmpscript,'w')
-#         file.write(txt)
-#         file.close()
-#         exec_rcode(self.Source.parent.RPath, tmpscript, wait = True)
-#         w = 100 + (20 * nbwords) + (100 * nbcl)
-#         h = 100 + (nbwords * 15)
-#         if w > 1100 : w = 1100
-#         if h > 800 : h = 800
-#         if h < 450 : h = 450
-#         win = MessageImage(self, u"Graphique", size=(w, h))
-#         win.addsaveimage(tmpgraph)
-#         txt = "<img src='%s'>" % tmpgraph
-#         win.HtmlPage.SetPage(txt)
-#         win.Show(True)
 
     def onlexdendro(self, evt):
         if 'corpus' in dir(self.Source):
@@ -698,7 +676,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 uci = True
         ucis_txt, ucestxt = doconcorde(corpus, ucef, ListWord, uci = uci)
         items = dict([[i, '<br><br>'.join([ucis_txt[i], ucestxt[i]])] for i in range(0,len(ucestxt))])
-        win = message(self, items, title, (800, 500))
+        win = message(self, items, title, (800, 500), uceids = ucef)
         return win
 
     def OnPopupTwo(self, event):
@@ -711,13 +689,13 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
     def OnPopupThree(self, event):
         corpus = self.Source.corpus
         uces = [classe[i] for classe in corpus.lc for i in range(0,len(classe))]
-        win = self.make_concord(uces, "Concordancier - UCE classées")
+        win = self.make_concord(uces, "Concordancier - Segments de texte classés")
         win.Show(True)
         
     def OnPopupFour(self, event):
         corpus = self.Source.corpus
         uces = [classe[i] for classe in corpus.lc for i in range(0,len(classe))] + corpus.lc0
-        win = self.make_concord(uces, "Concordancier - Toutes les UCE")
+        win = self.make_concord(uces, "Concordancier - Tous les segments de texte")
         win.Show(True)
 
     def OnPopupFive(self, event):
