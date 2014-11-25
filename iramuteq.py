@@ -306,7 +306,7 @@ class IraFrame(wx.Frame):
         self.statusbar = self.CreateStatusBar(2, wx.ST_SIZEGRIP)
         self.statusbar.SetStatusWidths([-2, -3])
         self.statusbar.SetStatusText(_(u"Ready"), 0)
-        self.statusbar.SetStatusText(_(u"Wellcome"), 1)
+        self.statusbar.SetStatusText(_(u"Welcome"), 1)
 
         # min size for the frame itself isn't completely done.
         # see the end up FrameManager::Update() for the test
