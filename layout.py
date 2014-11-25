@@ -12,7 +12,7 @@ import wx.lib.agw.labelbook as LB
 from wx.lib.agw.fmresources import *
 from chemins import ConstructPathOut, ChdTxtPathOut, FFF, ffr, PathOut, StatTxtPathOut, simipath
 from ConfigParser import ConfigParser
-from functions import ReadProfileAsDico, GetTxtProfile, read_list_file, ReadList, exec_rcode, print_liste, BugReport, DoConf, indices_simi, check_Rresult, progressbar, normpath_win32
+from functions import ReadProfileAsDico, GetTxtProfile, read_list_file, ReadList, exec_rcode, print_liste, BugReport, DoConf, indices_simi, check_Rresult, progressbar, normpath_win32, TGen
 from ProfList import ProfListctrlPanel
 from guiparam3d import param3d, simi3d
 from PrintRScript import write_afc_graph, print_simi3d, PrintSimiScript
@@ -519,6 +519,10 @@ class OpenCHDS():
             panel.TabChdSim.AddPage(self.prof_seg_nb, _(u"Repeated segments profiles").decode('utf8'))
   
 #       panel.Bind(wx.EVT_BUTTON, self.ongetrapport, id = self.ID_rapport)
+        if os.path.exists(os.path.join(self.parametres['pathout'], 'tgenchi2.csv')) :
+            self.parametres['tgenspec'] = os.path.join(self.parametres['pathout'], 'tgenchi2.csv')
+            TgenLayout(panel)
+        panel.TabChdSim.SetSelection(0)
         self.parent.nb.AddPage(panel, _(u"Clustering").decode('utf8') + ' - %s' % corpname)
         self.parent.ShowTab(True)
         self.parent.nb.SetSelection(self.parent.nb.GetPageCount() - 1)     
@@ -659,9 +663,14 @@ class TgenLayout :
         self.page = page
         parametres = self.page.parametres
         ira = wx.GetApp().GetTopWindow()
+        tgenpath = os.path.join(parametres['pathout'], 'tgen.csv')
         self.page.tgens, etoiles =  ReadList(parametres['tgenspec'], ira.syscoding, sep="\t")
+        tgen = TGen(path = tgenpath, encoding = parametres['encoding'])
+        tgen.read()
         tgentab = False
         gparent = None
+        if 'TabChdSim' in dir(page) :
+            page = page.TabChdSim
         for i in range(page.GetPageCount()) :
             tab = page.GetPage(i)
             if 'gparent' in dir(tab) :
@@ -671,14 +680,17 @@ class TgenLayout :
                 if tab.tgen :
                     tgentab = tab
                     break
+                
         if tgentab :
             self.page.tgentab.RefreshData(self.page.tgens)
-            self.page.SetSelection(i)
+            self.page.tgentab.tgens = tgen.tgen
+            page.SetSelection(i)
         else :
             self.page.tgentab = ListForSpec(ira, gparent, self.page.tgens, etoiles[1:])
             self.page.tgentab.tgen = True
-            self.page.AddPage(self.page.tgentab, u'Tgens Specificities')
-            self.page.SetSelection(self.page.GetPageCount() - 1)
+            self.page.tgentab.tgens = tgen.tgen
+            page.AddPage(self.page.tgentab, u'Tgens Specificities')
+            page.SetSelection(page.GetPageCount() - 1)
 
 class dolexlayout :
     def __init__(self, ira, corpus, parametres):
@@ -706,7 +718,7 @@ class dolexlayout :
         self.TabStat.parametres = parametres
         self.ListPan = ListForSpec(ira, self, self.DictSpec, self.etoiles)
         if os.path.exists(self.pathout['banalites.csv']) :
-            self.listban = ListForSpec(ira, self, self.dictban, ['eff'] + self.etoiles)
+            self.listban = ListForSpec(ira, self, self.dictban, ['eff'] + self.etoiles, usefirst = True)
         #self.ListPan2 = ListForSpec(sash.rightwin1, self, self.DictSpec, first)
         self.ListPant = ListForSpec(ira, self, self.DictType, self.etoiles)
         self.ListPanEff = ListForSpec(ira, self, self.DictEff, self.etoiles)
@@ -731,10 +743,6 @@ class dolexlayout :
             self.tabAFCTGraph = GraphPanelAfc(self.TabAFC, self.dictpathout, list_graph, self.parametres['clnb'], itempath ='liste_graph_afct', coding=self.encoding)
             self.TabAFC.AddPage(self.tabAFCTGraph, 'AFC type')
             self.TabStat.AddPage(self.TabAFC, 'AFC')
-        
-        
-        
-           
         
         ira.nb.AddPage(self.TabStat, u'Spécificités')
         self.ira = ira
@@ -801,9 +809,11 @@ class GraphPanelDendro(wx.Panel):
         self.panel_1.SetBackgroundColour('white')
         self.deb = wx.StaticText(self.panel_1, -1, txt)
         dendro_img = wx.Image(os.path.join(self.ira.images_path,'but_dendro.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        dendro_liste_img = wx.Image(os.path.join(self.ira.images_path,'but_dendro_liste.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        dendro_cloud_img= wx.Image(os.path.join(self.ira.images_path,'but_dendro_cloud.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.butdendro = wx.BitmapButton(self, -1, dendro_img)
-        self.butdendrotexte = wx.BitmapButton(self, -1, dendro_img)
-        self.butdendrocloud = wx.BitmapButton(self, -1, dendro_img)
+        self.butdendrotexte = wx.BitmapButton(self, -1, dendro_liste_img)
+        self.butdendrocloud = wx.BitmapButton(self, -1, dendro_cloud_img)
         
         for i in range(0,len(list_graph)):
             if os.path.exists(os.path.join(self.dirout,list_graph[i][0])) :
@@ -906,6 +916,9 @@ class GraphPanelDendro(wx.Panel):
             txt += """
             load("%s")
             source("%s")
+            if (is.null(debsup)) {
+                debsup <- debet
+            }
             chistable <- chistabletot[1:(debsup-1),]
             open_file_graph("%s", width=%i, height=%i, svg = %s)
             plot.dendro.prof(tree.cut1$tree.cl, classes, chistable, nbbycl = 60, type.dendro="%s", bw=%s, lab=NULL)
@@ -914,6 +927,9 @@ class GraphPanelDendro(wx.Panel):
             txt += """
             load("%s")
             source("%s")
+            if (is.null(debsup)) {
+                debsup <- debet
+            }
             chistable <- chistabletot[1:(debsup-1),]
             open_file_graph("%s", width=%i, height=%i, svg=%s)
             plot.dendro.cloud(tree.cut1$tree.cl, classes, chistable, nbbycl = 300, type.dendro="%s", bw=%s, lab=NULL)
@@ -923,7 +939,10 @@ class GraphPanelDendro(wx.Panel):
         tmpfile = tempfile.mktemp()
         with open(tmpfile, 'w') as f :
             f.write(txt)
+        busy = wx.BusyInfo(_("Please wait...").decode('utf8'), self.parent)
+        wx.SafeYield()
         error = exec_rcode(self.ira.RPath, tmpfile, wait=True) 
+        del busy
         check_Rresult(self.ira, error)
         self.list_graph.append([fileout, 'Dendrogramme CHD1 - %s' %  type_dendro])
         print_liste(self.dictpathout['liste_graph_chd'], self.list_graph)
@@ -1378,6 +1397,7 @@ class SimiMatLayout(DefaultMatLayout) :
                           'halo' : self.dial.halo.GetValue(),
                           'com' : self.dial.comcheck.GetValue(),
                           'communities' : self.dial.choix_com.GetSelection(),
+                          'edgecurved' : self.dial.check_curved.GetValue(),
                           }        
         if 'cexfromchi' in self.parametres :
             paramsimi['cexfromchi'] = self.dial.checkit.GetValue()

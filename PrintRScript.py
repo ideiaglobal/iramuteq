@@ -319,7 +319,7 @@ def RchdQuest(DicoPath, RscriptPath, nbcl = 10, mincl = 10):
     fileout.write(txt)
     fileout.close()
     
-def AlcesteTxtProf(DictChdTxtOut, RscriptsPath, clnb, taillecar):
+def ReinertTxtProf(DictChdTxtOut, RscriptsPath, clnb, taillecar):
     txt = "clnb<-%i\n" % clnb
     txt += """
 source("%s")
@@ -704,7 +704,7 @@ class PrintSimiScript(PrintRScript) :
         self.packages(['igraph', 'proxy', 'Matrix'])
         self.sources([self.analyse.parent.RscriptsPath['simi'], self.analyse.parent.RscriptsPath['Rgraph']])
         txt = ''
-        if not self.parametres['keep_coord'] and not self.parametres['type'] == 'simimatrix':
+        if not self.parametres['keep_coord'] and not (self.parametres['type'] == 'simimatrix' or self.parametres['type'] == 'simiclustermatrix') :
             txt += """
             dm.path <- "%s"
             cn.path <- "%s"
@@ -740,7 +740,7 @@ class PrintSimiScript(PrintRScript) :
                 index <- which(colnames(dm) == forme)
             }
             """
-        elif not self.parametres['keep_coord'] and self.parametres['type'] == 'simimatrix' :
+        elif not self.parametres['keep_coord'] and (self.parametres['type'] == 'simimatrix' or self.parametres['type'] == 'simiclustermatrix'):
             txt += """
             dm.path <- "%s"
             selected.col <- "%s"
@@ -909,7 +909,16 @@ class PrintSimiScript(PrintRScript) :
         
         if self.parametres['seuil_ok'] : seuil = str(self.parametres['seuil'])
         else : seuil = 'NULL'
-            
+        
+        if not self.parametres.get('edgecurved', False) :
+            ec = 'FALSE'
+        else :
+            ec = 'TRUE'
+        
+        txt += """
+        edge.curved <- %s
+        """ % ec
+        
         cols = str(self.parametres['cols']).replace(')',', max=255)')
         cola = str(self.parametres['cola']).replace(')',',max=255)')
 
@@ -1072,7 +1081,7 @@ class PrintSimiScript(PrintRScript) :
                 """
         else :
             #print self.parametres
-            if (self.parametres['type'] == 'clustersimitxt' and self.parametres.get('tmpchi', False)) or (self.parametres['type'] == 'simimatrix' and 'tmpchi' in self.parametres): 
+            if (self.parametres['type'] == 'clustersimitxt' and self.parametres.get('tmpchi', False)) or (self.parametres['type'] in ['simimatrix','simiclustermatrix'] and 'tmpchi' in self.parametres): 
                 txt += """
                 lchi <- read.table("%s")
                 lchi <- lchi[,1]
@@ -1080,7 +1089,7 @@ class PrintSimiScript(PrintRScript) :
                 txt += """
                     lchi <- lchi[sel.col]
                     """
-            if self.parametres['type'] == 'clustersimitxt' and self.parametres.get('cexfromchi', False) :
+            if self.parametres['type'] in ['clustersimitxt', 'simimatrix', 'simiclustermatrix'] and self.parametres.get('cexfromchi', False) :
                 txt += """ 
                 label.cex <- norm.vec(lchi, vcexminmax[1], vcexminmax[2])
                 """
@@ -1092,7 +1101,7 @@ class PrintSimiScript(PrintRScript) :
                 label.cex <- graph.simi$label.cex
             }
             """
-            if (self.parametres['type'] == 'clustersimitxt' or self.parametres['type'] == 'simimatrix') and self.parametres.get('sfromchi', False):
+            if (self.parametres['type'] in ['clustersimitxt', 'simimatrix', 'simiclustermatrix']) and self.parametres.get('sfromchi', False):
                 txt += """ 
                 vertex.size <- norm.vec(lchi, minmaxeff[1], minmaxeff[2])
                 if (!length(vertex.size)) vertex.size <- 0
@@ -1123,7 +1132,7 @@ class PrintSimiScript(PrintRScript) :
                 vertex.label.color <- colm[membership(com)]
             }
         }
-        coords <- plot.simi(graph.simi, p.type='%s',filename="%s", vertex.label = label.v, edge.label = label.e, vertex.col = vertex.col, vertex.label.color = vertex.label.color, vertex.label.cex=label.cex, vertex.size = vertex.size, edge.col = cola, leg=leg, width = width, height = height, alpha = alpha, movie = film, svg = svg)
+        coords <- plot.simi(graph.simi, p.type='%s',filename="%s", vertex.label = label.v, edge.label = label.e, vertex.col = vertex.col, vertex.label.color = vertex.label.color, vertex.label.cex=label.cex, vertex.size = vertex.size, edge.col = cola, leg=leg, width = width, height = height, alpha = alpha, movie = film, edge.curved = edge.curved, svg = svg)
         save.image(file="%s")
         """ % (type, self.filename, ffr(self.pathout['RData']))
         
@@ -1211,6 +1220,19 @@ class TgenSpecScript(PrintRScript):
         row.names(result) <- rownames(tgen)
         write.table(result, file = "%s", sep='\\t', col.names = NA)
         """ % ffr(self.pathout['tgenspec.csv'])
+        self.add(txt)
+        
+class TgenProfScript(PrintRScript):
+    def make_script(self):
+        self.sources([self.analyse.ira.RscriptsPath['chdfunct']])
+        txt = """
+        tgen <- read.csv2("%s", row.names = 1, sep = '\\t')
+        """ % ffr(self.parametres['tgeneff'])
+        txt += """
+        res <- build.prof.tgen(tgen)
+        write.table(res$chi2, file = "%s", sep='\\t', col.names = NA)
+        write.table(res$pchi2, file = "%s", sep='\\t', col.names = NA)
+        """ % (ffr(self.pathout['tgenchi2.csv']), ffr(self.pathout['tgenpchi2.csv']))
         self.add(txt)
         
 class FreqMultiScript(PrintRScript):

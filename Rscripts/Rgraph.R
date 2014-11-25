@@ -628,7 +628,10 @@ plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro
        names(ntoplot) <- rownames(toplot)
        ntoplot <- ntoplot[order(ntoplot, decreasing = TRUE)]
        ntoplot <- round(ntoplot, 0)
-       ntoplot <- ntoplot[1:nbbycl]
+       if (length(toplot) > nbbycl) {
+           ntoplot <- ntoplot[1:nbbycl]
+       }       
+       ntoplot <- ntoplot[which(ntoplot > 0)]
        #ntoplot <- ntoplot[order(ntoplot)]
        #ntoplot <- ifelse(length(ntoplot) > nbbycl, ntoplot[1:nbbycl], ntoplot)
        lclasses[[classe]] <- ntoplot
@@ -660,11 +663,14 @@ plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro
         #wordcloud(names(lclasses[[i]]), lclasses[[i]], scale = c(1.5, 0.2), random.order=FALSE, colors = colcloud[i])
         yval <- 1.1
         plot(0,0,pch='', axes = FALSE)
-        vcex <- norm.vec(lclasses[[i]], 1.5, 1.5)
+        vcex <- norm.vec(lclasses[[i]], 1, 2)
         for (j in 1:length(lclasses[[i]])) {
             yval <- yval-(strheight( names(lclasses[[i]])[j],cex=vcex[j])+0.02)
             text(-0.9, yval, names(lclasses[[i]])[j], cex = vcex[j], col = colcloud[i], adj=0)
         }
+    }
+    if (!from.cmd) {
+        dev.off()
     }
     
 }
@@ -686,10 +692,14 @@ plot.dendro.cloud <- function(tree, classes, chisqtable, nbbycl = 60, type.dendr
     lclasses <- list()
     for (classe in 1:length(sum.cl)) {
        ntoplot <- toplot[,classe]
+       names(ntoplot) <- rownames(toplot)
        ntoplot <- ntoplot[order(ntoplot, decreasing = TRUE)]
        ntoplot <- round(ntoplot, 0)
-       ntoplot <- ntoplot[1:nbbycl]
+       if (length(toplot) > nbbycl) {
+            ntoplot <- ntoplot[1:nbbycl]
+       }
        ntoplot <- ntoplot[order(ntoplot)]
+       ntoplot <- ntoplot[which(ntoplot > 0)]
        #ntoplot <- ifelse(length(ntoplot) > nbbycl, ntoplot[1:nbbycl], ntoplot)
        lclasses[[classe]] <- ntoplot
     }
@@ -714,7 +724,7 @@ plot.dendro.cloud <- function(tree, classes, chisqtable, nbbycl = 60, type.dendr
 	plot.phylo(tree,label.offset=0.1,tip.col=col, type=type.dendro)
     for (i in rev(tree.order)) {
         par(mar=c(0,0,1,0),cex=0.9)
-        wordcloud(names(lclasses[[i]]), lclasses[[i]], scale = c(4, 0.8), random.order=FALSE, colors = colcloud[i])
+        wordcloud(names(lclasses[[i]]), lclasses[[i]], scale = c(2.5, 0.5), random.order=FALSE, colors = colcloud[i])
     }
 }
 

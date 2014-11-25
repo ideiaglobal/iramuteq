@@ -25,12 +25,9 @@ class AnalyseMatrix :
         self.dlg = dlg
         self.parametres = parametres
         self.val = False
-        print self.parametres
         if not 'pathout' in self.parametres :
             self.parametres['pathout'] = PathOut(tableau.parametres['originalpath'], analyse_type = self.parametres['type'], dirout = tableau.parametres['pathout']).mkdirout()
-            print self.parametres
             self.pathout = PathOut(analyse_type = self.parametres['type'], dirout = self.parametres['pathout'])
-            print self.pathout.dirout
         else :
             self.pathout = PathOut(filename = tableau.parametres['originalpath'], dirout = self.parametres['pathout'], analyse_type = self.parametres['type'])
 

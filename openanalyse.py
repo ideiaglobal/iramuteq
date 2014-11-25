@@ -162,7 +162,7 @@ class OpenAnalyse():
             WordCloudLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'reinertmatrix' :
             OpenCHDS(self.parent,  corpus, self.conf, Alceste = False)
-        elif self.conf['type'] == 'simimatrix' :
+        elif self.conf['type'] == 'simimatrix' or self.conf['type'] == 'simiclustermatrix':
             SimiMatLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'proto' :
             ProtoLayout(self.parent, corpus, self.conf)

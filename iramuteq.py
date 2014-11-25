@@ -5,39 +5,36 @@
 #License: GNU GPL
 
 from optparse import OptionParser
+from wx import BusyCursor
 
 parser = OptionParser()
 parser.add_option("-f", "--file", dest="filename",
                   help="open FILE", metavar="FILE", default=False)
 (options, args) = parser.parse_args()
 
-#print args
-#print options
 import sys
 reload(sys)
 import locale
 import tempfile
 import codecs
 import os
-import shutil
 from random import randint
-from ConfigParser import *
+from ConfigParser import ConfigParser, RawConfigParser
 import webbrowser
 import gettext
 import logging
 #------------------------------------
 import wx
-#import wx.aui
 import wx.lib.agw.aui as aui
 import wx.html
 import wx.grid
 import wx.lib.hyperlink as hl
 #------------------------------------
-from functions import BugReport, PlaySound, ReadLexique, History, DoConf, ReadDicoAsDico, progressbar
+from functions import BugReport, PlaySound, History
 from checkversion import NewVersion
 from guifunct import *
 from tableau import Tableau
-from dialog import PrefDialog, CorpusPref
+from dialog import PrefDialog
 from tabfrequence import Frequences, FreqMultiple
 from tabchi2 import ChiSquare
 #from tabstudent import MakeStudent
@@ -48,18 +45,15 @@ from tabsimi import DoSimi
 from tabrsimple import InputText
 from tabverges import Prototypical
 from tabsplitvar import SplitMatrixFromVar
-#from textafcuci import AfcUci
-from textdist import AnalysePam
+#from textdist import AnalysePam
 from textstat import Stat
 from textaslexico import Lexico
 from textsimi import SimiTxt, SimiFromCluster
 from textwordcloud import WordCloud, ClusterCloud
 from textreinert import Reinert
-#from profile_segment import ProfileSegment
 #from textcheckcorpus import checkcorpus
 from openanalyse import OpenAnalyse
 from corpus import Builder, SubBuilder
-#from sheet import MySheet
 from checkinstall import CreateIraDirectory, CheckRPath, FindRPAthWin32, FindRPathNix, CheckRPackages, IsNew, UpgradeConf, CopyConf, RLibsAreInstalled
 from chemins import RscriptsPath, ConstructConfigPath, ConstructDicoPath, ConstructGlobalPath, PathOut
 from parse_factiva_xml import ImportFactiva
@@ -152,17 +146,18 @@ sys.stdout = printer()
 ConfigPath = ConstructConfigPath(UserConfigPath)
 
 langues = {'french' : wx.LANGUAGE_FRENCH,
-            'english' : wx.LANGUAGE_ENGLISH,
-            'portuguese' : wx.LANGUAGE_PORTUGUESE,
-            'italian' : wx.LANGUAGE_ITALIAN,
-            'spanish' : wx.LANGUAGE_SPANISH}
+           'english' : wx.LANGUAGE_ENGLISH,
+           'portuguese' : wx.LANGUAGE_PORTUGUESE,
+           'italian' : wx.LANGUAGE_ITALIAN,
+           'spanish' : wx.LANGUAGE_SPANISH
+           }
 
 code_langues = {'french' : 'fr_FR',
-             'english' : 'en',
-            'portuguese' : 'pt_PT',
-            'italian' : 'it_IT',
-            'spanish' : 'es_ES'
-            }
+                'english' : 'en',
+                'portuguese' : 'pt_PT',
+                'italian' : 'it_IT',
+                'spanish' : 'es_ES'
+               }
 #####################################################################
 
 class IraFrame(wx.Frame):
@@ -310,8 +305,8 @@ class IraFrame(wx.Frame):
 #--------------------------------------------------------------------
         self.statusbar = self.CreateStatusBar(2, wx.ST_SIZEGRIP)
         self.statusbar.SetStatusWidths([-2, -3])
-        self.statusbar.SetStatusText(u"Prêt", 0)
-        self.statusbar.SetStatusText(u"Bienvenue", 1)
+        self.statusbar.SetStatusText(_(u"Ready"), 0)
+        self.statusbar.SetStatusText(_(u"Welcome"), 1)
 
         # min size for the frame itself isn't completely done.
         # see the end up FrameManager::Update() for the test
@@ -345,7 +340,7 @@ class IraFrame(wx.Frame):
         #        f.write('')
         self.history = History(os.path.join(UserConfigPath, 'history.db'))
         self.tree = LeftTree(self)
-        self._mgr.AddPane(self.tree, aui.AuiPaneInfo().Name("lefttree").Caption(_(u"Navigator").decode('utf8')).
+        self._mgr.AddPane(self.tree, aui.AuiPaneInfo().Name("lefttree").Caption(_(u"Historic").decode('utf8')).
                           Left().MinSize(wx.Size(200,500)).Layer(1).Position(1).CloseButton(False).MaximizeButton(True).
                           MinimizeButton(True))
         
@@ -583,9 +578,16 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
             self.tableau = Tableau(self,os.path.abspath(self.input_path[0]))
             val = get_table_param(self, self.input_path[0])
             if val == wx.ID_OK :
-                self.tableau.make_content()
-                OpenAnalyse(self, self.tableau.parametres)
-                self.tree.OnItemAppend(self.tableau.parametres)
+                busy = wx.BusyInfo(_("Please wait...").decode('utf8'), self)
+                wx.SafeYield()
+                try :
+                    self.tableau.make_content()
+                    OpenAnalyse(self, self.tableau.parametres)
+                    self.tree.OnItemAppend(self.tableau.parametres)
+                    del busy 
+                except :
+                    del busy
+                    BugReport(self)
                 #self.tableau.show_tab()
 
     def OnOpenAnalyse(self, event):
@@ -965,8 +967,8 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         except:
             BugReport(self)
 
-    def SimiCluster(self, parametres = {}, fromprof = False, pathout = '', listactives = [], actives = [], tableau = None) :
-        DoSimi(self, param = parametres, fromprof =  fromprof, listactives = listactives, actives = actives, tableau = tableau)
+    def SimiCluster(self, parametres = {}, fromprof = False, tableau = None) :
+        self.analyse_matrix(DoSimi, parametres = parametres, analyse_type = 'simiclustermatrix', matrix = tableau, dlgnb = 5)
     
 #    def OnSimi(self,evt):
 #        try :

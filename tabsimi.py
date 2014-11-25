@@ -30,7 +30,7 @@ class DoSimi(AnalyseMatrix):
         self.cmd = self.parametres.get('cmd', False)
         self.dirout = self.parametres.get('pathout', False)
         if self.fromprof:
-            self.paramsimi = parametres
+            self.paramsimi = self.parametres
         else :
             self.paramsimi = {'coeff' : 0,
                           'layout' : 2,
@@ -109,7 +109,6 @@ class DoSimi(AnalyseMatrix):
                     #self.parametres['type'] = 'simimatrix'
                     if not self.pathout : 
                         self.parametres['pathout'] = ConstructPathOut(self.parametres['pathout'], 'SimiMatrix')
-                        print self.parametres['pathout']
                     else :
                         self.parametres['pathout'] = self.dirout
                     self.pathout.createdir(self.parametres['pathout'])

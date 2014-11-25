@@ -25,7 +25,7 @@ from operator import itemgetter
 #---------------------------------------------------------------------------
 
 class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
-    def __init__(self, parent,gparent, dlist = {}, first = [], menu = True):
+    def __init__(self, parent,gparent, dlist = {}, first = [], usefirst = False, menu = True):
     #def  __init__(self, parent) :
         wx.ListCtrl.__init__( self, parent, -1, style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_HRULES|wx.LC_VRULES)
         self.parent=parent
@@ -33,7 +33,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         self.dlist=dlist
         self.first = first
         self.tgen = False
-        if 'etoiles' in dir(self.gparent) :
+        if 'etoiles' in dir(self.gparent) and not usefirst :
             self.etoiles = self.gparent.etoiles
         else :
             self.etoiles = []
@@ -199,15 +199,14 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             menu.Append(self.popupID3, u"Graphique")
             menu_stcaract = wx.Menu()
             self.menuid = {}
-            for i, et in enumerate(self.etoiles) :
-                nid = wx.NewId()
-                self.menuid[nid] = i
-                menu_stcaract.Append(nid, et)
-                self.Bind(wx.EVT_MENU, self.onstcaract, id = nid)
-            menu.AppendMenu(-1, u"Segments de texte caractéristiques", menu_stcaract)
-            #menu.Append(self.popup_Tgen_glob, "Tgen global")
             if not self.tgen :
-                menu.Append(self.onmaketgen, "Make Tgen")
+                for i, et in enumerate(self.etoiles) :
+                    nid = wx.NewId()
+                    self.menuid[nid] = i
+                    menu_stcaract.Append(nid, et)
+                    self.Bind(wx.EVT_MENU, self.onstcaract, id = nid)
+                menu.AppendMenu(-1, u"Segments de texte caractéristiques", menu_stcaract)
+                menu.Append(self.onmaketgen, _(u"Make Tgen").decode('utf8'))
             self.PopupMenu(menu)
             menu.Destroy()
 
@@ -247,15 +246,10 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         parametres = page.parametres
         paneff = self.gparent.ListPanEff
         panchi = self.gparent.ListPan
-        #etoiles = self.gparent.etoiles
         et = self.etoiles[ind]
-        
-        #if et.startswith(u'X.') :
-        #    et = et.replace(u'X.', u'*')
         uces = corpus.getucesfrometoile(et)
         self.la = [panchi.dlist[i][0] for i in range(0, len(panchi.dlist)) if panchi.dlist[i][ind+1] >= minind ]
         self.lchi = [panchi.dlist[i][ind+1] for i in range(0, len(panchi.dlist)) if panchi.dlist[i][ind+1] >= minind ]
-        #lfreq = [paneff.dlist[i][ind+1] for i in range(0, len(panchi.dlist)) if panchi.dlist[i][ind+1] >= minind ]
         if max(self.lchi) == float('inf') :
             nchi = []
             for val in self.lchi :
@@ -277,8 +271,6 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         ucis_txt, ucestxt = doconcorde(corpus, nuces, self.la)
         items = dict([[i, '<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table><br>' % ntab2[i][0], ucestxt[i]])] for i in range(0,len(ucestxt))])
         win = message(self, items, u"Segments de texte caractéristiques - %s" % self.first[ind], (900, 600))
-        #win.html = '<html>\n' + '<br>'.join(['<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table>' % ntab2[i][0], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
-        #win.HtmlPage.SetPage(win.html)
         win.Show(True)
         
     def OnPopupTwo(self, event):
@@ -288,15 +280,17 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             corpus = page.corpus
         else :
             corpus = self.parent.parent.parent.corpus
-        item=self.getColumnText(self.GetFirstSelected(), 0)
-        uce_ok = corpus.getlemuces(item)
         ira = wx.GetApp().GetTopWindow()
-        ucis_txt, ucestxt = doconcorde(corpus, uce_ok, [item])
+        item=self.getColumnText(self.GetFirstSelected(), 0)
+        if not self.tgen :
+            uce_ok = corpus.getlemuces(item)
+            wordlist = [item]
+        else :
+            uce_ok = corpus.gettgenst(self.tgens[item])
+            wordlist = [val for val in self.tgens[item] if val in corpus.lems]
+        ucis_txt, ucestxt = doconcorde(corpus, uce_ok, wordlist)
         items = dict([[i, '<br><br>'.join([ucis_txt[i], ucestxt[i]])] for i in range(0,len(ucestxt))])
-        win = message(ira, items, u"Concordancier - %s" % item, (800, 500))
-        #win = message(ira, u"Concordancier", (800, 500))
-        #win.html = ('<html>\n<h1>%s</h1>' % item) + '<br>'.join(['<br>'.join([ucis_txt[i], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
-        #win.HtmlPage.SetPage(win.html)
+        win = message(ira, items, u"Concordancier - %s" % item, (800, 500), uceids = uce_ok)
         win.Show(True)
 
     def getinf(self, txt) :

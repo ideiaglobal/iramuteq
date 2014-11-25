@@ -321,6 +321,32 @@ BuildProf01<-function(x,classes) {
 	mat
 }
 
+build.prof.tgen <- function(x) {
+    nbst <- sum(x[nrow(x),])
+    totcl <- x[nrow(x),]
+    tottgen <- rowSums(x)
+    nbtgen <- nrow(x) - 1
+    chi2 <- x[1:(nrow(x)-1),]
+    pchi2 <- chi2
+    for (classe in 1:ncol(x)) {
+        for (tg in 1:nbtgen) {
+            cont <- c(x[tg, classe], tottgen[tg] - x[tg, classe], totcl[classe] - x[tg, classe], (nbst - totcl[classe]) - (tottgen[tg] - x[tg, classe]))
+            cont <- matrix(unlist(cont), nrow=2)
+            chiresult<-chisq.test(cont,correct=FALSE)
+            if (is.na(chiresult$p.value)) {
+                chiresult$p.value<-1
+                chiresult$statistic<-0
+            }
+            if (chiresult$expected[1,1] > cont[1,1]) {
+                chiresult$statistic <- chiresult$statistic * -1
+            }
+            chi2[tg,classe] <- chiresult$statistic
+            pchi2[tg,classe] <- chiresult$p.value
+        }
+    }
+    res <- list(chi2 = chi2, pchi2 = pchi2)
+}
+
 BuildProf<- function(x,dataclasse,clusternb,lim=2) {
 	####
 	#r.names<-rownames(x)

@@ -1564,7 +1564,7 @@ class FindInCluster(wx.Frame):
 class SearchDial ( wx.Frame ):
     
     def __init__( self, parent, listctrl, col, shown):
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP )
         self.parent = parent
         self.listctrl = listctrl
         self.col = col
