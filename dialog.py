@@ -2600,10 +2600,10 @@ class ConcordList(wx.HtmlListBox):
 
 class message(wx.Frame):
     def __init__(self, parent, items, title, size, save = True, uceids = None):
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_FRAME_STYLE )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.CLOSE_BOX|wx.DEFAULT_FRAME_STYLE|wx.FRAME_FLOAT_ON_PARENT|wx.TAB_TRAVERSAL )
         self.save = save
         self.uceids = uceids
-        self.ira = wx.GetApp().GetTopWindow() 
+        self.ira = wx.GetApp().GetTopWindow()
         self.SetIcon(self.ira._icon)
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         self.items = items

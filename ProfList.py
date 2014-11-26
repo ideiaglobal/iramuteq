@@ -619,7 +619,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             items = dict([[i, '<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table><br>' % ntab2[i][0], ucestxt[i]])] for i, uce in enumerate(nuces)])
             dlg.Destroy()
             win = message(self, items, u"Segments de texte caractéristiques - Classe %i" % self.cl, (750, 600), uceids = nuces)
-            win.SetWindowStyle(wx.STAY_ON_TOP)
+            #win.SetWindowStyle(wx.STAY_ON_TOP)
             #win.html = '<html>\n' + '<br>'.join(['<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table>' % ntab2[i][0], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
             #win.HtmlPage.SetPage(win.html)
             win.Show(True)
