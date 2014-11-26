@@ -20,14 +20,14 @@ import  wx.lib.mixins.listctrl  as  listmix
 #from tabsimi import DoSimi
 from listlex import ListForSpec
 from chemins import ConstructPathOut, ffr
-from dialog import PrefExport, PrefUCECarac, SearchDial, message, MessageImage, BarFrame
-from tableau import Tableau, copymatrix
+from dialog import PrefUCECarac, SearchDial, message, BarFrame
+from tableau import copymatrix
 from search_tools import SearchFrame
 import webbrowser
 #import cStringIO
 import tempfile
 import codecs
-from functions import exec_rcode, progressbar, treat_var_mod, doconcorde
+from functions import progressbar, treat_var_mod, doconcorde
 from PrintRScript import barplot
 from textclassechd import ClasseCHD
 from shutil import copyfile

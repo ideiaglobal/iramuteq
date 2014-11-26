@@ -2794,44 +2794,6 @@ class ExtractDialog ( wx.Dialog ):
     def __del__( self ):
         pass
 
-# class FreqDialog(wx.Dialog):
-#     def __init__(self, parent, ID, listcol, title, size) :
-#         wx.Dialog.__init__(self, parent, ID, title, size=size, pos=wx.DefaultPosition,style=wx.DEFAULT_DIALOG_STYLE | wx.CANCEL | wx.OK )
-#         pre = wx.PreDialog()
-#         pre.SetExtraStyle(wx.DIALOG_EX_CONTEXTHELP)
-#         pre.Create(parent, ID, title, wx.DefaultPosition, size, wx.DEFAULT_DIALOG_STYLE | wx.CANCEL | wx.OK)
-#         self.PostCreate(pre)
-#         self.parent = parent 
-#         sizer = wx.BoxSizer(wx.VERTICAL)
-#         #self.content = parent.content
-#         self.header = listcol
-#         #LABELLIST = []
-#         #for i in self.header:
-#         #    forme = i
-#         #    if len(forme) > 60 :
-#         #        LABELLIST.append(i[0:60])
-#         #    else:
-#         #        LABELLIST.append(i)
-#         self.list_box_1 = wx.ListBox(self, -1, choices=self.header, style=wx.LB_EXTENDED | wx.LB_HSCROLL)
-#         sizer.Add(self.list_box_1, 0, 5)
-#         
-#         btnsizer = wx.BoxSizer(wx.HORIZONTAL)
-#         
-#         btn = wx.Button(self, wx.ID_CANCEL)
-#         btnsizer.Add(btn)
-#         
-#         btn = wx.Button(self, wx.ID_OK)
-#         btn.SetDefault()
-#         btnsizer.Add(btn)
-#         
-#         sizer.Add(btnsizer, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_HORIZONTAL, 5)
-#         self.SetSizer(sizer)
-#         sizer.Fit(self)
-#         self.SetTitle(_(u"Selection").decode('utf8'))
-#   
-        # end wxGlade
-
-
 class FreqDialog ( wx.Dialog ):
     
     def __init__( self, parent, listcol, title, size =  wx.Size( -1,-1 ), showNA = True):
@@ -3203,7 +3165,9 @@ class BarGraphDialog ( wx.Dialog ):
 
 class MessageImage(wx.Frame):
     def __init__(self, parent, parametres, title, size):
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_FRAME_STYLE )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.CLOSE_BOX|wx.DEFAULT_FRAME_STYLE|wx.FRAME_FLOAT_ON_PARENT|wx.TAB_TRAVERSAL )
+        self.ira = wx.GetApp().GetTopWindow()
+        self.SetIcon(self.ira._icon)
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         self.parametres = parametres
         self.imageFile = self.parametres['tmpgraph']

@@ -10,11 +10,13 @@ import codecs
 
 
 class SearchFrame(wx.Frame):
-    def __init__(self, parent, id, title, corpus, size=(800, 500)):
+    def __init__(self, parent, id, title, corpus, size=(800, 900)):
         # begin wxGlade: MyFrame.__init__
         #kwds["style"] = wx.DEFAULT_FRAME_STYLE
-        wx.Frame.__init__(self, parent, id)
+        wx.Frame.__init__(self, parent, id, size = size, style = wx.CLOSE_BOX|wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
         self.parent = parent
+        self.ira = wx.GetApp().GetTopWindow()
+        self.SetIcon(self.ira._icon)
         search_id = wx.NewId()
         self.Bind(wx.EVT_MENU, self.onsearch, id = search_id)
         self.accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('F'), search_id)])
@@ -51,7 +53,7 @@ class SearchFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
         self.SetTitle(u'Navigation')
-        self.SetSize(wx.Size(400,700))
+        self.SetSize(wx.Size(900,700))
         self.__do_layout()
         # end wxGlade
 
