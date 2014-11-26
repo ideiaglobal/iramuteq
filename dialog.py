@@ -2604,7 +2604,7 @@ class message(wx.Frame):
         self.save = save
         self.uceids = uceids
         self.ira = wx.GetApp().GetTopWindow() 
-        self.SetIcon(self.ira.GetIcon())
+        self.SetIcon(self.ira._icon)
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         self.items = items
         self.html = ""
