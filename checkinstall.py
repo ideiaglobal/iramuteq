@@ -23,26 +23,49 @@ def IsNew(self):
         version_user = self.pref.get('iramuteq','version_nb').split('.')
     except NoOptionError :
         return True
+    userab = False
+    globab = False
     if version_user :
+        print len(version_user), len(version_glob)
         version_user[0] = int(version_user[0])
         version_user[1] = int(version_user[1])
         version_glob[0] = int(version_glob[0])
         version_glob[1] = int(version_glob[1])
+        if len(version_user) == 3 :
+            if 'a' in version_user[2] :
+                userab = 'a'
+                version_user[2] = int(version_user[2].replace('a', ''))
+            elif 'b' in version_user[2] :
+                userab = 'b'
+                version_user[2] = int(version_user[2].replace('b', ''))
+            else :
+                version_user[2] = int(version_user[2])
+        if len(version_glob) == 3 :
+            if 'a' in version_glob[2] :
+                globab = 'a'
+                version_glob[2] = int(version_glob[2].replace('a', ''))
+            elif 'b' in version_glob[2] :
+                globab = 'b'
+                version_glob[2] = int(version_glob[2].replace('b', ''))
+            else :
+                version_glob[2] = int(version_glob[2])
         if len(version_user) == len(version_glob) :
+            if version_glob > version_user :
+                return True
+            elif version_glob == version_user :
+                if globab == userab :
+                    return False
+                elif globab > userab :
+                    return True
+                else :
+                    return False
+            else :
+                return False
+        else :
             if version_glob > version_user :
                 return True
             else :
                 return False
-        if len(version_glob) == 2 :
-            if version_glob[:2] >= version_user[:2] :
-                return True
-            else :
-                return False
-        elif len(version_glob) == 3 :
-            if version_glob[:2] <= version_user[:2] :
-                return False
-            else :
-                return True
 
 def UpgradeConf(self) :
     log.info('upgrade conf')
