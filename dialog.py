@@ -3174,7 +3174,7 @@ class MessageImage(wx.Frame):
         if parametres['svg'] == 'TRUE' :
             self.imagename = u"image.svg"
         else :
-            self.imagename = u"iamge.png"
+            self.imagename = u"image.png"
         self.HtmlPage = wx.html.HtmlWindow(self, -1)
         self.HtmlPage.SetMinSize(size)
         if "gtk2" in wx.PlatformInfo:

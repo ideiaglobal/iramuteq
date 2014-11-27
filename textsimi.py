@@ -4,19 +4,13 @@
 #License: GNU/GPL
 
 from chemins import ffr, simipath
-#from corpus import Corpus
 import os
 from analysetxt import AnalyseText
-#from ConfigParser import RawConfigParser
-#from guifunct import getPage, getCorpus
 from guifunct import PrepSimi
 from functions import indices_simi, progressbar, treat_var_mod, read_list_file, print_liste
-#from tableau import Tableau
-#from tabsimi import DoSimi
 from PrintRScript import PrintSimiScript
 import wx
 from copy import copy
-
 import logging
 
 log = logging.getLogger('iramuteq.textsimi')
@@ -123,7 +117,8 @@ class SimiFromCluster(SimiTxt) :
         self.lfreq = lfreq
         self.lchi = lchi
         parametres['name'] = 'simi_classe_%i' % (numcluster + 1)
-        SimiTxt.__init__(self, ira, corpus, parametres, dlg, lemdial = False)
+        dlg.Destroy()
+        SimiTxt.__init__(self, ira, corpus, parametres, dlg=True, lemdial = False)
     
     def preferences(self) :
         return self.parametres
@@ -138,9 +133,9 @@ class SimiFromCluster(SimiTxt) :
             del self.parametres['bystar']
         dictcol = dict([[i, [act, self.corpus.getlemclustereff(act, self.numcluster)]] for i, act in enumerate(self.actives)]) 
         continu = True
+        #print self.dlg
         if self.dlg :
-            #self.listet = self.corpus.make_etoiles()
-            #self.listet.sort()
+            self.dlg.Destroy()
             self.stars = []#copy(self.listet)
             self.parametres['stars'] = 0#copy(self.listet)
             self.parametres['sfromchi'] = 1
@@ -151,6 +146,7 @@ class SimiFromCluster(SimiTxt) :
             else :
                 continu = False
         if continu :
+            self.dlg = progressbar(self.parent, 3)
             self.makefiles()
             self.parametres['type'] = 'clustersimitxt'
             script = PrintSimiScript(self)

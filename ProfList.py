@@ -45,6 +45,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         self.cl = cl
         self.var_mod = {}
         self.them_mod = {}
+        self.ira = wx.GetApp().GetTopWindow()
 
         line1 = profclasse.pop(0)
         classen = [line for line in profclasse if line[0] != '*' and line[0] != '*****']
@@ -546,7 +547,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                         'lem' : self.Source.parametres['lem'],
                         'tmpchi' : self.tmpchi}
         #try :
-        self.parent.SimiFromCluster(self.parent, self.Source.corpus, self.la, self.lfreq, self.lchi, self.cl - 1, parametres = parametres, dlg = progressbar(self, 4))
+        self.parent.SimiFromCluster(self.parent, self.Source.corpus, self.la, self.lfreq, self.lchi, self.cl - 1, parametres = parametres, dlg = progressbar(self.ira, 4))
         #except :
         #    print 'not acitve'
 
@@ -560,7 +561,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                         'lem' : self.Source.parametres['lem'],
                         'tmpchi' : self.tmpchi}
 
-        self.parent.SimiFromCluster(self.parent, self.Source.corpus, self.la, self.lfreq, self.lchi, self.cl - 1, parametres = parametres, dlg = progressbar(self, 4))
+        self.parent.SimiFromCluster(self.parent, self.Source.corpus, self.la, self.lfreq, self.lchi, self.cl - 1, parametres = parametres, dlg = progressbar(self.ira, 4))
 
     def on_segments(self,evt) :
         dlg = progressbar(self, 2)
