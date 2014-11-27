@@ -26,7 +26,6 @@ def IsNew(self):
     userab = False
     globab = False
     if version_user :
-        print len(version_user), len(version_glob)
         version_user[0] = int(version_user[0])
         version_user[1] = int(version_user[1])
         version_glob[0] = int(version_glob[0])
