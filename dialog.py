@@ -1739,6 +1739,7 @@ class OptLexi(wx.Dialog):
             self.label = wx.StaticText(self, -1, _(u"Minimum frequency").decode('utf8'))
             self.spin = wx.SpinCtrl(self, -1, min = 1, max = 10000, initial = 10)
         self.Bind(wx.EVT_CHOICE, self.onselect, self.choice)
+        self.Bind(wx.EVT_LISTBOX, self.onchoose, self.list_box_1)
         self.__set_properties()
         self.__do_layout()
         # end wxGlade
@@ -1750,6 +1751,7 @@ class OptLexi(wx.Dialog):
             self.spin.SetValue(10)
         self.choice.SetSelection(0)
         self.choice_indice.SetSelection(0)
+        self.button_1.Enable(False)
         #self.SetMinSize(wx.Size(300, 400))
         # end wxGlade
 
@@ -1789,7 +1791,18 @@ class OptLexi(wx.Dialog):
         else :
             for et in self.listet :
                 self.list_box_1.Append(et)
-
+    
+    def onchoose(self, evt):
+        if self.choice.GetSelection()== 0 :
+            if len(self.list_box_1.GetSelections()) > 0 :
+                self.button_1.Enable(True)
+            else :
+                self.button_1.Enable(False)
+        elif self.choice.GetSelection() == 1 :
+            if len(self.list_box_1.GetSelections()) > 1 :
+                self.button_1.Enable(True)
+            else :
+                self.button_1.Enable(False)    
 
 class PrefDendro ( wx.Dialog ):
     

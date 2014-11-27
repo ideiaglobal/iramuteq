@@ -38,6 +38,8 @@ class SimiTxt(AnalyseText):
                 continu = True
                 self.parametres = prep.parametres
                 self.dlg = progressbar(self.ira, 4)
+            else :
+                return False
         else :
             continu = True
         if continu :
