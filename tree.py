@@ -750,7 +750,25 @@ class LeftTree(CT.CustomTreeCtrl):
     
     def OnRename(self, event):
         pydata = self.itemdict['pydata']
-        print pydata
+        if 'matrix_name' in pydata :
+            name = 'matrix_name'
+        elif 'corpus_name' in pydata :
+            name = 'corpus_name'
+        else :
+            name = 'name'
+        oldname = pydata[name]
+        dlg = wx.TextEntryDialog(self, "Please Enter The New Item Name", 'Item Naming', oldname)
+        if dlg.ShowModal() == wx.ID_OK:
+            newname = dlg.GetValue()
+            dlg.Destroy()
+            pydata[name] = newname
+            Totconf = DoConf(configfile=pydata['ira'])
+            conf = Totconf.getoptions()
+            conf[name] = newname
+            Totconf.makeoptions(Totconf.getsections(), [conf])
+            self.history.update(pydata)
+            self.SetItemText(self.current, newname)
+            self.EnsureVisible(self.current)
 
     def OnItemBackground(self, event):
 

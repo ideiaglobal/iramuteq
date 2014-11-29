@@ -569,37 +569,34 @@ def PrintRapport(self, corpus, parametres, istxt = True):
 """ % datetime.datetime.now().ctime()
     if istxt :
         totocc = corpus.gettotocc()
-        txt += u'nombre de textes: %i%s' % (corpus.getucinb(), sep)
-        txt += u'nombre de segments de textes: %i%s' % (corpus.getucenb(), sep)
-        txt += u'nombre de formes: %i%s' % (len(corpus.formes), sep)
-        txt += u'nombre d\'occurrences: %i%s' % (totocc, sep)
-        txt += u'moyenne d\'occurrences par forme: %f%s' % (float(totocc) / float(len(self.corpus.formes)), sep)
-        txt += u'nombre de lemmes: %i%s' % (len(corpus.lems), sep)
-        txt += u'nombre de formes actives: %i%s' % (corpus.getactivesnb(1), sep)
-        txt += u'nombre de formes supplémentaires: %i%s' % (corpus.getactivesnb(2), sep)
-        txt += u'nombre de formes actives de fréquence >= %i: %i%s' % (parametres['eff_min_forme'], parametres['nbactives'], sep)
-        txt += u'moyenne d\'occurrences par segments :%f%s' % (float(totocc) / float(corpus.getucenb()), sep)
+        txt += ': '.join([_(u'Number of texts'),  u'%i%s' % (corpus.getucinb(), sep)])
+        txt += ': '.join([_(u'Number of text segments'),  '%i%s' % (corpus.getucenb(), sep)])
+        txt += ': '.join([_(u'Number of forms'), '%i%s' % (len(corpus.formes), sep)])
+        txt += ': '.join([_(u'Number of occurrences'), '%i%s' % (totocc, sep)])
+        #txt += u'moyenne d\'occurrences par forme: %f%s' % (float(totocc) / float(len(self.corpus.formes)), sep)
+        txt += ': '.join([_(u'Number of lemmas'), '%i%s' % (len(corpus.lems), sep)])
+        txt += ': '.join([_(u'Number of active forms'), '%i%s' % (corpus.getactivesnb(1), sep)])
+        txt += ': '.join([_(u'Number of supplementary forms'), '%i%s' % (corpus.getactivesnb(2), sep)])
+        txt += ' >= '.join([_(u'Number of active forms with a frequency'), '%i: %i%s' % (parametres['eff_min_forme'], parametres['nbactives'], sep)])
+        txt += ': '.join([_(u'Mean of forms by segment'), '%f%s' % (float(totocc) / float(corpus.getucenb()), sep)])
         if 'tailleuc1' in parametres :
             if parametres['classif_mode'] == 0 :
-                txt += u'taille rst1 / rst2: %i / %i - %i / %i%s' % (parametres['tailleuc1'], parametres['tailleuc2'], parametres['lenuc1'], parametres['lenuc2'], sep)
+                txt += ': '.join([_(u'Size of rst1 / rst2'), '%i / %i - %i / %i%s' % (parametres['tailleuc1'], parametres['tailleuc2'], parametres['lenuc1'], parametres['lenuc2'], sep)])
     else :
         self.Ucenb = self.nbind
-        txt += u'nombre d\'individus : %i%s' % (self.nbind, sep)
-        txt += u'nombre de classes : %i%s' % (self.clnb, sep)
+        txt += ': '.join([_(u'Number of lines'), '%i%s' % (self.nbind, sep)])
+        txt += ': '.join([_(u'Number of clusters'), '%i%s' % (self.clnb, sep)])
     if istxt :
-        txt += u'nombre de classes : %i%s' % (parametres['clnb'], sep)
+        txt += ': '.join([_(u'Number of clusters'), '%i%s' % (parametres['clnb'], sep)])
         if parametres['classif_mode'] == 0 or parametres['classif_mode'] == 1 :
-            txt += u'%i segments classés sur %i (%.2f%%)%s' % (sum([len(cl) for cl in corpus.lc]), corpus.getucenb(), (float(sum([len(cl) for cl in corpus.lc])) / float(corpus.getucenb())) * 100, sep)
+            txt += ' '.join(['%i' % sum([len(cl) for cl in corpus.lc]), u'segments classified on', '%i (%.2f%%)%s' % (corpus.getucenb(), (float(sum([len(cl) for cl in corpus.lc])) / float(corpus.getucenb())) * 100, sep)])
         elif self.parametres['classif_mode'] == 2 :
-            txt += u'%i textes classés sur %i (%.2f%%)%s' % (sum([len(cl) for cl in corpus.lc]), corpus.getucinb(), (float(sum([len(cl) for cl in corpus.lc]))) / float(corpus.getucinb()) * 100, sep)
+            txt += ' '.join([u'%i' % sum([len(cl) for cl in corpus.lc]), 'texts classified on', '%i (%.2f%%)%s' % (corpus.getucinb(), (float(sum([len(cl) for cl in corpus.lc]))) / float(corpus.getucinb()) * 100, sep)])
     else :
-        txt += u'%i segments classées sur %i (%.2f%%)%s' % (self.ucecla, self.Ucenb, (float(self.ucecla) / float(self.Ucenb)) * 100, sep)
+        txt += ' '.join(['%i' % self.ucecla, 'line classified on', '%i (%.2f%%)%s' % (self.Ucenb, (float(self.ucecla) / float(self.Ucenb)) * 100, sep)])
  
-    txt += """
-###########################
-temps d'analyse : %s
-###########################
-""" % parametres.get('time', '')
+    txt += ''.join([sep, u'###########################', sep, _(u'time'), ' : %s' % parametres.get('time', ''), sep, u'###########################', sep])
+
     with open(self.pathout['pre_rapport'], 'w') as f :
         f.write(txt)
 
@@ -689,7 +686,7 @@ class TgenLayout :
             self.page.tgentab = ListForSpec(ira, gparent, self.page.tgens, etoiles[1:])
             self.page.tgentab.tgen = True
             self.page.tgentab.tgens = tgen.tgen
-            page.AddPage(self.page.tgentab, u'Tgens Specificities')
+            page.AddPage(self.page.tgentab, _(u'Tgens Specificities').decode('utf8'))
             page.SetSelection(page.GetPageCount() - 1)
 
 class dolexlayout :
@@ -726,23 +723,23 @@ class dolexlayout :
         self.ListPanEffRelForme = ListForSpec(ira, self, self.DictEffRelForme, self.etoiles)
         self.ListPanEffRelType = ListForSpec(ira, self, self.DictEffRelType, self.etoiles)
         
-        self.TabStat.AddPage(self.ListPan, u'formes') 
+        self.TabStat.AddPage(self.ListPan, _(u'Forms').decode('utf8')) 
         if os.path.exists(self.pathout['banalites.csv']) :
-            self.TabStat.AddPage(self.listban, u'banalités')
-        self.TabStat.AddPage(self.ListPant, u'Types')
-        self.TabStat.AddPage(self.ListPanEff, u'Effectifs formes')
-        self.TabStat.AddPage(self.ListPanEffType, u'Effectifs Type')
-        self.TabStat.AddPage(self.ListPanEffRelForme, u'Effectifs relatifs formes')
-        self.TabStat.AddPage(self.ListPanEffRelType, u'Effectifs relatifs Type')
+            self.TabStat.AddPage(self.listban, _(u'Banal forms').decode('utf8'))
+        self.TabStat.AddPage(self.ListPant, _(u'POS').deode('utf8'))
+        self.TabStat.AddPage(self.ListPanEff, _(u'Forms frequencies').decode('utf8'))
+        self.TabStat.AddPage(self.ListPanEffType, _(u'POS frequencies').decode('utf8'))
+        self.TabStat.AddPage(self.ListPanEffRelForme, _(u'Forms relative frequencies').decode('utf8'))
+        self.TabStat.AddPage(self.ListPanEffRelType, _(u'POS relative frequencies').decode('utf8'))
         if self.parametres['clnb'] > 2 :
             self.TabAFC = aui.AuiNotebook(self.TabStat, -1, wx.DefaultPosition)
             list_graph=read_list_file(self.dictpathout['liste_graph_afcf'], encoding = self.encoding)
             self.tabAFCGraph = GraphPanelAfc(self.TabAFC, self.dictpathout, list_graph, self.parametres['clnb'], itempath ='liste_graph_afcf', coding = self.encoding)
-            self.TabAFC.AddPage(self.tabAFCGraph, 'AFC formes')
+            self.TabAFC.AddPage(self.tabAFCGraph, _(u'CA forms').decode('utf8'))
             list_graph=read_list_file(self.dictpathout['liste_graph_afct'], encoding = self.encoding)
             self.tabAFCTGraph = GraphPanelAfc(self.TabAFC, self.dictpathout, list_graph, self.parametres['clnb'], itempath ='liste_graph_afct', coding=self.encoding)
-            self.TabAFC.AddPage(self.tabAFCTGraph, 'AFC type')
-            self.TabStat.AddPage(self.TabAFC, 'AFC')
+            self.TabAFC.AddPage(self.tabAFCTGraph, _(u'CA POS').decode('utf8'))
+            self.TabStat.AddPage(self.TabAFC, _(u'CA').decode('utf8'))
         
         ira.nb.AddPage(self.TabStat, u'Spécificités')
         self.ira = ira
@@ -1005,7 +1002,7 @@ class CopusPanel(wx.Panel) :
         fgSizer5.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )        
         self.fgSizer5 = fgSizer5
         
-        self.m_staticText18 = wx.StaticText( self, wx.ID_ANY, u"Description du corpus", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText18 = wx.StaticText( self, wx.ID_ANY, _(u"Description of corpus").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
 
         self.m_staticText18.Wrap( -1 )
         fgSizer5.Add( self.m_staticText18, 0, wx.ALL, 5 )
@@ -1022,12 +1019,12 @@ class CopusPanel(wx.Panel) :
         self.m_staticText21.Wrap( -1 )
         fgSizer5.Add( self.m_staticText21, 0, wx.ALL, 5 )
 
-        description = {'lang' : u'langue',
-                       'encoding' : u'encodage',
-                       'ucinb' : u'Nombre de textes',
-                       'ucenb' : u'Nombre de segments de texte',
-                       'formesnb' : u'Nombre de formes',
-                       'hapax' : u'Nombre d\'hapax'
+        description = {'lang' : _(u'Langage').decode('utf8'),
+                       'encoding' : _(u'Characters set').decode('utf8'),
+                       'ucinb' : _(u'Number of texts').decode('utf8'),
+                       'ucenb' : _(u'Number of text segments').decode('utf8'),
+                       'formesnb' : _(u'Number of forms').decode('utf8'),
+                       'hapax' : _(u'Number of hapax').decode('utf8'),
                       }
 
         keys = ['lang', 'encoding', 'originalpath', 'pathout', 'date', 'time']
