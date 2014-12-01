@@ -726,7 +726,7 @@ class dolexlayout :
         self.TabStat.AddPage(self.ListPan, _(u'Forms').decode('utf8')) 
         if os.path.exists(self.pathout['banalites.csv']) :
             self.TabStat.AddPage(self.listban, _(u'Banal forms').decode('utf8'))
-        self.TabStat.AddPage(self.ListPant, _(u'POS').deode('utf8'))
+        self.TabStat.AddPage(self.ListPant, _(u'POS').decode('utf8'))
         self.TabStat.AddPage(self.ListPanEff, _(u'Forms frequencies').decode('utf8'))
         self.TabStat.AddPage(self.ListPanEffType, _(u'POS frequencies').decode('utf8'))
         self.TabStat.AddPage(self.ListPanEffRelForme, _(u'Forms relative frequencies').decode('utf8'))
@@ -741,7 +741,7 @@ class dolexlayout :
             self.TabAFC.AddPage(self.tabAFCTGraph, _(u'CA POS').decode('utf8'))
             self.TabStat.AddPage(self.TabAFC, _(u'CA').decode('utf8'))
         
-        ira.nb.AddPage(self.TabStat, u'Spécificités')
+        ira.nb.AddPage(self.TabStat, ' - '.join([_(u'Specificities').decode('utf8'), self.parametres['name']]))
         self.ira = ira
         
         self.TabStat.corpus = self.corpus
@@ -769,12 +769,19 @@ class StatLayout:
         #self.TabStatTot = wx.TextCtrl(self.TabStat, -1, style=wx.NO_BORDER | wx.TE_MULTILINE | wx.TE_RICH2)
         list_graph = [['zipf.png', 'zipf']]
         self.TabStatTot = GraphPanel(ira.nb, self.pathout, list_graph, self.result['glob'])
-        self.TabStat.AddPage(self.TabStatTot, 'global')
+        self.TabStat.AddPage(self.TabStatTot, _(u'Abstract').decode('utf8'))
+        
+        dictlabel = {'total' : _(u'Total').decode('utf8'),
+                     u'formes_actives' : _(u'Actives forms').decode('utf8'),
+                     u'formes_supplémentaires': _(u'Supplementary forms').decode('utf8'),
+                     u'hapax' : _(u'Hapax').decode('utf8'),
+                     }
+        
         for item in self.result:
             if item != 'glob':
                 datam = [['forme', 'nb']]
                 self.ListPan = ListPanel(ira, self, self.result[item])
-                self.TabStat.AddPage(self.ListPan, ' '.join(item.split('_'))) 
+                self.TabStat.AddPage(self.ListPan, dictlabel[item]) 
         ira.nb.AddPage(self.TabStat, '%s' % parametres['name'])
         ira.nb.SetSelection(ira.nb.GetPageCount() - 1)
         ira.ShowAPane("Tab_content")
@@ -1019,7 +1026,7 @@ class CopusPanel(wx.Panel) :
         self.m_staticText21.Wrap( -1 )
         fgSizer5.Add( self.m_staticText21, 0, wx.ALL, 5 )
 
-        description = {'lang' : _(u'Langage').decode('utf8'),
+        description = {'lang' : _(u'Language').decode('utf8'),
                        'encoding' : _(u'Characters set').decode('utf8'),
                        'ucinb' : _(u'Number of texts').decode('utf8'),
                        'ucenb' : _(u'Number of text segments').decode('utf8'),
@@ -1116,7 +1123,7 @@ class SimiLayout(DefaultTextLayout) :
         self.graphpan.Bind(wx.EVT_BUTTON, self.redosimi, self.graphpan.butafc)
         self.graphpan.Bind(wx.EVT_BUTTON, self.export, self.graphpan.butexport)
         self.tabsimi.AddPage(self.graphpan, 'Graph')
-        self.ira.nb.AddPage(self.tabsimi, 'Analyse de graph')
+        self.ira.nb.AddPage(self.tabsimi, _(u'Graph analysis').decode('utf8'))
         self.ira.ShowTab(True)
         self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
         
@@ -1208,7 +1215,7 @@ class SimiLayout(DefaultTextLayout) :
         with open(filetmp, 'w') as f :
             f.write(txt)
         exec_rcode(self.ira.RPath, filetmp)
-        mss = wx.MessageDialog(self.ira, fileout, u'Fichier exporté', wx.OK)
+        mss = wx.MessageDialog(self.ira, fileout, _(u'File exported').decode('utf8'), wx.OK)
         mss.CenterOnParent()
         mss.ShowModal()
         mss.Destroy()
@@ -1235,7 +1242,7 @@ class FreqLayout(DefaultMatLayout) :
         res = normpath_win32(self.pathout['resultats.html']).replace('\\','/')
         self.tab.LoadPage(res)
         self.tab.parametres = self.parametres
-        self.ira.nb.AddPage(self.tab, u"Fréquences")
+        self.ira.nb.AddPage(self.tab, ' - '.join([_(u"Frequency").decode('utf8'), self.parametres['name']]))
 
 
 class Chi2Layout(DefaultMatLayout) :
@@ -1246,14 +1253,14 @@ class Chi2Layout(DefaultMatLayout) :
         res = normpath_win32(self.pathout['resultats-chi2.html']).replace('\\','/')
         self.tab.LoadPage(res)
         self.tab.parametres = self.parametres
-        self.ira.nb.AddPage(self.tab, ' - '.join([u"Chi2", "%s" % self.parametres['name']]))
+        self.ira.nb.AddPage(self.tab, ' - '.join([u"Chi2", self.parametres['name']]))
         #self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
         #self.ira.ShowAPane("Tab_content")  
 
 
 class ProtoLayout(DefaultMatLayout) :
     def dolayout(self) :
-        list_graph = [['proto.png', 'Analyse prototypique']]
+        list_graph = [['proto.png', _(u'Prototypical analysis').decode('utf8')]]
         #self.Tab = aui.AuiNotebook(self.ira.nb, -1, wx.DefaultPosition)
         #if self.parametres['svg'] :
         #    list_graph = [['nuage_1.svg', 'Nuage']]
@@ -1263,7 +1270,7 @@ class ProtoLayout(DefaultMatLayout) :
         #self.Tab.AddPage(self.TabProto, 'Analyse Prototypique')
         #self.Tab.corpus = self.corpus
         self.TabProto.parametres = self.parametres
-        self.ira.nb.AddPage(self.TabProto, 'Analyse Prototypique - %s' % self.parametres['name'])
+        self.ira.nb.AddPage(self.TabProto, ' - '.join([_(u'Prototypical analysis').decode('utf8'), self.parametres['name']]))
         #self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
         #self.ira.ShowAPane("Tab_content")
 
@@ -1285,7 +1292,7 @@ class SimiMatLayout(DefaultMatLayout) :
         self.graphpan.Bind(wx.EVT_BUTTON, self.export, self.graphpan.butexport)
         self.tabsimi.AddPage(self.graphpan, 'Graph')
         self.tabsimi.parametres = self.parametres
-        self.parent.nb.AddPage(self.tabsimi, 'Analyse de graph')
+        self.parent.nb.AddPage(self.tabsimi, ' - '.join([_(u'Graph analysis').decode('utf8'), self.parametres['name']]))
         #self.parent.ShowTab(True)
         #self.parent.nb.SetSelection(self.parent.nb.GetPageCount() - 1)
 
@@ -1451,7 +1458,7 @@ class SimiMatLayout(DefaultMatLayout) :
         with open(filetmp, 'w') as f :
             f.write(txt)
         exec_rcode(self.ira.RPath, filetmp)
-        mss = wx.MessageDialog(self.ira, fileout, u'Fichier exporté', wx.OK)
+        mss = wx.MessageDialog(self.ira, fileout, _(u'File exported').decode('utf8'), wx.OK)
         mss.CenterOnParent()
         mss.ShowModal()
         mss.Destroy()

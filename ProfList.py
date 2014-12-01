@@ -246,7 +246,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
 
     def onsearchall(self, evt) :
         if 'FrameSearch' not in dir(self.Source) :
-            self.Source.FrameSearch = SearchFrame(self.parent, -1, u"Rechercher...", self.Source.corpus)
+            self.Source.FrameSearch = SearchFrame(self.parent, -1, _(u"Search...").decode('utf8'), self.Source.corpus)
         self.dial = SearchDial(self, self.Source.FrameSearch.liste, 1, False)
         self.dial.CenterOnParent()
         self.dial.Show()
@@ -310,37 +310,37 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
     
             # make a menu
             menu = wx.Menu()
-            menu.Append(self.popupID1, u"Formes associées")
-            menu.Append(self.idtablex, u"Chi2 par classe")
-            menu.Append(self.idlexdendro, u"Chi2 par classe + dendro")
-            menu.Append(self.idchimod, u"Chi2 modalités de la variable")
-            menu.Append(self.idwordgraph, u"Graphe du mot")
+            menu.Append(self.popupID1, _(u"Associated forms").decode('utf8'))
+            menu.Append(self.idtablex, _(u"Chi2 by cluster").decode('utf8'))
+            menu.Append(self.idlexdendro, _(u"Chi2 by cluster on dendrogram").decode('utf8'))
+            menu.Append(self.idchimod, _(u"Chi2 modalities of variable").decode('utf8'))
+            menu.Append(self.idwordgraph, _(u"Word graph").decode('utf8'))
             #menu.Append(self.export_classes, u"Exporter le corpus...") 
             
             #menu.Append(self.popupID10, u"Spécificités")
 
             menu_conc = wx.Menu()
-            menu_conc.Append(self.popupID2, u"dans les segments de texte de la classe")
-            menu_conc.Append(self.popupID3, u"dans les segments de texte classés")
-            menu_conc.Append(self.popupID4, u"dans tous les segments de texte")
-            menu.AppendMenu(-1, u"Concordancier", menu_conc)
+            menu_conc.Append(self.popupID2, _(u"In segments of this cluster").decode('utf8'))
+            menu_conc.Append(self.popupID3, _(u"In segments of this clustering").decode('utf8'))
+            menu_conc.Append(self.popupID4, _(u"In all segments").decode('utf8'))
+            menu.AppendMenu(-1, _(u"Concordance").decode('utf8'), menu_conc)
             menu.Append(self.onmaketgen, _(u"Make Tgen").decode('utf8'))
             menu_cnrtl = wx.Menu()      
-            menu_cnrtl.Append(self.popupID5, u"Définition")
-            menu_cnrtl.Append(self.popupID6, u"Etymologie")
-            menu_cnrtl.Append(self.popupID7, u"Synonymie")
-            menu_cnrtl.Append(self.popupID8, u"Antonymie")
-            menu_cnrtl.Append(self.popupID9, u"Morphologie")
-            menu_cnrtl.Append(self.popup_proxe, u"Proxémie")
-            menu.AppendMenu(-1, u"Outils du CNRTL", menu_cnrtl)
+            menu_cnrtl.Append(self.popupID5, _(u"Definition").decode('utf8'))
+            menu_cnrtl.Append(self.popupID6, _(u"Etymology").decode('utf8'))
+            menu_cnrtl.Append(self.popupID7, _(u"Synonymous").decode('utf8'))
+            menu_cnrtl.Append(self.popupID8, _(u"Antonym").decode('utf8'))
+            menu_cnrtl.Append(self.popupID9, _(u"Morphology").decode('utf8'))
+            menu_cnrtl.Append(self.popup_proxe, _(u"Proxemy").decode('utf8'))
+            menu.AppendMenu(-1, _(u"Tools from CNRTL (french only)").decode('utf8'), menu_cnrtl)
             menu.AppendSeparator()
-            menu.Append(self.popupIDgraph, u"Graphe de la classe")
-            menu.Append(self.idseg, u"Segments répétés")
-            menu.Append(self.iducecarac, u"Segments de texte caractéristiques")
-            menu.Append(self.idcloud, u"Nuage de la classe")
-            menu.Append(self.idexport, u'Exporter...')
-            menu.Append(self.idexporttropes, 'Exporter pour Tropes')
-            menu.Append(self.idexportowledge, 'Exporter pour Owledge')
+            menu.Append(self.popupIDgraph, _(u"Graph of cluster").decode('utf8'))
+            menu.Append(self.idseg, _(u"Repeated segments").decode('utf8'))
+            menu.Append(self.iducecarac, _(u"Typical text segments").decode('utf8'))
+            menu.Append(self.idcloud, _(u"Word cloud of cluster").decode('utf8'))
+            menu.Append(self.idexport, _(u'Export...').decode('utf8'))
+            menu.Append(self.idexporttropes, _(u'Export for Tropes').decode('utf8'))
+            menu.Append(self.idexportowledge, _('Exporter for Owledge').decode('utf8'))
             #menu.Append(self.popupID2, u"Concordancier")
     #        menu.Append(self.popupID3, "recharger")
     
@@ -356,10 +356,10 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 self.Bind(wx.EVT_MENU, self.quest_var_mod, id=self.pop3)
 
             menu = wx.Menu()
-            menu.Append(self.pop2, u"Chi2 par classe")
-            menu.Append(self.pop3, u"Chi2 modalités de la variable")
+            menu.Append(self.pop2, _(u"Chi2 by cluster").decode('utf8'))
+            menu.Append(self.pop3, _(u"Chi2 modalities of variable").decode('utf8'))
             menu.AppendSeparator()
-            menu.Append(self.pop1, u"Graphe de la classe")
+            menu.Append(self.pop1, _(u"Graph of cluster").decode('utf8'))
             self.PopupMenu(menu)
             menu.Destroy()
 
@@ -425,7 +425,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
     def quest_var_mod(self, evt) :  
         word = self.getselectedwords()[0]
         if len(word.split('_')) <= 1 :
-            dial = wx.MessageDialog(self, u"Ce n'est pas une forme du type variable_modalité", u"Problème", wx.OK | wx.ICON_WARNING)
+            dial = wx.MessageDialog(self, _(u"This is not a variable_modality form").decode('utf8'), _(u"Problem").decode('utf8'), wx.OK | wx.ICON_WARNING)
             dial.CenterOnParent()
             dial.ShowModal()
             dial.Destroy()
@@ -459,7 +459,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         try :
             words = [word for word in var_mod[var[0]]]
         except KeyError:
-            dial = wx.MessageDialog(self, _(u"This is not a meta-data"), u"Problème", wx.OK | wx.ICON_WARNING)
+            dial = wx.MessageDialog(self, _(u"This is not a meta-data"), _(u"Problem").decode('utf8'), wx.OK | wx.ICON_WARNING)
             dial.CenterOnParent()
             dial.ShowModal()
             dial.Destroy()
@@ -587,7 +587,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         first = ['','','']
         para={'dico': d,'fline':first}
         dlg.Destroy()
-        win = wliste(self, -1, u"Segments répétés - Classe %i" % self.cl, d, first, size=(600, 500))
+        win = wliste(self, -1, ' - '.join([_(u"Repeated segments").decode('utf8'), "Classe %i" % self.cl]), d, first, size=(600, 500))
         win.Show(True)
 
     def on_uce_carac(self,evt) :
@@ -619,7 +619,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             ucis_txt, ucestxt = doconcorde(corpus, nuces, self.la, uci = uci)
             items = dict([[i, '<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table><br>' % ntab2[i][0], ucestxt[i]])] for i, uce in enumerate(nuces)])
             dlg.Destroy()
-            win = message(self, items, u"Segments de texte caractéristiques - Classe %i" % self.cl, (750, 600), uceids = nuces)
+            win = message(self, items, ' - '.join([_(u"Typical text segments").decode('utf8'), "Classe %i" % self.cl]), (750, 600), uceids = nuces)
             #win.SetWindowStyle(wx.STAY_ON_TOP)
             #win.html = '<html>\n' + '<br>'.join(['<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table>' % ntab2[i][0], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
             #win.HtmlPage.SetPage(win.html)
@@ -685,19 +685,19 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         if 'corpus' in dir(self.Source) :
             corpus = self.Source.corpus
             uces = corpus.lc[self.cl-1]
-            win = self.make_concord(uces, "Concordancier - Classe %i" % self.cl)
+            win = self.make_concord(uces, ' - '.join([_(u"Concordance").decode('utf8'), "Classe %i" % self.cl]))
             win.Show(True)
     
     def OnPopupThree(self, event):
         corpus = self.Source.corpus
         uces = [classe[i] for classe in corpus.lc for i in range(0,len(classe))]
-        win = self.make_concord(uces, "Concordancier - Segments de texte classés")
+        win = self.make_concord(uces, ' - '.join([_(u"Concordance").decode('utf8'), _(u"Segments of this clustering").decode('utf8')]))
         win.Show(True)
         
     def OnPopupFour(self, event):
         corpus = self.Source.corpus
         uces = [classe[i] for classe in corpus.lc for i in range(0,len(classe))] + corpus.lc0
-        win = self.make_concord(uces, "Concordancier - Tous les segments de texte")
+        win = self.make_concord(uces, ' - '.join([_(u"Concordance").decode('utf8'), _(u"All segments").decode('utf8')]))
         win.Show(True)
 
     def OnPopupFive(self, event):
@@ -751,7 +751,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         rep.sort(key = itemgetter(1), reverse = True)
         #win = message(self, u"Formes associées", wx.Size(300, 200))
         items = dict([[i, '\t:\t'.join([str(val) for val in forme])] for i, forme in enumerate(rep)])
-        win = message(self, items, u"Formes associées", (300, 200))
+        win = message(self, items, _(u"Associated Forms").decode('utf8'), (300, 200))
         #win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
         #win.HtmlPage.SetPage(win.html)
         win.Show(True)
@@ -764,7 +764,7 @@ class wliste(wx.Frame):
     def __init__(self, parent, id, title, d, fline, size=(600, 500)):
         wx.Frame.__init__(self, parent, id)
         self.liste = ListForSpec(self, parent, d, fline[1:], menu = False)
-        self.button_1 = wx.Button(self, -1, "Fermer")
+        self.button_1 = wx.Button(self, -1, _(u"Close").decode('utf8'))
         self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
         self.__do_layout()

@@ -5,20 +5,10 @@
 #License: GNU/GPL
 
 from chemins import ffr
-from chemins import PathOut
 from analysetxt import AnalyseText
-#from corpus import Corpus
-from guifunct import getPage, getCorpus
-from ConfigParser import RawConfigParser
-from functions import sortedby, progressbar, CreateIraFile, exec_rcode, check_Rresult, DoConf
-from dialog import StatDialog
-from openanalyse import OpenAnalyse
-#from ttparser import * 
+from functions import sortedby, progressbar, exec_rcode, check_Rresult 
 import tempfile
 from time import sleep
-import wx
-import os
-
 import logging
 
 logger = logging.getLogger('iramuteq.textstat')
@@ -57,14 +47,13 @@ class Stat(AnalyseText) :
         phapax = (float(len(hapax)) / float(occurrences)) * 100
         phapax_forme = (float(len(hapax)) / (float(len(formes)))) * 100
         moy_occu_mot = float(occurrences) / float(len(formes))
-        txt = 'Globale\n'
-        txt += 'nombre de textes : %i\n' % len(self.corpus.ucis)
-        txt += 'nombre d\'occurrences : %i\n' % occurrences
-        txt += 'nombre de formes : %i\n' % (len(formes))
-        txt += 'moyenne d\'occurrences par forme : %.2f\n' % moy_occu_mot
-        txt += 'nombre d\'hapax : %i (%.2f%% des occurrences - %.2f%% des formes)\n' % (len(hapax), phapax, phapax_forme)
-        print float(occurrences), float(len(self.corpus.ucis))
-        txt += 'moyenne d\'occurrences par texte : %.2f' % (float(occurrences)/float(len(self.corpus.ucis)))
+        txt = ''.join([_(u'Abstract').decode('utf8'), '\n'])
+        txt += ''.join([_(u'Number of texts').decode('utf8'),' : ', '%i\n' % len(self.corpus.ucis)])
+        txt += ''.join([_(u"Number of occurrences").decode('utf8'),' : %i\n' % occurrences])
+        txt += ''.join([_(u'Number of forms').decode('utf8'), ' : %i\n' % (len(formes))])
+        txt += ''.join([_(u"Number of hapax").decode('utf8'),' : %i (%.2f%%' % (len(hapax),phapax), _(u'of occurrences').decode('utf8'), ' - %.2f%% ' % phapax_forme, _(u'of forms').decode('utf8'), ')\n']) 
+        #print float(occurrences), float(len(self.corpus.ucis))
+        txt += ''.join([_(u"Mean of occurrences by text").decode('utf8'), ' : %.2f' % (float(occurrences)/float(len(self.corpus.ucis)))])
         if self.dlg :
             self.dlg.Update(7, u'Ecriture...')
         self.result['glob'] = txt
