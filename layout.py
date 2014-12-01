@@ -569,33 +569,33 @@ def PrintRapport(self, corpus, parametres, istxt = True):
 """ % datetime.datetime.now().ctime()
     if istxt :
         totocc = corpus.gettotocc()
-        txt += ': '.join([_(u'Number of texts'),  u'%i%s' % (corpus.getucinb(), sep)])
-        txt += ': '.join([_(u'Number of text segments'),  '%i%s' % (corpus.getucenb(), sep)])
-        txt += ': '.join([_(u'Number of forms'), '%i%s' % (len(corpus.formes), sep)])
-        txt += ': '.join([_(u'Number of occurrences'), '%i%s' % (totocc, sep)])
+        txt += ': '.join([_(u'Number of texts').decode('utf8'),  u'%i%s' % (corpus.getucinb(), sep)])
+        txt += ': '.join([_(u'Number of text segments').decode('utf8'),  '%i%s' % (corpus.getucenb(), sep)])
+        txt += ': '.join([_(u'Number of forms').decode('utf8'), '%i%s' % (len(corpus.formes), sep)])
+        txt += ': '.join([_(u'Number of occurrences').decode('utf8'), '%i%s' % (totocc, sep)])
         #txt += u'moyenne d\'occurrences par forme: %f%s' % (float(totocc) / float(len(self.corpus.formes)), sep)
-        txt += ': '.join([_(u'Number of lemmas'), '%i%s' % (len(corpus.lems), sep)])
-        txt += ': '.join([_(u'Number of active forms'), '%i%s' % (corpus.getactivesnb(1), sep)])
-        txt += ': '.join([_(u'Number of supplementary forms'), '%i%s' % (corpus.getactivesnb(2), sep)])
-        txt += ' >= '.join([_(u'Number of active forms with a frequency'), '%i: %i%s' % (parametres['eff_min_forme'], parametres['nbactives'], sep)])
-        txt += ': '.join([_(u'Mean of forms by segment'), '%f%s' % (float(totocc) / float(corpus.getucenb()), sep)])
+        txt += ': '.join([_(u'Number of lemmas').decode('utf8'), '%i%s' % (len(corpus.lems), sep)])
+        txt += ': '.join([_(u'Number of active forms').decode('utf8'), '%i%s' % (corpus.getactivesnb(1), sep)])
+        txt += ': '.join([_(u'Number of supplementary forms').decode('utf8'), '%i%s' % (corpus.getactivesnb(2), sep)])
+        txt += ' >= '.join([_(u'Number of active forms with a frequency').decode('utf8'), '%i: %i%s' % (parametres['eff_min_forme'], parametres['nbactives'], sep)])
+        txt += ': '.join([_(u'Mean of forms by segment').decode('utf8'), '%f%s' % (float(totocc) / float(corpus.getucenb()), sep)])
         if 'tailleuc1' in parametres :
             if parametres['classif_mode'] == 0 :
-                txt += ': '.join([_(u'Size of rst1 / rst2'), '%i / %i - %i / %i%s' % (parametres['tailleuc1'], parametres['tailleuc2'], parametres['lenuc1'], parametres['lenuc2'], sep)])
+                txt += ': '.join([_(u'Size of rst1 / rst2').decode('utf8'), '%i / %i - %i / %i%s' % (parametres['tailleuc1'], parametres['tailleuc2'], parametres['lenuc1'], parametres['lenuc2'], sep)])
     else :
         self.Ucenb = self.nbind
-        txt += ': '.join([_(u'Number of lines'), '%i%s' % (self.nbind, sep)])
-        txt += ': '.join([_(u'Number of clusters'), '%i%s' % (self.clnb, sep)])
+        txt += ': '.join([_(u'Number of lines').decode('utf8'), '%i%s' % (self.nbind, sep)])
+        txt += ': '.join([_(u'Number of clusters').decode('utf8'), '%i%s' % (self.clnb, sep)])
     if istxt :
-        txt += ': '.join([_(u'Number of clusters'), '%i%s' % (parametres['clnb'], sep)])
+        txt += ': '.join([_(u'Number of clusters').decode('utf8'), '%i%s' % (parametres['clnb'], sep)])
         if parametres['classif_mode'] == 0 or parametres['classif_mode'] == 1 :
-            txt += ' '.join(['%i' % sum([len(cl) for cl in corpus.lc]), u'segments classified on', '%i (%.2f%%)%s' % (corpus.getucenb(), (float(sum([len(cl) for cl in corpus.lc])) / float(corpus.getucenb())) * 100, sep)])
+            txt += ' '.join(['%i' % sum([len(cl) for cl in corpus.lc]), _(u'segments classified on').decode('utf8'), '%i (%.2f%%)%s' % (corpus.getucenb(), (float(sum([len(cl) for cl in corpus.lc])) / float(corpus.getucenb())) * 100, sep)])
         elif self.parametres['classif_mode'] == 2 :
-            txt += ' '.join([u'%i' % sum([len(cl) for cl in corpus.lc]), 'texts classified on', '%i (%.2f%%)%s' % (corpus.getucinb(), (float(sum([len(cl) for cl in corpus.lc]))) / float(corpus.getucinb()) * 100, sep)])
+            txt += ' '.join([u'%i' % sum([len(cl) for cl in corpus.lc]), _(u'texts classified on').decode('utf8'), '%i (%.2f%%)%s' % (corpus.getucinb(), (float(sum([len(cl) for cl in corpus.lc]))) / float(corpus.getucinb()) * 100, sep)])
     else :
-        txt += ' '.join(['%i' % self.ucecla, 'line classified on', '%i (%.2f%%)%s' % (self.Ucenb, (float(self.ucecla) / float(self.Ucenb)) * 100, sep)])
+        txt += ' '.join(['%i' % self.ucecla, _(u'line classified on').decode('utf8'), '%i (%.2f%%)%s' % (self.Ucenb, (float(self.ucecla) / float(self.Ucenb)) * 100, sep)])
  
-    txt += ''.join([sep, u'###########################', sep, _(u'time'), ' : %s' % parametres.get('time', ''), sep, u'###########################', sep])
+    txt += ''.join([sep, u'###########################', sep, _(u'time').decode('utf8'), ' : %s' % parametres.get('time', ''), sep, u'###########################', sep])
 
     with open(self.pathout['pre_rapport'], 'w') as f :
         f.write(txt)

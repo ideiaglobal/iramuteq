@@ -751,7 +751,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         rep.sort(key = itemgetter(1), reverse = True)
         #win = message(self, u"Formes associées", wx.Size(300, 200))
         items = dict([[i, '\t:\t'.join([str(val) for val in forme])] for i, forme in enumerate(rep)])
-        win = message(self, items, _(u"Associated Forms").decode('utf8'), (300, 200))
+        win = message(self, items, _(u"Associated forms").decode('utf8'), (300, 200))
         #win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
         #win.HtmlPage.SetPage(win.html)
         win.Show(True)
