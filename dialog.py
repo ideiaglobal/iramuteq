@@ -1038,7 +1038,7 @@ class PrefSimpleFile(wx.Dialog):
 class StatDialog ( wx.Dialog ):
     
     def __init__( self, parent, keys ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Settings", pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Settings").decode('utf8'), pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.DEFAULT_DIALOG_STYLE )
         
         self.fileout = ""
         self.parent = parent
@@ -1049,7 +1049,7 @@ class StatDialog ( wx.Dialog ):
         
         gSizer1 = wx.GridSizer( 0, 2, 0, 0 )
         
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Lemmatization", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Lemmatization").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         gSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -1058,18 +1058,18 @@ class StatDialog ( wx.Dialog ):
         self.radio_lem.SetSelection( 0 )
         gSizer1.Add( self.radio_lem, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
-        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"Keys properties", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, _(u"Keys properties").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         gSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.button_5 = wx.Button( self, wx.ID_PREFERENCES, u"properties", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.button_5 = wx.Button( self, wx.ID_PREFERENCES, _(u"properties").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         gSizer1.Add( self.button_5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
-        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"Dictionary", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, _(u"Dictionary").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
         gSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        radio_dictchoiceChoices = [ u"indexation", u"other" ]
+        radio_dictchoiceChoices = [ _(u"indexation").decode('utf8'), _(u"other").decode('utf8') ]
         self.radio_dictchoice = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, radio_dictchoiceChoices, 1, wx.RA_SPECIFY_COLS )
         self.radio_dictchoice.SetSelection( 0 )
         gSizer1.Add( self.radio_dictchoice, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )

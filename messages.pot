@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-01 12:03+0100\n"
+"POT-Creation-Date: 2014-12-02 18:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -244,7 +244,7 @@ msgstr ""
 msgid "Description of corpus"
 msgstr ""
 
-#: dialog.py:2331
+#: dialog.py:1068 dialog.py:2331
 msgid "Dictionary"
 msgstr ""
 
@@ -480,6 +480,10 @@ msgstr ""
 msgid "Keep punctuation"
 msgstr ""
 
+#: dialog.py:1061
+msgid "Keys properties"
+msgstr ""
+
 #: dialog.py:2322 layout.py:1029
 msgid "Language"
 msgstr ""
@@ -490,6 +494,10 @@ msgstr ""
 
 #: dialog.py:919 dialog.py:1255
 msgid "Lemmatised corpus"
+msgstr ""
+
+#: dialog.py:1052
+msgid "Lemmatization"
 msgstr ""
 
 #: iramuteq.py:1087
@@ -907,8 +915,8 @@ msgstr ""
 msgid "Select columns"
 msgstr ""
 
-#: dialog.py:330 dialog.py:469 dialog.py:970 dialog.py:2149 dialog.py:2279
-#: dialog.py:2864 guifunct.py:161 OptionAlceste.py:63
+#: dialog.py:330 dialog.py:469 dialog.py:970 dialog.py:1041 dialog.py:2149
+#: dialog.py:2279 dialog.py:2864 guifunct.py:161 OptionAlceste.py:63
 msgid "Settings"
 msgstr ""
 
@@ -1285,6 +1293,10 @@ msgstr ""
 msgid "hypergeometrical law"
 msgstr ""
 
+#: dialog.py:1072
+msgid "indexation"
+msgstr ""
+
 #: layout.py:596
 msgid "line classified on"
 msgstr ""
@@ -1318,8 +1330,16 @@ msgstr ""
 msgid "of occurrences"
 msgstr ""
 
+#: dialog.py:1072
+msgid "other"
+msgstr ""
+
 #: dialog.py:2286
 msgid "paragraphs"
+msgstr ""
+
+#: dialog.py:1065
+msgid "properties"
 msgstr ""
 
 #: dialog.py:1222

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: iramuteq 0.6 alpha 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-01 12:03+0100\n"
-"PO-Revision-Date: 2014-12-01 12:45+0200\n"
+"POT-Creation-Date: 2014-12-02 18:12+0100\n"
+"PO-Revision-Date: 2014-12-02 18:14+0200\n"
 "Last-Translator: Pierre Ratinaud <ratinaud@univ-tlse2.fr>\n"
 "Language-Team: LANGUAGE <ratinaud@univ-tlse2.fr>\n"
 "Language: fr\n"
@@ -248,7 +248,7 @@ msgstr "Type de dendrogramme"
 msgid "Description of corpus"
 msgstr "Description du corpus"
 
-#: dialog.py:2331
+#: dialog.py:1068 dialog.py:2331
 msgid "Dictionary"
 msgstr "Dictionnaire"
 
@@ -484,6 +484,10 @@ msgstr "Langue de l'interface"
 msgid "Keep punctuation"
 msgstr "Conserver la ponctuation"
 
+#: dialog.py:1061
+msgid "Keys properties"
+msgstr "Paramètres des clés"
+
 #: dialog.py:2322 layout.py:1029
 msgid "Language"
 msgstr "Langue"
@@ -495,6 +499,10 @@ msgstr "Présentation"
 #: dialog.py:919 dialog.py:1255
 msgid "Lemmatised corpus"
 msgstr "Corpus lemmatisé"
+
+#: dialog.py:1052
+msgid "Lemmatization"
+msgstr "Lemmatisation"
 
 #: iramuteq.py:1087
 msgid "License GNU GPL"
@@ -913,8 +921,8 @@ msgstr "Sélection par"
 msgid "Select columns"
 msgstr "Sélectionnez les colonnes"
 
-#: dialog.py:330 dialog.py:469 dialog.py:970 dialog.py:2149 dialog.py:2279
-#: dialog.py:2864 guifunct.py:161 OptionAlceste.py:63
+#: dialog.py:330 dialog.py:469 dialog.py:970 dialog.py:1041 dialog.py:2149
+#: dialog.py:2279 dialog.py:2864 guifunct.py:161 OptionAlceste.py:63
 msgid "Settings"
 msgstr "Paramètres"
 
@@ -1291,6 +1299,10 @@ msgstr "hauteur"
 msgid "hypergeometrical law"
 msgstr "loi hypergéométrique"
 
+#: dialog.py:1072
+msgid "indexation"
+msgstr "indexation"
+
 #: layout.py:596
 msgid "line classified on"
 msgstr "lignes classées sur"
@@ -1324,9 +1336,17 @@ msgstr "des formes"
 msgid "of occurrences"
 msgstr "des occurrences"
 
+#: dialog.py:1072
+msgid "other"
+msgstr "Autre"
+
 #: dialog.py:2286
 msgid "paragraphs"
 msgstr "paragraphes"
+
+#: dialog.py:1065
+msgid "properties"
+msgstr ""
 
 #: dialog.py:1222
 msgid "relative (mean of chi2 of marked forms in segment)"
