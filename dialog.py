@@ -543,9 +543,9 @@ class PrefGraph(wx.Dialog):
         self.paramgraph=paramgraph
         self.labeltype = wx.StaticText(self, -1, _(u"Graphic type").decode('utf8'))
         if self.paramgraph['clnb'] <= 3 :
-            choix = [u'2D', 'web 2D']
+            choix = [u'2D']#, 'web 2D']
         else :
-            choix=[u'2D' ,u'3D', 'web 2D', 'web 3D']
+            choix=[u'2D' ,u'3D']#, 'web 2D', 'web 3D']
         self.choicetype = wx.Choice(self, -1, (100,50), choices=choix)
         self.label_format = wx.StaticText(self, -1, _(u"Picture format").decode('utf8'))
         self.choix_format =  wx.Choice(self, -1, (100,50), choices = ['png', 'svg'])        
@@ -1053,7 +1053,7 @@ class StatDialog ( wx.Dialog ):
         self.m_staticText1.Wrap( -1 )
         gSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        radio_lemChoices = [ u"yes", u"no" ]
+        radio_lemChoices = [ _(u"yes").decode('utf8'), _(u"no").decode('utf8') ]
         self.radio_lem = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, radio_lemChoices, 1, wx.RA_SPECIFY_COLS )
         self.radio_lem.SetSelection( 0 )
         gSizer1.Add( self.radio_lem, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )

@@ -250,7 +250,7 @@ class PrefSimi ( wx.Dialog ):
         self.m_staticText5.Wrap( -1 )
         fgSizer3.Add( self.m_staticText5, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
         
-        choice3Choices = [ u"dynamique", u"statique", u"3D", u'web2D', u"web3D" ]
+        choice3Choices = [ u"dynamique", u"statique", u"3D"]#, u'web2D', u"web3D" ]
         self.choice3 = wx.Choice( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice3Choices, 0 )
         self.choice3.SetSelection( 0 )
 
