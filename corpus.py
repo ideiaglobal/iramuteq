@@ -1597,6 +1597,8 @@ class Builder :
                 filein = parametres['dictionary']
             else :
                 filein = None
+            if dial.corpusname.GetValue() != '' :
+                parametres['corpus_name'] = dial.corpusname.GetValue()
             dial.Destroy()
             ReadLexique(self.parent, lang = parametres['lang'], filein = filein)
             if parametres['lang'] != 'other' and  os.path.exists(self.parent.DictPath.get(parametres['lang']+'_exp', 'french_exp')):

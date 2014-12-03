@@ -248,7 +248,7 @@ class IraFrame(wx.Frame):
         file_menu.Append(wx.ID_EXIT, _(u"Exit").decode('utf8'))
         
         edit_menu = wx.Menu()
-        edit_menu.Append(wx.ID_PREFERENCES, '', _(u'Preferences').decode('utf8'))
+        edit_menu.Append(wx.ID_PREFERENCES, _(u'Preferences').decode('utf8'))
         
         view_menu = wx.Menu()
         view_menu.Append(ID_ACCEUIL, _(u"Home page").decode('utf8'))
