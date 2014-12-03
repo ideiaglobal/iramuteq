@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-02 18:12+0100\n"
+"POT-Creation-Date: 2014-12-03 18:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -766,7 +766,7 @@ msgstr ""
 msgid "Play a sound at the end of analysis"
 msgstr ""
 
-#: corpus.py:1622 iramuteq.py:581 iramuteq.py:626 layout.py:946 tree.py:739
+#: corpus.py:1624 iramuteq.py:581 iramuteq.py:626 layout.py:946 tree.py:739
 #: tree.py:1063
 msgid "Please wait..."
 msgstr ""
@@ -1310,7 +1310,7 @@ msgid "modalities"
 msgstr ""
 
 #: dialog.py:46 dialog.py:56 dialog.py:349 dialog.py:364 dialog.py:921
-#: dialog.py:1259 dialog.py:1331
+#: dialog.py:1056 dialog.py:1259 dialog.py:1331
 msgid "no"
 msgstr ""
 
@@ -1411,6 +1411,6 @@ msgid "width"
 msgstr ""
 
 #: dialog.py:46 dialog.py:56 dialog.py:349 dialog.py:364 dialog.py:921
-#: dialog.py:1259 dialog.py:1331
+#: dialog.py:1056 dialog.py:1259 dialog.py:1331
 msgid "yes"
 msgstr ""

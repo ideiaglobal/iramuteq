@@ -459,7 +459,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         try :
             words = [word for word in var_mod[var[0]]]
         except KeyError:
-            dial = wx.MessageDialog(self, _(u"This is not a meta-data"), _(u"Problem").decode('utf8'), wx.OK | wx.ICON_WARNING)
+            dial = wx.MessageDialog(self, _(u"This is not a meta-data").decode('utf8'), _(u"Problem").decode('utf8'), wx.OK | wx.ICON_WARNING)
             dial.CenterOnParent()
             dial.ShowModal()
             dial.Destroy()
