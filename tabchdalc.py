@@ -101,7 +101,10 @@ class AnalyseQuest(AnalyseMatrix):
         while pid.poll() == None :
             self.dlg.Pulse(u"Analyse (patientez...)")
             time.sleep(0.2)
-        check_Rresult(self.parent, pid)
+        if not check_Rresult(self.parent, pid) :
+            if self.dlg :
+                self.dlg.Destroy()
+            return 'NOK'
 #------------------------------------------------------------
         count += 1
         self.dlg.Update(count, u"Ecriture des résultats")

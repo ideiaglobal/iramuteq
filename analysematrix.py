@@ -65,7 +65,10 @@ class AnalyseMatrix :
         else :
             self.val = False
             if self.dlg is not None :
-                self.dlg.Destroy()
+                try :
+                    self.dlg.Destroy()
+                except :
+                    pass
  
     def doanalyse(self) :
         pass
