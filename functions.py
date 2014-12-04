@@ -695,20 +695,20 @@ def read_list_file(filename, encoding = sys.getdefaultencoding()):
             
 
 def progressbar(self, maxi) :
-    if 'parent' in dir(self) :
-        parent = self.parent
-    else :
-        parent = self
+    ira = wx.GetApp().GetTopWindow()
+    parent = ira
     try :
         maxi = int(maxi)
     except :
         maxi = 1
-    return wx.ProgressDialog("Traitements",
+    prog = wx.ProgressDialog("Traitements",
                              "Veuillez patienter...",
                              maximum=maxi,
                              parent=parent,
                              style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT
                              )
+    prog.SetIcon(ira._icon)
+    return prog
 
 
 def treat_var_mod(variables) :
