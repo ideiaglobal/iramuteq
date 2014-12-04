@@ -50,6 +50,7 @@ class AnalyseText :
             if not self.parametres.get('dictionary', False) :
                 self.corpus.make_lems(lem=self.parametres['lem'])
             else :
+                print 'read new dico'
                 dico = ReadDicoAsDico(self.parametres['dictionary'])
                 self.corpus.make_lems_from_dict(dico, dolem=self.parametres['lem'])
                 dictname = os.path.basename(self.parametres['dictionary'])

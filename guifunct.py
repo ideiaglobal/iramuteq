@@ -250,7 +250,7 @@ class PrefSimi ( wx.Dialog ):
         self.m_staticText5.Wrap( -1 )
         fgSizer3.Add( self.m_staticText5, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
         
-        choice3Choices = [ u"dynamique", u"statique", u"3D", u'web2D', u"web3D" ]
+        choice3Choices = [ u"dynamique", u"statique", u"3D"]#, u'web2D', u"web3D" ]
         self.choice3 = wx.Choice( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice3Choices, 0 )
         self.choice3.SetSelection( 0 )
 
@@ -728,16 +728,6 @@ class PrefSimi ( wx.Dialog ):
         self.__set_properties()
  
         # Connect Events
-       # if not self.paramsimi['first'] :
-       #     self.check_coord.Bind( wx.EVT_CHECKBOX, self.OnKeepCoords )
-       # self.choice3.Bind( wx.EVT_CHOICE, self.OnChangeType )
-       # self.check2.Bind( wx.EVT_CHECKBOX, self.OnCheck2 )
-       # self.checki.Bind( wx.EVT_CHECKBOX, self.OnChecki )
-       # self.check_vcex.Bind( wx.EVT_CHECKBOX, self.OnCheck_vcex )
-       # self.checkit.Bind( wx.EVT_CHECKBOX, self.OnCheckit )
-       # self.check_s_size.Bind( wx.EVT_CHECKBOX, self.OnCheck_s_size )
-        
-        # Connect Events
         if not self.paramsimi['first'] :
             self.check_coord.Bind( wx.EVT_CHECKBOX, self.OnKeepCoords )
         self.choice3.Bind( wx.EVT_CHOICE, self.OnChangeType )
@@ -923,19 +913,22 @@ class PrepSimi :
                         self.parametres['listet'] = self.etline
                     else:
                         vardial.Destroy()
-            last = self.dial.listcol.GetFirstSelected()
-            lastl = [self.dial.listcol.GetFirstSelected()]
-            indexes = [self.dial.listcol.getColumnText(self.dial.listcol.GetFirstSelected(),0)]
-            while self.dial.listcol.GetNextSelected(last) != -1:
-                last = self.dial.listcol.GetNextSelected(last)
-                lastl.append(last)
-                indexes.append(self.dial.listcol.getColumnText(last,0))
-            column = [actives.index(val) for val in indexes]
-            column.sort()
-            with open(pathout, 'w') as f :
-                f.write('\n'.join([`val` for val in column]))
-            self.make_param()
-            self.dial.Destroy()
+                        self.val = False
+                        self.dial.Destroy()
+            if self.val :
+                last = self.dial.listcol.GetFirstSelected()
+                lastl = [self.dial.listcol.GetFirstSelected()]
+                indexes = [self.dial.listcol.getColumnText(self.dial.listcol.GetFirstSelected(),0)]
+                while self.dial.listcol.GetNextSelected(last) != -1:
+                    last = self.dial.listcol.GetNextSelected(last)
+                    lastl.append(last)
+                    indexes.append(self.dial.listcol.getColumnText(last,0))
+                column = [actives.index(val) for val in indexes]
+                column.sort()
+                with open(pathout, 'w') as f :
+                    f.write('\n'.join([`val` for val in column]))
+                self.make_param()
+                self.dial.Destroy()
         else :
             self.dial.Destroy()
 

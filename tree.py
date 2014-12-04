@@ -394,11 +394,11 @@ class LeftTree(CT.CustomTreeCtrl):
                 stat = menu.Append(wx.ID_ANY, _(u"Statistics").decode('utf8'))
                 spec = menu.Append(wx.ID_ANY, _(u"Specificities and CA").decode('utf8'))
                 classification = wx.Menu()
-                reinert = classification.Append(wx.ID_ANY, _(u"Reinert method").decode('utf8'))
+                reinert = classification.Append(wx.ID_ANY, _(u"Reinert's Method").decode('utf8'))
                 #pam = classification.Append(wx.ID_ANY, u"Par matrice des distances")
                 menu.AppendMenu(-1, _(u"Clustering").decode('utf8'), classification)
-                simi = menu.Append(wx.ID_ANY, _(u"Similarities analysis").decode('utf8'))
-                wdc = menu.Append(wx.ID_ANY, _(u"Wordcloud").decode('utf8'))
+                simi = menu.Append(wx.ID_ANY, _(u"Similarities Analysis").decode('utf8'))
+                wdc = menu.Append(wx.ID_ANY, _(u"WordCloud").decode('utf8'))
                 subcorpus = wx.Menu()
                 subcorpusfrommeta = subcorpus.Append(wx.ID_ANY, _(u'Sub corpus from metadata').decode('utf8'))
                 subcorpusfromtheme = subcorpus.Append(wx.ID_ANY, _(u'Sub corpus from thematic').decode('utf8'))
@@ -750,7 +750,25 @@ class LeftTree(CT.CustomTreeCtrl):
     
     def OnRename(self, event):
         pydata = self.itemdict['pydata']
-        print pydata
+        if 'matrix_name' in pydata :
+            name = 'matrix_name'
+        elif 'corpus_name' in pydata :
+            name = 'corpus_name'
+        else :
+            name = 'name'
+        oldname = pydata[name]
+        dlg = wx.TextEntryDialog(self, "Please Enter The New Item Name", 'Item Naming', oldname)
+        if dlg.ShowModal() == wx.ID_OK:
+            newname = dlg.GetValue()
+            dlg.Destroy()
+            pydata[name] = newname
+            Totconf = DoConf(configfile=pydata['ira'])
+            conf = Totconf.getoptions()
+            conf[name] = newname
+            Totconf.makeoptions(Totconf.getsections(), [conf])
+            self.history.update(pydata)
+            self.SetItemText(self.current, newname)
+            self.EnsureVisible(self.current)
 
     def OnItemBackground(self, event):
 

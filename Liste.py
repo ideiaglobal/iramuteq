@@ -53,9 +53,9 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
         self.attr2.SetBackgroundColour("light blue")
 
         
-        self.InsertColumn(0, 'forme', wx.LIST_FORMAT_RIGHT)
-        self.InsertColumn(1, 'nb', wx.LIST_FORMAT_RIGHT)
-        self.InsertColumn(2, 'type', wx.LIST_FORMAT_RIGHT)
+        self.InsertColumn(0, _(u'Form').decode('utf8'), wx.LIST_FORMAT_RIGHT)
+        self.InsertColumn(1, _(u'Freq.').decode('utf8'), wx.LIST_FORMAT_RIGHT)
+        self.InsertColumn(2, _(u'POS').decode('utf8'), wx.LIST_FORMAT_RIGHT)
         #self.InsertColumn(3, '', wx.LIST_FORMAT_RIGHT)
 
         self.SetColumnWidth(0, 150)   
@@ -160,8 +160,8 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
         # make a menu
         menu = wx.Menu()
         # add some items
-        menu.Append(self.popupID1, u"Formes associées")
-        menu.Append(self.popupID2, u"Concordancier")
+        menu.Append(self.popupID1, _(u"Associated forms").decode('utf8'))
+        menu.Append(self.popupID2, _(u"Concordance").decode('utf8'))
 #        menu.Append(self.popupID3, "recharger")
 
         self.PopupMenu(menu)
@@ -188,7 +188,7 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
         uce_ok = corpus.getlemuces(item)
         ucis_txt, ucestxt = doconcorde(corpus, uce_ok, [item])
         items = dict([[i, '<br><br>'.join([ucis_txt[i], ucestxt[i]])] for i in range(0,len(ucestxt))])
-        win = message(self, items, u"Concordancier - %s" % item, (800, 500), uceids = uce_ok)
+        win = message(self, items, ' - '.join([_(u"Concordance").decode('utf8'),  "%s" % item]), (800, 500), uceids = uce_ok)
         #win = message(self, u"Concordancier", (750, 600))
         #win.html = ('<html>\n<h1>%s</h1>' % item) + '<br>'.join(['<br>'.join([ucis_txt[i], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
         #win.HtmlPage.SetPage(win.html)

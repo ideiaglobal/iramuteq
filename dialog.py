@@ -543,9 +543,9 @@ class PrefGraph(wx.Dialog):
         self.paramgraph=paramgraph
         self.labeltype = wx.StaticText(self, -1, _(u"Graphic type").decode('utf8'))
         if self.paramgraph['clnb'] <= 3 :
-            choix = [u'2D', 'web 2D']
+            choix = [u'2D']#, 'web 2D']
         else :
-            choix=[u'2D' ,u'3D', 'web 2D', 'web 3D']
+            choix=[u'2D' ,u'3D']#, 'web 2D', 'web 3D']
         self.choicetype = wx.Choice(self, -1, (100,50), choices=choix)
         self.label_format = wx.StaticText(self, -1, _(u"Picture format").decode('utf8'))
         self.choix_format =  wx.Choice(self, -1, (100,50), choices = ['png', 'svg'])        
@@ -1038,7 +1038,7 @@ class PrefSimpleFile(wx.Dialog):
 class StatDialog ( wx.Dialog ):
     
     def __init__( self, parent, keys ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Settings", pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Settings").decode('utf8'), pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.DEFAULT_DIALOG_STYLE )
         
         self.fileout = ""
         self.parent = parent
@@ -1049,27 +1049,27 @@ class StatDialog ( wx.Dialog ):
         
         gSizer1 = wx.GridSizer( 0, 2, 0, 0 )
         
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Lemmatization", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Lemmatization").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         gSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        radio_lemChoices = [ u"yes", u"no" ]
+        radio_lemChoices = [ _(u"yes").decode('utf8'), _(u"no").decode('utf8') ]
         self.radio_lem = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, radio_lemChoices, 1, wx.RA_SPECIFY_COLS )
         self.radio_lem.SetSelection( 0 )
         gSizer1.Add( self.radio_lem, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
-        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"Keys properties", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, _(u"Keys properties").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         gSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.button_5 = wx.Button( self, wx.ID_PREFERENCES, u"properties", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.button_5 = wx.Button( self, wx.ID_PREFERENCES, _(u"properties").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         gSizer1.Add( self.button_5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
-        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"Dictionary", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, _(u"Dictionary").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
         gSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        radio_dictchoiceChoices = [ u"indexation", u"other" ]
+        radio_dictchoiceChoices = [ _(u"indexation").decode('utf8'), _(u"other").decode('utf8') ]
         self.radio_dictchoice = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, radio_dictchoiceChoices, 1, wx.RA_SPECIFY_COLS )
         self.radio_dictchoice.SetSelection( 0 )
         gSizer1.Add( self.radio_dictchoice, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
@@ -1739,6 +1739,7 @@ class OptLexi(wx.Dialog):
             self.label = wx.StaticText(self, -1, _(u"Minimum frequency").decode('utf8'))
             self.spin = wx.SpinCtrl(self, -1, min = 1, max = 10000, initial = 10)
         self.Bind(wx.EVT_CHOICE, self.onselect, self.choice)
+        self.Bind(wx.EVT_LISTBOX, self.onchoose, self.list_box_1)
         self.__set_properties()
         self.__do_layout()
         # end wxGlade
@@ -1750,6 +1751,7 @@ class OptLexi(wx.Dialog):
             self.spin.SetValue(10)
         self.choice.SetSelection(0)
         self.choice_indice.SetSelection(0)
+        self.button_1.Enable(False)
         #self.SetMinSize(wx.Size(300, 400))
         # end wxGlade
 
@@ -1789,7 +1791,18 @@ class OptLexi(wx.Dialog):
         else :
             for et in self.listet :
                 self.list_box_1.Append(et)
-
+    
+    def onchoose(self, evt):
+        if self.choice.GetSelection()== 0 :
+            if len(self.list_box_1.GetSelections()) > 0 :
+                self.button_1.Enable(True)
+            else :
+                self.button_1.Enable(False)
+        elif self.choice.GetSelection() == 1 :
+            if len(self.list_box_1.GetSelections()) > 1 :
+                self.button_1.Enable(True)
+            else :
+                self.button_1.Enable(False)    
 
 class PrefDendro ( wx.Dialog ):
     
@@ -2600,10 +2613,11 @@ class ConcordList(wx.HtmlListBox):
 
 class message(wx.Frame):
     def __init__(self, parent, items, title, size, save = True, uceids = None):
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_FRAME_STYLE )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.CLOSE_BOX|wx.DEFAULT_FRAME_STYLE|wx.FRAME_FLOAT_ON_PARENT|wx.TAB_TRAVERSAL )
         self.save = save
         self.uceids = uceids
-        self.ira = wx.GetApp().GetTopWindow() 
+        self.ira = wx.GetApp().GetTopWindow()
+        self.SetIcon(self.ira._icon)
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         self.items = items
         self.html = ""
@@ -2792,44 +2806,6 @@ class ExtractDialog ( wx.Dialog ):
     
     def __del__( self ):
         pass
-
-# class FreqDialog(wx.Dialog):
-#     def __init__(self, parent, ID, listcol, title, size) :
-#         wx.Dialog.__init__(self, parent, ID, title, size=size, pos=wx.DefaultPosition,style=wx.DEFAULT_DIALOG_STYLE | wx.CANCEL | wx.OK )
-#         pre = wx.PreDialog()
-#         pre.SetExtraStyle(wx.DIALOG_EX_CONTEXTHELP)
-#         pre.Create(parent, ID, title, wx.DefaultPosition, size, wx.DEFAULT_DIALOG_STYLE | wx.CANCEL | wx.OK)
-#         self.PostCreate(pre)
-#         self.parent = parent 
-#         sizer = wx.BoxSizer(wx.VERTICAL)
-#         #self.content = parent.content
-#         self.header = listcol
-#         #LABELLIST = []
-#         #for i in self.header:
-#         #    forme = i
-#         #    if len(forme) > 60 :
-#         #        LABELLIST.append(i[0:60])
-#         #    else:
-#         #        LABELLIST.append(i)
-#         self.list_box_1 = wx.ListBox(self, -1, choices=self.header, style=wx.LB_EXTENDED | wx.LB_HSCROLL)
-#         sizer.Add(self.list_box_1, 0, 5)
-#         
-#         btnsizer = wx.BoxSizer(wx.HORIZONTAL)
-#         
-#         btn = wx.Button(self, wx.ID_CANCEL)
-#         btnsizer.Add(btn)
-#         
-#         btn = wx.Button(self, wx.ID_OK)
-#         btn.SetDefault()
-#         btnsizer.Add(btn)
-#         
-#         sizer.Add(btnsizer, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_HORIZONTAL, 5)
-#         self.SetSizer(sizer)
-#         sizer.Fit(self)
-#         self.SetTitle(_(u"Selection").decode('utf8'))
-#   
-        # end wxGlade
-
 
 class FreqDialog ( wx.Dialog ):
     
@@ -3202,14 +3178,16 @@ class BarGraphDialog ( wx.Dialog ):
 
 class MessageImage(wx.Frame):
     def __init__(self, parent, parametres, title, size):
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_FRAME_STYLE )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.CLOSE_BOX|wx.DEFAULT_FRAME_STYLE|wx.FRAME_FLOAT_ON_PARENT|wx.TAB_TRAVERSAL )
+        self.ira = wx.GetApp().GetTopWindow()
+        self.SetIcon(self.ira._icon)
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         self.parametres = parametres
         self.imageFile = self.parametres['tmpgraph']
         if parametres['svg'] == 'TRUE' :
             self.imagename = u"image.svg"
         else :
-            self.imagename = u"iamge.png"
+            self.imagename = u"image.png"
         self.HtmlPage = wx.html.HtmlWindow(self, -1)
         self.HtmlPage.SetMinSize(size)
         if "gtk2" in wx.PlatformInfo:

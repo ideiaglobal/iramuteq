@@ -248,7 +248,7 @@ class IraFrame(wx.Frame):
         file_menu.Append(wx.ID_EXIT, _(u"Exit").decode('utf8'))
         
         edit_menu = wx.Menu()
-        edit_menu.Append(wx.ID_PREFERENCES, '', _(u'Preferences').decode('utf8'))
+        edit_menu.Append(wx.ID_PREFERENCES, _(u'Preferences').decode('utf8'))
         
         view_menu = wx.Menu()
         view_menu.Append(ID_ACCEUIL, _(u"Home page").decode('utf8'))
@@ -305,8 +305,8 @@ class IraFrame(wx.Frame):
 #--------------------------------------------------------------------
         self.statusbar = self.CreateStatusBar(2, wx.ST_SIZEGRIP)
         self.statusbar.SetStatusWidths([-2, -3])
-        self.statusbar.SetStatusText(_(u"Ready"), 0)
-        self.statusbar.SetStatusText(_(u"Welcome"), 1)
+        self.statusbar.SetStatusText(_(u"Ready").decode('utf8'), 0)
+        self.statusbar.SetStatusText(_(u"Welcome").decode('utf8'), 1)
 
         # min size for the frame itself isn't completely done.
         # see the end up FrameManager::Update() for the test

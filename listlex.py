@@ -194,9 +194,9 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             # make a menu
             menu = wx.Menu()
             # add some items
-            menu.Append(self.popupID1, u"Formes associées")
-            menu.Append(self.popupID2, u"Concordancier")
-            menu.Append(self.popupID3, u"Graphique")
+            menu.Append(self.popupID1, _(u"Associated forms").decode('utf8'))
+            menu.Append(self.popupID2, _(u"Concordance").decode('utf8'))
+            menu.Append(self.popupID3, _(u"Graphic").decode('utf8'))
             menu_stcaract = wx.Menu()
             self.menuid = {}
             if not self.tgen :
@@ -205,7 +205,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
                     self.menuid[nid] = i
                     menu_stcaract.Append(nid, et)
                     self.Bind(wx.EVT_MENU, self.onstcaract, id = nid)
-                menu.AppendMenu(-1, u"Segments de texte caractéristiques", menu_stcaract)
+                menu.AppendMenu(-1, _(u"Typical text segments").decode('utf8'), menu_stcaract)
                 menu.Append(self.onmaketgen, _(u"Make Tgen").decode('utf8'))
             self.PopupMenu(menu)
             menu.Destroy()
@@ -229,7 +229,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             rep.append([corpus.getforme(forme).forme, corpus.getforme(forme).freq])
         rep.sort(key = itemgetter(1), reverse = True)
         items = dict([[i, '<font face="courier">' + '\t:\t'.join([str(val) for val in forme]) + '</font>'] for i, forme in enumerate(rep)])
-        win = message(self, items, u"Formes associées", (300, 200))
+        win = message(self, items, _(u"Associated forms").decode('utf8'), (300, 200))
         #win = message(self, u"Formes associées", (300, 200))
         #win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
         #win.HtmlPage.SetPage(win.html)
@@ -270,7 +270,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         nuces = [val[1] for val in ntab2]
         ucis_txt, ucestxt = doconcorde(corpus, nuces, self.la)
         items = dict([[i, '<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table><br>' % ntab2[i][0], ucestxt[i]])] for i in range(0,len(ucestxt))])
-        win = message(self, items, u"Segments de texte caractéristiques - %s" % self.first[ind], (900, 600))
+        win = message(self, items, ' - '.join([_(u"Typical text segments").decode('utf8'), "%s" % self.first[ind]]), (900, 600))
         win.Show(True)
         
     def OnPopupTwo(self, event):
@@ -290,7 +290,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             wordlist = [val for val in self.tgens[item] if val in corpus.lems]
         ucis_txt, ucestxt = doconcorde(corpus, uce_ok, wordlist)
         items = dict([[i, '<br><br>'.join([ucis_txt[i], ucestxt[i]])] for i in range(0,len(ucestxt))])
-        win = message(ira, items, u"Concordancier - %s" % item, (800, 500), uceids = uce_ok)
+        win = message(ira, items, ' - '.join([_(u"Concordance").decode('utf8'), "%s" % item]), (800, 500), uceids = uce_ok)
         win.Show(True)
 
     def getinf(self, txt) :
@@ -341,7 +341,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         with open(tmpscript, 'w') as f :
             f.write(txt)
         exec_rcode(self.parent.RPath, tmpscript, wait = True)
-        win = MessageImage(self, -1, u"Graphique", size=(700, 500),style = wx.DEFAULT_FRAME_STYLE)
+        win = MessageImage(self, -1, _(u"Graphic").decode('utf8'), size=(700, 500),style = wx.DEFAULT_FRAME_STYLE)
         win.addsaveimage(tmpgraph)
         txt = "<img src='%s'>" % tmpgraph
         win.HtmlPage.SetPage(txt)

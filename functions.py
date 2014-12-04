@@ -189,6 +189,19 @@ class History :
 
     def rmtab(self, analyse) :
         del self.opened[analyse['uuid']]
+    
+    def update(self, analyse) :
+        if 'matrix_name' in analyse :
+            self.matrixanalyse[analyse['uuid']].update(analyse)
+        elif 'corpus_name' in analyse :
+            self.corpus[analyse['uuid']].update(analyse)
+        elif 'corpus' in analyse :
+            self.analyses[analyse['uuid']].update(analyse)
+        else :
+            toupdate = [an for an in self.matrixanalyse[analyse['matrix']]['analyses'] if an['uuid'] == analyse['uuid']]
+            toupdate[0].update(analyse)
+        self.write()
+        self.read()
 
     def clean(self) :
         corpustodel = [corpus for corpus in self.history if not os.path.exists(corpus['ira'])]
