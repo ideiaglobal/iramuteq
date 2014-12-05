@@ -329,7 +329,7 @@ class PrefSimi ( wx.Dialog ):
         self.m_staticline40 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline40, 0, wx.EXPAND |wx.ALL, 5 )
         
-        self.m_staticText321 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Edge curved"), wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText321 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Edge curved").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText321.Wrap( -1 )
         fgSizer3.Add( self.m_staticText321, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
