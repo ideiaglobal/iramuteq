@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-03 18:41+0100\n"
+"POT-Creation-Date: 2014-12-09 00:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,7 +45,7 @@ msgstr ""
 msgid "Add cluster size"
 msgstr ""
 
-#: ProfList.py:700
+#: ProfList.py:689
 msgid "All segments"
 msgstr ""
 
@@ -53,7 +53,7 @@ msgstr ""
 msgid "Antiprofiles"
 msgstr ""
 
-#: ProfList.py:332
+#: ProfList.py:327
 msgid "Antonym"
 msgstr ""
 
@@ -61,8 +61,8 @@ msgstr ""
 msgid "Are you sure ?"
 msgstr ""
 
-#: Liste.py:163 Liste.py:180 listlex.py:198 listlex.py:233 ProfList.py:313
-#: ProfList.py:754
+#: Liste.py:163 Liste.py:180 listlex.py:198 listlex.py:233 ProfList.py:308
+#: ProfList.py:743
 msgid "Associated forms"
 msgstr ""
 
@@ -134,15 +134,15 @@ msgstr ""
 msgid "Chi2"
 msgstr ""
 
-#: ProfList.py:314 ProfList.py:359
+#: ProfList.py:309 ProfList.py:354
 msgid "Chi2 by cluster"
 msgstr ""
 
-#: ProfList.py:315
+#: ProfList.py:310
 msgid "Chi2 by cluster on dendrogram"
 msgstr ""
 
-#: ProfList.py:316 ProfList.py:360
+#: ProfList.py:311 ProfList.py:355
 msgid "Chi2 modalities of variable"
 msgstr ""
 
@@ -162,7 +162,7 @@ msgstr ""
 msgid "Cleaning"
 msgstr ""
 
-#: ProfList.py:767
+#: ProfList.py:756
 msgid "Close"
 msgstr ""
 
@@ -199,8 +199,8 @@ msgstr ""
 msgid "Compute Tgen"
 msgstr ""
 
-#: Liste.py:164 Liste.py:191 listlex.py:199 listlex.py:294 ProfList.py:326
-#: ProfList.py:688 ProfList.py:694 ProfList.py:700
+#: Liste.py:164 Liste.py:191 listlex.py:199 listlex.py:294 ProfList.py:321
+#: ProfList.py:677 ProfList.py:683 ProfList.py:689
 msgid "Concordance"
 msgstr ""
 
@@ -220,7 +220,7 @@ msgstr ""
 msgid "Default values"
 msgstr ""
 
-#: ProfList.py:329
+#: ProfList.py:324
 msgid "Definition"
 msgstr ""
 
@@ -272,7 +272,7 @@ msgstr ""
 msgid "Edition"
 msgstr ""
 
-#: ProfList.py:330
+#: ProfList.py:325
 msgid "Etymology"
 msgstr ""
 
@@ -300,7 +300,7 @@ msgstr ""
 msgid "Export for ..."
 msgstr ""
 
-#: ProfList.py:342
+#: ProfList.py:337
 msgid "Export for Tropes"
 msgstr ""
 
@@ -308,11 +308,11 @@ msgstr ""
 msgid "Export lemma dictionary"
 msgstr ""
 
-#: ProfList.py:341
+#: ProfList.py:336
 msgid "Export..."
 msgstr ""
 
-#: ProfList.py:343
+#: ProfList.py:338
 msgid "Exporter for Owledge"
 msgstr ""
 
@@ -400,7 +400,7 @@ msgstr ""
 msgid "Graph analysis"
 msgstr ""
 
-#: ProfList.py:337 ProfList.py:362
+#: ProfList.py:332 ProfList.py:357
 msgid "Graph of cluster"
 msgstr ""
 
@@ -408,7 +408,7 @@ msgstr ""
 msgid "Graph settings"
 msgstr ""
 
-#: listlex.py:200 listlex.py:345
+#: dialog.py:3266 listlex.py:200 listlex.py:345
 msgid "Graphic"
 msgstr ""
 
@@ -440,7 +440,7 @@ msgstr ""
 msgid "Home page"
 msgstr ""
 
-#: dialog.py:1869
+#: dialog.py:1869 dialog.py:3128
 msgid "Image format"
 msgstr ""
 
@@ -452,15 +452,15 @@ msgstr ""
 msgid "Import from factiva"
 msgstr ""
 
-#: ProfList.py:325
+#: ProfList.py:320
 msgid "In all segments"
 msgstr ""
 
-#: ProfList.py:323
+#: ProfList.py:318
 msgid "In segments of this cluster"
 msgstr ""
 
-#: ProfList.py:324
+#: ProfList.py:319
 msgid "In segments of this clustering"
 msgstr ""
 
@@ -528,7 +528,7 @@ msgstr ""
 msgid "List of not plotted points : "
 msgstr ""
 
-#: listlex.py:210 ProfList.py:327
+#: listlex.py:210 ProfList.py:322
 msgid "Make Tgen"
 msgstr ""
 
@@ -610,7 +610,7 @@ msgstr ""
 msgid "Modalities (one by line, with the *)"
 msgstr ""
 
-#: ProfList.py:333
+#: ProfList.py:328
 msgid "Morphology"
 msgstr ""
 
@@ -779,7 +779,7 @@ msgstr ""
 msgid "Potato mode (less precise, faster)"
 msgstr ""
 
-#: iramuteq.py:251
+#: dialog.py:3085 iramuteq.py:251
 msgid "Preferences"
 msgstr ""
 
@@ -787,7 +787,7 @@ msgstr ""
 msgid "Previous"
 msgstr ""
 
-#: ProfList.py:428 ProfList.py:462
+#: ProfList.py:417 ProfList.py:451
 msgid "Problem"
 msgstr ""
 
@@ -803,7 +803,7 @@ msgstr ""
 msgid "Prototypical analysis"
 msgstr ""
 
-#: ProfList.py:334
+#: ProfList.py:329
 msgid "Proxemy"
 msgstr ""
 
@@ -839,7 +839,7 @@ msgstr ""
 msgid "Rename"
 msgstr ""
 
-#: ProfList.py:338 ProfList.py:590
+#: ProfList.py:333 ProfList.py:579
 msgid "Repeated segments"
 msgstr ""
 
@@ -871,6 +871,10 @@ msgstr ""
 msgid "Save as ..."
 msgstr ""
 
+#: dialog.py:3222
+msgid "Save as..."
+msgstr ""
+
 #: dialog.py:1736 guifunct.py:219
 msgid "Score"
 msgstr ""
@@ -883,11 +887,11 @@ msgstr ""
 msgid "Search ..."
 msgstr ""
 
-#: ProfList.py:249
+#: ProfList.py:244
 msgid "Search..."
 msgstr ""
 
-#: ProfList.py:694
+#: ProfList.py:683
 msgid "Segments of this clustering"
 msgstr ""
 
@@ -930,6 +934,10 @@ msgstr ""
 
 #: iramuteq.py:268 iramuteq.py:288 tree.py:400
 msgid "Similarities Analysis"
+msgstr ""
+
+#: dialog.py:3093
+msgid "Size"
 msgstr ""
 
 #: OptionAlceste.py:31
@@ -1000,7 +1008,7 @@ msgstr ""
 msgid "Supplementary variables are marked with a *"
 msgstr ""
 
-#: ProfList.py:331
+#: ProfList.py:326
 msgid "Synonymous"
 msgstr ""
 
@@ -1077,11 +1085,11 @@ msgstr ""
 msgid "This file will be delete : "
 msgstr ""
 
-#: ProfList.py:462
+#: ProfList.py:451
 msgid "This is not a meta-data"
 msgstr ""
 
-#: ProfList.py:428
+#: ProfList.py:417
 msgid "This is not a variable_modality form"
 msgstr ""
 
@@ -1089,7 +1097,7 @@ msgstr ""
 msgid "Tools"
 msgstr ""
 
-#: ProfList.py:335
+#: ProfList.py:330
 msgid "Tools from CNRTL (french only)"
 msgstr ""
 
@@ -1097,7 +1105,7 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-#: listlex.py:209 listlex.py:274 ProfList.py:339 ProfList.py:622
+#: listlex.py:209 listlex.py:274 ProfList.py:334 ProfList.py:611
 msgid "Typical text segments"
 msgstr ""
 
@@ -1157,11 +1165,11 @@ msgstr ""
 msgid "Welcome"
 msgstr ""
 
-#: ProfList.py:340
+#: ProfList.py:335
 msgid "Word cloud of cluster"
 msgstr ""
 
-#: ProfList.py:317
+#: ProfList.py:312
 msgid "Word graph"
 msgstr ""
 
@@ -1195,6 +1203,10 @@ msgstr ""
 
 #: tree.py:485
 msgid "antiprofiles"
+msgstr ""
+
+#: dialog.py:3097
+msgid "automatic"
 msgstr ""
 
 #: dialog.py:2907 dialog.py:2927
@@ -1285,7 +1297,7 @@ msgstr ""
 msgid "graphical"
 msgstr ""
 
-#: dialog.py:554 dialog.py:1826 dialog.py:1979 guifunct.py:416
+#: dialog.py:554 dialog.py:1826 dialog.py:1979 dialog.py:3113 guifunct.py:416
 msgid "height"
 msgstr ""
 
@@ -1301,7 +1313,7 @@ msgstr ""
 msgid "line classified on"
 msgstr ""
 
-#: dialog.py:2907 dialog.py:2927
+#: dialog.py:2907 dialog.py:2927 dialog.py:3097
 msgid "manual"
 msgstr ""
 
@@ -1406,7 +1418,7 @@ msgstr ""
 msgid "variables"
 msgstr ""
 
-#: dialog.py:552 dialog.py:1837 dialog.py:1991 guifunct.py:423
+#: dialog.py:552 dialog.py:1837 dialog.py:1991 dialog.py:3106 guifunct.py:423
 msgid "width"
 msgstr ""
 

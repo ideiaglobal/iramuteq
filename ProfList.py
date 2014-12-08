@@ -14,10 +14,8 @@
 #----------------------------------------------------------------------------
 
 import os
-import sys
 import  wx
 import  wx.lib.mixins.listctrl  as  listmix
-#from tabsimi import DoSimi
 from listlex import ListForSpec
 from chemins import ConstructPathOut, ffr
 from dialog import PrefUCECarac, SearchDial, message, BarFrame
@@ -28,9 +26,6 @@ import webbrowser
 import tempfile
 import codecs
 from functions import progressbar, treat_var_mod, doconcorde
-from PrintRScript import barplot
-from textclassechd import ClasseCHD
-from shutil import copyfile
 from operator import itemgetter
 from copy import copy
 
@@ -372,9 +367,6 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         parametres['type'] = 'clustercloud'
         parametres['prof'] = self.Source.pathout['actprof_classe_%i.csv' % self.cl]
         del  parametres['uuid']
-        #if not os.path.exists(self.Source.pathout['actprof_classe_%i.csv' % self.lc]) :
-        #    with open(self.Source.pathout['actprof_classe_%i.csv' % self.lc], 'w') as f :
-        #        f.write('\n'.join(prof).encode(self.parent.syscoding))
         self.parent.OnClusterCloud(self.Source.corpus, parametres = parametres)
 
     def onexport(self, evt) :
@@ -388,9 +380,6 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         dial = wx.MessageDialog(self, self.Source.pathout['classe_%i_export.txt' % self.cl], u"Export", wx.OK|wx.ICON_INFORMATION)
         dial.ShowModal()
         dial.Destroy()
-        #if 'corpus' in dir(self.Source):
-        #    corpus = self.Source.corpus
-        #ClasseCHD(self.parent, corpus, self.cl)
     
     def onexporttropes(self, evt) :
         if 'corpus' in dir(self.Source):
@@ -596,7 +585,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         if dial.ShowModal() == wx.ID_OK :
             limite = dial.spin_eff.GetValue()
             atype = dial.radio_type.GetSelection()
-            dlg = progressbar(self,maxi = 4)
+            dlg = progressbar(self.ira,maxi = 4)
             corpus = self.Source.corpus
             uces = corpus.lc[self.cl-1]
             if self.Source.parametres['classif_mode'] != 2 :
