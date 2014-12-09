@@ -12,6 +12,7 @@ from functions import exec_rcode, check_Rresult, ReadProfileAsDico, ReadList
 from listlex import *
 from dialog import PrefSegProf, PrefProfTypes
 from time import sleep
+from chemins import ffr
 
 class ProfileSegment() :
     def __init__(self, parent, pathout, parametres, corpus) :
@@ -46,13 +47,13 @@ class ProfileSegment() :
         txt = """
         load("%s")
         source("%s")
-        """ % (self.dictpathout['RData'], self.parent.RscriptsPath['chdfunct'])
+        """ % (ffr(self.dictpathout['RData']), ffr(self.parent.RscriptsPath['chdfunct']))
 
         txt += """
         dt <- read.csv2("%s", row.names = 1)
         to <- build.pond.prof(dt)
         PrintProfile(n1,to[4],NULL,to[5],NULL,clnb,"%s","%s")
-        """ % (self.corpus.dictpathout['segments_classes'], self.dictpathout['prof_seg'], self.dictpathout['antiprof_seg'])
+        """ % (ffr(self.corpus.dictpathout['segments_classes']), ffr(self.dictpathout['prof_seg']), ffr(self.dictpathout['antiprof_seg']))
         fo = tempfile.mktemp(dir=self.parent.TEMPDIR)
         with open(fo, 'w') as f :
             f.write(txt)
@@ -109,21 +110,21 @@ class ProfilType() :
         txt = """
         load("%s")
         source("%s")
-        """ % (self.corpus.dictpathout['RData'], self.parent.RscriptsPath['chdfunct'])
+        """ % (ffr(self.corpus.dictpathout['RData']), ffr(self.parent.RscriptsPath['chdfunct']))
 
         txt += """
         dt <- read.csv2("%s", row.names = 1)
-        """ % self.corpus.dictpathout['type_cl']
+        """ % ffr(self.corpus.dictpathout['type_cl'])
         if alceste :
             txt += """
             to <- build.pond.prof(dt)
             PrintProfile(n1,to[4],NULL,to[5],NULL,clnb,"%s","%s")
-            """ % (self.outprof, self.corpus.dictpathout['antiprof_type'])
+            """ % (ffr(self.outprof), ffr(self.corpus.dictpathout['antiprof_type']))
         else :
             txt += """
             to <- AsLexico2(dt)
             write.csv2(to[[1]], file = "%s")
-            """ % (self.outprof)
+            """ % (ffr(self.outprof))
             # write.csv2(to[[3]], file = "%s")
             # % (self.outprof)
         fo = tempfile.mktemp(dir=self.parent.TEMPDIR)
