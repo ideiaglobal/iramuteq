@@ -22,6 +22,27 @@ from textreinert import TgenProf
 
 log = logging.getLogger('iramuteq.tree')
 
+def buildmenu(menu, parent_menu):
+    for i in range(parent_menu.GetMenuItemCount()) :
+        item = parent_menu.FindItemByPosition(i)
+        itemid = item.GetId()
+        itemtext = item.GetText()
+        itemicon = item.GetBitmap()
+        nitem = wx.MenuItem(menu, itemid, itemtext)
+        nitem.SetBitmap(itemicon)
+        if item.IsSubMenu() :
+            nmenu = wx.Menu()
+            for val in item.GetSubMenu().GetMenuItems() :
+                itemid = val.GetId()
+                itemtext = val.GetText()
+                itemicon = val.GetBitmap()
+                nitem = wx.MenuItem(menu, itemid, itemtext)
+                nitem.SetBitmap(itemicon)
+                nmenu.AppendItem(nitem)
+            menu.AppendMenu(-1, item.GetText(), nmenu)
+        else :
+            menu.AppendItem(nitem)
+
 class InfoDialog ( wx.Dialog ):
     
     def __init__( self, parent, txt, parametres ):
@@ -110,26 +131,11 @@ class LeftTree(CT.CustomTreeCtrl):
         self.styles = treestyles
         self.item = None
         
+
         self.il = wx.ImageList(16, 16)
         self.ild = {}
-        imgtextroot = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'textroot.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['alceste'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'reinert.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['corpus'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'textcorpus.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['wordcloud'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'wordcloud.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['stat'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'stats.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['simitxt'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'simitxt.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['clustersimitxt'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'clustersimitxt.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['clustercloud'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'clustercloud.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['spec'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'spec.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        imgmatroot = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'matroot.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['matrix'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'matrix.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['freq'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'frequences.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['freqmulti'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'frequences.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['chi2'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'chi2.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['reinertmatrix'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'reinertmatrix.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['simimatrix'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'simimatrix.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['simiclustermatrix'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'simimatrix.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
-        self.ild['proto'] = self.il.Add(wx.Image(os.path.join(self.parent.images_path,'proto.png'), wx.BITMAP_TYPE_PNG).Scale(16,16).ConvertToBitmap())
+        for img in self.ira.images_analyses :
+            self.ild[img] = self.il.Add(self.ira.images_analyses[img])
         self.SetImageList(self.il)
         
         self.count = 0
@@ -146,8 +152,8 @@ class LeftTree(CT.CustomTreeCtrl):
         
         self.textroot = self.AppendItem(self.root, _(u'Textual corpus'))
         self.SetPyData(self.textroot, {'uuid': 'textroot'})
-        self.SetItemImage(self.textroot, imgtextroot, CT.TreeItemIcon_Normal)
-        self.SetItemImage(self.textroot, imgtextroot, CT.TreeItemIcon_Expanded)     
+        self.SetItemImage(self.textroot, self.ild['textroot'], CT.TreeItemIcon_Normal)
+        self.SetItemImage(self.textroot, self.ild['textroot'], CT.TreeItemIcon_Expanded)     
 
         for corpus in reversed(self.h) :
             child = self.AppendItem(self.textroot, corpus['corpus_name'])
@@ -168,8 +174,8 @@ class LeftTree(CT.CustomTreeCtrl):
 
         self.matroot = self.AppendItem(self.root, _(u'Matrix'))
         self.SetPyData(self.matroot, {'uuid': 'matroot'})
-        self.SetItemImage(self.matroot, imgmatroot, CT.TreeItemIcon_Normal)
-        self.SetItemImage(self.matroot, imgmatroot, CT.TreeItemIcon_Expanded)
+        self.SetItemImage(self.matroot, self.ild['matroot'], CT.TreeItemIcon_Normal)
+        self.SetItemImage(self.matroot, self.ild['matroot'], CT.TreeItemIcon_Expanded)
         
         orphmat = []
         for matrix in reversed(self.history.matrix) :
@@ -391,54 +397,11 @@ class LeftTree(CT.CustomTreeCtrl):
             menu.AppendSeparator()
     
             if 'corpus_name' in pydata :
-                stat = menu.Append(wx.ID_ANY, _(u"Statistics").decode('utf8'))
-                spec = menu.Append(wx.ID_ANY, _(u"Specificities and CA").decode('utf8'))
-                classification = wx.Menu()
-                reinert = classification.Append(wx.ID_ANY, _(u"Reinert's Method").decode('utf8'))
-                #pam = classification.Append(wx.ID_ANY, u"Par matrice des distances")
-                menu.AppendMenu(-1, _(u"Clustering").decode('utf8'), classification)
-                simi = menu.Append(wx.ID_ANY, _(u"Similarities Analysis").decode('utf8'))
-                wdc = menu.Append(wx.ID_ANY, _(u"WordCloud").decode('utf8'))
-                subcorpus = wx.Menu()
-                subcorpusfrommeta = subcorpus.Append(wx.ID_ANY, _(u'Sub corpus from metadata').decode('utf8'))
-                subcorpusfromtheme = subcorpus.Append(wx.ID_ANY, _(u'Sub corpus from thematic').decode('utf8'))
-                menu.AppendMenu(-1, _(u"Sub corpus").decode('utf8'), subcorpus)
+                buildmenu(menu, self.parent.text_menu)
                 menu.AppendSeparator()
-                self.Bind(wx.EVT_MENU, self.OnReinert, reinert)
-                #self.Bind(wx.EVT_MENU, self.OnPam, pam)
-                self.Bind(wx.EVT_MENU, self.OnStat, stat)
-                self.Bind(wx.EVT_MENU, self.OnSpec, spec)
-                self.Bind(wx.EVT_MENU, self.OnSimiTxt, simi)
-                self.Bind(wx.EVT_MENU, self.OnWordCloud, wdc)
-                self.Bind(wx.EVT_MENU, self.OnSubTextFromMeta, subcorpusfrommeta)
-                self.Bind(wx.EVT_MENU, self.OnSubTextFromTheme, subcorpusfromtheme)
             elif 'matrix_name' in pydata :
-                for i in range(self.parent.matrix_menu.GetMenuItemCount()) :
-                    item = self.parent.matrix_menu.FindItemByPosition(i)
-                    itemid = item.GetId()
-                    itemtext = item.GetText()
-                    if item.IsSubMenu() :
-                        nmenu = wx.Menu()
-                        for val in item.GetSubMenu().GetMenuItems() :
-                            nmenu.Append(val.GetId(), val.GetText())
-                        menu.AppendMenu(itemid, itemtext, nmenu)
-                    else :
-                        menu.Append(itemid, itemtext)
-                split = wx.Menu()
-                splitfromvar = split.Append(-1, _(u"Split from variable").decode('utf8'))
-                menu.AppendMenu(-1, _(u"Split matrix").decode('utf8'), split)
-                self.Bind(wx.EVT_MENU, self.OnSplitFromVar, splitfromvar)
-                    #print item, itemid, itemtext
-                #menu = self.parent.matrix_menu
-                #freq = menu.Append(wx.ID_ANY, _(u"Frequency").decode('utf8'))
-                #chi2 = menu.Append(wx.ID_ANY, _(u"Chi square").decode('utf8'))
-                #chdreinert = menu.Append(wx.ID_ANY, _(u"Reinert clustering").decode('utf8'))
-                #simi = menu.Append(wx.ID_ANY, _(u"Similarity analysis").decode('utf8'))
+                buildmenu(menu, self.parent.matrix_menu)
                 menu.AppendSeparator()
-                #self.Bind(wx.EVT_MENU, self.OnFreq, freq)
-                #self.Bind(wx.EVT_MENU, self.OnChiSquare, chi2)
-                #self.Bind(wx.EVT_MENU, self.OnSimiTab, simi)
-                #self.Bind(wx.EVT_MENU, self.OnCHDReinert, chdreinert)
             elif pydata.get('type', False) == 'alceste' and pydata['uuid'] in self.parent.history.opened :
                 openmenu = wx.Menu()
                 antipro = openmenu.Append(wx.ID_ANY, _(u"Antiprofiles").decode('utf8'))
@@ -556,29 +519,29 @@ class LeftTree(CT.CustomTreeCtrl):
     def OnWordCloud(self, evt) :
         self.parent.OnWordCloud(evt, self.getcorpus())
     
-    def OnFreq(self, evt):
-        self.parent.OnFreq(evt, self.getmatrix())
+#    def OnFreq(self, evt):
+#        self.parent.OnFreq(evt, self.getmatrix())
         
-    def OnChiSquare(self, evt):
-        self.parent.OnChi2(evt, self.getmatrix())
+#    def OnChiSquare(self, evt):
+#        self.parent.OnChi2(evt, self.getmatrix())
         
-    def OnSimiTab(self, evt): 
-        self.parent.OnSimiTab(evt, self.getmatrix())
+#    def OnSimiTab(self, evt): 
+#        self.parent.OnSimiTab(evt, self.getmatrix())
     
-    def OnProto(self, evt):
-        self.parent.OnProto(evt, self.getmatrix())
+#    def OnProto(self, evt):
+#        self.parent.OnProto(evt, self.getmatrix())
     
-    def OnSplitFromVar(self, evt):
-        self.parent.OnSplitVar(evt, self.getmatrix())
+#    def OnSplitFromVar(self, evt):
+#        self.parent.OnSplitVar(evt, self.getmatrix())
         
-    def OnCHDReinert(self, evt):
-        self.parent.OnCHDReinert(evt, self.getmatrix())
+#    def OnCHDReinert(self, evt):
+#        self.parent.OnCHDReinert(evt, self.getmatrix())
     
-    def OnSubTextFromMeta(self, evt):
-        self.parent.OnSubText(self.getcorpus(), parametres = {'frommeta' : True})
+    #def OnSubTextFromMeta(self, evt):
+    #    self.parent.OnSubText(self.getcorpus(), parametres = {'frommeta' : True})
     
-    def OnSubTextFromTheme(self, evt):
-        self.parent.OnSubText(self.getcorpus(), parametres = {'fromtheme' : True})    
+    #def OnSubTextFromTheme(self, evt):
+    #    self.parent.OnSubText(self.getcorpus(), parametres = {'fromtheme' : True})    
 
     def OnProfSR(self, evt) :
         ProfileSegment(self.parent, self.page.dictpathout, self.page.parametres, self.page.corpus)
@@ -746,7 +709,7 @@ class LeftTree(CT.CustomTreeCtrl):
         dial.Destroy()
     
     def OnSubCorpusFromClusters(self, evt):
-        self.parent.OnSubText(self.getcorpus(), parametres = {'fromclusters' : True, 'clnb': self.page.parametres['clnb'], 'lc' : self.page.corpus.lc})
+        self.parent.OnSubText(evt, corpus = self.getcorpus(), parametres = {'fromclusters' : True, 'clnb': self.page.parametres['clnb'], 'lc' : self.page.corpus.lc})
     
     def OnRename(self, event):
         pydata = self.itemdict['pydata']

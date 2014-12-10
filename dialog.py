@@ -2676,9 +2676,8 @@ class message(wx.Frame):
         self.Destroy()
     
     def OnSub(self ,evt):
-        parametres = {'fromuceids' : True, 'uceids' : self.uceids}
-        self.ira.OnSubText(None, parametres)
-
+        parametres = {'fromuceids' : True, 'uceids' : self.uceids, 'isempty' : True}
+        self.ira.OnSubText(wx.MenuEvent(), None, parametres)
 
 
 class ExtractDialog ( wx.Dialog ):
@@ -3029,7 +3028,7 @@ class SimpleDialog ( wx.Dialog ):
 class SubTextFromMetaDial ( wx.Dialog ):
     
     def __init__( self, parent, parametres ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Subcorpus from metadata", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Subcorpus").decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
@@ -3039,14 +3038,14 @@ class SubTextFromMetaDial ( wx.Dialog ):
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"SubCorpus Name", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Name").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         self.subcorpusname = wx.TextCtrl( self, wx.ID_ANY, parametres['corpus_name'], wx.DefaultPosition, wx.Size( 300,-1 ), 0 )
         fgSizer1.Add( self.subcorpusname, 0, wx.ALL, 5 )
         
-        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"Select one or more metadata", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, _(u"Select one or more metadata").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -3075,9 +3074,18 @@ class SubTextFromMetaDial ( wx.Dialog ):
         bSizer1.Fit( self )
         
         self.Centre( wx.BOTH )
+        self.Bind(wx.EVT_LISTBOX, self.onchoose, self.m_listBox1)
+        if not parametres.get('isempty', False) :
+            self.m_sdbSizer1OK.Enable(False)
     
     def __del__( self ):
         pass
+    
+    def onchoose(self, evt):
+        if len(self.m_listBox1.GetSelections()) > 0 :
+            self.m_sdbSizer1OK.Enable(True)
+        else :
+            self.m_sdbSizer1OK.Enable(False)
 
 class BarGraphDialog ( wx.Dialog ):
     
