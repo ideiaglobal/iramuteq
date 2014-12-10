@@ -2676,9 +2676,8 @@ class message(wx.Frame):
         self.Destroy()
     
     def OnSub(self ,evt):
-        parametres = {'fromuceids' : True, 'uceids' : self.uceids}
-        self.ira.OnSubText(None, parametres)
-
+        parametres = {'fromuceids' : True, 'uceids' : self.uceids, 'isempty' : True}
+        self.ira.OnSubText(wx.MenuEvent(), None, parametres)
 
 
 class ExtractDialog ( wx.Dialog ):
@@ -3029,7 +3028,7 @@ class SimpleDialog ( wx.Dialog ):
 class SubTextFromMetaDial ( wx.Dialog ):
     
     def __init__( self, parent, parametres ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Subcorpus from metadata", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Subcorpus").decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
@@ -3039,14 +3038,14 @@ class SubTextFromMetaDial ( wx.Dialog ):
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"SubCorpus Name", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Name").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         self.subcorpusname = wx.TextCtrl( self, wx.ID_ANY, parametres['corpus_name'], wx.DefaultPosition, wx.Size( 300,-1 ), 0 )
         fgSizer1.Add( self.subcorpusname, 0, wx.ALL, 5 )
         
-        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"Select one or more metadata", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, _(u"Select one or more metadata").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -3075,14 +3074,23 @@ class SubTextFromMetaDial ( wx.Dialog ):
         bSizer1.Fit( self )
         
         self.Centre( wx.BOTH )
+        self.Bind(wx.EVT_LISTBOX, self.onchoose, self.m_listBox1)
+        if not parametres.get('isempty', False) :
+            self.m_sdbSizer1OK.Enable(False)
     
     def __del__( self ):
         pass
+    
+    def onchoose(self, evt):
+        if len(self.m_listBox1.GetSelections()) > 0 :
+            self.m_sdbSizer1OK.Enable(True)
+        else :
+            self.m_sdbSizer1OK.Enable(False)
 
 class BarGraphDialog ( wx.Dialog ):
     
     def __init__( self, parent, width, height ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Preferences", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Preferences").decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
@@ -3090,11 +3098,11 @@ class BarGraphDialog ( wx.Dialog ):
         
         bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
         
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Size", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Size").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         bSizer2.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        sizeradioChoices = [ u"automatic", u"manual" ]
+        sizeradioChoices = [ _(u"automatic").decode('utf8'), _(u"manual").decode('utf8') ]
         self.sizeradio = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, sizeradioChoices, 1, wx.RA_SPECIFY_COLS )
         self.sizeradio.SetSelection( 0 )
         bSizer2.Add( self.sizeradio, 0, wx.ALIGN_TOP|wx.ALL, 5 )
@@ -3103,14 +3111,14 @@ class BarGraphDialog ( wx.Dialog ):
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"width", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, _(u"width").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         self.widthsp = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 1000000, 600 )
         fgSizer1.Add( self.widthsp, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"height", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, _(u"height").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
         fgSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -3125,7 +3133,7 @@ class BarGraphDialog ( wx.Dialog ):
         
         bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
         
-        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, u"Image format", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, _(u"Image format").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText4.Wrap( -1 )
         bSizer3.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -3219,7 +3227,7 @@ class MessageImage(wx.Frame):
 
     def OnSaveImage(self, event) :
         dlg = wx.FileDialog(
-            self, message="Enregistrer sous...", defaultDir=os.getcwd(),
+            self, message=_(u"Save as...").decode('utf8'), defaultDir=os.getcwd(),
             defaultFile= self.imagename, wildcard=self.parametres['wildcard'], style=wx.SAVE | wx.OVERWRITE_PROMPT
             )
         dlg.SetFilterIndex(2)
@@ -3263,7 +3271,7 @@ class BarFrame :
             with open(tmpscript,'w') as f :
                 f.write(txt)
             exec_rcode(ira.RPath, tmpscript, wait = True)
-            win = MessageImage(ira, parametres, u"Graphique", size=(700, 500))
+            win = MessageImage(ira, parametres, _(u"Graphic").decode('utf8'), size=(700, 500))
             if svg == 'FALSE' :
                 txt = "<img src='%s'>" % tmpgraph
             else :

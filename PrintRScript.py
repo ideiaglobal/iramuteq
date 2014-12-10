@@ -1189,7 +1189,7 @@ class ProtoScript(PrintRScript) :
         open_file_graph("%s",height=800, width=1000)
         prototypical(mat, mfreq = %s, mrank = %s, cloud = FALSE, cexrange=c(1,2.4), cexalpha= c(0.4, 1), type = '%s')
         dev.off()
-        """ % (self.analyse.pathout['table.csv'], self.analyse.pathout['proto.png'], self.parametres['limfreq'], self.parametres['limrang'], self.parametres['typegraph'])
+        """ % (ffr(self.analyse.pathout['table.csv']), ffr(self.analyse.pathout['proto.png']), self.parametres['limfreq'], self.parametres['limrang'], self.parametres['typegraph'])
         self.add(txt)
         self.write()
 
