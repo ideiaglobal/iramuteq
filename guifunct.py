@@ -622,7 +622,7 @@ class PrefSimi ( wx.Dialog ):
         self.m_staticText21.Wrap( -1 )
         bSizer5.Add( self.m_staticText21, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
         
-        self.cols = wx.ColourPickerCtrl( self.m_panel3, wx.ID_ANY, wx.Colour( 255, 0, 0 ), wx.DefaultPosition, wx.Size( 10,10 ), wx.CLRP_DEFAULT_STYLE )
+        self.cols = wx.ColourPickerCtrl( self.m_panel3, wx.ID_ANY, wx.Colour( 255, 0, 0 ), wx.DefaultPosition, wx.DefaultSize, wx.CLRP_DEFAULT_STYLE )
         bSizer5.Add( self.cols, 0, wx.ALL, 5 )
         
         
