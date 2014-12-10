@@ -306,7 +306,7 @@ def write_tab(tab, fileout) :
 class BugDialog(wx.Dialog):
     def __init__(self, *args, **kwds):
         # begin wxGlade: MyDialog.__init__
-        kwds["style"] = wx.DEFAULT_DIALOG_STYLE
+        kwds["style"] = wx.DEFAULT_DIALOG_STYLE | wx.STAY_ON_TOP
         kwds["size"] = wx.Size(500, 200)
         wx.Dialog.__init__(self, *args, **kwds)
         self.SetTitle(kwds['title'])
@@ -707,10 +707,9 @@ def progressbar(self, maxi) :
                              parent=parent,
                              style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT
                              )
-    prog.SetIcon(ira._icon)
     prog.SetSize((400,150))
+    prog.SetIcon(ira._icon)
     return prog
-
 
 def treat_var_mod(variables) :
     var_mod = {}

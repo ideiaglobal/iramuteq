@@ -647,7 +647,7 @@ vous devez signaler le chemin de l'éxecutable de R dans les préférences."""
     def OnVerif(self, evt) :
         pack = CheckRPackages(self)
         if pack :
-            dlg = wx.MessageDialog(self, u"Installation OK", u"Installation", wx.OK | wx.ICON_INFORMATION)
+            dlg = wx.MessageDialog(self, _(u"Installation OK").decode('utf8'), _(u"Installation").decode('utf8'), wx.OK | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
             dlg.CenterOnParent()
             if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
                 evt.Veto()
