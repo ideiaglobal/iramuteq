@@ -83,7 +83,6 @@ class AnalyseQuest(AnalyseMatrix):
         if 'formatted' in self.parametres:
             self.tableau.make_01_alc_format(self.pathout['mat01.csv'])
         else:
-            print self.parametres['listsup']
             self.tableau.make_01_from_selection(self.parametres['listact'], self.parametres['listsup'])
         file = open(self.pathout['listeuce1'], 'w')
         file.write('num uce;num uc\n')

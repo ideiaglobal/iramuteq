@@ -30,11 +30,7 @@ class Prototypical(AnalyseMatrix) :
 #         self.colnames = self.tableau.get_colnames()
 #         AnalyseMatrix.__init__(self, parent, parent.tableau, self.parametres, dlg = dlg)
     
-    def doanalyse(self) :
-        res = self.check_val()
-        return res
-
-    def check_val(self) :
+    def doparametres(self, dlg = None):
         self.dial = ProtoDial(self.ira, self.tableau.colnames)
         self.dial.CenterOnParent()
 
@@ -63,12 +59,16 @@ class Prototypical(AnalyseMatrix) :
                         self.parametres['typegraph'] = 'classical'
                         self.parametres['cloud'] = True
                     else :
-                        self.parametres['typegraph'] = 'plan'      
-                    table_assoc, table_rank = self.dotable()
-                    self.makedatas(table_assoc, table_rank)
-                    self.DoR()
+                        self.parametres['typegraph'] = 'plan'
+                self.dial.Destroy()
         else :
-            return 'stop'
+            self.dial.Destroy()               
+            self.parametres = None
+    
+    def doanalyse(self) :
+        table_assoc, table_rank = self.dotable()
+        self.makedatas(table_assoc, table_rank)
+        self.DoR()
 
     def dotable(self) :
         table_assoc = self.tableau.select_col(self.ColSel1)

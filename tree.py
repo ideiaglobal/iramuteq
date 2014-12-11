@@ -1093,11 +1093,15 @@ class LeftTree(CT.CustomTreeCtrl):
 
         if pydata is not None :
             if 'corpus_name' in pydata or 'corpus' in pydata :
-                self.ira.ShowMenu('text', True)
                 self.ira.ShowMenu('matrix', False)
+                self.ira.ShowMenu('text', True)
             if 'matrix_name' in pydata or 'matrix' in pydata:
                 self.ira.ShowMenu('text', False)
-                self.ira.ShowMenu('matrix', True)                
+                self.ira.ShowMenu('matrix', True)
+            if 'uuid' in pydata :
+                if pydata['uuid'] in ['textroot', 'matroot'] :
+                    self.ira.ShowMenu('text', False)
+                    self.ira.ShowMenu('matrix', False)             
             self.pydata = pydata
             if pydata['uuid'] in self.parent.history.opened :
                 for i in range(self.parent.nb.GetPageCount()) :
