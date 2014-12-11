@@ -182,6 +182,8 @@ images_analyses = {
         'simimatrix' : 'simimatrix.png',
         'simiclustermatrix' : 'simimatrix.png',
         'proto' : 'proto.png',
+        'TXM' : 'TXM.png',
+        'europress' : 'europress.png',
          }
 #####################################################################
 
@@ -254,11 +256,11 @@ class IraFrame(wx.Frame):
         file_menu.AppendMenu(-1, _(u"Import from factiva").decode('utf8'), menuFactiva)
 
         item = wx.MenuItem(file_menu, ID_ImportTXM, _(u"Import from TXM").decode('utf8'), _(u"Import from TXM").decode('utf8'))
-        item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
+        item.SetBitmap(self.images_analyses['TXM'])
         file_menu.AppendItem(item)
         
         item = wx.MenuItem(file_menu, ID_ImportEuro, _(u"Import from Europress").decode('utf8'), _(u"Import from Europress").decode('utf8'))
-        item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
+        item.SetBitmap(self.images_analyses['europress'])
         file_menu.AppendItem(item)        
 
         menuTools = wx.Menu()
@@ -716,8 +718,9 @@ class IraFrame(wx.Frame):
 
     def OnOpenAnalyse(self, event):
         self.AnalysePath = OnOpen(self, "Analyse")
-        OpenAnalyse(self, self.AnalysePath[1][0], True)
-        self.ShowMenu('view')
+        if self.AnalysePath :
+            OpenAnalyse(self, self.AnalysePath[1][0], True)
+            self.ShowMenu('view')
 
     def OnOpenText(self, event):
         inputname, self.input_path = OnOpen(self, "Texte")

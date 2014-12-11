@@ -9,12 +9,6 @@ import os
 import xml.sax
 import glob
 
-
-
-#infiledir = '/home/pierre/TXM/corpus/voeux-bin/txm/VOEUX/'
-#fileout = 'VOEUXExportfromTXM.txt'
-
-
 class TXMParser(xml.sax.ContentHandler) :
     def __init__(self, fileout, encodage_out) :
         self.fileout = fileout
@@ -63,17 +57,14 @@ class TXMParser(xml.sax.ContentHandler) :
             self.fileout.write(sent.encode(self.encodage_out))
         self.sent = []
 
-
-
-class TXM2IRA :
-    def __init__(self, pathin, fileout, encodage_in, encodage_out) :
+def TXM2IRA(pathin, fileout, encodage_in, encodage_out) :
         parser = xml.sax.make_parser()
         files = glob.glob(os.path.join(pathin,'*.xml'))
+        if len(files) == 0 :
+            return 'nofile'
         with open(fileout, 'w') as fout :
             parser.setContentHandler(TXMParser(fout, encodage_out))
             for f in files :
                 parser.parse(open(f, 'r'))
                 fout.write('\n\n')
-        print 'done'
-
-#TXM2IRA(infiledir, fileout)
+        return None

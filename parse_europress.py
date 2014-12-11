@@ -73,7 +73,7 @@ class MyHTMLParser(HTMLParser):
         #print "Encountered an end tag :", tag
     def handle_data(self, data):
         if self.currentattr == 'DocPublicationName' :
-            PublicationName = data.replace(' ', '_').replace('(','').replace(')','').replace('.','').replace('/','').replace("'",'').lower()
+            PublicationName = data.replace(' ', '_').replace('(','').replace(')','').replace('.','').replace('/','').replace("'",'').replace(';', '').replace(':', '').replace(u'·','').lower()
             PublicationName = PublicationName.split(',')[0]
             self.meta.append(u'*source_' + PublicationName)
         elif self.currentattr == 'DocHeader' :
@@ -93,13 +93,14 @@ class MyHTMLParser(HTMLParser):
         self.outfile = outfile
         
 
-class ParseEuropress :
-    def __init__(self, txtdir, fileout, encodage_in, encodage_out) :
+def ParseEuropress(txtdir, fileout, encodage_in, encodage_out) :
         files = []
         for root, subfolders, subfiles in os.walk(txtdir) :
             nf = [os.path.join(root, f) for f in subfiles if f.split('.')[-1] == 'html']
             nf.sort()
             files += nf
+        if len(files) == 0 :
+            return 'nofile'
         tot = 0
         parser = MyHTMLParser()
         with open(fileout,'w') as outf : 
@@ -110,7 +111,7 @@ class ParseEuropress :
                     content = infile.read() 
                 parser.feed(content)
                 tot += parser.nb
-                print 'ok', parser.nb, 'articles', ' - total : ', tot   
+        return tot
                 
 #ParseEuropress('/home/pierre/fac/lerass/mariage/press', '/home/pierre/workspace/iramuteq/dev/europress/corpus_out.txt', 'utf8', 'utf8')     
         #print "Encountered some data  :", data

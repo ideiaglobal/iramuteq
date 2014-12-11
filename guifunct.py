@@ -41,7 +41,7 @@ def OnOpen(self, type):
             elif type == "Texte":
                 return False, [False]
             elif type == "Analyse":
-                return [False]
+                return False
 
 def getfileextension(file) :
     return os.path.splitext(file)[1]

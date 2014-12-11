@@ -14,9 +14,9 @@ from parse_factiva_mail import ParseFactivaMail
 from parse_factiva_txt import ParseFactivaPaste
 from parse_europress import ParseEuropress
 from import_txm import TXM2IRA
+from functions import BugReport
 
 def ParseDocument(filename) :
-    print filename
     with codecs.open(filename, 'r', 'utf-8') as f :
         content = f.read()
     content = content.replace('<hlt>', ' ').replace('</hlt>', ' ')
@@ -86,6 +86,8 @@ class PrefImport(wx.Dialog):
         self.PostCreate(pre)
         if methode in ['xml', 'txm'] :
             txt = _(u'Select a directory of xml files').decode('utf8')
+        elif methode == 'euro' :
+            txt = _(u'Select a directory of html files').decode('utf8')
         else :
             txt = _(u'Select a directory of txt files').decode('utf8')
         self.parent = parent
@@ -153,8 +155,6 @@ class PrefImport(wx.Dialog):
         else :
             self.EndModal(wx.ID_CANCEL)
 
-
-
 class ImportFactiva():
     def __init__(self, parent, methode):
         self.dial =  PrefImport(parent, methode=methode)
@@ -163,20 +163,40 @@ class ImportFactiva():
         if val == wx.ID_OK :
             xmldir = self.dial.dbb.GetValue()
             corp_out = self.dial.fbb.GetValue()
-            if methode == 'xml' :
-                res = getcorpus_from_xml(xmldir, corp_out)
-            elif methode == 'mail' :
-                res = ParseFactivaMail(xmldir, corp_out, 'utf8', parent.syscoding)
-            elif methode == 'txt' :
-                res = ParseFactivaPaste(xmldir, corp_out, 'utf8', parent.syscoding)
-            elif methode == 'txm' :
-                res = TXM2IRA(xmldir, corp_out, 'utf8', parent.syscoding)
-            elif methode == 'euro' :
-                res = ParseEuropress(xmldir, corp_out, 'utf8', 'utf8')
-            if res == 'nofile' :
-                dlg = wx.MessageDialog(parent, u"Pas de fichier \'.xml\' dans %s" % xmldir, 'ATTENTION', wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
-                dlg.CenterOnParent()
-                dlg.ShowModal()
-           #else :
-           #     parent.filename = corp_out
-           #     parent.OpenText()
+            self.dial.Destroy()
+            busy = wx.BusyInfo(_("Please wait...").decode('utf8'))
+            wx.SafeYield()
+            try :
+                if methode == 'xml' :
+                    res = getcorpus_from_xml(xmldir, corp_out)
+                elif methode == 'mail' :
+                    res = ParseFactivaMail(xmldir, corp_out, 'utf8', parent.syscoding)
+                elif methode == 'txt' :
+                    res = ParseFactivaPaste(xmldir, corp_out, 'utf8', parent.syscoding)
+                elif methode == 'txm' :
+                    res = TXM2IRA(xmldir, corp_out, 'utf8', parent.syscoding)
+                elif methode == 'euro' :
+                    res = ParseEuropress(xmldir, corp_out, 'utf8', 'utf8')
+                del busy
+                if res == 'nofile' :
+                    dlg = wx.MessageDialog(parent, u"Pas de fichiers dans %s" % xmldir, 'ATTENTION', wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
+                    dlg.CenterOnParent()
+                    dlg.ShowModal()
+                    dlg.Destroy()
+                else :
+                    msg = '\n'.join([_(u"Corpus created :").decode('utf8'), corp_out, _(u"Do you want to open it in IRaMuTeQ ?").decode('utf8')])
+                    dlg = wx.MessageDialog(parent, msg, _(u'Information').decode('utf8'), wx.YES_NO | wx.NO_DEFAULT | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
+                    dlg.CenterOnParent()
+                    val = dlg.ShowModal()
+                    if val == wx.ID_YES :
+                        dlg.Destroy()
+                        parent.filename = os.path.abspath(corp_out)
+                        parent.OpenText()
+                    else :
+                        dlg.Destroy()
+            except :
+                del busy
+                BugReport(parent)
+        else :
+            self.dial.Destroy()
+                
