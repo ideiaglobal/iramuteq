@@ -393,11 +393,11 @@ class LeftTree(CT.CustomTreeCtrl):
         if not item in [self.textroot, self.matroot] :
             menu = wx.Menu()
             info = wx.MenuItem(menu, wx.ID_ANY, _(u"Informations").decode('utf8'))
-            info.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_INFORMATION))
+            info.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_INFORMATION, size = (16,16)))
             menu.AppendItem(info)
             
             rename = wx.MenuItem(menu, wx.ID_ANY, _(u"Rename").decode('utf8'))
-            rename.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_TIP))
+            rename.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_TIP, size = (16,16)))
             menu.AppendItem(rename)
             menu.AppendSeparator()
     
@@ -457,7 +457,7 @@ class LeftTree(CT.CustomTreeCtrl):
                 self.Bind(wx.EVT_MENU, self.OnRapport, rapport)
     
             itemdelete = wx.MenuItem(menu, wx.ID_ANY, _(u"Delete from history").decode('utf8'))
-            itemdelete.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_DELETE))
+            itemdelete.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_DELETE, size = (16,16)))
             menu.AppendItem(itemdelete)
             #item11 = menu.Append(wx.ID_ANY, "Prepend An Item")
             #item12 = menu.Append(wx.ID_ANY, "Append An Item")
