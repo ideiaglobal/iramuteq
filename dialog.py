@@ -2237,8 +2237,10 @@ class ChiDialog(wx.Dialog):
         self.__set_properties()
         self.__do_layout()
 
-        self.Bind(wx.EVT_LISTBOX, self.Select1, self.list_box_1)
+        self.Bind(wx.EVT_LISTBOX, self.selchange, self.list_box_1)
+        self.Bind(wx.EVT_LISTBOX, self.selchange, self.list_box_2)
         self.Bind(wx.EVT_BUTTON, self.onparam, self.button_pref)
+        self.button_1.Enable(False)
         # end wxGlade
 #-------------------------------
     def __set_properties(self):
@@ -2264,8 +2266,11 @@ class ChiDialog(wx.Dialog):
         self.Layout()
         # end wxGlade
 
-    def Select1(self, event): # wxGlade: ConfChi2.<event_handler>
-        event.Skip()
+    def selchange(self, event): # wxGlade: ConfChi2.<event_handler>
+        if (len(self.list_box_1.GetSelections()) == 0) or (len(self.list_box_2.GetSelections()) == 0) :
+            self.button_1.Enable(False)
+        else :
+            self.button_1.Enable(True)
     
     
     def onparam(self,event):
@@ -2851,11 +2856,17 @@ class FreqDialog ( wx.Dialog ):
         bSizer1.Fit( self )
         
         self.Centre( wx.BOTH )
+        self.Bind(wx.EVT_LISTBOX, self.selchange, self.m_listBox1)
+        self.m_sdbSizer1OK.Enable(False)
     
     def __del__( self ):
         pass
     
-
+    def selchange(self, evt):
+        if len(self.m_listBox1.GetSelections()) == 0 :
+            self.m_sdbSizer1OK.Enable(False)
+        else :
+            self.m_sdbSizer1OK.Enable(True)
 
 class ProtoDial ( wx.Dialog ):
     
@@ -2973,9 +2984,19 @@ class ProtoDial ( wx.Dialog ):
         # Connect Events
         self.choix_freq.Bind( wx.EVT_CHOICE, self.UpdateText )
         self.choix_rang.Bind( wx.EVT_CHOICE, self.UpdateText )
+        self.Bind(wx.EVT_LISTBOX, self.selchange, self.variables)
+        self.Bind(wx.EVT_LISTBOX, self.selchange, self.rangs)
+        
+        self.m_sdbSizer1OK.Enable(False)
     
     def __del__( self ):
         pass
+    
+    def selchange(self, evt):
+        if (len(self.variables.GetSelections()) == 0) or (len(self.rangs.GetSelections()) == 0) or (len(self.variables.GetSelections()) != len(self.rangs.GetSelections())) :
+            self.m_sdbSizer1OK.Enable(False)
+        else :
+            self.m_sdbSizer1OK.Enable(True)
     
     
     # Virtual event handlers, overide them in your derived class

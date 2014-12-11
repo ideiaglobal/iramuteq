@@ -222,7 +222,7 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
 	out <- list(graph = g.toplot, mat.eff = mat.eff, eff = eff, mat = mat.simi, v.label = v.label, we.width = we.width, we.label=we.label, label.cex = label.cex, layout = lo, communities = com, halo = halo, elim=vec)
 }
 	
-plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities = NULL, vertex.col = 'red', edge.col = 'black', edge.label = TRUE, vertex.label=TRUE, vertex.label.color = 'black', vertex.label.cex= NULL, vertex.size=NULL, leg=NULL, width = 800, height = 800, alpha = 0.1, cexalpha = FALSE, movie = NULL, edge.curved = TRUE, svg = FALSE) {
+plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities = NULL, vertex.col = 'red', edge.col = 'black', edge.label = TRUE, vertex.label=TRUE, vertex.label.color = 'black', vertex.label.cex= NULL, vertex.size=NULL, leg=NULL, width = 800, height = 800, alpha = 0.1, cexalpha = FALSE, movie = NULL, edge.curved = TRUE, svg = FALSE, bg='white') {
 	mat.simi <- graph.simi$mat
 	g.toplot <- graph.simi$graph
     if (is.null(vertex.size)) {
@@ -266,6 +266,7 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
         #print('ATTENTION - PAS OPEN FILE')
         open_file_graph(filename, width = width, height = height, svg = svg)
         par(mar=c(2,2,2,2))
+        par(bg=bg)
         if (!is.null(leg)) {
             layout(matrix(c(1,2),1,2, byrow=TRUE),widths=c(3,lcm(7)))
             par(mar=c(2,2,1,0))

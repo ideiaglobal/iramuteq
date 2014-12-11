@@ -242,7 +242,7 @@ class IraFrame(wx.Frame):
         file_menu.AppendItem(item)
         
         item = wx.MenuItem(file_menu, ID_OnOpenAnalyse, _(u"Open an analysis").decode('utf8'), _(u"Open an analysis").decode('utf8'))
-        item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
+        item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN, size = (16,16)))
         file_menu.AppendItem(item)
 
         
@@ -283,7 +283,10 @@ class IraFrame(wx.Frame):
         file_menu.Append(wx.ID_EXIT, _(u"Exit").decode('utf8'))
         
         edit_menu = wx.Menu()
-        edit_menu.Append(wx.ID_PREFERENCES, _(u'Preferences').decode('utf8'))
+        pref = wx.MenuItem(edit_menu, wx.ID_PREFERENCES, _(u'Preferences').decode('utf8'))
+        pref.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_HELP_SETTINGS, size = (16,16)))
+        edit_menu.AppendItem(pref)
+        #edit_menu.Append(wx.ID_PREFERENCES, _(u'Preferences').decode('utf8'))
         
         view_menu = wx.Menu()
         view_menu.Append(ID_ACCEUIL, _(u"Home page").decode('utf8'))
