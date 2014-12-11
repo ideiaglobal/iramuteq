@@ -1051,34 +1051,34 @@ class StatDialog ( wx.Dialog ):
         
         self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, _(u"Lemmatization").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
-        gSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
+        gSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_VERTICAL, 1 )
         
         radio_lemChoices = [ _(u"yes").decode('utf8'), _(u"no").decode('utf8') ]
         self.radio_lem = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, radio_lemChoices, 1, wx.RA_SPECIFY_COLS )
         self.radio_lem.SetSelection( 0 )
-        gSizer1.Add( self.radio_lem, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 1 )
+        gSizer1.Add( self.radio_lem, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT, 1 )
         
         self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, _(u"Keys properties").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
-        gSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
+        gSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_VERTICAL, 1 )
         
         self.button_5 = wx.Button( self, wx.ID_PREFERENCES, _(u"properties").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
-        gSizer1.Add( self.button_5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 1 )
+        gSizer1.Add( self.button_5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT, 1 )
         
         self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, _(u"Dictionary").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
-        gSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
+        gSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL, 1 )
         
         radio_dictchoiceChoices = [ _(u"indexation").decode('utf8'), _(u"other").decode('utf8') ]
         self.radio_dictchoice = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, radio_dictchoiceChoices, 1, wx.RA_SPECIFY_COLS )
         self.radio_dictchoice.SetSelection( 0 )
-        gSizer1.Add( self.radio_dictchoice, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 1 )
+        gSizer1.Add( self.radio_dictchoice, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT, 1 )
         
         
         bSizer1.Add( gSizer1, 1, wx.EXPAND, 1 )
         
         self.dictpath = filebrowse.FileBrowseButton(self, -1, size=(350, -1),  labelText = _(u"Path").decode('utf8'), fileMode = 2, fileMask = '*')
-        bSizer1.Add( self.dictpath, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
+        bSizer1.Add( self.dictpath, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 1 )
         self.dictpath.Enable(False)
 
         m_sdbSizer1 = wx.StdDialogButtonSizer()
