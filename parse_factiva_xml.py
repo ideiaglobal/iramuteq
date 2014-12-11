@@ -89,7 +89,7 @@ class PrefImport(wx.Dialog):
         else :
             txt = _(u'Select a directory of txt files').decode('utf8')
         self.parent = parent
-        self.txt1 = wx.StaticText(self, -1, txt.encode('utf8'))
+        self.txt1 = wx.StaticText(self, -1, txt)
         self.dbb = filebrowse.DirBrowseButton(self, -1, size=(450, -1), changeCallback = self.fbbCallback)
         self.dbb.SetLabel("")
         self.txt2 = wx.StaticText(self, -1, _(u'Output file').decode('utf8'))
