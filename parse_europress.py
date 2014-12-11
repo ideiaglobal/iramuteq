@@ -10,11 +10,6 @@ import os
 from HTMLParser import HTMLParser
 
 
-infile = '/home/pierre/workspace/iramuteq/dev/europress/DocActionPrintSave.aspx.html'
-
-with codecs.open(infile, 'r', 'utf8') as f :
-    html = f.read()
-
 mois = {u'janvier' : '01', 
         u'février' : '02',
         u'mars' : '03',
