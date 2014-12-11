@@ -12,6 +12,7 @@ import re
 import wx
 from parse_factiva_mail import ParseFactivaMail
 from parse_factiva_txt import ParseFactivaPaste
+from parse_europress import ParseEuropress
 from import_txm import TXM2IRA
 
 def ParseDocument(filename) :
@@ -170,6 +171,8 @@ class ImportFactiva():
                 res = ParseFactivaPaste(xmldir, corp_out, 'utf8', parent.syscoding)
             elif methode == 'txm' :
                 res = TXM2IRA(xmldir, corp_out, 'utf8', parent.syscoding)
+            elif methode == 'euro' :
+                res = ParseEuropress(xmldir, corp_out, 'utf8', 'utf8')
             if res == 'nofile' :
                 dlg = wx.MessageDialog(parent, u"Pas de fichier \'.xml\' dans %s" % xmldir, 'ATTENTION', wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
                 dlg.CenterOnParent()

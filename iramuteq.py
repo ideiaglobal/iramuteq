@@ -5,7 +5,6 @@
 #License: GNU GPL
 
 from optparse import OptionParser
-from wx import BusyCursor
 
 parser = OptionParser()
 parser.add_option("-f", "--file", dest="filename",
@@ -94,6 +93,7 @@ ID_Splitfromvar = wx.NewId()
 ID_Subtxtfrommeta = wx.NewId()
 ID_Subtxtfromthem = wx.NewId()
 ID_WC = wx.NewId()
+ID_ImportEuro = wx.NewId()
 ##########################################################
 #elements de configuration
 ##########################################################
@@ -256,6 +256,10 @@ class IraFrame(wx.Frame):
         item = wx.MenuItem(file_menu, ID_ImportTXM, _(u"Import from TXM").decode('utf8'), _(u"Import from TXM").decode('utf8'))
         item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
         file_menu.AppendItem(item)
+        
+        item = wx.MenuItem(file_menu, ID_ImportEuro, _(u"Import from Europress").decode('utf8'), _(u"Import from Europress").decode('utf8'))
+        item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
+        file_menu.AppendItem(item)        
 
         menuTools = wx.Menu()
         splitvar = wx.MenuItem(menuTools, wx.ID_ANY, _(u"Split from variable").decode('utf8'))
@@ -533,6 +537,7 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnHelp, id=wx.ID_HELP)
         self.Bind(wx.EVT_MENU, self.OnPref, id=wx.ID_PREFERENCES)
         self.Bind(wx.EVT_MENU, self.OnImportTXM, id=ID_ImportTXM)
+        self.Bind(wx.EVT_MENU, self.OnImportEuropress, id=ID_ImportEuro)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 ##################################################################
         flags = self._mgr.GetAGWFlags()
@@ -624,16 +629,10 @@ class IraFrame(wx.Frame):
             if not RLibsAreInstalled(self) :
                 CheckRPackages(self)
         else :
-            msg = '\n'.join([_(u"Can't find R executable"), _(u"If R is not installed, get it from http://www.r-project.org."),
-                             _(u"If R is installed, report its path in Preferences."),
-                             _(u"IRaMuTeQ does not work without R.")])
-#            msg = u"""
-#Le chemin de l'executable de R n'a pas été trouvé.
-#Si R n'est pas installé, vous devez l'installer (http://www.r-project.org/).
-#Si R n'est pas installé dans le répertoire par défaut
-#(souvent C:\Program Files\R\R-2.x.x\R.exe sous windows ou /usr/bin/R sous linux ou Mac Os X)
-#vous devez signaler le chemin de l'éxecutable de R dans les préférences.""" 
-            dlg = wx.MessageDialog(self, msg, u"Problème de configuration", wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
+            msg = '\n'.join([_(u"Can't find R executable"), _(u"If R is not installed, get it from http://www.r-project.org.").decode('utf8'),
+                             _(u"If R is installed, report its path in Preferences.").decode('utf8'),
+                             _(u"IRaMuTeQ does not work without R.").decode('utf8')])
+            dlg = wx.MessageDialog(self, msg, _(u"Problem").decode('utf8'), wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
             dlg.CenterOnParent()
             if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
                 pass
@@ -800,6 +799,7 @@ class IraFrame(wx.Frame):
         info.Name = ConfigGlob.get('DEFAULT', 'name')
         info.Version = ConfigGlob.get('DEFAULT', 'version')
         info.Copyright = ConfigGlob.get('DEFAULT', 'copyright')
+        info.Translators = ConfigGlob.get('DEFAULT', 'translators').decode('utf8').split(';')
         info.Description = u"""
 Interface de R pour les Analyses Multidimensionnelles 
 de Textes et de Questionnaires
@@ -1064,6 +1064,12 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
     def OnImportTXM(self, evt) :
         try :
             ImportFactiva(self, 'txm')
+        except :
+            BugReport(self)
+    
+    def OnImportEuropress(self, evt) :
+        try :
+            ImportFactiva(self, 'euro')
         except :
             BugReport(self)
 
