@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-09 00:28+0100\n"
+"POT-Creation-Date: 2014-12-11 14:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "3D graph"
 msgstr ""
 
-#: iramuteq.py:294
+#: iramuteq.py:373
 msgid "About..."
 msgstr ""
 
@@ -49,7 +49,7 @@ msgstr ""
 msgid "All segments"
 msgstr ""
 
-#: layout.py:339 tree.py:444 tree.py:657
+#: layout.py:339 tree.py:407 tree.py:620
 msgid "Antiprofiles"
 msgstr ""
 
@@ -61,7 +61,7 @@ msgstr ""
 msgid "Are you sure ?"
 msgstr ""
 
-#: Liste.py:163 Liste.py:180 listlex.py:198 listlex.py:233 ProfList.py:308
+#: Liste.py:163 Liste.py:180 listlex.py:197 listlex.py:232 ProfList.py:308
 #: ProfList.py:743
 msgid "Associated forms"
 msgstr ""
@@ -102,6 +102,10 @@ msgstr ""
 msgid "CA forms"
 msgstr ""
 
+#: iramuteq.py:627
+msgid "Can't find R executable"
+msgstr ""
+
 #: dialog.py:2376
 msgid "Change ..."
 msgstr ""
@@ -110,7 +114,7 @@ msgstr ""
 msgid "Characteristic text segments"
 msgstr ""
 
-#: dialog.py:82 dialog.py:2313 dialog.py:2706 layout.py:1030
+#: dialog.py:82 dialog.py:2313 dialog.py:2705 layout.py:1030
 msgid "Characters set"
 msgstr ""
 
@@ -130,7 +134,7 @@ msgid ""
 "of R packages"
 msgstr ""
 
-#: dialog.py:1481 iramuteq.py:261
+#: dialog.py:1481 iramuteq.py:290
 msgid "Chi2"
 msgstr ""
 
@@ -170,12 +174,12 @@ msgstr ""
 msgid "Cluster"
 msgstr ""
 
-#: dialog.py:1308 iramuteq.py:266 iramuteq.py:287 layout.py:526
-#: OptionAlceste.py:29 tree.py:399
+#: dialog.py:1308 iramuteq.py:291 iramuteq.py:338 layout.py:526
+#: OptionAlceste.py:29
 msgid "Clustering"
 msgstr ""
 
-#: tree.py:454 tree.py:639 tree.py:648
+#: tree.py:417 tree.py:602 tree.py:611
 msgid "Clusters statistics"
 msgstr ""
 
@@ -183,7 +187,7 @@ msgstr ""
 msgid "Color or black and white"
 msgstr ""
 
-#: tree.py:452 tree.py:612
+#: tree.py:415 tree.py:575
 msgid "Colored corpus"
 msgstr ""
 
@@ -195,11 +199,11 @@ msgstr ""
 msgid "Communities"
 msgstr ""
 
-#: tree.py:450 tree.py:479
+#: tree.py:413 tree.py:442
 msgid "Compute Tgen"
 msgstr ""
 
-#: Liste.py:164 Liste.py:191 listlex.py:199 listlex.py:294 ProfList.py:321
+#: Liste.py:164 Liste.py:191 listlex.py:198 listlex.py:293 ProfList.py:321
 #: ProfList.py:677 ProfList.py:683 ProfList.py:689
 msgid "Concordance"
 msgstr ""
@@ -228,7 +232,7 @@ msgstr ""
 msgid "Delete characters not in this list"
 msgstr ""
 
-#: tree.py:492
+#: tree.py:455
 msgid "Delete from history"
 msgstr ""
 
@@ -248,7 +252,7 @@ msgstr ""
 msgid "Dictionary"
 msgstr ""
 
-#: tree.py:626
+#: tree.py:589
 msgid "Done"
 msgstr ""
 
@@ -268,7 +272,7 @@ msgstr ""
 msgid "Edges width proportional to score"
 msgstr ""
 
-#: iramuteq.py:298
+#: iramuteq.py:377
 msgid "Edition"
 msgstr ""
 
@@ -276,23 +280,23 @@ msgstr ""
 msgid "Etymology"
 msgstr ""
 
-#: iramuteq.py:248
+#: iramuteq.py:277
 msgid "Exit"
 msgstr ""
 
-#: tree.py:456
+#: tree.py:419
 msgid "Export clusters"
 msgstr ""
 
-#: tree.py:451
+#: tree.py:414
 msgid "Export corpus"
 msgstr ""
 
-#: tree.py:472
+#: tree.py:435
 msgid "Export dictionary"
 msgstr ""
 
-#: dialog.py:2998
+#: dialog.py:2997
 msgid "Export finished. Open in a web browser :"
 msgstr ""
 
@@ -304,7 +308,7 @@ msgstr ""
 msgid "Export for Tropes"
 msgstr ""
 
-#: tree.py:473
+#: tree.py:436
 msgid "Export lemma dictionary"
 msgstr ""
 
@@ -316,15 +320,15 @@ msgstr ""
 msgid "Exporter for Owledge"
 msgstr ""
 
-#: iramuteq.py:233
+#: iramuteq.py:262
 msgid "Extract mods"
 msgstr ""
 
-#: iramuteq.py:234
+#: iramuteq.py:263
 msgid "Extract thematics"
 msgstr ""
 
-#: dialog.py:2737
+#: dialog.py:2736
 msgid "Extraction type"
 msgstr ""
 
@@ -344,7 +348,7 @@ msgstr ""
 msgid "Factor z : "
 msgstr ""
 
-#: iramuteq.py:297
+#: iramuteq.py:376
 msgid "File"
 msgstr ""
 
@@ -384,7 +388,7 @@ msgstr ""
 msgid "Freq."
 msgstr ""
 
-#: iramuteq.py:259
+#: iramuteq.py:288
 msgid "Frequencies"
 msgstr ""
 
@@ -408,7 +412,7 @@ msgstr ""
 msgid "Graph settings"
 msgstr ""
 
-#: dialog.py:3266 listlex.py:200 listlex.py:345
+#: dialog.py:3274 listlex.py:199 listlex.py:344
 msgid "Graphic"
 msgstr ""
 
@@ -428,27 +432,39 @@ msgstr ""
 msgid "Hapax"
 msgstr ""
 
-#: iramuteq.py:302
+#: iramuteq.py:381
 msgid "Help"
 msgstr ""
 
-#: iramuteq.py:343
+#: iramuteq.py:441
 msgid "Historic"
 msgstr ""
 
-#: iramuteq.py:254
+#: iramuteq.py:283
 msgid "Home page"
 msgstr ""
 
-#: dialog.py:1869 dialog.py:3128
+#: iramuteq.py:629
+msgid "IRaMuTeQ does not work without R."
+msgstr ""
+
+#: iramuteq.py:628
+msgid "If R is installed, report its path in Preferences."
+msgstr ""
+
+#: iramuteq.py:627
+msgid "If R is not installed, get it from http://www.r-project.org."
+msgstr ""
+
+#: dialog.py:1869 dialog.py:3136
 msgid "Image format"
 msgstr ""
 
-#: iramuteq.py:227
+#: iramuteq.py:256
 msgid "Import from TXM"
 msgstr ""
 
-#: iramuteq.py:225
+#: iramuteq.py:254
 msgid "Import from factiva"
 msgstr ""
 
@@ -464,12 +480,20 @@ msgstr ""
 msgid "In segments of this clustering"
 msgstr ""
 
-#: dialog.py:2831
+#: dialog.py:2830
 msgid "Include empty cells (NA)"
 msgstr ""
 
-#: tree.py:389
+#: tree.py:395
 msgid "Informations"
+msgstr ""
+
+#: iramuteq.py:653
+msgid "Installation"
+msgstr ""
+
+#: iramuteq.py:653
+msgid "Installation OK"
 msgstr ""
 
 #: dialog.py:369
@@ -500,7 +524,7 @@ msgstr ""
 msgid "Lemmatization"
 msgstr ""
 
-#: iramuteq.py:1087
+#: iramuteq.py:1218
 msgid "License GNU GPL"
 msgstr ""
 
@@ -512,7 +536,7 @@ msgstr ""
 msgid "Like Lexico"
 msgstr ""
 
-#: dialog.py:2901
+#: dialog.py:2900
 msgid "Limit frequency"
 msgstr ""
 
@@ -520,7 +544,7 @@ msgstr ""
 msgid "Limit points by cluster chi2"
 msgstr ""
 
-#: dialog.py:2921
+#: dialog.py:2920
 msgid "Limit rank"
 msgstr ""
 
@@ -528,7 +552,7 @@ msgstr ""
 msgid "List of not plotted points : "
 msgstr ""
 
-#: listlex.py:210 ProfList.py:322
+#: listlex.py:209 ProfList.py:322
 msgid "Make Tgen"
 msgstr ""
 
@@ -540,11 +564,11 @@ msgstr ""
 msgid "Make text segments"
 msgstr ""
 
-#: tree.py:169
+#: iramuteq.py:399 tree.py:175
 msgid "Matrix"
 msgstr ""
 
-#: iramuteq.py:300
+#: iramuteq.py:379
 msgid "Matrix analysis"
 msgstr ""
 
@@ -582,7 +606,7 @@ msgstr ""
 msgid "Mean of occurrences by text"
 msgstr ""
 
-#: dialog.py:1739 dialog.py:2941
+#: dialog.py:1739 dialog.py:2940
 msgid "Minimum frequency"
 msgstr ""
 
@@ -606,7 +630,7 @@ msgstr ""
 msgid "Minimum text segments frenquency in clusters (2= automatic)"
 msgstr ""
 
-#: dialog.py:2728
+#: dialog.py:2727
 msgid "Modalities (one by line, with the *)"
 msgstr ""
 
@@ -614,11 +638,15 @@ msgstr ""
 msgid "Morphology"
 msgstr ""
 
-#: iramuteq.py:260
-msgid "Multiple frequencies"
+#: iramuteq.py:289
+msgid "Multiple  Frequencies"
 msgstr ""
 
-#: tree.py:453
+#: dialog.py:3041
+msgid "Name"
+msgstr ""
+
+#: tree.py:416
 msgid "Navigator"
 msgstr ""
 
@@ -626,7 +654,7 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: tree.py:720
+#: tree.py:683
 msgid "No TGen yet !"
 msgstr ""
 
@@ -686,35 +714,35 @@ msgstr ""
 msgid "Number of texts"
 msgstr ""
 
-#: dialog.py:2741
+#: dialog.py:2740
 msgid "One file by modality"
 msgstr ""
 
-#: iramuteq.py:295
+#: iramuteq.py:374
 msgid "Online help..."
 msgstr ""
 
-#: dialog.py:2741
+#: dialog.py:2740
 msgid "Only one file"
 msgstr ""
 
-#: tree.py:445 tree.py:487
+#: tree.py:408 tree.py:450
 msgid "Open ..."
 msgstr ""
 
-#: iramuteq.py:205
+#: iramuteq.py:233 iramuteq.py:399
 msgid "Open a matrix"
 msgstr ""
 
-#: iramuteq.py:209
+#: iramuteq.py:238 iramuteq.py:401
 msgid "Open a text corpus"
 msgstr ""
 
-#: iramuteq.py:213
+#: iramuteq.py:242
 msgid "Open an analysis"
 msgstr ""
 
-#: tree.py:626
+#: tree.py:589
 msgid "Open in a web browser ?"
 msgstr ""
 
@@ -738,7 +766,7 @@ msgstr ""
 msgid "POS frequencies"
 msgstr ""
 
-#: tree.py:448
+#: tree.py:411
 msgid "POS profiles"
 msgstr ""
 
@@ -766,12 +794,12 @@ msgstr ""
 msgid "Play a sound at the end of analysis"
 msgstr ""
 
-#: corpus.py:1624 iramuteq.py:581 iramuteq.py:626 layout.py:946 tree.py:739
-#: tree.py:1063
+#: corpus.py:1624 iramuteq.py:706 iramuteq.py:755 layout.py:946 tree.py:702
+#: tree.py:1026
 msgid "Please wait..."
 msgstr ""
 
-#: tree.py:514
+#: tree.py:477
 msgid "Please wait...Reading corpus"
 msgstr ""
 
@@ -779,7 +807,7 @@ msgstr ""
 msgid "Potato mode (less precise, faster)"
 msgstr ""
 
-#: dialog.py:3085 iramuteq.py:251
+#: dialog.py:3093 iramuteq.py:280
 msgid "Preferences"
 msgstr ""
 
@@ -795,7 +823,7 @@ msgstr ""
 msgid "Profiles"
 msgstr ""
 
-#: iramuteq.py:269
+#: iramuteq.py:294
 msgid "Prototypical Analysis"
 msgstr ""
 
@@ -819,7 +847,7 @@ msgstr ""
 msgid "Ranking score"
 msgstr ""
 
-#: dialog.py:2878
+#: dialog.py:2877
 msgid "Ranks"
 msgstr ""
 
@@ -827,15 +855,15 @@ msgstr ""
 msgid "Reading profiles"
 msgstr ""
 
-#: iramuteq.py:308
+#: iramuteq.py:387
 msgid "Ready"
 msgstr ""
 
-#: iramuteq.py:264 iramuteq.py:285 tree.py:397
+#: iramuteq.py:292 iramuteq.py:339
 msgid "Reinert's Method"
 msgstr ""
 
-#: tree.py:390
+#: tree.py:396
 msgid "Rename"
 msgstr ""
 
@@ -843,7 +871,7 @@ msgstr ""
 msgid "Repeated segments"
 msgstr ""
 
-#: dialog.py:1243 layout.py:519 tree.py:447
+#: dialog.py:1243 layout.py:519 tree.py:410
 msgid "Repeated segments profiles"
 msgstr ""
 
@@ -855,7 +883,7 @@ msgstr ""
 msgid "Replace dash by space"
 msgstr ""
 
-#: tree.py:455 tree.py:486 tree.py:666 tree.py:676
+#: tree.py:418 tree.py:449 tree.py:629 tree.py:639
 msgid "Report"
 msgstr ""
 
@@ -871,7 +899,7 @@ msgstr ""
 msgid "Save as ..."
 msgstr ""
 
-#: dialog.py:3222
+#: dialog.py:3230
 msgid "Save as..."
 msgstr ""
 
@@ -883,7 +911,7 @@ msgstr ""
 msgid "Score on edges"
 msgstr ""
 
-#: tree.py:635
+#: tree.py:598
 msgid "Search ..."
 msgstr ""
 
@@ -903,7 +931,7 @@ msgstr ""
 msgid "Select a directory of xml files"
 msgstr ""
 
-#: dialog.py:2352 dialog.py:2701
+#: dialog.py:2352 dialog.py:2700
 msgid "Select a file"
 msgstr ""
 
@@ -919,24 +947,28 @@ msgstr ""
 msgid "Select columns"
 msgstr ""
 
+#: dialog.py:3048
+msgid "Select one or more metadata"
+msgstr ""
+
 #: dialog.py:330 dialog.py:469 dialog.py:970 dialog.py:1041 dialog.py:2149
-#: dialog.py:2279 dialog.py:2864 guifunct.py:161 OptionAlceste.py:63
+#: dialog.py:2279 dialog.py:2863 guifunct.py:161 OptionAlceste.py:63
 msgid "Settings"
 msgstr ""
 
-#: iramuteq.py:255
+#: iramuteq.py:284
 msgid "Show data"
 msgstr ""
 
-#: iramuteq.py:256
+#: iramuteq.py:285
 msgid "Show results"
 msgstr ""
 
-#: iramuteq.py:268 iramuteq.py:288 tree.py:400
+#: iramuteq.py:293 iramuteq.py:340
 msgid "Similarities Analysis"
 msgstr ""
 
-#: dialog.py:3093
+#: dialog.py:3101
 msgid "Size"
 msgstr ""
 
@@ -956,7 +988,7 @@ msgstr ""
 msgid "Specificities"
 msgstr ""
 
-#: iramuteq.py:282 tree.py:395
+#: iramuteq.py:337
 msgid "Specificities and CA"
 msgstr ""
 
@@ -964,36 +996,36 @@ msgstr ""
 msgid "Spheres transparency"
 msgstr ""
 
-#: iramuteq.py:232 tree.py:428
+#: iramuteq.py:261 iramuteq.py:295
 msgid "Split from variable"
-msgstr ""
-
-#: tree.py:429
-msgid "Split matrix"
 msgstr ""
 
 #: layout.py:551
 msgid "Stat by cluster"
 msgstr ""
 
-#: iramuteq.py:281 tree.py:394
+#: iramuteq.py:336
 msgid "Statistics"
 msgstr ""
 
-#: tree.py:405
+#: iramuteq.py:342
 msgid "Sub corpus"
 msgstr ""
 
-#: tree.py:457
+#: tree.py:420
 msgid "Sub corpus from clusters"
 msgstr ""
 
-#: tree.py:403
+#: iramuteq.py:343
 msgid "Sub corpus from metadata"
 msgstr ""
 
-#: tree.py:404
+#: iramuteq.py:344
 msgid "Sub corpus from thematic"
+msgstr ""
+
+#: dialog.py:3031
+msgid "Subcorpus"
 msgstr ""
 
 #: dialog.py:1340
@@ -1020,7 +1052,11 @@ msgstr ""
 msgid "Take the x first points by cluster"
 msgstr ""
 
-#: iramuteq.py:301
+#: iramuteq.py:401
+msgid "Text"
+msgstr ""
+
+#: iramuteq.py:380
 msgid "Text analysis"
 msgstr ""
 
@@ -1060,11 +1096,11 @@ msgstr ""
 msgid "Text size proportional to frequency"
 msgstr ""
 
-#: tree.py:147
+#: tree.py:153
 msgid "Textual corpus"
 msgstr ""
 
-#: tree.py:449 tree.py:478
+#: tree.py:412 tree.py:441
 msgid "Tgen Editor"
 msgstr ""
 
@@ -1076,7 +1112,7 @@ msgstr ""
 msgid "This file already exists. Continue anyway ?"
 msgstr ""
 
-#: tree.py:1074
+#: tree.py:1037
 #, python-format
 msgid "This file does not exist : %s"
 msgstr ""
@@ -1093,7 +1129,7 @@ msgstr ""
 msgid "This is not a variable_modality form"
 msgstr ""
 
-#: iramuteq.py:241
+#: iramuteq.py:270
 msgid "Tools"
 msgstr ""
 
@@ -1105,7 +1141,7 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-#: listlex.py:209 listlex.py:274 ProfList.py:334 ProfList.py:611
+#: listlex.py:208 listlex.py:273 ProfList.py:334 ProfList.py:611
 msgid "Typical text segments"
 msgstr ""
 
@@ -1125,11 +1161,11 @@ msgstr ""
 msgid "Used forms"
 msgstr ""
 
-#: dialog.py:2874
+#: dialog.py:2873
 msgid "Variables"
 msgstr ""
 
-#: dialog.py:2718
+#: dialog.py:2717
 msgid "Variables (with the * but without the _)"
 msgstr ""
 
@@ -1157,11 +1193,11 @@ msgstr ""
 msgid "Vertex text size proportional to frequency"
 msgstr ""
 
-#: iramuteq.py:299
+#: iramuteq.py:378
 msgid "View"
 msgstr ""
 
-#: iramuteq.py:309
+#: iramuteq.py:388
 msgid "Welcome"
 msgstr ""
 
@@ -1177,7 +1213,7 @@ msgstr ""
 msgid "Word size proportional to ..."
 msgstr ""
 
-#: iramuteq.py:290 tree.py:401
+#: iramuteq.py:341
 msgid "WordCloud"
 msgstr ""
 
@@ -1201,15 +1237,15 @@ msgstr ""
 msgid "actives forms"
 msgstr ""
 
-#: tree.py:485
+#: tree.py:448
 msgid "antiprofiles"
 msgstr ""
 
-#: dialog.py:3097
+#: dialog.py:3105
 msgid "automatic"
 msgstr ""
 
-#: dialog.py:2907 dialog.py:2927
+#: dialog.py:2906 dialog.py:2926
 msgid "automatic (mean)"
 msgstr ""
 
@@ -1257,7 +1293,7 @@ msgstr ""
 msgid "coordinates"
 msgstr ""
 
-#: dialog.py:2298 dialog.py:2697
+#: dialog.py:2298 dialog.py:2696
 msgid "corpus"
 msgstr ""
 
@@ -1281,15 +1317,15 @@ msgstr ""
 msgid "frequency"
 msgstr ""
 
-#: iramuteq.py:221
+#: iramuteq.py:250
 msgid "from copy/paste"
 msgstr ""
 
-#: iramuteq.py:220
+#: iramuteq.py:249
 msgid "from mail"
 msgstr ""
 
-#: iramuteq.py:219
+#: iramuteq.py:248
 msgid "from xml"
 msgstr ""
 
@@ -1297,7 +1333,7 @@ msgstr ""
 msgid "graphical"
 msgstr ""
 
-#: dialog.py:554 dialog.py:1826 dialog.py:1979 dialog.py:3113 guifunct.py:416
+#: dialog.py:554 dialog.py:1826 dialog.py:1979 dialog.py:3121 guifunct.py:416
 msgid "height"
 msgstr ""
 
@@ -1313,7 +1349,7 @@ msgstr ""
 msgid "line classified on"
 msgstr ""
 
-#: dialog.py:2907 dialog.py:2927 dialog.py:3097
+#: dialog.py:2906 dialog.py:2926 dialog.py:3105
 msgid "manual"
 msgstr ""
 
@@ -1402,7 +1438,7 @@ msgstr ""
 msgid "texts classified on"
 msgstr ""
 
-#: dialog.py:2747
+#: dialog.py:2746
 msgid "thematics (one by line, with the -*)"
 msgstr ""
 
@@ -1418,7 +1454,7 @@ msgstr ""
 msgid "variables"
 msgstr ""
 
-#: dialog.py:552 dialog.py:1837 dialog.py:1991 dialog.py:3106 guifunct.py:423
+#: dialog.py:552 dialog.py:1837 dialog.py:1991 dialog.py:3114 guifunct.py:423
 msgid "width"
 msgstr ""
 

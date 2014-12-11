@@ -624,12 +624,15 @@ class IraFrame(wx.Frame):
             if not RLibsAreInstalled(self) :
                 CheckRPackages(self)
         else :
-            msg = u"""
-Le chemin de l'executable de R n'a pas été trouvé.
-Si R n'est pas installé, vous devez l'installer (http://www.r-project.org/).
-Si R n'est pas installé dans le répertoire par défaut
-(souvent C:\Program Files\R\R-2.x.x\R.exe sous windows ou /usr/bin/R sous linux ou Mac Os X)
-vous devez signaler le chemin de l'éxecutable de R dans les préférences.""" 
+            msg = '\n'.join([_(u"Can't find R executable"), _(u"If R is not installed, get it from http://www.r-project.org."),
+                             _(u"If R is installed, report its path in Preferences."),
+                             _(u"IRaMuTeQ does not work without R.")])
+#            msg = u"""
+#Le chemin de l'executable de R n'a pas été trouvé.
+#Si R n'est pas installé, vous devez l'installer (http://www.r-project.org/).
+#Si R n'est pas installé dans le répertoire par défaut
+#(souvent C:\Program Files\R\R-2.x.x\R.exe sous windows ou /usr/bin/R sous linux ou Mac Os X)
+#vous devez signaler le chemin de l'éxecutable de R dans les préférences.""" 
             dlg = wx.MessageDialog(self, msg, u"Problème de configuration", wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
             dlg.CenterOnParent()
             if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
