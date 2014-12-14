@@ -94,6 +94,9 @@ ID_Subtxtfrommeta = wx.NewId()
 ID_Subtxtfromthem = wx.NewId()
 ID_WC = wx.NewId()
 ID_ImportEuro = wx.NewId()
+ID_Fact_xml = wx.NewId()
+ID_Fact_mail = wx.NewId()
+ID_Fact_copy = wx.NewId()
 ##########################################################
 #elements de configuration
 ##########################################################
@@ -184,6 +187,10 @@ images_analyses = {
         'proto' : 'proto.png',
         'TXM' : 'TXM.png',
         'europress' : 'europress.png',
+        'factiva_xml' : 'factiva_xml.png',
+        'factiva_copy' : 'factiva_copy.png',
+        'factiva_mail': 'factiva_mail.png',
+        'iramuteq' : 'iraicone.png',
          }
 #####################################################################
 
@@ -242,18 +249,8 @@ class IraFrame(wx.Frame):
         file_menu.AppendItem(item)
         
         item = wx.MenuItem(file_menu, ID_OnOpenAnalyse, _(u"Open an analysis").decode('utf8'), _(u"Open an analysis").decode('utf8'))
-        item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN, size = (16,16)))
+        item.SetBitmap(self.images_analyses['iramuteq'])
         file_menu.AppendItem(item)
-
-        
-        menuFactiva = wx.Menu()
-        fact_from_xml = wx.MenuItem(menuFactiva, wx.ID_ANY, _(u"from xml").decode('utf8'))
-        fact_from_mail = wx.MenuItem(menuFactiva, wx.ID_ANY, _(u"from mail").decode('utf8'))
-        fact_from_txt = wx.MenuItem(menuFactiva, wx.ID_ANY, _(u"from copy/paste").decode('utf8'))
-        menuFactiva.AppendItem(fact_from_xml)
-        menuFactiva.AppendItem(fact_from_mail)
-        menuFactiva.AppendItem(fact_from_txt)
-        file_menu.AppendMenu(-1, _(u"Import from factiva").decode('utf8'), menuFactiva)
 
         item = wx.MenuItem(file_menu, ID_ImportTXM, _(u"Import from TXM").decode('utf8'), _(u"Import from TXM").decode('utf8'))
         item.SetBitmap(self.images_analyses['TXM'])
@@ -262,6 +259,18 @@ class IraFrame(wx.Frame):
         item = wx.MenuItem(file_menu, ID_ImportEuro, _(u"Import from Europress").decode('utf8'), _(u"Import from Europress").decode('utf8'))
         item.SetBitmap(self.images_analyses['europress'])
         file_menu.AppendItem(item)        
+        
+        menuFactiva = wx.Menu()
+        fact_from_xml = wx.MenuItem(menuFactiva, ID_Fact_xml, _(u"from xml").decode('utf8'))
+        fact_from_xml.SetBitmap(self.images_analyses['factiva_xml'])
+        fact_from_mail = wx.MenuItem(menuFactiva, ID_Fact_mail, _(u"from mail").decode('utf8'))
+        fact_from_mail.SetBitmap(self.images_analyses['factiva_mail'])
+        fact_from_txt = wx.MenuItem(menuFactiva, ID_Fact_copy, _(u"from copy/paste").decode('utf8'))
+        fact_from_txt.SetBitmap(self.images_analyses['factiva_copy'])
+        menuFactiva.AppendItem(fact_from_xml)
+        menuFactiva.AppendItem(fact_from_mail)
+        menuFactiva.AppendItem(fact_from_txt)
+        file_menu.AppendMenu(-1, _(u"Import from factiva").decode('utf8'), menuFactiva)
 
         menuTools = wx.Menu()
         splitvar = wx.MenuItem(menuTools, wx.ID_ANY, _(u"Split from variable").decode('utf8'))
@@ -379,8 +388,14 @@ class IraFrame(wx.Frame):
         self.text_menu = text_menu
         
         help_menu = wx.Menu()
-        help_menu.Append(wx.ID_ABOUT, _(u"About...").decode('utf8'))
-        help_menu.Append(wx.ID_HELP, _(u"Online help...").decode('utf8'))
+        about = wx.MenuItem(help_menu, wx.ID_ABOUT, _(u"About...").decode('utf8'))
+        about.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_INFORMATION, size = (16,16)))
+        help_menu.AppendItem(about)
+        #help_menu.Append(wx.ID_ABOUT, _(u"About...").decode('utf8'))
+        help = wx.MenuItem(help_menu, wx.ID_HELP, _(u"Online help...").decode('utf8'))
+        help.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_HELP, size = (16,16)))
+        help_menu.AppendItem(help)
+        #help_menu.Append(wx.ID_HELP, _(u"Online help...").decode('utf8'))
         
         self.mb.Append(file_menu, _(u"File").decode('utf8'))
         self.mb.Append(edit_menu, _(u"Edition").decode('utf8'))
@@ -408,7 +423,16 @@ class IraFrame(wx.Frame):
         tb1.AddLabelTool(ID_OpenData, "OpenData", self.images_analyses['matroot'], shortHelp=_(u"Matrix").decode('utf8'), longHelp=_(u"Open a matrix").decode('utf8'))
         tb1.AddSeparator()
         tb1.AddLabelTool(ID_OpenText, "OpenText", self.images_analyses['textroot'], shortHelp=_(u"Text").decode('utf8'), longHelp=_(u"Open a text corpus").decode('utf8'))
-        
+        tb1.AddSeparator()
+        tb1.AddLabelTool(ID_OnOpenAnalyse, "OpenAnalyse", self.images_analyses['iramuteq'], shortHelp= _(u"Open an analysis").decode('utf8'), longHelp=_(u"Open an analysis").decode('utf8'))
+        tb1.AddSeparator()
+        tb1.AddLabelTool(ID_ImportTXM, "ImportTXM", self.images_analyses['TXM'], shortHelp= _(u"Import from TXM").decode('utf8'), longHelp=_(u"Import from TXM").decode('utf8'))
+        tb1.AddSeparator()
+        tb1.AddLabelTool(ID_ImportEuro, "ImportEuro", self.images_analyses['europress'], shortHelp= _(u"Import from Europress").decode('utf8'), longHelp=_(u"Import from Europress").decode('utf8'))
+        tb1.AddSeparator()
+        tb1.AddLabelTool(ID_Fact_xml, "ImportFactxml", self.images_analyses['factiva_xml'], shortHelp= _(u"Factiva from xml").decode('utf8'), longHelp=_(u"Factiva from xml").decode('utf8'))
+        tb1.AddLabelTool(ID_Fact_mail, "ImportFactmail", self.images_analyses['factiva_mail'], shortHelp= _(u"Factiva from mail").decode('utf8'), longHelp=_(u"Factiva from mail").decode('utf8'))
+        tb1.AddLabelTool(ID_Fact_copy, "ImportFactcopy", self.images_analyses['factiva_copy'], shortHelp= _(u"Factiva from copy/paste").decode('utf8'), longHelp=_(u"Factiva from copy/paste").decode('utf8'))
         tb1.Realize()
         
         tb_text = wx.ToolBar(self, -1, wx.DefaultPosition, wx.DefaultSize,
