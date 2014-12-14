@@ -2623,24 +2623,25 @@ class message(wx.Frame):
         self.uceids = uceids
         self.ira = wx.GetApp().GetTopWindow()
         self.SetIcon(self.ira._icon)
-        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        #self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         self.items = items
         self.html = ""
         #self.HtmlPage=wx.html.HtmlWindow(self, -1)
+        self.panel = wx.Panel(self, wx.ID_ANY)
         self.HtmlPage = ConcordList(self, items)
         #self.HtmlPage.SetMinSize( size )
         #if "gtk2" in wx.PlatformInfo:
         #    self.HtmlPage.SetStandardFonts()
         #self.HtmlPage.SetFonts('Courier','Courier')
 
-        self.button_1 = wx.Button(self, wx.ID_CANCEL)
+        self.button_1 = wx.Button(self.panel, wx.ID_CANCEL)
 
         self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
         if self.save :
-            self.button_2 = wx.Button(self, wx.ID_SAVE)
+            self.button_2 = wx.Button(self.panel, wx.ID_SAVE)
             self.Bind(wx.EVT_BUTTON, self.OnSavePage, self.button_2)
         if self.uceids is not None :
-            self.butsub = wx.Button(self, -1, _(u"Build sub corpus").decode('utf8'))
+            self.butsub = wx.Button(self.panel, -1, _(u"Build sub corpus").decode('utf8'))
             self.Bind(wx.EVT_BUTTON, self.OnSub, self.butsub)
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
         self.__do_layout()
@@ -2650,13 +2651,14 @@ class message(wx.Frame):
         sizer_2.Add(self.HtmlPage, 1, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
         #m_sdbSizer1 = wx.StdDialogButtonSizer()
         m_sdbSizer1 = wx.BoxSizer(wx.HORIZONTAL)
-        m_sdbSizer1.Add(  self.button_1 , 0, wx.RIGHT | wx.EXPAND)
+        m_sdbSizer1.Add(  self.button_1 , 0, wx.ALIGN_RIGHT | wx.EXPAND)
         if self.save :
-            m_sdbSizer1.Add(  self.button_2 , 0, wx.RIGHT | wx.EXPAND)
+            m_sdbSizer1.Add(  self.button_2 , 0, wx.ALIGN_RIGHT | wx.EXPAND)
         if self.uceids is not None :
-            m_sdbSizer1.Add(  self.butsub , 0, wx.RIGHT | wx.EXPAND)
+            m_sdbSizer1.Add(  self.butsub , 0, wx.ALIGN_RIGHT | wx.EXPAND)
         #m_sdbSizer1.Realize()
-        sizer_2.Add(m_sdbSizer1, 0, wx.RIGHT | wx.EXPAND, 5)
+        self.panel.SetSizer( m_sdbSizer1 )
+        sizer_2.Add(self.panel, 0, wx.ALIGN_RIGHT, 5)
         self.SetSizer(sizer_2)
         self.Layout()
         sizer_2.Fit( self )
