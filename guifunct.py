@@ -1105,13 +1105,13 @@ class TGenFrame ( wx.Frame ):
         
         tgensChoices = Tgen.tgen.keys()
         self.tgens = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, tgensChoices, 0 )
-        #self.tgens.SetMinSize( wx.Size( 200,250 ) )
+        self.tgens.SetMinSize( wx.Size( 250,350 ) )
         
         fgSizer1.Add( self.tgens, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
         
         tgencontentChoices = []
         self.tgencontent = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, tgencontentChoices, 0|wx.VSCROLL )
-        #self.tgencontent.SetMinSize( wx.Size( 200,250 ) )
+        self.tgencontent.SetMinSize( wx.Size( 250,350 ) )
         
         fgSizer1.Add( self.tgencontent, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
         
