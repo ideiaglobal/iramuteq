@@ -83,7 +83,6 @@ ID_SaveTab = wx.NewId()
 ID_CreateText = wx.NewId()
 ID_ACCEUIL = wx.NewId()
 ID_RESULT = wx.NewId()
-ID_VIEWDATA = wx.NewId()
 ID_HTMLcontent = wx.NewId()
 ID_SimiTxt = wx.NewId()
 ID_proto = wx.NewId()
@@ -191,6 +190,9 @@ images_analyses = {
         'factiva_copy' : 'factiva_copy.png',
         'factiva_mail': 'factiva_mail.png',
         'iramuteq' : 'iraicone.png',
+        'subcorpusmeta' : 'subcorpusmeta.png',
+        'subcorpusthema' : 'subcorpusthema.png',
+        'preferences' : 'preferences.png'
          }
 #####################################################################
 
@@ -293,13 +295,19 @@ class IraFrame(wx.Frame):
         
         edit_menu = wx.Menu()
         pref = wx.MenuItem(edit_menu, wx.ID_PREFERENCES, _(u'Preferences').decode('utf8'))
-        pref.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_HELP_SETTINGS, size = (16,16)))
+        pref.SetBitmap(self.images_analyses['preferences'])
         edit_menu.AppendItem(pref)
         #edit_menu.Append(wx.ID_PREFERENCES, _(u'Preferences').decode('utf8'))
         
         view_menu = wx.Menu()
-        view_menu.Append(ID_ACCEUIL, _(u"Home page").decode('utf8'))
-        view_menu.Append(ID_RESULT, _(u'Show results').decode('utf8'))
+        home = wx.MenuItem(view_menu, ID_ACCEUIL, _(u"Home page").decode('utf8'))
+        home.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_GO_HOME, size = (16,16)))
+        view_menu.AppendItem(home)
+        #view_menu.Append(ID_ACCEUIL, _(u"Home page").decode('utf8'))
+        results = wx.MenuItem(view_menu, ID_RESULT, _(u'Show results').decode('utf8'))
+        results.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_LIST_VIEW, size = (16,16)))
+        view_menu.AppendItem(results)
+        #view_menu.Append(ID_RESULT, _(u'Show results').decode('utf8'))
         #view_menu.AppendSeparator()
         matrix_menu = wx.Menu()
         matanalyses = [[ID_Freq, _(u"Frequencies").decode('utf8'), 'freq'],
@@ -309,7 +317,7 @@ class IraFrame(wx.Frame):
                         'content' : [[ID_CHDReinert, _(u"Reinert's Method").decode('utf8'), 'reinertmatrix']]},
                        [ID_SIMI, _(u"Similarities Analysis").decode('utf8'), 'simimatrix'],
                        [ID_proto, _(u"Prototypical Analysis").decode('utf8'), 'proto'],
-                       [ID_Splitfromvar, _(u"Split from variable").decode('utf8'), '']]
+                       [ID_Splitfromvar, _(u"Split from variable").decode('utf8'), 'subcorpusmeta']]
         
         for analyse in matanalyses :
             if not isinstance(analyse, dict) :
@@ -357,8 +365,8 @@ class IraFrame(wx.Frame):
                          [ID_SimiTxt, _(u"Similarities Analysis").decode('utf8'), 'simitxt'],
                          [ID_WC, _(u"WordCloud").decode('utf8'), 'wordcloud'],
                          {'name' : _(u"Sub corpus").decode('utf8'),
-                          'content' : [[ID_Subtxtfrommeta, _(u'Sub corpus from metadata').decode('utf8'), None],
-                                       [ID_Subtxtfromthem, _(u'Sub corpus from thematic').decode('utf8'), None]]},
+                          'content' : [[ID_Subtxtfrommeta, _(u'Sub corpus from metadata').decode('utf8'), 'subcorpusmeta'],
+                                       [ID_Subtxtfromthem, _(u'Sub corpus from thematic').decode('utf8'), 'subcorpusthema']]},
                          ]
         
         for analyse in analyses_text :
@@ -432,6 +440,11 @@ class IraFrame(wx.Frame):
         tb1.AddLabelTool(ID_Fact_xml, "ImportFactxml", self.images_analyses['factiva_xml'], shortHelp= _(u"Factiva from xml").decode('utf8'), longHelp=_(u"Factiva from xml").decode('utf8'))
         tb1.AddLabelTool(ID_Fact_mail, "ImportFactmail", self.images_analyses['factiva_mail'], shortHelp= _(u"Factiva from mail").decode('utf8'), longHelp=_(u"Factiva from mail").decode('utf8'))
         tb1.AddLabelTool(ID_Fact_copy, "ImportFactcopy", self.images_analyses['factiva_copy'], shortHelp= _(u"Factiva from copy/paste").decode('utf8'), longHelp=_(u"Factiva from copy/paste").decode('utf8'))
+        tb1.AddSeparator()
+        tb1.AddLabelTool(wx.ID_PREFERENCES, "Preferences", self.images_analyses['preferences'], shortHelp= _(u"Preferences").decode('utf8'), longHelp=_(u"Preferences").decode('utf8'))
+        tb1.AddSeparator()
+        tb1.AddLabelTool(ID_ACCEUIL, "Home", wx.ArtProvider_GetBitmap(wx.ART_GO_HOME, size = (16,16)), shortHelp= _(u"Home page").decode('utf8'), longHelp=_(u"Home page").decode('utf8'))
+        tb1.AddLabelTool(ID_RESULT, "Results", wx.ArtProvider_GetBitmap(wx.ART_LIST_VIEW, size = (16,16)), shortHelp= _(u'Show results').decode('utf8'), longHelp=_(u'Show results').decode('utf8'))
         tb1.Realize()
         
         tb_text = wx.ToolBar(self, -1, wx.DefaultPosition, wx.DefaultSize,
@@ -537,7 +550,6 @@ class IraFrame(wx.Frame):
         # Show How To Use The Closing Panes Event
 ##################################################################        
         self.Bind(wx.EVT_MENU, self.OnAcceuil, id=ID_ACCEUIL)
-        self.Bind(wx.EVT_MENU, self.OnViewData, id=ID_VIEWDATA)
         self.Bind(wx.EVT_MENU, self.ShowTab, id=ID_RESULT)
         self.Bind(wx.EVT_MENU, self.OnOpenData, id=ID_OpenData)
         self.Bind(wx.EVT_MENU, self.OnOpenText, id=ID_OpenText)
@@ -615,8 +627,7 @@ class IraFrame(wx.Frame):
         self.type = ''
 
 ##############################################################@
-        self.DisEnSaveTabAs(False)
-        self.ShowMenu('view', False)
+        self.ShowMenu('view', True)
         self.ShowMenu('matrix', False)
         self.ShowMenu('text', False)
    
@@ -693,14 +704,6 @@ class IraFrame(wx.Frame):
             if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
                 evt.Veto()
 
-    def DisEnSaveTabAs(self, DISEN):
-    #Disable SaveTabAs
-        file_menu = self.mb.GetMenu(0)
-        items = file_menu.GetMenuItems()
-        for item in items :
-            if item.GetId() == ID_SaveTab :
-                item.Enable(DISEN)
-    
     def ShowMenu(self, menu, Show=True):
         if menu == 'text' :
             menu_pos = 4
@@ -765,23 +768,6 @@ class IraFrame(wx.Frame):
         if inputname:
             self.OpenText()
    
-    def OnViewData(self, event):
-        if self.type == "Data":
-            if not self.DataPop :
-                self.Sheet.Populate(self.content)
-                self.DataPop = True
-                self.DataTxt = False
-            self.ShowAPane(u"Data")
-        elif self.type == "Texte" or self.type == 'Analyse' :
-            if not self.DataTxt :
-                self.text_ctrl_txt.Clear()
-                self.text_ctrl_txt.write(self.content)
-                self.text_ctrl_txt.ShowPosition(0)
-                self.DataTxt = True
-                self.DataPop = False
-            self.ShowAPane(u"Text")
-        self._mgr.Update()
-    
     def OnSubText(self, evt, corpus = None, parametres = None):
         if corpus is None :
             corpus = self.tree.getcorpus()
@@ -829,7 +815,6 @@ class IraFrame(wx.Frame):
                 count += 1
                 keepGoing = dlg.Update(count, u"Chargement du dictionnaire")
                 dlg.Destroy()
-        #self.OnViewData(wx.EVT_BUTTON)
         
     def OnExit(self, event):
         self.Close()
@@ -908,7 +893,6 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
     
     def LastTabClose(self) :
         if self.nb.GetPageCount() == 1 :
-            #self.DisEnSaveTabAs(False)
             if self.DataTxt :
                 self.ShowAPane("Text")
             elif self.DataPop :

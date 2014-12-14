@@ -375,7 +375,7 @@ releases at startup""").decode('utf8')
         self.m_staticText46.Wrap( -1 )
         fgSizer1.Add( self.m_staticText46, 0, wx.ALL, 5 )
         
-        self.listlangues = [ u"french", u"english", u"spanish", u"portuguese", u"italian" ]
+        self.listlangues = [ u"english",u"french", u"italian", u"portuguese", u"spanish"]
         self.langues = wx.Choice( self, wx.ID_ANY, (200, -1), choices = self.listlangues)
         #self.langues.SetSelection( 0 )
         fgSizer1.Add( self.langues, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
