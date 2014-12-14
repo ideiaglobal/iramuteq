@@ -36,12 +36,15 @@ class WordCloud(AnalyseText):
             elif self.parametres['mode'] == 1 :
                 self.actives = self.corpus.make_actives_limit(limit, 2)
             dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)]) 
-            SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], dlg = True)
-            self.dlg = progressbar(self.ira, 2)
-            self.make_wordcloud()
-            script = WordCloudRScript(self)
-            script.make_script()
-            self.doR(script.scriptout, dlg = self.dlg, message = 'R...')
+            selectcol = SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], dlg = True)
+            if selectcol.ok :
+                self.dlg = progressbar(self.ira, 2)
+                self.make_wordcloud()
+                script = WordCloudRScript(self)
+                script.make_script()
+                self.doR(script.scriptout, dlg = self.dlg, message = 'R...')
+            else :
+                return 'NOK'
         else :
             return 'NOK'
     

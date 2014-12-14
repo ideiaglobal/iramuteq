@@ -149,6 +149,7 @@ class SelectColumn :
             else :
                 self.ok = False
         else :
+            self.ok = True
             if selected is None :
                 selected = [i for i in range(0, len(actives))]
             with open(pathout, 'w') as f :
@@ -1079,7 +1080,7 @@ class CreateTgenDialog ( wx.Frame ):
 class TGenFrame ( wx.Frame ):
     
     def __init__( self, parent, corpus, Tgen ):
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Tgen", pos = wx.DefaultPosition, size = wx.Size( 600,434 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL|wx.FRAME_FLOAT_ON_PARENT|wx.STAY_ON_TOP )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Tgen", pos = wx.DefaultPosition, size = wx.Size( -1, -1 ), style = wx.CLOSE_BOX|wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL|wx.STAY_ON_TOP )
         
         self.Tgen = Tgen
         self.parent = parent
@@ -1104,15 +1105,15 @@ class TGenFrame ( wx.Frame ):
         
         tgensChoices = Tgen.tgen.keys()
         self.tgens = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, tgensChoices, 0 )
-        self.tgens.SetMinSize( wx.Size( 200,250 ) )
+        #self.tgens.SetMinSize( wx.Size( 200,250 ) )
         
-        fgSizer1.Add( self.tgens, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        fgSizer1.Add( self.tgens, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
         
         tgencontentChoices = []
         self.tgencontent = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, tgencontentChoices, 0|wx.VSCROLL )
-        self.tgencontent.SetMinSize( wx.Size( 200,250 ) )
+        #self.tgencontent.SetMinSize( wx.Size( 200,250 ) )
         
-        fgSizer1.Add( self.tgencontent, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        fgSizer1.Add( self.tgencontent, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
         
         fgSizer2 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer2.SetFlexibleDirection( wx.BOTH )
@@ -1125,7 +1126,7 @@ class TGenFrame ( wx.Frame ):
         fgSizer2.Add( self.but_del, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         
-        fgSizer1.Add( fgSizer2, 0, wx.EXPAND, 5 )
+        fgSizer1.Add( fgSizer2, 0, wx.EXPAND, 0 )
         
         fgSizer3 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer3.SetFlexibleDirection( wx.BOTH )
@@ -1136,7 +1137,7 @@ class TGenFrame ( wx.Frame ):
         self.but_compute = wx.Button( self, wx.ID_ANY, u"Compute", wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer3.Add( self.but_compute, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )      
 
-        fgSizer1.Add( fgSizer3, 0, wx.EXPAND, 5 )
+        fgSizer1.Add( fgSizer3, 0, wx.EXPAND, 0 )
 
         bSizer1.Add( fgSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -1152,6 +1153,7 @@ class TGenFrame ( wx.Frame ):
         
         self.SetSizer( bSizer1 )
         self.Layout()
+        bSizer1.Fit( self )
         
         self.Centre( wx.BOTH )
         
