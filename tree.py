@@ -686,7 +686,7 @@ class LeftTree(CT.CustomTreeCtrl):
         corpus = self.page.corpus
         tgenpath = os.path.join(self.page.parametres['pathout'], 'tgen.csv')        
         if not os.path.exists(tgenpath) :
-            message = wx.MessageDialog(self.parent, _(u"No TGen yet !"), style = wx.ICON_EXCLAMATION | wx.OK) 
+            message = wx.MessageDialog(self.parent, _(u"No TGen yet !").decode('utf8'), style = wx.ICON_EXCLAMATION | wx.OK) 
             message.ShowModal()
             message.Destroy()
         else :
@@ -726,7 +726,7 @@ class LeftTree(CT.CustomTreeCtrl):
         else :
             name = 'name'
         oldname = pydata[name]
-        dlg = wx.TextEntryDialog(self, "Please Enter The New Item Name", 'Item Naming', oldname)
+        dlg = wx.TextEntryDialog(self, _("New Name").decode('utf8'), _(u'Rename').decode('utf8'), oldname)
         if dlg.ShowModal() == wx.ID_OK:
             newname = dlg.GetValue()
             dlg.Destroy()
