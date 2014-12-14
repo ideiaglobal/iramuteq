@@ -299,7 +299,6 @@ class IraFrame(wx.Frame):
         
         view_menu = wx.Menu()
         view_menu.Append(ID_ACCEUIL, _(u"Home page").decode('utf8'))
-        view_menu.Append(ID_VIEWDATA, _(u"Show data").decode('utf8'))
         view_menu.Append(ID_RESULT, _(u'Show results').decode('utf8'))
         #view_menu.AppendSeparator()
         matrix_menu = wx.Menu()
@@ -454,6 +453,12 @@ class IraFrame(wx.Frame):
                 for subana in analyse['content'] :
                     tb_mat.AddLabelTool(subana[0], subana[1], self.images_analyses.get(subana[2], wx.EmptyBitmap(16,16)), shortHelp = subana[1], longHelp = subana[1])        
         tb_mat.Realize()
+        
+        tb_help = wx.ToolBar(self, -1, wx.DefaultPosition, wx.DefaultSize,
+                         wx.TB_FLAT | wx.TB_NODIVIDER)
+        tb_help.AddLabelTool(wx.ID_ABOUT, "About", wx.ArtProvider_GetBitmap(wx.ART_INFORMATION, size=(16,16)), shortHelp=_(u"About...").decode('utf8'), longHelp=_(u"About...").decode('utf8'))
+        tb_help.AddLabelTool(wx.ID_HELP, "Help", wx.ArtProvider_GetBitmap(wx.ART_HELP, size=(16,16)), shortHelp=_(u"Online help...").decode('utf8'), longHelp=_(u"Online help...").decode('utf8'))
+        tb_help.Realize()
 #------------------------------------------------------------------------------------------------
 
         self.text_ctrl_txt = wx.TextCtrl(self, -1, "", wx.Point(0, 0), wx.Size(200, 200), wx.NO_BORDER | wx.TE_MULTILINE | wx.TE_RICH2 | wx.TE_READONLY)
@@ -513,8 +518,13 @@ class IraFrame(wx.Frame):
         self._mgr.AddPane(tb_mat, aui.AuiPaneInfo().
                           Name("tb_mat").Caption("analyse_matrix").
                           ToolbarPane().Top().
-                          LeftDockable(True).RightDockable(False))           
-        
+                          LeftDockable(True).RightDockable(False))
+                
+        self._mgr.AddPane(tb_help, aui.AuiPaneInfo().
+                          Name("tb_help").Caption("help").
+                          ToolbarPane().Top().
+                          LeftDockable(True).RightDockable(False))
+                
         self._mgr.GetPane('tb_text').Hide()
         self._mgr.GetPane('tb_mat').Hide()
         
