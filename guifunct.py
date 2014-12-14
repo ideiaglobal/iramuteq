@@ -1139,7 +1139,7 @@ class TGenFrame ( wx.Frame ):
 
         fgSizer1.Add( fgSizer3, 0, wx.EXPAND, 0 )
 
-        bSizer1.Add( fgSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        bSizer1.Add( fgSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
         
         m_sdbSizer2 = wx.StdDialogButtonSizer()
         self.m_sdbSizer2OK = wx.Button( self, wx.ID_OK )
