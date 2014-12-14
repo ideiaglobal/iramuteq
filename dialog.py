@@ -2628,7 +2628,7 @@ class message(wx.Frame):
         self.html = ""
         #self.HtmlPage=wx.html.HtmlWindow(self, -1)
         self.panel = wx.Panel(self, wx.ID_ANY)
-        self.HtmlPage = ConcordList(self, items)
+        self.HtmlPage = ConcordList(self.panel, items)
         #self.HtmlPage.SetMinSize( size )
         #if "gtk2" in wx.PlatformInfo:
         #    self.HtmlPage.SetStandardFonts()
@@ -2657,10 +2657,10 @@ class message(wx.Frame):
         if self.uceids is not None :
             m_sdbSizer1.Add(  self.butsub , 0, wx.ALIGN_RIGHT | wx.EXPAND)
         #m_sdbSizer1.Realize()
-        self.panel.SetSizer( m_sdbSizer1 )
-        sizer_2.Add(self.panel, 0, wx.ALIGN_RIGHT, 5)
-        self.SetSizer(sizer_2)
-        self.Layout()
+        #self.panel.SetSizer( m_sdbSizer1 )
+        sizer_2.Add( m_sdbSizer1, 0, wx.ALIGN_RIGHT, 5)
+        self.panel.SetSizer(sizer_2)
+        self.panel.Layout()
         sizer_2.Fit( self )
 
     def OnSavePage(self, evt) :
