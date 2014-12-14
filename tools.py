@@ -58,10 +58,12 @@ class Extract :
                 ExtractMods(parametres)
             elif option == 'them' :
                 SplitFromThem(parametres)
-        dial.Destroy()
-        dial = wx.MessageDialog(parent, 'Done !', style = wx.OK)
-        dial.ShowModal()
-        dial.Destroy()
+            dial.Destroy()
+            dial = wx.MessageDialog(parent, 'Done !', style = wx.OK)
+            dial.ShowModal()
+            dial.Destroy()
+        else :
+            dial.Destroy()
 
 class SplitFromVar :
     def __init__(self, parametres) :
