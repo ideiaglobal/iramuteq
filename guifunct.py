@@ -11,6 +11,7 @@ import dialog
 from listlex import *
 from vitemspicker import VItemsPicker, EVT_IP_SELECTION_CHANGED, IP_SORT_CHOICES, IP_SORT_SELECTED, IP_REMOVE_FROM_CHOICES
 from functions import treat_var_mod
+from wx import GetTopLevelWindows
 
 
 def OnOpen(self, type):
@@ -988,10 +989,12 @@ class CreateTgenDialog ( wx.Frame ):
     
     def __init__( self, parent, lemlist, tgen = None, tgens = None ):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u'Tgen Creator', pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL|wx.FRAME_FLOAT_ON_PARENT|wx.STAY_ON_TOP )
-        
+        self.ira = wx.GetApp().GetTopWindow()
+        self.SetIcon(self.ira._icon)
         self.tgens = tgens
         self.edit = False
         self.parent = parent
+        
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
         bSizer2 = wx.BoxSizer( wx.VERTICAL )
@@ -1081,13 +1084,17 @@ class TGenFrame ( wx.Frame ):
     
     def __init__( self, parent, corpus, Tgen ):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Tgen", pos = wx.DefaultPosition, size = wx.Size( -1, -1 ), style = wx.CLOSE_BOX|wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL|wx.STAY_ON_TOP )
-        
+        self.ira = wx.GetApp().GetTopWindow()
+        self.SetIcon(self.ira._icon)
         self.Tgen = Tgen
         self.parent = parent
         self.corpus = corpus
         self.activetgen = None
+        self.panel = wx.Panel(self, wx.ID_ANY)
         
-        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        #self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        
+        panelsizer = wx.BoxSizer( wx.VERTICAL )
         
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
         
@@ -1095,22 +1102,22 @@ class TGenFrame ( wx.Frame ):
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Tgen", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1 = wx.StaticText( self.panel, wx.ID_ANY, u"Tgen", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"Content", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( self.panel, wx.ID_ANY, u"Content", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         tgensChoices = Tgen.tgen.keys()
-        self.tgens = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, tgensChoices, 0 )
+        self.tgens = wx.ListBox( self.panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, tgensChoices, 0 )
         self.tgens.SetMinSize( wx.Size( 250,350 ) )
         
         fgSizer1.Add( self.tgens, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
         
         tgencontentChoices = []
-        self.tgencontent = wx.ListBox( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, tgencontentChoices, 0|wx.VSCROLL )
+        self.tgencontent = wx.ListBox( self.panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, tgencontentChoices, 0|wx.VSCROLL )
         self.tgencontent.SetMinSize( wx.Size( 250,350 ) )
         
         fgSizer1.Add( self.tgencontent, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
@@ -1119,10 +1126,10 @@ class TGenFrame ( wx.Frame ):
         fgSizer2.SetFlexibleDirection( wx.BOTH )
         fgSizer2.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.but_new = wx.Button( self, wx.ID_ANY, u"New...", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.but_new = wx.Button( self.panel, wx.ID_ANY, u"New...", wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer2.Add( self.but_new, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.but_del = wx.Button( self, wx.ID_ANY, u"Delete", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.but_del = wx.Button( self.panel, wx.ID_ANY, u"Delete", wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer2.Add( self.but_del, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         
@@ -1131,10 +1138,10 @@ class TGenFrame ( wx.Frame ):
         fgSizer3 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer3.SetFlexibleDirection( wx.BOTH )
         fgSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        self.but_edit = wx.Button( self, wx.ID_ANY, u"Edit", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.but_edit = wx.Button( self.panel, wx.ID_ANY, u"Edit", wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer3.Add( self.but_edit, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.but_compute = wx.Button( self, wx.ID_ANY, u"Compute", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.but_compute = wx.Button( self.panel, wx.ID_ANY, u"Compute", wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer3.Add( self.but_compute, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )      
 
         fgSizer1.Add( fgSizer3, 0, wx.EXPAND, 0 )
@@ -1142,7 +1149,7 @@ class TGenFrame ( wx.Frame ):
         bSizer1.Add( fgSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
         
         m_sdbSizer2 = wx.StdDialogButtonSizer()
-        self.m_sdbSizer2OK = wx.Button( self, wx.ID_OK )
+        self.m_sdbSizer2OK = wx.Button( self.panel, wx.ID_OK )
         m_sdbSizer2.AddButton( self.m_sdbSizer2OK )
         #self.m_sdbSizer2Cancel = wx.Button( self, wx.ID_CANCEL )
         #m_sdbSizer2.AddButton( self.m_sdbSizer2Cancel )
@@ -1150,9 +1157,11 @@ class TGenFrame ( wx.Frame ):
         
         bSizer1.Add( m_sdbSizer2, 0, wx.EXPAND, 5 )
         
+        #panelsizer.Add(bSizer1, 0, wx.EXPAND, 5 )
         
-        self.SetSizer( bSizer1 )
-        self.Layout()
+        #panel.SetSizer( panelsizer )
+        self.panel.SetSizer( bSizer1 )
+        self.panel.Layout()
         bSizer1.Fit( self )
         
         self.Centre( wx.BOTH )
