@@ -1248,7 +1248,7 @@ class ExportMetaTable :
             fileout = dial.fbb.GetValue()
             dial.Destroy()
             corpus.export_meta_table(fileout)
-            dlg = wx.MessageDialog(self.ira, _("Done !").decode('utf8'), _(u"Export metadata").decode('utf8'), wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+            dlg = wx.MessageDialog(self.ira, _("Done !").decode('utf8'), _(u"Export metadata").decode('utf8'), wx.OK | wx.ICON_INFORMATION)
             dlg.CenterOnParent()
             dlg.ShowModal()
             dlg.Destroy()
