@@ -7,7 +7,7 @@ import wx
 import os
 import sys
 from copy import copy
-import dialog
+from dialog import FileOptionDialog, SelectColDial, OptLexi, PrefSimpleFile
 from listlex import *
 from vitemspicker import VItemsPicker, EVT_IP_SELECTION_CHANGED, IP_SORT_CHOICES, IP_SORT_SELECTED, IP_REMOVE_FROM_CHOICES
 from functions import treat_var_mod
@@ -49,7 +49,7 @@ def getfileextension(file) :
 
 def get_table_param(self, filename) :
     if getfileextension(filename) == '.csv':
-        dlg = dialog.FileOptionDialog(self, -1, _(u"File format").decode('utf8'), sep=True, size=(350, 200),
+        dlg = FileOptionDialog(self, -1, _(u"File format").decode('utf8'), sep=True, size=(350, 200),
                      style=wx.DEFAULT_DIALOG_STYLE)
         dlg.CenterOnParent()
         val = dlg.ShowModal()
@@ -61,7 +61,7 @@ def get_table_param(self, filename) :
             self.tableau.parametres['filetype'] = 'csv'
             self.tableau.parametres['encodage'] = dlg.le[dlg.list_encodages.GetSelection()]
     elif  getfileextension(filename) == '.xls' :
-        dlg = dialog.FileOptionDialog(self, -1, _(u"File format").decode('utf8'), sep=False, sheet = True, size=(350, 200),
+        dlg = FileOptionDialog(self, -1, _(u"File format").decode('utf8'), sep=False, sheet = True, size=(350, 200),
                      style=wx.DEFAULT_DIALOG_STYLE)
         dlg.CenterOnParent()
         val = dlg.ShowModal()
@@ -72,7 +72,7 @@ def get_table_param(self, filename) :
             self.tableau.parametres['sheetnb'] = dlg.spin1.GetValue()
             self.tableau.parametres['filetype'] = 'xls'
     elif getfileextension(filename) == '.ods':
-        dlg = dialog.FileOptionDialog(self, -1, _(u"File format").decode('utf8'), sep=False, size=(350, 200),
+        dlg = FileOptionDialog(self, -1, _(u"File format").decode('utf8'), sep=False, size=(350, 200),
                      style=wx.DEFAULT_DIALOG_STYLE)
         dlg.CenterOnParent()
         val = dlg.ShowModal()
@@ -116,7 +116,7 @@ class SelectColumn :
     def __init__(self, parent, dictcol, actives, pathout, selected = None, dlg = False) :
         self.ira = parent
         if dlg :
-            dial = dialog.SelectColDial(self.ira)
+            dial = SelectColDial(self.ira)
             listcol = ListForSpec(dial, self, dictcol, ['eff'])
             dial.bSizer2.Add( listcol, 2, wx.ALL|wx.EXPAND, 5 )
             dial.m_sdbSizer2.AddButton( dial.m_sdbSizer2OK )
@@ -897,7 +897,7 @@ class PrepSimi :
             if 'bystar' in self.parametres :
                 if self.dial.check_bystar.GetValue() :
                     variables = treat_var_mod(self.parametres['stars'])
-                    vardial = dialog.OptLexi(parent, force_chi = True) 
+                    vardial = OptLexi(parent, force_chi = True) 
                     vardial.listet = self.parametres['stars']
                     vardial.variables = [v for v in variables]
                     for et in vardial.variables :
@@ -1236,3 +1236,21 @@ class TGenFrame ( wx.Frame ):
         self.tgens.Append(self.dial.m_textCtrl1.GetValue())
         self.dial.Destroy()
         evt.Skip()
+
+class ExportMetaTable :
+    def __init__(self, parent, corpus):
+        self.ira = parent
+        dial = PrefSimpleFile(self, self.ira, **{'mask' : '*.csv', 'title': _(u"meta-data table").decode('utf8')})
+        dial.fbb.SetValue(corpus.pathout['metadata.csv'])
+        dial.CenterOnParent()
+        res = dial.ShowModal()
+        if res == wx.ID_OK :
+            fileout = dial.fbb.GetValue()
+            dial.Destroy()
+            corpus.export_meta_table(fileout)
+            dlg = wx.MessageDialog(self.ira, _("Done !").decode('utf8'), _(u"Export meta-data").decode('utf8'), wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+            dlg.CenterOnParent()
+            dlg.ShowModal()
+            dlg.Destroy()
+        else :
+            dial.Destroy()         

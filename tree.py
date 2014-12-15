@@ -11,7 +11,7 @@ import logging
 from openanalyse import OpenAnalyse
 from corpus import Corpus, copycorpus
 from tableau import Tableau, copymatrix
-from functions import DoConf, GetTxtProfile, TGen, BugReport
+from functions import DoConf, GetTxtProfile, TGen, BugReport, open_folder
 from profile_segment import ProfileSegment, ProfilType
 from search_tools import SearchFrame
 from dialog import PrefSimpleFile, PrefExport
@@ -399,6 +399,11 @@ class LeftTree(CT.CustomTreeCtrl):
             rename = wx.MenuItem(menu, wx.ID_ANY, _(u"Rename").decode('utf8'))
             rename.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_TIP, size = (16,16)))
             menu.AppendItem(rename)
+ 
+            openfolder = wx.MenuItem(menu, wx.ID_ANY, _(u"Open directory").decode('utf8'))
+            openfolder.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FOLDER_OPEN, size = (16,16)))
+            menu.AppendItem(openfolder)           
+            
             menu.AppendSeparator()
     
             if 'corpus_name' in pydata :
@@ -473,6 +478,7 @@ class LeftTree(CT.CustomTreeCtrl):
             self.Bind(wx.EVT_MENU, self.OnItemInfo, info)
             self.Bind(wx.EVT_MENU, self.OnRename, rename)
             self.Bind(wx.EVT_MENU, self.OnItemDelete, itemdelete)
+            self.Bind(wx.EVT_MENU, self.OnOpenFolder, openfolder)
             #self.Bind(wx.EVT_MENU, self.OnItemPrepend, item11)
             #self.Bind(wx.EVT_MENU, self.OnItemAppend, item12)
             
@@ -738,6 +744,12 @@ class LeftTree(CT.CustomTreeCtrl):
             self.history.update(pydata)
             self.SetItemText(self.current, newname)
             self.EnsureVisible(self.current)
+    
+    def OnOpenFolder(self, evt):
+        try :
+            open_folder(os.path.dirname(self.pydata['ira']))
+        except :
+            print 'cannot open folder %s' % self.pydata.get('ira', 'noirapath')
 
     def OnItemBackground(self, event):
 

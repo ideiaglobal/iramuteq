@@ -539,6 +539,14 @@ class Corpus :
                     ident += 1
                     f.write('\n'.join([self.ucis[self.iduces[uce[0]].uci].paras[ident].encode(self.parametres['syscoding']), uce[1].encode(self.parametres['syscoding'])]) + '\n')
     
+    def export_meta_table(self, outf) :
+        metas = [[`i`] + text.etoiles[1:] for i, text in enumerate(self.ucis)]
+        longueur_max = max([len(val) for val in metas])
+        first = ['column_%i' % i for i in range(longueur_max)]
+        metas.insert(0, first)
+        with open(outf, 'w') as f :
+            f.write('\n'.join(['\t'.join(line) for line in metas]).encode(self.parametres['syscoding']))
+    
     def export_corpus_classes(self, outf, alc = True, lem = False, uci = False) :
         ucecl = {}
         for i, lc in enumerate(self.lc) :

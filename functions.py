@@ -30,6 +30,14 @@ log = logging.getLogger('iramuteq')
 indices_simi = [u'cooccurrence' ,'pourcentage de cooccurrence',u'Russel',u'Jaccard', 'Kulczynski1', 'Kulczynski2', 'Mountford', 'Fager', 'simple matching', 'Hamman', 'Faith', 'Tanimoto', 'Dice', 'Phi', 'Stiles', 'Michael', 'Mozley', 'Yule', 'Yule2', 'Ochiai', 'Simpson', 'Braun-Blanquet','Chi-squared', 'Phi-squared', 'Tschuprow', 'Cramer', 'Pearson', 'binomial']
 
 
+
+def open_folder(folder):
+    if sys.platform == "win32":
+        os.startfile(folder)
+    else:
+        opener ="open" if sys.platform == "darwin" else "xdg-open"
+        call([opener, folder])
+
 def normpath_win32(path) :
     if not sys.platform == 'win32' :
         return path

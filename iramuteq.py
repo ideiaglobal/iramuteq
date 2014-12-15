@@ -96,6 +96,7 @@ ID_ImportEuro = wx.NewId()
 ID_Fact_xml = wx.NewId()
 ID_Fact_mail = wx.NewId()
 ID_Fact_copy = wx.NewId()
+ID_exportmeta = wx.NewId()
 ##########################################################
 #elements de configuration
 ##########################################################
@@ -317,7 +318,8 @@ class IraFrame(wx.Frame):
                         'content' : [[ID_CHDReinert, _(u"Reinert's Method").decode('utf8'), 'reinertmatrix']]},
                        [ID_SIMI, _(u"Similarities Analysis").decode('utf8'), 'simimatrix'],
                        [ID_proto, _(u"Prototypical Analysis").decode('utf8'), 'proto'],
-                       [ID_Splitfromvar, _(u"Split from variable").decode('utf8'), 'subcorpusmeta']]
+                       [ID_Splitfromvar, _(u"Split from variable").decode('utf8'), 'subcorpusmeta'],
+                        ]
         
         for analyse in matanalyses :
             if not isinstance(analyse, dict) :
@@ -367,6 +369,7 @@ class IraFrame(wx.Frame):
                          {'name' : _(u"Sub corpus").decode('utf8'),
                           'content' : [[ID_Subtxtfrommeta, _(u'Sub corpus from metadata').decode('utf8'), 'subcorpusmeta'],
                                        [ID_Subtxtfromthem, _(u'Sub corpus from thematic').decode('utf8'), 'subcorpusthema']]},
+                         [ID_exportmeta, _(u"Export meta-data table").decode('utf8'), None],
                          ]
         
         for analyse in analyses_text :
@@ -589,6 +592,7 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnPref, id=wx.ID_PREFERENCES)
         self.Bind(wx.EVT_MENU, self.OnImportTXM, id=ID_ImportTXM)
         self.Bind(wx.EVT_MENU, self.OnImportEuropress, id=ID_ImportEuro)
+        self.Bind(wx.EVT_MENU, self.OnExportMeta, id=ID_exportmeta)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 ##################################################################
         flags = self._mgr.GetAGWFlags()
@@ -1096,6 +1100,14 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             ImportFactiva(self, 'euro')
         except :
             BugReport(self)
+    
+    def OnExportMeta(self, evt, corpus = None):
+        if corpus is None :
+            corpus = self.tree.getcorpus()
+        try :
+            ExportMetaTable(self, corpus)
+        except :
+            BugReport(self) 
 
     def ExtractTools(self, evt) :
         ID = evt.GetId()
