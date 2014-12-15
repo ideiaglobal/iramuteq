@@ -3250,15 +3250,17 @@ class ImageViewer ( wx.Frame ):
         bSizer2.Fit( self.m_panel1 )
         bSizer1.Add( self.m_panel1, 1, wx.EXPAND |wx.ALL, 5 )
         
-        
+        panel = wx.Panel(self, -1)
         m_sdbSizer1 = wx.StdDialogButtonSizer()
-        self.m_sdbSizer1Save = wx.Button( self, wx.ID_SAVE )
+        self.m_sdbSizer1Save = wx.Button( panel, wx.ID_SAVE )
         m_sdbSizer1.AddButton( self.m_sdbSizer1Save )
-        self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
+        self.m_sdbSizer1Cancel = wx.Button( panel, wx.ID_CANCEL )
         m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
         m_sdbSizer1.Realize();
         
-        bSizer1.Add( m_sdbSizer1, 0, wx.EXPAND, 5 )
+        panel.SetSizer( m_sdbSizer1 )
+        
+        bSizer1.Add( panel, 0, wx.EXPAND, 5 )
         
         
         self.SetSizer( bSizer1 )
