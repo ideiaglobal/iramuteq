@@ -1021,14 +1021,18 @@ class CreateTgenDialog ( wx.Frame ):
         
         bSizer2.Add( self.ip, 0, wx.ALL, 5 )
         
+        butpanel = wx.Panel(self, -1)
+        
         m_sdbSizer3 = wx.StdDialogButtonSizer()
-        self.m_sdbSizer3OK = wx.Button( self, wx.ID_OK )
+        self.m_sdbSizer3OK = wx.Button( butpanel, wx.ID_OK )
         m_sdbSizer3.AddButton( self.m_sdbSizer3OK )
-        self.m_sdbSizer3Cancel = wx.Button( self, wx.ID_CANCEL )
+        self.m_sdbSizer3Cancel = wx.Button( butpanel, wx.ID_CANCEL )
         m_sdbSizer3.AddButton( self.m_sdbSizer3Cancel )
         m_sdbSizer3.Realize();
         
-        bSizer2.Add( m_sdbSizer3, 1, wx.EXPAND, 5 )
+        butpanel.SetSizer( m_sdbSizer3 )
+        
+        bSizer2.Add( butpanel, 1, wx.EXPAND, 5 )
         
         
         self.SetSizer( bSizer2 )
@@ -1147,6 +1151,7 @@ class TGenFrame ( wx.Frame ):
         fgSizer1.Add( fgSizer3, 0, wx.EXPAND, 0 )
 
         bSizer1.Add( fgSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+        
         
         m_sdbSizer2 = wx.StdDialogButtonSizer()
         self.m_sdbSizer2OK = wx.Button( self.panel, wx.ID_OK )
