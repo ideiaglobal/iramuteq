@@ -11,7 +11,7 @@ from dialog import FileOptionDialog, SelectColDial, OptLexi, PrefSimpleFile
 from listlex import *
 from vitemspicker import VItemsPicker, EVT_IP_SELECTION_CHANGED, IP_SORT_CHOICES, IP_SORT_SELECTED, IP_REMOVE_FROM_CHOICES
 from functions import treat_var_mod
-from wx import GetTopLevelWindows
+#from wx import GetTopLevelWindows
 
 
 def OnOpen(self, type):
@@ -174,7 +174,7 @@ class PrefSimi ( wx.Dialog ):
             self.listcol.SetMinSize( wx.Size( 270,-1 ) )
             listsizer = wx.BoxSizer( wx.VERTICAL )
             countsizer = wx.BoxSizer( wx.HORIZONTAL )
-            self.butcount = wx.Button(self, -1, "count")
+            self.butcount = wx.Button(self, -1, _(u"count").decode('utf8'))
             self.textcount = wx.TextCtrl(self, -1, "", wx.DefaultPosition, wx.Size( 100,-1 ), wx.TE_READONLY )
             countsizer.Add(self.butcount, 0, wx.ALL, 5)
             countsizer.Add(self.textcount, 0, wx.ALL, 5 )
@@ -988,7 +988,7 @@ class PrepSimi :
 class CreateTgenDialog ( wx.Frame ):
     
     def __init__( self, parent, lemlist, tgen = None, tgens = None ):
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u'Tgen Creator', pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL|wx.FRAME_FLOAT_ON_PARENT|wx.STAY_ON_TOP )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = _(u'Tgen Creator').decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL|wx.FRAME_FLOAT_ON_PARENT|wx.STAY_ON_TOP )
         self.ira = wx.GetApp().GetTopWindow()
         self.SetIcon(self.ira._icon)
         self.tgens = tgens
@@ -1003,7 +1003,7 @@ class CreateTgenDialog ( wx.Frame ):
         fgSizer3.SetFlexibleDirection( wx.BOTH )
         fgSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, u"Name", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, _(u"Name").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
         fgSizer3.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
@@ -1016,8 +1016,8 @@ class CreateTgenDialog ( wx.Frame ):
         
         bSizer2.Add( fgSizer3, 1, wx.ALIGN_CENTER_HORIZONTAL, 5 )
         
-        self.ip = VItemsPicker(self,-1, lemlist,'Forms', 'Selected')
-        self.ip._source.SetMinSize( wx.Size( 250, 400 ) )
+        self.ip = VItemsPicker(self,-1, lemlist, _(u'Forms').decode('utf8'), _('Selection').decode('utf8'))
+        self.ip._source.SetMinSize( wx.Size( 350, 400 ) )
         
         bSizer2.Add( self.ip, 0, wx.ALL, 5 )
         
@@ -1106,7 +1106,7 @@ class TGenFrame ( wx.Frame ):
         self.m_staticText1.Wrap( -1 )
         fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_staticText2 = wx.StaticText( self.panel, wx.ID_ANY, u"Content", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( self.panel, wx.ID_ANY, _(u"Content").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
@@ -1126,10 +1126,10 @@ class TGenFrame ( wx.Frame ):
         fgSizer2.SetFlexibleDirection( wx.BOTH )
         fgSizer2.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.but_new = wx.Button( self.panel, wx.ID_ANY, u"New...", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.but_new = wx.Button( self.panel, wx.ID_ANY, _(u"New...").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer2.Add( self.but_new, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.but_del = wx.Button( self.panel, wx.ID_ANY, u"Delete", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.but_del = wx.Button( self.panel, wx.ID_ANY, _(u"Delete").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer2.Add( self.but_del, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         
@@ -1138,10 +1138,10 @@ class TGenFrame ( wx.Frame ):
         fgSizer3 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer3.SetFlexibleDirection( wx.BOTH )
         fgSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        self.but_edit = wx.Button( self.panel, wx.ID_ANY, u"Edit", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.but_edit = wx.Button( self.panel, wx.ID_ANY, _(u"Edit").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer3.Add( self.but_edit, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.but_compute = wx.Button( self.panel, wx.ID_ANY, u"Compute", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.but_compute = wx.Button( self.panel, wx.ID_ANY, _(u"Compute").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer3.Add( self.but_compute, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )      
 
         fgSizer1.Add( fgSizer3, 0, wx.EXPAND, 0 )
@@ -1186,9 +1186,9 @@ class TGenFrame ( wx.Frame ):
     
     def OnNewTgen( self, event, tgen = None ):
         if tgen is None :
-            self.dial = CreateTgenDialog(self, dict([[i, [lem, self.corpus.lems[lem].freq]] for i, lem in enumerate(self.corpus.lems.keys())]), tgens = self.Tgen.tgen)
+            self.dial = CreateTgenDialog(self, dict([[i, [lem, self.corpus.lems[lem].freq, self.corpus.lems[lem].gram]] for i, lem in enumerate(self.corpus.lems.keys())]), tgens = self.Tgen.tgen)
         else :
-            self.dial = CreateTgenDialog(self, dict([[i, [lem, self.corpus.lems[lem].freq]] for i, lem in enumerate(self.corpus.lems.keys())]), tgen = tgen, tgens = self.Tgen.tgen)
+            self.dial = CreateTgenDialog(self, dict([[i, [lem, self.corpus.lems[lem].freq, self.corpus.lems[lem].gram]] for i, lem in enumerate(self.corpus.lems.keys())]), tgen = tgen, tgens = self.Tgen.tgen)
             self.dial.ip._source.selected = dict(zip(self.Tgen.tgen[tgen], self.Tgen.tgen[tgen]))
             self.activetgen = tgen
         self.dial.Show()
@@ -1210,7 +1210,7 @@ class TGenFrame ( wx.Frame ):
             tgens = self.tgens.GetItems()
             tgen = tgens[self.tgens.GetSelection()]
             self.activetgen = tgen
-            self.dial = CreateTgenDialog(self, dict([[i, [lem, self.corpus.lems[lem].freq]] for i, lem in enumerate(self.corpus.lems.keys())]), tgen = tgen, tgens = self.Tgen.tgen)
+            self.dial = CreateTgenDialog(self, dict([[i, [lem, self.corpus.lems[lem].freq, self.corpus.lems[lem].gram]] for i, lem in enumerate(self.corpus.lems.keys())]), tgen = tgen, tgens = self.Tgen.tgen)
             self.dial.Bind(wx.EVT_CLOSE, self.OnDialClose)
             self.dial.m_textCtrl1.Enable(False)
             self.dial.ip._source.selected = dict(zip(self.Tgen.tgen[tgen], self.Tgen.tgen[tgen]))
@@ -1240,7 +1240,7 @@ class TGenFrame ( wx.Frame ):
 class ExportMetaTable :
     def __init__(self, parent, corpus):
         self.ira = parent
-        dial = PrefSimpleFile(self, self.ira, **{'mask' : '*.csv', 'title': _(u"meta-data table").decode('utf8')})
+        dial = PrefSimpleFile(self, self.ira, **{'mask' : '*.csv', 'title': _(u"metadata table").decode('utf8')})
         dial.fbb.SetValue(corpus.pathout['metadata.csv'])
         dial.CenterOnParent()
         res = dial.ShowModal()
@@ -1248,7 +1248,7 @@ class ExportMetaTable :
             fileout = dial.fbb.GetValue()
             dial.Destroy()
             corpus.export_meta_table(fileout)
-            dlg = wx.MessageDialog(self.ira, _("Done !").decode('utf8'), _(u"Export meta-data").decode('utf8'), wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+            dlg = wx.MessageDialog(self.ira, _("Done !").decode('utf8'), _(u"Export metadata").decode('utf8'), wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
             dlg.CenterOnParent()
             dlg.ShowModal()
             dlg.Destroy()

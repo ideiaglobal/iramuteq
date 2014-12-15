@@ -193,7 +193,8 @@ images_analyses = {
         'iramuteq' : 'iraicone.png',
         'subcorpusmeta' : 'subcorpusmeta.png',
         'subcorpusthema' : 'subcorpusthema.png',
-        'preferences' : 'preferences.png'
+        'preferences' : 'preferences.png',
+        'exportmetatable' : 'exportmetatable.png',
          }
 #####################################################################
 
@@ -369,7 +370,7 @@ class IraFrame(wx.Frame):
                          {'name' : _(u"Sub corpus").decode('utf8'),
                           'content' : [[ID_Subtxtfrommeta, _(u'Sub corpus from metadata').decode('utf8'), 'subcorpusmeta'],
                                        [ID_Subtxtfromthem, _(u'Sub corpus from thematic').decode('utf8'), 'subcorpusthema']]},
-                         [ID_exportmeta, _(u"Export meta-data table").decode('utf8'), None],
+                         [ID_exportmeta, _(u"Export metadata table").decode('utf8'), 'exportmetatable'],
                          ]
         
         for analyse in analyses_text :
@@ -1222,26 +1223,34 @@ class IntroPanel(wx.Panel):
         linkcolor = wx.Colour(255, 0, 0)
         sizer1 = wx.BoxSizer(wx.VERTICAL)
         sizer2 = wx.BoxSizer(wx.VERTICAL)
-        sizer3 = wx.BoxSizer(wx.HORIZONTAL)
         sizer4 = wx.BoxSizer(wx.HORIZONTAL)
-        sizer5 = wx.BoxSizer(wx.HORIZONTAL)
         grid_sizer_1 = wx.FlexGridSizer(1, 4, 0, 0)
         grid_sizer_3 = wx.FlexGridSizer(1, 4, 0, 0)
         grid_sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
+        
+        iralink = hl.HyperLinkCtrl(self, wx.ID_ANY, u"http://www.iramuteq.org", URL="http://www.iramuteq.org")
+        iralink.SetColours(linkcolor, linkcolor, "RED")
+        iralink.SetBackgroundColour(bckgrdcolor)
+        iralink.EnableRollover(True)
+        iralink.SetUnderlines(False, False, True)
+        iralink.SetBold(True)
+        iralink.UpdateLink()
+        
         PanelPres = wx.Panel(self)
         bckgrdcolor = wx.Colour(randint(0, 255), randint(0, 255), randint(0, 255))
         PanelPres.SetBackgroundColour(bckgrdcolor)
+        
         label_1 = wx.StaticText(self, -1, u"IRaMuTeQ", size=(-1, -1))
         label_1.SetFont(wx.Font(46, wx.TELETYPE, wx.NORMAL, wx.BOLD, 0, "Purisa"))
         label_1.SetForegroundColour(wx.RED)
-        iraicone = wx.Image(os.path.join(ImagePath,'iraicone248x248.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        
+        iraicone = wx.Image(os.path.join(ImagePath,'iraicone100x100.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         but_ira = wx.StaticBitmap(self, -1, bitmap = iraicone)
+
+        
         label2 = wx.StaticText(PanelPres, -1 , u'\nVersion ' + ConfigGlob.get('DEFAULT', 'version') + '\n')
         label2.SetForegroundColour(txtcolour)
         label2.SetBackgroundColour(bckgrdcolor)
-        #label3 = wx.StaticText(PanelPres, -1 , u'Equipe ')
-        #label3.SetForegroundColour(txtcolour)
-        #label3.SetBackgroundColour(bckgrdcolor)
         self.hyper2 = hl.HyperLinkCtrl(PanelPres, wx.ID_ANY, u"REPERE", URL="http://repere.no-ip.org/")
         self.hyper2.SetColours(linkcolor, linkcolor, "RED")
         self.hyper2.SetBackgroundColour(bckgrdcolor)
@@ -1249,9 +1258,11 @@ class IntroPanel(wx.Panel):
         self.hyper2.SetUnderlines(False, False, True)
         self.hyper2.SetBold(True)
         self.hyper2.UpdateLink()
+        
         label_lerass = wx.StaticText(PanelPres, -1, u'Laboratoire ')
         label_lerass.SetForegroundColour(txtcolour)
         label_lerass.SetBackgroundColour(bckgrdcolor)
+        
         self.hyper_lerass = hl.HyperLinkCtrl(PanelPres, -1, u'LERASS', URL="http://www.lerass.com")
         self.hyper_lerass.SetColours(linkcolor, linkcolor, "RED")
         self.hyper_lerass.SetBackgroundColour(bckgrdcolor)
@@ -1259,14 +1270,18 @@ class IntroPanel(wx.Panel):
         self.hyper_lerass.SetUnderlines(False, False, True)
         self.hyper_lerass.SetBold(True)
         self.hyper_lerass.UpdateLink()
+        
         blank = wx.StaticText(PanelPres, -1, u'\n')
         blank1 = wx.StaticText(PanelPres, -1, u'\n')
+        
         labellicence = wx.StaticText(PanelPres, -1, _(u"License GNU GPL").decode('utf8'))
         labellicence.SetForegroundColour(txtcolour)
         labellicence.SetBackgroundColour(bckgrdcolor)
+        
         labelcopy = wx.StaticText(PanelPres, -1, ConfigGlob.get('DEFAULT', 'copyright'))
         labelcopy.SetForegroundColour(txtcolour)
         labelcopy.SetBackgroundColour(bckgrdcolor)
+        
         python_img = wx.Image(os.path.join(ImagePath,'python-logo.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         r_img = wx.Image(os.path.join(ImagePath,'Rlogo.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         lexique_img = wx.Image(os.path.join(ImagePath,'LexTexte4.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
@@ -1278,35 +1293,29 @@ class IntroPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.OnR, but_r)
         
         
-        #grid_sizer_1.Add(label3, 0, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 0)
         grid_sizer_1.Add(self.hyper2, 0, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 0)
         grid_sizer_3.Add(label_lerass, 0, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 0)
         grid_sizer_3.Add(self.hyper_lerass, 0, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 0)
         sizer4.Add(label_1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 5)
         
         sizer2.Add(label2, 0, wx.ALIGN_CENTER, 5)
-        #sizer2.Add(wx.StaticText(PanelPres, -1, u''), 0, wx.ALIGN_CENTER, 5)
         sizer2.Add(wx.StaticText(PanelPres, -1, u''), 0, wx.ALIGN_CENTER, 5)
         sizer2.Add(wx.StaticText(PanelPres, -1, u''), 0, wx.ALIGN_CENTER, 5)
         sizer2.Add(grid_sizer_3, 0, wx.ALIGN_CENTER, 5)
         sizer2.Add(wx.StaticText(PanelPres, -1, u' '), 0, wx.ALIGN_CENTER, 5)
-        #sizer2.Add(wx.StaticText(PanelPres, -1, u''), 0, wx.ALIGN_CENTER, 5)
-        #sizer2.Add(wx.StaticText(PanelPres, -1, u''), 0, wx.ALIGN_CENTER, 5)
         sizer2.Add(grid_sizer_1, 0, wx.ALIGN_CENTER, 5)
         sizer2.Add(labellicence, 0, wx.ALIGN_CENTER, 5)
         sizer2.Add(labelcopy, 0, wx.ALIGN_CENTER, 5)
-        sizer1.Add(sizer4, 1, wx.ALIGN_CENTER_HORIZONTAL, 0)
+        sizer1.Add(sizer4, 2, wx.ALIGN_CENTER_HORIZONTAL, 0)
         sizer1.Add(but_ira, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 5)
-        sizer2.Add(wx.StaticText(PanelPres, -1, u''), 0, wx.ALIGN_CENTER, 5)
+        sizer1.Add(iralink, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_TOP, 5)
+        sizer2.Add(wx.StaticText(PanelPres, -1, u''), 0, wx.ALIGN_CENTER, 10)
         PanelPres.SetSizer(sizer2)
-        #sizer5.Add(blank, 1, wx.EXPAND | wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 2)
-        sizer5.Add(PanelPres, 1, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 0)
-        #sizer5.Add(blank1, 1, wx.ALIGN_CENTER_HORIZONTAL,2)
         grid_sizer_2.Add(but_python, 1, wx.ALIGN_BOTTOM)
         grid_sizer_2.Add(but_lexique, 1, wx.ALIGN_BOTTOM)
         grid_sizer_2.Add(but_r, 1,  wx.ALIGN_BOTTOM)
         
-        sizer1.Add(sizer5, 0, wx.EXPAND |wx.ALL, 10)
+        sizer1.Add(PanelPres, 0, wx.EXPAND |wx.ALL, 10)
         sizer1.Add(grid_sizer_2, 2, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 1)
         self.SetSizer(sizer1)
         sizer1.Fit(self)

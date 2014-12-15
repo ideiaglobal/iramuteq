@@ -199,7 +199,7 @@ The items are displayed in the selection part of the widget'''
             sizer.Add(wx.StaticText(self, label = label), 0,
                        wx.ALIGN_LEFT|wx.ALL, 5)
         #self._source = wx.VListBox(self, -1, style = style)
-        self._source = ListForSpec(self, self.parent, dlist = items, first = ['eff'], menu = True)
+        self._source = ListForSpec(self, self.parent, dlist = items, first = ['eff', _(u"POS").decode('utf8')], menu = True)
         self._source.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self._OnDClick)
         #self._source.Bind(wx.EVT_LISTBOX_DCLICK, self._OnDClick)
         #self._source.SetItems(items)
