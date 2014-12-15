@@ -15,6 +15,7 @@ from PrintRScript import barplot
 import tempfile
 import sys
 from KeyFrame import AlcOptFrame
+import wx.lib.hyperlink as hl
 #---------------------------------------------------------------------------
 provider = wx.SimpleHelpProvider()
 wx.HelpProvider_Set(provider)
@@ -3207,46 +3208,75 @@ class BarGraphDialog ( wx.Dialog ):
             self.heightsp.Enable(True)         
         event.Skip()
 
-class MessageImage(wx.Frame):
-    def __init__(self, parent, parametres, title, size):
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.CLOSE_BOX|wx.DEFAULT_FRAME_STYLE|wx.FRAME_FLOAT_ON_PARENT|wx.TAB_TRAVERSAL )
+class ImageViewer ( wx.Frame ):
+    
+    def __init__( self, parent, parametres, title, size ):
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_FRAME_STYLE|wx.MAXIMIZE_BOX|wx.MINIMIZE_BOX|wx.STAY_ON_TOP|wx.TAB_TRAVERSAL )
+        
         self.ira = wx.GetApp().GetTopWindow()
         self.SetIcon(self.ira._icon)
-        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         self.parametres = parametres
         self.imageFile = self.parametres['tmpgraph']
         if parametres['svg'] == 'TRUE' :
             self.imagename = u"image.svg"
         else :
             self.imagename = u"image.png"
-        self.HtmlPage = wx.html.HtmlWindow(self, -1)
-        self.HtmlPage.SetMinSize(size)
-        if "gtk2" in wx.PlatformInfo:
-            self.HtmlPage.SetStandardFonts()
-        self.HtmlPage.SetFonts('Courier', 'Courier')
         
-        self.button_1 = wx.Button(self, wx.ID_CANCEL)
-        self.button_2 = wx.Button(self, wx.ID_SAVE)
-        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
-        self.Bind(wx.EVT_BUTTON, self.OnSaveImage, self.button_2)
-        self.do_layout()
-
-    def do_layout(self):
-        self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
-        self.sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.sizer_1.Add(self.HtmlPage, 2, wx.EXPAND, 0)
-
-        self.m_sdbSizer1 = wx.StdDialogButtonSizer()
-        self.m_sdbSizer1.AddButton(  self.button_2 )
-        self.m_sdbSizer1.AddButton(  self.button_1 )
-        self.m_sdbSizer1.Realize()
-        self.sizer_1.Add(self.m_sdbSizer1, 0, wx.EXPAND, 5)
-        self.SetSizer(self.sizer_1)
+        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        
+        bSizer1 = wx.BoxSizer( wx.VERTICAL )
+        
+        self.m_panel1 = wx.ScrolledWindow(self, -1)# wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.HSCROLL|wx.TAB_TRAVERSAL|wx.VSCROLL )
+        self.m_panel1.SetScrollbars(1, 1, 200, 300)
+        bSizer2 = wx.BoxSizer( wx.VERTICAL )
+        
+        if parametres['svg'] == 'FALSE' :
+            image = wx.Image(self.imageFile, wx.BITMAP_TYPE_PNG)
+            W = image.GetWidth()
+            H = image.GetHeight()
+            if W > 1000 :
+                W = 1000
+            if H > 800 :
+                H = 800
+            image = image.ConvertToBitmap()
+            self.m_bitmap1 = wx.StaticBitmap( self.m_panel1, wx.ID_ANY, image, wx.DefaultPosition, wx.DefaultSize, 0 )
+            bSizer2.Add( self.m_bitmap1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        else :
+            link = hl.HyperLinkCtrl(self.m_panel1, wx.ID_ANY, u"Click on this link", URL=self.imageFile )
+            bSizer2.Add( link, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.m_panel1.SetSizer( bSizer2 )
+        self.m_panel1.Layout()
+        bSizer2.Fit( self.m_panel1 )
+        bSizer1.Add( self.m_panel1, 1, wx.EXPAND |wx.ALL, 5 )
+        
+        
+        m_sdbSizer1 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer1Save = wx.Button( self, wx.ID_SAVE )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1Save )
+        self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
+        m_sdbSizer1.Realize();
+        
+        bSizer1.Add( m_sdbSizer1, 0, wx.EXPAND, 5 )
+        
+        
+        self.SetSizer( bSizer1 )
         self.Layout()
-        self.sizer_1.Fit( self )
-
+        
+        self.Centre( wx.BOTH )
+        
+        if parametres['svg'] == 'FALSE' :
+            self.SetSize((W + 30,H + 30))
+        
+        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.m_sdbSizer1Cancel)
+        self.Bind(wx.EVT_BUTTON, self.OnSaveImage, self.m_sdbSizer1Save)
+    
+    def __del__( self ):
+        pass
+    
     def OnCloseMe(self, event):
-        self.Destroy()
+        self.Destroy()    
 
     def OnSaveImage(self, event) :
         dlg = wx.FileDialog(
@@ -3294,12 +3324,6 @@ class BarFrame :
             with open(tmpscript,'w') as f :
                 f.write(txt)
             exec_rcode(ira.RPath, tmpscript, wait = True)
-            win = MessageImage(ira, parametres, _(u"Graphic").decode('utf8'), size=(700, 500))
-            if svg == 'FALSE' :
-                txt = "<img src='%s'>" % tmpgraph
-            else :
-                txt = """Copiez ce lien dans votre navigateur : <br>
-                        <a href="%s">%s</a>""" % (tmpgraph, tmpgraph)
-            win.HtmlPage.SetPage(txt)
+            win = ImageViewer(ira, parametres, _(u"Graphic").decode('utf8'), size=(700, 500))
             win.Show(True)
         dial.Destroy()           

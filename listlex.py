@@ -20,7 +20,7 @@ import tempfile
 from functions import exec_rcode, doconcorde
 from chemins import ffr
 from PrintRScript import barplot
-from dialog import SearchDial, message, BarGraphDialog, MessageImage, BarFrame
+from dialog import SearchDial, message, BarGraphDialog, BarFrame
 from operator import itemgetter
 #---------------------------------------------------------------------------
 
