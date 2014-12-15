@@ -999,22 +999,26 @@ class CreateTgenDialog ( wx.Frame ):
         
         bSizer2 = wx.BoxSizer( wx.VERTICAL )
         
+        namepan = wx.Panel(self, -1)
+        
         fgSizer3 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer3.SetFlexibleDirection( wx.BOTH )
         fgSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, _(u"Name").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3 = wx.StaticText( namepan, wx.ID_ANY, _(u"Name").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
+        
         fgSizer3.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         
-        self.m_textCtrl1 = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_textCtrl1 = wx.TextCtrl( namepan, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_textCtrl1.SetMinSize( wx.Size( 250,-1 ) )
 
         
         fgSizer3.Add( self.m_textCtrl1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
+        namepan.SetSizer( fgSizer3 )
         
-        bSizer2.Add( fgSizer3, 1, wx.ALIGN_CENTER_HORIZONTAL, 5 )
+        bSizer2.Add( namepan, 1, wx.ALIGN_CENTER_HORIZONTAL, 5 )
         
         self.ip = VItemsPicker(self,-1, lemlist, _(u'Forms').decode('utf8'), _('Selection').decode('utf8'))
         self.ip._source.SetMinSize( wx.Size( 350, 400 ) )
