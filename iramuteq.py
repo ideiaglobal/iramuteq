@@ -684,7 +684,7 @@ class IraFrame(wx.Frame):
             if not RLibsAreInstalled(self) :
                 CheckRPackages(self)
         else :
-            msg = '\n'.join([_(u"Can't find R executable"), _(u"If R is not installed, get it from http://www.r-project.org.").decode('utf8'),
+            msg = '\n'.join([_(u"Can't find R executable").decode('utf8'), _(u"If R is not installed, get it from http://www.r-project.org.").decode('utf8'),
                              _(u"If R is installed, report its path in Preferences.").decode('utf8'),
                              _(u"IRaMuTeQ does not work without R.").decode('utf8')])
             dlg = wx.MessageDialog(self, msg, _(u"Problem").decode('utf8'), wx.OK | wx.ICON_WARNING)
