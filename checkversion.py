@@ -41,7 +41,7 @@ def NewVersion(parent):
 Une nouvelle version d'IRaMuTeQ (%s) est disponible.
 Vous pouvez la télécharger à partir du site web iramuteq :
 http://www.iramuteq.org""" % '-'.join(lastversion)
-        dlg = wx.MessageDialog(parent, msg, u"Nouvelle version disponible", wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
+        dlg = wx.MessageDialog(parent, msg, u"Nouvelle version disponible", wx.OK | wx.ICON_WARNING)
         dlg.CenterOnParent()
         if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
              evt.Veto()

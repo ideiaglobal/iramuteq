@@ -999,8 +999,6 @@ class CreateTgenDialog ( wx.Frame ):
         
         bSizer2 = wx.BoxSizer( wx.VERTICAL )
         
-        namesizer = wx.BoxSizer( wx.VERTICAL )
-        
         namepan = wx.Panel(self, -1)
         
         fgSizer3 = wx.FlexGridSizer( 0, 2, 0, 0 )
@@ -1014,15 +1012,12 @@ class CreateTgenDialog ( wx.Frame ):
         
         self.m_textCtrl1 = wx.TextCtrl( namepan, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_textCtrl1.SetMinSize( wx.Size( 250,-1 ) )
-
         
         fgSizer3.Add( self.m_textCtrl1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         namepan.SetSizer( fgSizer3 )
         
-        namesizer.Add( namepan, 1, wx.EXPAND, 5 )
-        
-        bSizer2.Add( namesizer, 1, wx.ALIGN_CENTER_HORIZONTAL, 5 )
+        bSizer2.Add( namepan, 1, wx.EXPAND, 5 )
         
         self.ip = VItemsPicker(self,-1, lemlist, _(u'Forms').decode('utf8'), _('Selection').decode('utf8'))
         self.ip._source.SetMinSize( wx.Size( 350, 400 ) )

@@ -29,7 +29,7 @@ import wx.html
 import wx.grid
 import wx.lib.hyperlink as hl
 #------------------------------------
-from functions import BugReport, PlaySound, History
+from functions import BugReport, PlaySound, History, progressbar
 from checkversion import NewVersion
 from guifunct import *
 from tableau import Tableau
@@ -313,7 +313,7 @@ class IraFrame(wx.Frame):
         #view_menu.AppendSeparator()
         matrix_menu = wx.Menu()
         matanalyses = [[ID_Freq, _(u"Frequencies").decode('utf8'), 'freq'],
-                       [ID_Freq, _(u"Multiple  Frequencies").decode('utf8'), 'freqmulti'],
+                       [ID_FreqMulti, _(u"Multiple  Frequencies").decode('utf8'), 'freqmulti'],
                        [ID_Chi2, _(u"Chi2").decode('utf8'), 'chi2'],
                        {'name' : _(u"Clustering").decode('utf8'),
                         'content' : [[ID_CHDReinert, _(u"Reinert's Method").decode('utf8'), 'reinertmatrix']]},
@@ -786,17 +786,12 @@ class IraFrame(wx.Frame):
             wx.SafeYield()
             corpus = builder.doanalyse()
             self.history.add(corpus.parametres)
-            self.tree.OnItemAppend(corpus.parametres)
             OpenAnalyse(self, corpus.parametres)
+            self.tree.OnItemAppend(corpus.parametres)
             del busy
             
     def OpenText(self):
-        dlg = wx.ProgressDialog("Ouverture...",
-                                   "Veuillez patienter...",
-                                   maximum=2,
-                                   parent=self,
-                                   style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT
-                                   )
+        dlg = progressbar(self, 5) 
         
         builder =  Builder(self, dlg)
         if builder.res == wx.ID_OK :

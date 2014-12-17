@@ -1881,38 +1881,38 @@ class PrefDendro ( wx.Dialog ):
         self.m_staticline41 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline41, 0, wx.EXPAND |wx.ALL, 5 )        
         
+        if self.param['typedendro'] == 'classique' :
+            self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, _(u"Color or black and white").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_staticText5.Wrap( -1 )
+            fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, _(u"Color or black and white").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_staticText5.Wrap( -1 )
-        fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+            m_radioBox1Choices = [ _(u"color").decode('utf8'), _(u"black and white").decode('utf8') ]
+            self.m_radioBox1 = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_radioBox1Choices, 1, wx.RA_SPECIFY_COLS )
+            self.m_radioBox1.SetSelection( 0 )
+            fgSizer1.Add( self.m_radioBox1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
         
-        m_radioBox1Choices = [ _(u"color").decode('utf8'), _(u"black and white").decode('utf8') ]
-        self.m_radioBox1 = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_radioBox1Choices, 1, wx.RA_SPECIFY_COLS )
-        self.m_radioBox1.SetSelection( 0 )
-        fgSizer1.Add( self.m_radioBox1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
+            self.m_staticline5 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+            fgSizer1.Add( self.m_staticline5, 0, wx.EXPAND |wx.ALL, 5 )
         
-        self.m_staticline5 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-        fgSizer1.Add( self.m_staticline5, 0, wx.EXPAND |wx.ALL, 5 )
+            self.m_staticline6 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+            fgSizer1.Add( self.m_staticline6, 0, wx.EXPAND |wx.ALL, 5 )
         
-        self.m_staticline6 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-        fgSizer1.Add( self.m_staticline6, 0, wx.EXPAND |wx.ALL, 5 )
+            bSizer4 = wx.BoxSizer( wx.HORIZONTAL )
         
-        bSizer4 = wx.BoxSizer( wx.HORIZONTAL )
+            self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, _(u"Add cluster size").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_staticText6.Wrap( -1 )
+            bSizer4.Add( self.m_staticText6, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, _(u"Add cluster size").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_staticText6.Wrap( -1 )
-        bSizer4.Add( self.m_staticText6, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+            self.m_checkBox1 = wx.CheckBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_checkBox1.SetValue(True) 
+            bSizer4.Add( self.m_checkBox1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_checkBox1 = wx.CheckBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_checkBox1.SetValue(True) 
-        bSizer4.Add( self.m_checkBox1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+            fgSizer1.Add( bSizer4, 1, wx.EXPAND, 5 )
         
-        fgSizer1.Add( bSizer4, 1, wx.EXPAND, 5 )
-        
-        m_radioBox2Choices = [ _(u"circular diagram").decode('utf8'), _(u"bar").decode('utf8') ]
-        self.m_radioBox2 = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_radioBox2Choices, 1, wx.RA_SPECIFY_COLS )
-        self.m_radioBox2.SetSelection( 0 )
-        fgSizer1.Add( self.m_radioBox2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
+            m_radioBox2Choices = [ _(u"circular diagram").decode('utf8'), _(u"bar").decode('utf8') ]
+            self.m_radioBox2 = wx.RadioBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, m_radioBox2Choices, 1, wx.RA_SPECIFY_COLS )
+            self.m_radioBox2.SetSelection( 0 )
+            fgSizer1.Add( self.m_radioBox2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
         
         self.m_staticline7 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline7, 0, wx.EXPAND |wx.ALL, 5 )
@@ -1942,10 +1942,11 @@ class PrefDendro ( wx.Dialog ):
         self.m_spinCtrl2.SetValue(self.param['width'])
         self.m_spinCtrl1.SetValue(self.param['height'])
         self.m_choice1.SetSelection(self.param['type_dendro'])
-        self.m_radioBox1.SetSelection(self.param['color_nb'])
-        self.m_checkBox1.SetValue(self.param['taille_classe'])
-        self.m_radioBox2.SetSelection(self.param['type_tclasse'])
         self.choice_format.SetSelection(self.param['svg'])
+        if self.param['typedendro'] == 'classique' :
+            self.m_radioBox1.SetSelection(self.param['color_nb'])
+            self.m_checkBox1.SetValue(self.param['taille_classe'])
+            self.m_radioBox2.SetSelection(self.param['type_tclasse'])
     
     def __del__( self ):
         pass

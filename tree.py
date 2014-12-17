@@ -143,6 +143,13 @@ class LeftTree(CT.CustomTreeCtrl):
 
         self.history = parent.history
         self.h = self.history.history
+        
+        idopenfolder = wx.NewId()
+        accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL,  ord('E'),  idopenfolder)])
+        self.SetAcceleratorTable(accel_tbl)
+        
+        self.Bind(wx.EVT_MENU, self.OnOpenFolder, id=idopenfolder)
+        
         self.root = self.AddRoot("Iramuteq")
         
         if not(self.GetAGWWindowStyleFlag() & CT.TR_HIDE_ROOT):
@@ -578,7 +585,7 @@ class LeftTree(CT.CustomTreeCtrl):
             self.page.corpus.export_corpus_classes(dial.fbb.GetValue(), alc = alc, lem = lem, uci = uci)
             msg = u"Fini !"
             dial.Destroy()
-            dlg = wx.MessageDialog(self.parent, msg, u"Export", wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+            dlg = wx.MessageDialog(self.parent, msg, u"Export", wx.OK | wx.ICON_INFORMATION)
             dlg.CenterOnParent()
             dlg.ShowModal()
             dlg.Destroy()
@@ -599,7 +606,7 @@ class LeftTree(CT.CustomTreeCtrl):
             with open(fileout, 'w') as f :
                 f.write(txt)
             msg = ' !\n'.join([_(u"Done").decode('utf8'), _(u"Open in a web browser ?").decode('utf8')])
-            dlg = wx.MessageDialog(self.parent, msg, u"Corpus en couleur", wx.NO | wx.YES | wx.NO_DEFAULT | wx.ICON_QUESTION)
+            dlg = wx.MessageDialog(self.parent, msg, u"Corpus en couleur", wx.NO | wx.YES | wx.ICON_QUESTION)
             dlg.CenterOnParent()
             if dlg.ShowModal() == wx.ID_YES :
                 webbrowser.open(fileout)
@@ -620,7 +627,7 @@ class LeftTree(CT.CustomTreeCtrl):
             dial.Destroy()
             self.page.corpus.get_stat_by_cluster(fileout)
             msg = u"Fini !"
-            dlg = wx.MessageDialog(self.parent, msg, _(u"Clusters statistics").decode('utf8'), wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+            dlg = wx.MessageDialog(self.parent, msg, _(u"Clusters statistics").decode('utf8'), wx.OK | wx.ICON_INFORMATION)
             dlg.CenterOnParent()
             if dlg.ShowModal() == wx.ID_OK :
                 dlg.Destroy()        
@@ -648,7 +655,7 @@ class LeftTree(CT.CustomTreeCtrl):
             with open(fileout, 'w') as f :
                 f.write(self.page.debtext + '\n' + GetTxtProfile(self.page.DictProfile, self.page.cluster_size))
             msg = u"Fini !"
-            dlg = wx.MessageDialog(self.parent, msg, _(u"Report").decode('utf8'), wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+            dlg = wx.MessageDialog(self.parent, msg, _(u"Report").decode('utf8'), wx.OK | wx.ICON_INFORMATION)
             dlg.CenterOnParent()
             dlg.ShowModal()
             dlg.Destroy()

@@ -179,13 +179,13 @@ class ImportFactiva():
                     res = ParseEuropress(xmldir, corp_out, 'utf8', 'utf8')
                 del busy
                 if res == 'nofile' :
-                    dlg = wx.MessageDialog(parent, u"Pas de fichiers dans %s" % xmldir, 'ATTENTION', wx.OK | wx.NO_DEFAULT | wx.ICON_WARNING)
+                    dlg = wx.MessageDialog(parent, u"Pas de fichiers dans %s" % xmldir, 'ATTENTION', wx.OK | wx.ICON_WARNING)
                     dlg.CenterOnParent()
                     dlg.ShowModal()
                     dlg.Destroy()
                 else :
                     msg = '\n'.join([_(u"Corpus created :").decode('utf8'), corp_out, _(u"Do you want to open it in IRaMuTeQ ?").decode('utf8')])
-                    dlg = wx.MessageDialog(parent, msg, _(u'Information').decode('utf8'), wx.YES_NO | wx.NO_DEFAULT | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
+                    dlg = wx.MessageDialog(parent, msg, _(u'Information').decode('utf8'), wx.YES_NO | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
                     dlg.CenterOnParent()
                     val = dlg.ShowModal()
                     if val == wx.ID_YES :

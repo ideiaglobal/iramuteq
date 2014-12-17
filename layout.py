@@ -548,7 +548,7 @@ class OpenCHDS():
             dial.Destroy()
             self.corpus.get_stat_by_cluster(fileout)
             msg = u"Fini !"
-            dlg = wx.MessageDialog(self.parent, msg, _(u"Stat by cluster").decode('utf8'), wx.OK | wx.NO_DEFAULT | wx.ICON_INFORMATION)
+            dlg = wx.MessageDialog(self.parent, msg, _(u"Stat by cluster").decode('utf8'), wx.OK | wx.ICON_INFORMATION)
             dlg.CenterOnParent()
             if dlg.ShowModal() == wx.ID_OK :
                 dlg.Destroy()
@@ -870,10 +870,11 @@ class GraphPanelDendro(wx.Panel):
         self.param['width'] = dial.m_spinCtrl2.GetValue()
         self.param['height'] = dial.m_spinCtrl1.GetValue()
         self.param['type_dendro'] = dial.m_choice1.GetSelection()
-        self.param['color_nb'] = dial.m_radioBox1.GetSelection()
-        self.param['taille_classe'] = dial.m_checkBox1.GetValue()
-        self.param['type_tclasse'] = dial.m_radioBox2.GetSelection()
         self.param['svg'] = dial.choice_format.GetSelection()
+        if self.param['typedendro'] == 'classique' :
+            self.param['color_nb'] = dial.m_radioBox1.GetSelection()
+            self.param['taille_classe'] = dial.m_checkBox1.GetValue()
+            self.param['type_tclasse'] = dial.m_radioBox2.GetSelection()
 
     def make_dendro(self, dendro = 'simple') :
         if self.param['svg'] :
@@ -961,6 +962,7 @@ class GraphPanelDendro(wx.Panel):
 
 
     def ondendro(self, evt):
+        self.param['typedendro'] = 'classique'
         dial = PrefDendro(self.ira, self.param)
         val = dial.ShowModal()
         if val == wx.ID_OK :
@@ -968,6 +970,7 @@ class GraphPanelDendro(wx.Panel):
             self.make_dendro()
     
     def ondendrotexte(self, evt):
+        self.param['typedendro'] = 'texte'
         dial = PrefDendro(self.ira, self.param)
         val = dial.ShowModal()
         if val == wx.ID_OK :
@@ -975,6 +978,7 @@ class GraphPanelDendro(wx.Panel):
             self.make_dendro(dendro = 'texte')
 
     def ondendrocloud(self, evt):
+        self.param['typedendro'] = 'cloud'
         dial = PrefDendro(self.ira, self.param)
         val = dial.ShowModal()
         if val == wx.ID_OK :
