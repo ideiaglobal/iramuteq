@@ -1208,10 +1208,13 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 class IntroPanel(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        col = randint(0, 255)
-        col1 = randint(0,255)
-        col2 = randint(0,255)
+        #col = randint(0, 255)
+        #col1 = randint(0,255)
+        #col2 = randint(0,255)
         #col = 57
+        col = 161
+        col1 = 198
+        col2 = 224
         bckgrdcolor = wx.Colour(col, col1, col2)
         self.SetBackgroundColour(bckgrdcolor)
         txtcolour = wx.Colour(250, 250, 250)

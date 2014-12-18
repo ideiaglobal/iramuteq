@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: iramuteq 0.6 alpha 1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-12-15 22:38+0100\n"
-"PO-Revision-Date: 2014-12-15 22:42+0200\n"
+"PO-Revision-Date: 2014-12-18 00:27+0200\n"
 "Last-Translator: Pierre Ratinaud <ratinaud@univ-tlse2.fr>\n"
 "Language-Team: LANGUAGE <ratinaud@univ-tlse2.fr>\n"
 "Language: fr\n"
@@ -718,7 +718,7 @@ msgstr "Nouveau nom"
 
 #: guifunct.py:1129
 msgid "New..."
-msgstr ""
+msgstr "Nouveau..."
 
 #: dialog.py:1354 dialog.py:1582
 msgid "Next"
