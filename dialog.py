@@ -2670,7 +2670,7 @@ class message(wx.Frame):
             self, message=_(u"Save as ...").decode('utf8'), defaultDir=os.getcwd(),
             defaultFile="concordancier.html", wildcard="html|*.html", style=wx.SAVE | wx.OVERWRITE_PROMPT
             )
-        dlg.SetFilterIndex(2)
+        #dlg.SetFilterIndex(2)
         dlg.CenterOnParent()
         self.html = '<br>'.join([self.items[i] for i in range(0,len(self.items))])
         if dlg.ShowModal() == wx.ID_OK:
