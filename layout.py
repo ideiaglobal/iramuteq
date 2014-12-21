@@ -1214,7 +1214,7 @@ class SimiLayout(DefaultTextLayout) :
         E(graph)$weight <- graph.simi$we.width
         write.graph(graph, fileout, format = 'graphml')
         #saveAsGEXF(graph, filepath = fileout)
-        """ % (self.pathout['RData.RData'], self.parent.RscriptsPath['simi'], fileout)
+        """ % (ffr(self.pathout['RData.RData']), ffr(self.parent.RscriptsPath['simi']), fileout)
         filetmp = tempfile.mktemp()
         with open(filetmp, 'w') as f :
             f.write(txt)
@@ -1457,7 +1457,7 @@ class SimiMatLayout(DefaultMatLayout) :
         E(graph)$weight <- graph.simi$we.width
         write.graph(graph, fileout, format = 'graphml')
         #saveAsGEXF(graph, filepath = fileout)
-        """ % (self.pathout['RData.RData'], self.parent.RscriptsPath['simi'], fileout)
+        """ % (ffr(self.pathout['RData.RData']), ffr(self.parent.RscriptsPath['simi']), fileout)
         filetmp = tempfile.mktemp()
         with open(filetmp, 'w') as f :
             f.write(txt)
