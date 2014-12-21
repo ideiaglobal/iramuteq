@@ -1201,7 +1201,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
                 #self.Text = OpenAnalyse(self, self.filename)
                 OpenAnalyse(self, self.filename)
         if not truepath:
-            print 'ce fichier n\'existe pas'
+            print 'This file does not exist'
             
         
 
