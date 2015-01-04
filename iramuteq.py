@@ -56,6 +56,7 @@ from corpus import Builder, SubBuilder
 from checkinstall import CreateIraDirectory, CheckRPath, FindRPAthWin32, FindRPathNix, CheckRPackages, IsNew, UpgradeConf, CopyConf, RLibsAreInstalled
 from chemins import RscriptsPath, ConstructConfigPath, ConstructDicoPath, ConstructGlobalPath, PathOut
 from parse_factiva_xml import ImportFactiva
+from parse_dmi import ImportDMI
 from tools import Extract
 
 from tree import LeftTree
@@ -97,6 +98,7 @@ ID_Fact_xml = wx.NewId()
 ID_Fact_mail = wx.NewId()
 ID_Fact_copy = wx.NewId()
 ID_exportmeta = wx.NewId()
+ID_importdmi = wx.NewId()
 ##########################################################
 #elements de configuration
 ##########################################################
@@ -195,6 +197,7 @@ images_analyses = {
         'subcorpusthema' : 'subcorpusthema.png',
         'preferences' : 'preferences.png',
         'exportmetatable' : 'exportmetatable.png',
+        'importdmi' : 'twitter.png'
          }
 #####################################################################
 
@@ -262,6 +265,10 @@ class IraFrame(wx.Frame):
         
         item = wx.MenuItem(file_menu, ID_ImportEuro, _(u"Import from Europress").decode('utf8'), _(u"Import from Europress").decode('utf8'))
         item.SetBitmap(self.images_analyses['europress'])
+        file_menu.AppendItem(item)        
+        
+        item = wx.MenuItem(file_menu, ID_importdmi, _(u"Import from DMI-TCAT (exp.)").decode('utf8'), _(u"Import from DMI-TCAT (exp.)").decode('utf8'))
+        item.SetBitmap(self.images_analyses['importdmi'])
         file_menu.AppendItem(item)        
         
         menuFactiva = wx.Menu()
@@ -441,6 +448,8 @@ class IraFrame(wx.Frame):
         tb1.AddSeparator()
         tb1.AddLabelTool(ID_ImportEuro, "ImportEuro", self.images_analyses['europress'], shortHelp= _(u"Import from Europress").decode('utf8'), longHelp=_(u"Import from Europress").decode('utf8'))
         tb1.AddSeparator()
+        tb1.AddLabelTool(ID_importdmi, "ImportDMI", self.images_analyses['importdmi'], shortHelp= _(u"Import from DMI-TCAT (exp.)").decode('utf8'), longHelp=_(u"Import from DMI-TCAT (exp.)").decode('utf8'))
+        tb1.AddSeparator()        
         tb1.AddLabelTool(ID_Fact_xml, "ImportFactxml", self.images_analyses['factiva_xml'], shortHelp= _(u"Factiva from xml").decode('utf8'), longHelp=_(u"Factiva from xml").decode('utf8'))
         tb1.AddLabelTool(ID_Fact_mail, "ImportFactmail", self.images_analyses['factiva_mail'], shortHelp= _(u"Factiva from mail").decode('utf8'), longHelp=_(u"Factiva from mail").decode('utf8'))
         tb1.AddLabelTool(ID_Fact_copy, "ImportFactcopy", self.images_analyses['factiva_copy'], shortHelp= _(u"Factiva from copy/paste").decode('utf8'), longHelp=_(u"Factiva from copy/paste").decode('utf8'))
@@ -593,6 +602,7 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnPref, id=wx.ID_PREFERENCES)
         self.Bind(wx.EVT_MENU, self.OnImportTXM, id=ID_ImportTXM)
         self.Bind(wx.EVT_MENU, self.OnImportEuropress, id=ID_ImportEuro)
+        self.Bind(wx.EVT_MENU, self.OnImportDMI, id=ID_importdmi)
         self.Bind(wx.EVT_MENU, self.OnExportMeta, id=ID_exportmeta)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 ##################################################################
@@ -1096,6 +1106,9 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             ImportFactiva(self, 'euro')
         except :
             BugReport(self)
+    
+    def OnImportDMI(self, evt):
+        ImportDMI(self, {})
     
     def OnExportMeta(self, evt, corpus = None):
         if corpus is None :
