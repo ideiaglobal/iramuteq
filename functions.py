@@ -716,7 +716,7 @@ def progressbar(self, maxi) :
                              style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT
                              )
     prog.SetSize((400,150))
-    prog.SetIcon(ira._icon)
+    #prog.SetIcon(ira._icon)
     return prog
 
 def treat_var_mod(variables) :

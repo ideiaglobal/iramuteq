@@ -84,15 +84,21 @@ class PrefImport(wx.Dialog):
         pre.SetExtraStyle(wx.DIALOG_EX_CONTEXTHELP)
         pre.Create(parent, -1, '', pos, size, style)
         self.PostCreate(pre)
+        self.methode = methode
         if methode in ['xml', 'txm'] :
             txt = _(u'Select a directory of xml files').decode('utf8')
         elif methode == 'euro' :
             txt = _(u'Select a directory of html files').decode('utf8')
+        elif methode == 'dmi' :
+            txt = _(u'Select a csv file').decode('utf8')
         else :
             txt = _(u'Select a directory of txt files').decode('utf8')
         self.parent = parent
         self.txt1 = wx.StaticText(self, -1, txt)
-        self.dbb = filebrowse.DirBrowseButton(self, -1, size=(450, -1), changeCallback = self.fbbCallback)
+        if methode != 'dmi' :
+            self.dbb = filebrowse.DirBrowseButton(self, -1, size=(450, -1), changeCallback = self.fbbCallback)
+        else :
+            self.dbb = filebrowse.FileBrowseButton(self, -1, size=(450, -1), fileMode = 2, changeCallback = self.fbbCallback)
         self.dbb.SetLabel("")
         self.txt2 = wx.StaticText(self, -1, _(u'Output file').decode('utf8'))
         self.fbb = filebrowse.FileBrowseButton(self, -1, size=(450, -1), fileMode = 2)
@@ -133,12 +139,22 @@ class PrefImport(wx.Dialog):
    
     def fbbCallback(self, evt):
         if self.fbb.GetValue() == "" :
-            self.fbb.SetValue(os.path.join(self.dbb.GetValue(), 'corpus.txt'))
+            if self.methode != 'dmi' :
+                self.fbb.SetValue(os.path.join(self.dbb.GetValue(), 'corpus.txt'))
+            else :
+                self.fbb.SetValue(os.path.join(os.path.dirname(self.dbb.GetValue()), 'corpus.txt'))
         #self.log.write('FileBrowseButton: %s\n' % evt.GetString())
 
     def checkfile(self, evt) :
         if evt.GetId() == wx.ID_OK :
             if self.dbb.GetValue() != "" :
+                if self.methode == 'dmi' :
+                    if not os.path.exists(self.dbb.GetValue()) :
+                        dlg = wx.MessageDialog(self, 
+                        ' : '.join([self.dbb.GetValue(), _(u"this file doesn't exist")]), 'ATTENTION', wx.NO | wx.YES | wx.ICON_WARNING)
+                        dlg.CenterOnParent()
+                        if dlg.ShowModal() not in [wx.ID_NO, wx.ID_CANCEL]:
+                            self.EndModal(wx.ID_OK)
                 if os.path.exists(self.fbb.GetValue()):
                     dlg = wx.MessageDialog(self, 
                     u"%s\nCe fichier existe, continuer quand même ?" % self.fbb.GetValue(), 'ATTENTION', wx.NO | wx.YES | wx.ICON_WARNING)
