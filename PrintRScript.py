@@ -4,7 +4,7 @@
 #License: GNU/GPL
 
 import tempfile
-from chemins import ffr
+from chemins import ffr, PathOut
 import os
 import locale
 from datetime import datetime
@@ -162,13 +162,15 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         row.names(data2) <- 1:nrow(data2)
         """ % ffr(DicoPath['TableUc2'])
     txt += """
-    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)
-    """
+    log1 <- "%s"
+    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path, log.file = log1)
+    """ % ffr(DicoPath['log-chd1.txt'])
     
     if classif_mode == 0:
         txt += """
-    chd2<-CHD(data2, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)
-    """
+    log2 <- "%s"
+    chd2<-CHD(data2, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path, log.file = log2)
+    """ % ffr(DicoPath['log-chd2.txt'])
     
     txt += """
     #lecture des uce
@@ -1201,6 +1203,41 @@ class ExportAfc(PrintRScript) :
         txt = """
         """
 
+class MergeGraphes(PrintRScript) :
+    def __init__(self, parametres):
+        self.script = u"#Script genere par IRaMuTeQ - %s\n" % datetime.now().ctime()
+        self.pathout = PathOut()
+        self.parametres = parametres
+        self.scriptout = self.pathout['temp']
+        
+    def make_script(self) :
+        #FIXME
+        
+        txt = """
+        library(igraph)
+        library(Matrix)
+        graphs <- list()
+        """
+        load = """
+        load("%s")
+        g <- graph.simi$graph
+        V(g)$weight <- (graph.simi$mat.eff/nrow(dm))*100
+        graphs[['%s']] <- g
+        """
+        for i, graph in enumerate(self.parametres['lgraphes']) :
+            path = os.path.dirname(graph)
+            gname = ''.join(['g', `i`])
+            RData = os.path.join(path,'RData.RData')
+            txt += load % (ffr(RData), gname)
+        self.add(txt)
+        self.sources(['/home/pierre/workspace/iramuteq/Rscripts/simi.R'])
+        txt = """
+        ng <- merge.graph(graphs)
+        ngraph <- list(graph=ng, layout=layout.fruchterman.reingold(ng, dim=3), labex.cex=V(ng)$weight)
+        write.graph(ng, "%s", format = 'graphml')
+        """ % ffr(self.parametres['grapheout'])
+        self.add(txt)
+    
 class TgenSpecScript(PrintRScript):
     def make_script(self):
         self.packages(['textometry'])

@@ -58,6 +58,7 @@ from chemins import RscriptsPath, ConstructConfigPath, ConstructDicoPath, Constr
 from parse_factiva_xml import ImportFactiva
 from parse_dmi import ImportDMI
 from tools import Extract
+from analyse_merge import AnalyseMerge
 
 from tree import LeftTree
 ##########################################################
@@ -99,6 +100,7 @@ ID_Fact_mail = wx.NewId()
 ID_Fact_copy = wx.NewId()
 ID_exportmeta = wx.NewId()
 ID_importdmi = wx.NewId()
+ID_merge = wx.NewId()
 ##########################################################
 #elements de configuration
 ##########################################################
@@ -120,10 +122,10 @@ ConfigGlob.read(DictConfigPath['global'])
 DefaultConf = ConfigParser()
 DefaultConf.read(DictConfigPath['preferences'])
 #repertoire de l'utilisateur
-if os.getenv('HOME') != None:
-    user_home = os.getenv('HOME')
-else:
-    user_home = os.getenv('HOMEPATH')
+user_home = os.getenv('HOME')
+if user_home is None :
+    user_home = os.path.expanduser('~')
+
 UserConfigPath = os.path.abspath(os.path.join(user_home, '.iramuteq'))
 #Si pas de fichiers de config utilisateur, on cree le repertoire
 CreateIraDirectory(UserConfigPath, AppliPath)
@@ -206,7 +208,8 @@ class IraFrame(wx.Frame):
                  size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE | 
                                             wx.SUNKEN_BORDER | 
                                             wx.CLIP_CHILDREN):
-        log.info('Starting...')
+        log.info('Starting... ' )
+        log.info('version : %s' % ConfigGlob.get('DEFAULT', 'version'))
         wx.Frame.__init__(self, parent, id, title, pos, size, style)
         #configuration
         self.AppliPath = AppliPath
@@ -270,6 +273,9 @@ class IraFrame(wx.Frame):
         item = wx.MenuItem(file_menu, ID_importdmi, _(u"Import from DMI-TCAT (exp.)").decode('utf8'), _(u"Import from DMI-TCAT (exp.)").decode('utf8'))
         item.SetBitmap(self.images_analyses['importdmi'])
         file_menu.AppendItem(item)        
+        
+        item = wx.MenuItem(file_menu, ID_merge, _(u'Merge graphs').decode('utf8'), _(u'Merge graphs').decode('utf8'))
+        file_menu.AppendItem(item)
         
         menuFactiva = wx.Menu()
         fact_from_xml = wx.MenuItem(menuFactiva, ID_Fact_xml, _(u"from xml").decode('utf8'))
@@ -604,6 +610,7 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnImportEuropress, id=ID_ImportEuro)
         self.Bind(wx.EVT_MENU, self.OnImportDMI, id=ID_importdmi)
         self.Bind(wx.EVT_MENU, self.OnExportMeta, id=ID_exportmeta)
+        self.Bind(wx.EVT_MENU, self.OnMergeGraph, id = ID_merge)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 ##################################################################
         flags = self._mgr.GetAGWFlags()
@@ -801,9 +808,7 @@ class IraFrame(wx.Frame):
             del busy
             
     def OpenText(self):
-        dlg = progressbar(self, 5) 
-        
-        builder =  Builder(self, dlg)
+        builder =  Builder(self, 5)
         if builder.res == wx.ID_OK :
             try :
                 corpus = builder.doanalyse()
@@ -811,11 +816,11 @@ class IraFrame(wx.Frame):
                 self.tree.OnItemAppend(corpus.parametres)
                 OpenAnalyse(self, corpus.parametres)
             except :
-                dlg.Destroy()
+                builder.dlg.Destroy()
                 BugReport(self)
             else :
                 count = 1
-                keepGoing = dlg.Update(count, u"Lecture du fichier")
+                keepGoing = builder.dlg.Update(count, u"Lecture du fichier")
                 self.ShowMenu('view')
                 self.ShowMenu('text')
                 self.ShowMenu('matrix', False)
@@ -823,8 +828,8 @@ class IraFrame(wx.Frame):
                 self.DataTxt = False
                 self.Text = ''
                 count += 1
-                keepGoing = dlg.Update(count, u"Chargement du dictionnaire")
-                dlg.Destroy()
+                keepGoing = builder.dlg.Update(count, u"Chargement du dictionnaire")
+                builder.dlg.Destroy()
         
     def OnExit(self, event):
         self.Close()
@@ -1002,6 +1007,9 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 #                 PlaySound(self)
 #         except:
 #             BugReport(self)
+    def OnMergeGraph(self, evt):
+        #FIXME
+        AnalyseMerge(self, {'type': 'merge', 'fileout' : '/tmp/test.txt'}, dlg = 5)
     
     def OnProto(self, evt, matrix = None) :
         self.analyse_matrix(Prototypical, matrix = matrix, analyse_type = 'proto', dlgnb = 3) 
@@ -1194,7 +1202,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             else:
                 truepath = False
         else:
-            pass
+            return
         if truepath :
             if os.path.splitext(self.filename)[1] in ['.csv', '.xls', '.ods']:
                 self.tableau = Tableau(self, self.filename)
@@ -1345,7 +1353,7 @@ class MySplashScreen(wx.SplashScreen):
         bmp = wx.Image(os.path.join(ImagePath, 'splash.png')).ConvertToBitmap()
         wx.SplashScreen.__init__(self, bmp,
                                  wx.SPLASH_CENTRE_ON_SCREEN | wx.SPLASH_TIMEOUT,
-                                 2000, None, -1)
+                                 1000, None, -1)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.fc = wx.FutureCall(1, self.ShowMain)
 

@@ -544,9 +544,9 @@ class PrefGraph(wx.Dialog):
         self.paramgraph=paramgraph
         self.labeltype = wx.StaticText(self, -1, _(u"Graphic type").decode('utf8'))
         if self.paramgraph['clnb'] <= 3 :
-            choix = [u'2D']#, 'web 2D']
+            choix = [u'2D', 'web 2D']
         else :
-            choix=[u'2D' ,u'3D']#, 'web 2D', 'web 3D']
+            choix=[u'2D' ,u'3D', 'web 2D', 'web 3D']
         self.choicetype = wx.Choice(self, -1, (100,50), choices=choix)
         self.label_format = wx.StaticText(self, -1, _(u"Picture format").decode('utf8'))
         self.choix_format =  wx.Choice(self, -1, (100,50), choices = ['png', 'svg'])        
@@ -1577,7 +1577,7 @@ class SearchDial ( wx.Frame ):
         self.search = wx.SearchCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER )
         self.search.ShowSearchButton( True )
         self.search.ShowCancelButton( True )
-        bSizer1.Add( self.search, 0, wx.ALL, 5 )
+        bSizer1.Add( self.search, 0, wx.ALL|wx.EXPAND, 5 )
         sizer2 = wx.BoxSizer(wx.HORIZONTAL)
         self.backward = wx.Button(self, wx.ID_BACKWARD, _(u"Previous").decode('utf8'))
         self.forward = wx.Button(self, wx.ID_FORWARD, _(u"Next").decode('utf8'))
@@ -1707,6 +1707,49 @@ def UnSelectList(liste) :
             last = liste.GetNextSelected(last)
             liste.Select(liste.GetFirstSelected(),False)
 
+class SearchCorpus(SearchDial):
+    def OnSearch(self, evt):
+        search_word = self.search.GetValue()
+        if search_word.strip() != '' :
+            self.corpus_ok = self.listctrl.GetCorpusByName(search_word)
+            if self.corpus_ok != [] :
+                if len(self.corpus_ok) == 1 :
+                    self.listctrl.GiveFocus(None, self.corpus_ok[0]['uuid'])
+                    self.Destroy()
+                else :
+                    self.listctrl.GiveFocus(None, self.corpus_ok[-1]['uuid'])
+                    self.forward.Enable(True)
+                    self.backward.Enable(False)                        
+                    self.forwitem = 1
+                    self.backitem = -1
+                    #for corpus in corpus_ok :
+                    #    self.listctrl.SetContentBackground(uuid = corpus['uuid'])
+            else :
+                print 'no results'
+        else :
+            self.Destroy()
+            
+    def onforward(self, evt) :
+        self.forwitem += 1
+        self.listctrl.GiveFocus(uuid=self.corpus_ok[-self.forwitem]['uuid'])
+        if self.forwitem == len(self.corpus_ok) :
+            self.forward.Enable(False)
+            self.backward.Enable(True)
+            self.backitem = self.forwitem - 1
+        else :
+            self.backitem = self.forwitem - 1
+            self.backward.Enable(True)
+
+    def onbackward(self, evt) :
+        self.listctrl.GiveFocus(uuid=self.corpus_ok[-self.backitem]['uuid'])
+        self.backitem -= 1
+        if self.backitem == 0 :
+            self.forwitem -= 1
+            self.forward.Enable(True)
+            self.backward.Enable(False)
+        else :
+            self.forwitem -= 1
+            self.forward.Enable(True)
 
 class OptLexi(wx.Dialog):
     def __init__(self, parent, force_chi = False):
@@ -2527,9 +2570,10 @@ class CorpusPref ( wx.Dialog ):
         self.Centre( wx.BOTH )
 
     def OnChangeDir(self, evt) :
-        dlg = wx.DirDialog(self.parent, _(u"Choose a folder").decode('utf8'), style = wx.DD_DEFAULT_STYLE)
-        if dlg.ShowModal() == wx.ID_OK :
+        sdlg = wx.DirDialog(self.parent, _(u"Choose a folder").decode('utf8'), style = wx.DD_DEFAULT_STYLE)
+        if sdlg.ShowModal() == wx.ID_OK :
             self.repout_choices.SetValue(dlg.GetPath())
+        sdlg.Destroy()
     
     def __del__( self ):
         pass
@@ -3286,7 +3330,7 @@ class ImageViewer ( wx.Frame ):
             self, message=_(u"Save as...").decode('utf8'), defaultDir=os.getcwd(),
             defaultFile= self.imagename, wildcard=self.parametres['wildcard'], style=wx.SAVE | wx.OVERWRITE_PROMPT
             )
-        dlg.SetFilterIndex(2)
+        dlg.SetFilterIndex(0)
         dlg.CenterOnParent()
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
@@ -3330,3 +3374,104 @@ class BarFrame :
             win = ImageViewer(ira, parametres, _(u"Graphic").decode('utf8'), size=(700, 500))
             win.Show(True)
         dial.Destroy()           
+
+class MergeDialog ( wx.Dialog ):
+    
+    def __init__( self, parent ):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE|wx.MINIMIZE_BOX )
+        
+        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        
+        bSizer1 = wx.BoxSizer( wx.VERTICAL )
+        
+        self.m_scrolledWindow1 = wx.ScrolledWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( 600,200 ), wx.HSCROLL|wx.VSCROLL )
+        self.m_scrolledWindow1.SetScrollRate( 5, 5 )
+        #self.m_scrolledWindow1.SetMinSize( wx.Size( 500,200 ) )
+        
+        fgSizer2 = wx.FlexGridSizer( 0, 2, 0, 0 )
+        fgSizer2.AddGrowableCol( 1 )
+        fgSizer2.SetFlexibleDirection( wx.BOTH )
+        fgSizer2.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_ALL )
+        
+        self.m_staticText3 = wx.StaticText( self.m_scrolledWindow1, wx.ID_ANY, u"graphe 1", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3.Wrap( -1 )
+        fgSizer2.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.m_filePicker3 = wx.FilePickerCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST|wx.FLP_USE_TEXTCTRL )
+        self.m_filePicker3.SetMinSize( wx.Size( 400,-1 ) )
+        
+        fgSizer2.Add( self.m_filePicker3, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+        
+        self.m_staticText4 = wx.StaticText( self.m_scrolledWindow1, wx.ID_ANY, u"graphe 2", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4.Wrap( -1 )
+        fgSizer2.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.m_filePicker4 = wx.FilePickerCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST|wx.FLP_USE_TEXTCTRL )
+        self.m_filePicker4.SetMinSize( wx.Size( 400,-1 ) )
+        
+        fgSizer2.Add( self.m_filePicker4, 1, wx.ALL|wx.EXPAND, 5 )
+        
+        
+        self.m_scrolledWindow1.SetSizer( fgSizer2 )
+        self.m_scrolledWindow1.Layout()
+        bSizer1.Add( self.m_scrolledWindow1, 0, wx.ALL, 5 )
+        
+        self.button_add = wx.Button( self, wx.ID_ANY, u"Add graphe", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer1.Add( self.button_add, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        m_sdbSizer1 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
+        self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
+        m_sdbSizer1.Realize();
+        
+        bSizer1.Add( m_sdbSizer1, 1, wx.EXPAND, 5 )
+        
+        
+        self.SetSizer( bSizer1 )
+        self.Layout()
+        bSizer1.Fit( self )
+        
+        self.Centre( wx.BOTH )
+        
+        # Connect Events
+        self.button_add.Bind( wx.EVT_BUTTON, self.OnAddGraphe )
+        self.m_filePicker3.Bind(wx.EVT_FILEPICKER_CHANGED, self.OnFileChange)
+        self.m_filePicker4.Bind(wx.EVT_FILEPICKER_CHANGED, self.OnFileChange)
+        self.finish(fgSizer2, bSizer1)
+    
+    def __del__( self ):
+        pass
+    
+    def finish(self, fgSizer2, bSizer1):
+        self.graphs = [self.m_filePicker3, self.m_filePicker4]
+        self.fgSizer2 = fgSizer2
+        self.bSizer1 = bSizer1
+    
+    def OnFileChange(self, evt):
+        obj = evt.GetEventObject()
+        if obj.GetPath() != '' :
+            for graph in self.graphs :
+                graph.SetInitialDirectory(os.path.dirname(obj.GetPath()))
+    
+    # Virtual event handlers, overide them in your derived class
+    def OnAddGraphe( self, event ):
+        lab =  wx.StaticText( self.m_scrolledWindow1, wx.ID_ANY, ' '.join(['graphe', `len(self.graphs) + 1`]), wx.DefaultPosition, wx.DefaultSize, 0 )
+        lab.Wrap(-1)
+        self.graphs.append( wx.FilePickerCtrl( self.m_scrolledWindow1, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE|wx.FLP_FILE_MUST_EXIST|wx.FLP_USE_TEXTCTRL ) )
+        self.graphs[-1].SetMinSize( wx.Size( 400, -1))
+        if self.graphs[-2].GetPath() != '' :
+            self.graphs[-1].SetInitialDirectory(os.path.dirname(self.graphs[-2].GetPath()))
+        self.graphs[-1].Bind(wx.EVT_FILEPICKER_CHANGED, self.OnFileChange)
+        self.fgSizer2.Add( lab, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        self.fgSizer2.Add( self.graphs[-1], 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+        self.m_scrolledWindow1.Layout()
+        self.m_scrolledWindow1.SetSizer( self.fgSizer2 )
+        #self.fgSizer2.Fit( self.m_scrolledWindow1 )
+        self.Layout()
+        #self.bSizer1.Fit(self)
+        event.Skip()
+    
+    def RemoveGraphe(self, evt ):
+        pass
