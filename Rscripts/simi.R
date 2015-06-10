@@ -340,7 +340,11 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
 	#		Sys.sleep(0.5)
 	} else if (p.type == 'web') {
 		library(rgexf)
-		simi.to.gexf(filename, graph.simi, nodes.attr = NULL)
+        graph.simi$label.cex <- label.cex
+        graph.simi$color <- vertex.col
+        label <- v.label
+        nodes.attr <- data.frame(label)
+		simi.to.gexf(filename, graph.simi, nodes.attr = nodes.attr)
 	}
 }
 
@@ -407,4 +411,46 @@ saveAsGEXF = function(g, filepath="converted_graph.gexf")
                        meta=c(list(creator="iramuteq", description="igraph -> gexf converted file", keywords="igraph, gexf, R, rgexf"), graphAtt))
   
   print(output, filepath, replace=T)
+}
+
+
+merge.graph <- function(graphs) {
+    ng <- graph.union(graphs, byname=T)
+    print(list.vertex.attributes(ng))
+    V.weight <- V(ng)$weight_1 
+    E.weight <- E(ng)$weight_1
+    cols <- rainbow(length(graphs))
+    V.color <- rep(cols[1], length(V.weight))
+    print(cbind(V(ng)$name, V.weight, V.color))
+    for (i in 2:length(graphs)) {
+        print(i)
+        tw <- paste('weight_', i, sep='')
+        tocomp <- get.vertex.attribute(ng,tw)
+        totest <- intersect(which(!is.na(V.weight)), which(!is.na(tocomp)))
+        maxmat <- cbind(V.weight[totest], tocomp[totest])
+        resmax <- apply(maxmat, 1, which.max)
+        ncolor <- c(cols[(i-1)], cols[i])
+        to.change <- totest[which(resmax == 2)]
+        V.color[to.change] <- cols[i]
+        V.weight[totest] <- apply(maxmat, 1, max)
+        nas <- which(is.na(V.weight))
+        nas2 <- which(is.na(tocomp))
+        fr2 <- setdiff(nas,nas2)
+        V.weight[fr2] <- tocomp[fr2]
+        V.color[fr2] <- cols[i]
+        
+        tocomp <- get.edge.attribute(ng, tw)
+        totest <- intersect(which(!is.na(E.weight)), which(!is.na(tocomp)))
+        maxmat <- cbind(E.weight[totest], tocomp[totest])
+        resmax <- apply(maxmat, 1, which.max)
+        E.weight[totest] <- apply(maxmat, 1, max)
+        nas <- which(is.na(E.weight))
+        nas2 <- which(is.na(tocomp))
+        fr2 <- setdiff(nas,nas2)
+        E.weight[fr2] <- tocomp[fr2]        
+    }
+    V(ng)$weight <- V.weight
+    V(ng)$color <- V.color
+    E(ng)$weight <- E.weight
+    ng
 }
