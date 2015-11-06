@@ -8,7 +8,7 @@ _ = gettext.gettext
 import locale
 import sys
 from time import time
-from functions import decoupercharact, ReadDicoAsDico, DoConf, ReadLexique
+from functions import decoupercharact, ReadDicoAsDico, DoConf, ReadLexique, progressbar
 import re
 import sqlite3
 import itertools
@@ -173,7 +173,13 @@ class Corpus :
         return list(set(list(itertools.chain(*[[int(val) for val in row[0].split()] if not isinstance(row[0], int) else [row[0]] for row in res]))))
 
     def gettgenst(self, tgen):
-        formesid = ', '.join([`val` for lem in tgen for val in self.lems[lem].formes if lem in self.lems])
+        formesid = ''
+        for lem in tgen :
+            if lem in self.lems :
+                formesid += ', '.join([`val` for val in self.lems[lem].formes])
+            else :
+                print 'abscent: ',lem
+        #formesid = ', '.join([`val` for lem in tgen for val in self.lems[lem].formes if lem in self.lems])
         query = 'SELECT uces FROM uces where id IN (%s) ORDER BY id' % formesid
         res = self.cformes.execute(query)
         return list(set(list(itertools.chain(*[[int(val) for val in row[0].split()] if not isinstance(row[0], int) else [row[0]] for row in res]))))
@@ -374,7 +380,9 @@ class Corpus :
         for lem in tokeep :
             deff = self.getlemuceseff(lem)
             ucesk = deff.keys()
-            tab.append([lem] + [sum([deff[uce] for uce in et.intersection(ucesk)]) for et in etuces])
+            line = [lem] + [sum([deff[uce] for uce in et.intersection(ucesk)]) for et in etuces]
+            if sum(line[1:]) >= mineff :
+                tab.append(line)
         tab.insert(0, [''] + etoiles)
         return tab
     
@@ -1303,7 +1311,9 @@ class BuildCorpus :
             self.cleans.append(self.dotiret)
 
     def make_expression(self,txt) :
-        for expression in self.expressions:
+        exp = self.expressions.keys()
+        exp.sort(reverse=True)
+        for expression in exp :
             if expression in txt :
                 txt = txt.replace(expression, self.expressions[expression][0])
         return txt
@@ -1589,6 +1599,7 @@ class Builder :
     def __init__(self, parent, dlg = None) :
         self.parent = parent
         self.dlg = dlg
+
         parametres = DoConf(os.path.join(self.parent.UserConfigPath,'corpus.cfg')).getoptions('corpus')
         parametres['pathout'] = PathOut(parent.filename, 'corpus').mkdirout()
         parametres['corpus_name'] = os.path.split(parametres['pathout'])[1]
@@ -1597,6 +1608,8 @@ class Builder :
         dial.txtpath.SetLabel(parent.filename)
         #dial.repout_choices.SetValue(parametres['pathout'])
         self.res = dial.ShowModal()
+        if self.dlg is not None :
+            self.dlg = progressbar(self.parent, self.dlg)
         if self.res == 5100 :
             parametres = dial.doparametres()
             parametres['originalpath'] = parent.filename
