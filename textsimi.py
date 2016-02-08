@@ -7,10 +7,12 @@ from chemins import ffr, simipath
 import os
 from analysetxt import AnalyseText
 from guifunct import PrepSimi
-from functions import indices_simi, progressbar, treat_var_mod, read_list_file, print_liste
-from PrintRScript import PrintSimiScript
+from functions import indices_simi, progressbar, treat_var_mod, read_list_file, print_liste, DoConf, exec_rcode, check_Rresult
+from PrintRScript import PrintSimiScript 
 import wx
 from copy import copy
+from operator import itemgetter
+import codecs
 import logging
 
 log = logging.getLogger('iramuteq.textsimi')
@@ -41,7 +43,12 @@ class SimiTxt(AnalyseText):
             else :
                 return False
         else :
+            order_actives = [[i, act, self.corpus.getlemeff(act)] for i, act in enumerate(self.actives)]
+            order_actives = sorted(order_actives, key=itemgetter(2), reverse = True)
+            with open(self.pathout['selected.csv'], 'w') as f :
+                f.write('\n'.join([`order_actives[val][0]` for val in self.parametres['selected']]))
             continu = True
+            
         if continu :
             self.makefiles()
             script = PrintSimiScript(self)
@@ -182,3 +189,6 @@ class SimiFromCluster(SimiTxt) :
         with open(self.pathout['actives_chi.csv'], 'w') as f :
             f.write('\n'.join([`val` for val in self.lchi]))
 
+
+
+                
