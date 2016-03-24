@@ -1,7 +1,7 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2012, Pierre Ratinaud
+#Copyright (c) 2008-2016, Pierre Ratinaud
 #License: GNU GPL
 
 from optparse import OptionParser
@@ -36,6 +36,7 @@ from tableau import Tableau
 from dialog import PrefDialog
 from tabfrequence import Frequences, FreqMultiple
 from tabchi2 import ChiSquare
+from tabchi2mcnemar import McNemar
 #from tabstudent import MakeStudent
 from tabchddist import ChdCluster
 from tabafcm import DoAFCM
@@ -68,6 +69,7 @@ ID_OpenText = wx.NewId()
 ID_OnOpenAnalyse = wx.NewId()
 ID_Freq = wx.NewId()
 ID_Chi2 = wx.NewId()
+ID_Chi2mc = wx.NewId()
 ID_Student = wx.NewId()
 ID_CHDSIM = wx.NewId()
 ID_CHDReinert = wx.NewId()
@@ -185,6 +187,7 @@ images_analyses = {
         'freq' : 'frequences.png',
         'freqmulti' : 'frequences.png',
         'chi2' : 'chi2.png',
+        'chi2mcnemar' : 'chi2.png',
         'reinertmatrix' : 'reinertmatrix.png',
         'simimatrix' : 'simimatrix.png',
         'simiclustermatrix' : 'simimatrix.png',
@@ -328,6 +331,7 @@ class IraFrame(wx.Frame):
         matanalyses = [[ID_Freq, _(u"Frequencies").decode('utf8'), 'freq'],
                        [ID_FreqMulti, _(u"Multiple  Frequencies").decode('utf8'), 'freqmulti'],
                        [ID_Chi2, _(u"Chi2").decode('utf8'), 'chi2'],
+                       [ID_Chi2mc, _(u"Chi2 McNemar").decode('utf8'), 'chi2mcnemar'],
                        {'name' : _(u"Clustering").decode('utf8'),
                         'content' : [[ID_CHDReinert, _(u"Reinert's Method").decode('utf8'), 'reinertmatrix']]},
                        [ID_SIMI, _(u"Similarities Analysis").decode('utf8'), 'simimatrix'],
@@ -582,6 +586,7 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnFreq, id=ID_Freq)
         self.Bind(wx.EVT_MENU, self.OnFreqMulti, id=ID_FreqMulti)
         self.Bind(wx.EVT_MENU, self.OnChi2, id=ID_Chi2)
+        self.Bind(wx.EVT_MENU, self.OnChi2McNemar, id=ID_Chi2mc)
         self.Bind(wx.EVT_MENU, self.OnStudent, id=ID_Student)
         self.Bind(wx.EVT_MENU, self.OnCHDSIM, id=ID_CHDSIM)
         self.Bind(wx.EVT_MENU, self.OnCHDReinert, id=ID_CHDReinert)
@@ -968,6 +973,9 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 
     def OnChi2(self, event, matrix = None):
         self.analyse_matrix(ChiSquare, matrix = matrix, analyse_type = 'chi2', dlgnb = 3) 
+
+    def OnChi2McNemar(self, event, matrix = None):
+        self.analyse_matrix(McNemar, matrix = matrix, analyse_type = 'chi2mcnemar', dlgnb = 3)
 
     def OnSimiTab(self, event, matrix = None):
         self.analyse_matrix(DoSimi, matrix = matrix, analyse_type = 'simimatrix', dlgnb = 5)

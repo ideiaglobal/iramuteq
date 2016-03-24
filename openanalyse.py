@@ -170,6 +170,6 @@ class OpenAnalyse():
             MatLayout(self.parent, corpus)
         elif self.conf['type'] == 'freq' or self.conf['type'] == 'freqmulti':
             FreqLayout(self.parent, corpus, self.conf)
-        elif self.conf['type'] == 'chi2' :
+        elif self.conf['type'] == 'chi2' or self.conf['type'] == 'chi2mcnemar':
             Chi2Layout(self.parent, corpus, self.conf)
         
