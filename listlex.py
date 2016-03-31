@@ -33,6 +33,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         self.dlist=dlist
         self.first = first
         self.tgen = False
+        self.tgenlem = False
         if 'etoiles' in dir(self.gparent) and not usefirst :
             self.etoiles = self.gparent.etoiles
         else :
@@ -184,12 +185,14 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
                 self.popup_Tgen_glob = wx.NewId()
                 self.onmaketgen = wx.NewId()
                 self.ID_stcaract = wx.NewId()
+                self.id_tgendetails = wx.NewId()
 
-                self.Bind(wx.EVT_MENU, self.OnPopupOne, id=self.popupID1)
-                self.Bind(wx.EVT_MENU, self.OnPopupTwo, id=self.popupID2)
-                self.Bind(wx.EVT_MENU, self.OnPopupThree, id=self.popupID3)
-                self.Bind(wx.EVT_MENU, self.OnTgen_glob, id=self.popup_Tgen_glob)
-                self.Bind(wx.EVT_MENU, self.OnMakeTgen, id=self.onmaketgen)
+                self.Bind(wx.EVT_MENU, self.OnPopupOne, id = self.popupID1)
+                self.Bind(wx.EVT_MENU, self.OnPopupTwo, id = self.popupID2)
+                self.Bind(wx.EVT_MENU, self.OnPopupThree, id = self.popupID3)
+                self.Bind(wx.EVT_MENU, self.OnTgen_glob, id = self.popup_Tgen_glob)
+                self.Bind(wx.EVT_MENU, self.OnMakeTgen, id = self.onmaketgen)
+                self.Bind(wx.EVT_MENU, self.OnTgenDetails, id = self.id_tgendetails)
                 #self.Bind(wx.EVT_MENU, self.onstcaract, id = self.ID_stcaract)
             # make a menu
             menu = wx.Menu()
@@ -207,6 +210,8 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
                     self.Bind(wx.EVT_MENU, self.onstcaract, id = nid)
                 menu.AppendMenu(-1, _(u"Typical text segments").decode('utf8'), menu_stcaract)
                 menu.Append(self.onmaketgen, _(u"Make Tgen").decode('utf8'))
+            else :
+                menu.Append(self.id_tgendetails, _(u'Tgen details').decode('utf8'))
             self.PopupMenu(menu)
             menu.Destroy()
 
@@ -347,5 +352,52 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         win.HtmlPage.SetPage(txt)
         win.Show(True)
     
+    def OnTgenDetails(self, evt):
+        if 'nb' in dir(self.parent) :
+            activenotebook = self.parent.nb.GetSelection()
+            page = self.parent.nb.GetPage(activenotebook)
+            corpus = page.corpus
+        else :
+            corpus = self.parent.parent.parent.corpus
+        ira = wx.GetApp().GetTopWindow()
+        item=self.getColumnText(self.GetFirstSelected(), 0)
+        wordlist = [val for val in self.tgens[item] if val in corpus.lems]
+        wordlist = dict(zip(wordlist,wordlist))
+        res = dict([[val, self.tgenlem[val]] for val in self.tgenlem if self.tgenlem[val][0] in wordlist])
+        win = ListLexFrame(self, ira, corpus, res, self.etoiles)
+        win.Show()
+        
+    
     def OnMakeTgen(self, evt):
         self.parent.tree.OnTgenEditor(self.getselectedwords())
+
+class ListLexFrame ( wx.Frame ):
+    
+    def __init__( self, parent, ira, corpus, data, columns ):
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        
+        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        
+        bSizer1 = wx.BoxSizer( wx.VERTICAL )
+        
+        
+        self.listlex = ListForSpec(self, ira, data, columns)
+        bSizer1.Add( self.listlex, 5, wx.ALL|wx.EXPAND, 5 )
+        
+        m_sdbSizer1 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
+        self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
+        m_sdbSizer1.Realize();
+        
+        bSizer1.Add( m_sdbSizer1, 0, wx.EXPAND, 5 )
+        
+        
+        self.SetSizer( bSizer1 )
+        self.Layout()
+        
+        self.Centre( wx.BOTH )
+    
+    def __del__( self ):
+        pass
