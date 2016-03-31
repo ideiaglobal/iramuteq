@@ -10,7 +10,11 @@ from copy import copy
 from dialog import FileOptionDialog, SelectColDial, OptLexi, PrefSimpleFile
 from listlex import *
 from vitemspicker import VItemsPicker, EVT_IP_SELECTION_CHANGED, IP_SORT_CHOICES, IP_SORT_SELECTED, IP_REMOVE_FROM_CHOICES
-from functions import treat_var_mod
+from functions import treat_var_mod, print_liste, exec_rcode, check_Rresult, DoConf, read_list_file, indices_simi
+import codecs
+import wx.lib.hyperlink as hl
+from webexport import WebExport
+from PrintRScript import PrintSimiScript
 #from wx import GetTopLevelWindows
 
 
@@ -252,7 +256,7 @@ class PrefSimi ( wx.Dialog ):
         self.m_staticText5.Wrap( -1 )
         fgSizer3.Add( self.m_staticText5, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
         
-        choice3Choices = [ u"dynamique", u"statique", u"3D"]#, u'web2D', u"web3D" ]
+        choice3Choices = [ u"dynamique", u"statique", u"3D", u'web2D', u"web3D" ]
         self.choice3 = wx.Choice( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice3Choices, 0 )
         self.choice3.SetSelection( 0 )
 
@@ -982,7 +986,7 @@ class PrepSimi :
             param['vlabcolor'] = self.parametres['vlabcolor']
         if 'check_bystar' in dir(self.dial) :
             param['bystar'] = self.dial.check_bystar.GetValue()
-            param['stars'] = self.parametres['stars']
+            param['stars'] = self.parametres.get('stars', 0)
         self.parametres.update(param)
 
 class CreateTgenDialog ( wx.Frame ):
@@ -1262,3 +1266,75 @@ class ExportMetaTable :
             dlg.Destroy()
         else :
             dial.Destroy()         
+
+
+def redosimi(self, evt) :
+    with open(self.pathout['selected.csv'],'r') as f :
+        selected = f.read()
+    selected = [int(val) for val in selected.splitlines()]
+    if self.actives is None :
+        with codecs.open(self.pathout['actives.csv'], 'r', self.parametres['encoding']) as f :
+            self.actives = f.read()
+        self.actives = self.actives.splitlines()#[act for act in self.actives.splitlines()]
+    if os.path.exists(self.pathout['actives_nb.csv']) :
+        with open(self.pathout['actives_nb.csv'], 'r') as f :
+            act_nb = f.read()
+            act_nb = act_nb.splitlines()
+        dictcol = dict([[i, [self.actives[i], int(act_nb[i])]] for i, val in enumerate(self.actives)])
+    else :
+        dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
+    #res = SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], selected = selected, dlg = True) 
+    #if res.ok :
+    if evt is not None :
+        prep = PrepSimi(self.ira, self, self.parametres,self.pathout['selected.csv'], self.actives, indices_simi, wordlist = dictcol, selected = selected)
+    else :
+        class EmptyBase(object): pass
+        prep = EmptyBase()
+        prep.val = wx.ID_OK
+        prep.parametres = self.parametres
+        order_actives = [[i, act, self.corpus.getlemeff(act)] for i, act in enumerate(self.actives)]
+        order_actives = sorted(order_actives, key=itemgetter(2), reverse = True)
+        with open(self.pathout['selected.csv'], 'w') as f :
+            f.write('\n'.join([`order_actives[val][0]` for val in self.parametres['selected']]))
+    if prep.val == wx.ID_OK or evt is None:
+        self.parametres = prep.parametres
+
+        script = PrintSimiScript(self)
+        script.make_script()
+        pid = exec_rcode(self.ira.RPath, script.scriptout, wait = True)
+        check_Rresult(self.ira, pid)
+        if self.parametres['type_graph'] in [1,3] :
+            if self.parametres['svg'] :
+                filename, ext = os.path.splitext(script.filename)
+                fileout = filename + '.svg'
+            elif self.parametres['type_graph'] == 3 :
+                fileout = script.filename
+                parametres = {'gexffile' :  fileout,
+                  'dirout' : os.path.dirname(fileout),
+                  'titre': 'Le titre',
+                  #'nodemin': self.param['txt_min'],
+                  #'nodemax': self.param['txt_max'],
+                  #'bargraphw' : 60*int(self.param['clnb']),
+                  }
+                web = WebExport(self.ira, parametres)
+                fileout = web.exportsimi()             
+            else :
+                fileout = script.filename
+            if os.path.exists(self.pathout['liste_graph']):
+                graph_simi = read_list_file(self.pathout['liste_graph'])
+                graph_simi.append([os.path.basename(fileout), script.txtgraph])
+            else :
+                graph_simi = [[os.path.basename(fileout), script.txtgraph]]
+            self.fileout = fileout
+            print_liste(self.pathout['liste_graph'], graph_simi)
+        DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
+        if evt is not None :
+            if self.parametres['type_graph'] in [1,3] :
+                if self.parametres['svg'] or self.parametres['type_graph'] == 3 :
+                    self.graphpan.sizer_3.Add(hl.HyperLinkCtrl(self.graphpan.panel_1, -1, fileout, URL = fileout), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+                else :
+                    self.graphpan.sizer_3.Add(wx.StaticBitmap(self.graphpan.panel_1, -1, wx.Bitmap(fileout, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+                self.graphpan.sizer_3.Add(wx.StaticText(self.graphpan.panel_1,-1, script.txtgraph), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+                self.graphpan.sizer_3.Fit(self.graphpan.panel_1)
+                self.graphpan.Layout()
+                self.graphpan.panel_1.Scroll(0,self.graphpan.panel_1.GetScrollRange(wx.VERTICAL))
