@@ -31,7 +31,7 @@ my.jaccard <- function(x) {
     a <- make.a(x)
     b <- make.b(x)
     c <- make.c(x)
-    d <- make.d(x, a, b, c)
+    #d <- make.d(x, a, b, c)
     jac <- a / (a + b + c)
     jac
 }
@@ -114,7 +114,7 @@ BuildProf01<-function(x,classes) {
 	mat
 }
 
-do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.type = 'frutch', max.tree = TRUE, coeff.vertex=NULL, coeff.edge = NULL, minmaxeff=c(NULL,NULL), vcexminmax= c(NULL,NULL), cex = 1, coords = NULL, communities = NULL, halo = FALSE) {
+do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.type = 'frutch', max.tree = TRUE, coeff.vertex=NULL, coeff.edge = NULL, minmaxeff=c(NULL,NULL), vcexminmax= c(NULL,NULL), cex = 1, coords = NULL, communities = NULL, halo = FALSE, fromcoords=NULL, forvertex=NULL) {
 	mat.simi <- x$mat
     mat.eff <- x$eff
     v.label <- colnames(mat.simi)
@@ -138,7 +138,7 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
 	}
 
     if (!is.null(seuil)) {
-        if (seuil >= max(mat.simi)) seuil <- 0
+        if (seuil >= max(mat.simi)) seuil <- -Inf
         vec<-vector()
         w<-E(g.toplot)$weight
         tovire <- which(w<=seuil)
@@ -166,34 +166,49 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
         label.cex = cex
     }
     if (!is.null(coeff.edge)) {
+        #FIXME
         we.width <- norm.vec(abs(E(g.toplot)$weight), coeff.edge[1], coeff.edge[2]) 
 	    #we.width <- abs((E(g.toplot)$weight/max(abs(E(g.toplot)$weight)))*coeff.edge)
     } else {
         we.width <- NULL
     }
     if (method != 'binom') {
-        we.label <- round(E(g.toplot)$weight,2)
-    } else {
         we.label <- round(E(g.toplot)$weight,3)
+    } else {
+        we.label <- round(E(g.toplot)$weight,4)
     }
 	if (p.type=='rgl' || p.type=='rglweb') {
         nd<-3
     } else {
         nd<-2
     }
+    if (! is.null(fromcoords)) {
+        newfrom <- matrix(runif(nd*length(V(g.toplot)$name),min(fromcoords)),max(fromcoords),ncol=nd, nrow=length(V(g.toplot)$name))
+        for (i in 1:length(V(g.toplot)$name)) {
+            if(V(g.toplot)$name[i] %in% forvertex) {
+                newfrom[i,] <- fromcoords[which(forvertex==V(g.toplot)$name[i]),]
+            }
+        }
+       fromcoords <- newfrom
+    }
+    #print(layout.type)
     if (is.null(coords)) {
-    	if (layout.type == 'frutch')
-    		lo <- layout.fruchterman.reingold(g.toplot,dim=nd)#, weightsA=E(g.toplot)$weight)
-    	if (layout.type == 'kawa')
-    		lo <- layout.kamada.kawai(g.toplot,dim=nd)
+    	if (layout.type == 'frutch') {
+            #lo <- layout_with_drl(g.toplot,dim=nd)
+            lo <- layout_with_fr(g.toplot,dim=nd, grid="grid", niter=10000, weights=1/E(g.toplot)$weight)#, start.temp = 1)#, )
+        }
+    	if (layout.type == 'kawa') {
+    		lo <- layout_with_kk(g.toplot,dim=nd, weights=1/E(g.toplot)$weight, start=fromcoords, epsilon=0, maxiter = 10000)
+            #print(lo)
+        }
     	if (layout.type == 'random')
-    		lo <- layout.random(g.toplot,dim=nd)
+    		lo <- layout_on_grid(g.toplot,dim=nd)
     	if (layout.type == 'circle' & p.type != 'rgl')
-    		lo <- layout.circle(g.toplot)
+    		lo <- layout_in_circle(g.toplot)
     	if (layout.type == 'circle' & p.type == 'rgl')
-    		lo <- layout.sphere(g.toplot)
+    		lo <- layout_on_sphere(g.toplot)
         if (layout.type == 'graphopt')
-            lo <- layout.graphopt(g.toplot)
+            lo <- layout_as_tree(g.toplot, circular = TRUE)
     } else {
         lo <- coords
     }
@@ -243,11 +258,13 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
         we.label <- NA
     }
 	lo <- graph.simi$layout
+    #rownames(lo) <- v.label
     if (!is.null(vertex.label.cex)) {
         label.cex<-vertex.label.cex
     } else {
         label.cex = graph.simi$label.cex
     }
+ 
     if (cexalpha) {
         alphas <- norm.vec(label.cex, 0.5,1)
         nvlc <- NULL
@@ -415,30 +432,41 @@ saveAsGEXF = function(g, filepath="converted_graph.gexf")
 
 
 merge.graph <- function(graphs) {
+    library(colorspace)
     ng <- graph.union(graphs, byname=T)
-    print(list.vertex.attributes(ng))
     V.weight <- V(ng)$weight_1 
     E.weight <- E(ng)$weight_1
     cols <- rainbow(length(graphs))
     V.color <- rep(cols[1], length(V.weight))
-    print(cbind(V(ng)$name, V.weight, V.color))
     for (i in 2:length(graphs)) {
-        print(i)
         tw <- paste('weight_', i, sep='')
         tocomp <- get.vertex.attribute(ng,tw)
         totest <- intersect(which(!is.na(V.weight)), which(!is.na(tocomp)))
         maxmat <- cbind(V.weight[totest], tocomp[totest])
         resmax <- apply(maxmat, 1, which.max)
         ncolor <- c(cols[(i-1)], cols[i])
-        to.change <- totest[which(resmax == 2)]
-        V.color[to.change] <- cols[i]
+        #rbgcol1 <- col2rgb(cols[(i-1)])
+        #rbgcol1 <- rbgcol1/255
+        #rgbcol1 <- RGB(rbgcol1[1],rbgcol1[2],rbgcol1[3])
+        rbgcol2 <- col2rgb(cols[i])
+        rbgcol2 <- rbgcol2/255
+        rgbcol2 <- RGB(rbgcol2[1],rbgcol2[2],rbgcol2[3])       
+        for (j in totest) {
+            alpha <- tocomp[j] /(V.weight[j] + tocomp[j])
+            rbgcol1 <- col2rgb(V.color[j])
+            rbgcol1 <- rbgcol1/255
+            #mix.col <- mixcolor(alpha,rbgcol1, rbgcol2)
+            mix.col <- mixcolor(alpha, RGB(rbgcol1[1],rbgcol1[2],rbgcol1[3]), RGB(rbgcol2[1],rbgcol2[2],rbgcol2[3]))
+            V.color[j] <- adjustcolor(hex(mix.col), 0.6)
+        }
+        #to.change <- totest[which(resmax == 2)]
+        #V.color[to.change] <- cols[i]
         V.weight[totest] <- apply(maxmat, 1, max)
         nas <- which(is.na(V.weight))
         nas2 <- which(is.na(tocomp))
         fr2 <- setdiff(nas,nas2)
         V.weight[fr2] <- tocomp[fr2]
         V.color[fr2] <- cols[i]
-        
         tocomp <- get.edge.attribute(ng, tw)
         totest <- intersect(which(!is.na(E.weight)), which(!is.na(tocomp)))
         maxmat <- cbind(E.weight[totest], tocomp[totest])
@@ -450,6 +478,7 @@ merge.graph <- function(graphs) {
         E.weight[fr2] <- tocomp[fr2]        
     }
     V(ng)$weight <- V.weight
+    print(V.color)
     V(ng)$color <- V.color
     E(ng)$weight <- E.weight
     ng
