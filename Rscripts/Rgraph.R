@@ -227,7 +227,7 @@ stopoverlap <- function(x, cex.par = NULL, xlim = NULL, ylim = NULL) {
 			} else {
 				if(r>sqrt(.5)){
 					print(paste(words[i], "could not be fit on page. It will not be plotted."))
-                    notplot <- rbind(notplot,c(words[i], x[i,1], x[i,2]))
+                    notplot <- rbind(notplot,c(words[i], x[i,1], x[i,2], size[i], i))
 					isOverlaped <- FALSE
 				}
 				theta <- theta+thetaStep
@@ -419,8 +419,6 @@ select_point_chi <- function(tablechi, chi_limit) {
 select.chi.classe <- function(tablechi, nb, active = TRUE) {
     rowkeep <- NULL
     if (active & !is.null(debsup)) {
-        print(debsup)
-        print('###############################################################@')
         tablechi <- tablechi[1:(debsup-1),]
     }
     if (nb > nrow(tablechi)) {
@@ -431,6 +429,21 @@ select.chi.classe <- function(tablechi, nb, active = TRUE) {
     }
     rowkeep <- unique(rowkeep)
     rowkeep
+}
+
+select.chi.classe.et <- function(tablechi, nb){
+    rowkeep <- NULL
+    if (!is.null(debet)) {
+        ntablechi <- tablechi[debet:nrow(tablechi),]
+    }
+    if (nb > nrow(ntablechi)) {
+        nb <- nrow(ntablechi)
+    }
+    for (i in 1:ncol(ntablechi)) {
+        rowkeep <- append(rowkeep,order(ntablechi[,i], decreasing = TRUE)[1:nb])
+    }
+    rowkeep <- unique(rowkeep)
+    rowkeep    
 }
 
 #from summary.ca
@@ -621,6 +634,8 @@ plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro
     tree.order<- as.numeric(tree$tip.label)
 	vec.mat<-NULL
     row.keep <- select.chi.classe(chisqtable, nbbycl)
+    #et.keep <- select.chi.classe.et(chisqtable, 10)
+    #print(chistable[et.keep,])
     toplot <- chisqtable[row.keep,]
     lclasses <- list()
     for (classe in 1:length(sum.cl)) {
@@ -654,16 +669,16 @@ plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro
 	    tree[[2]]<-paste('classe ',tree[[2]])
     }
 	par(mar=c(2,1,0,1))
-	plot.phylo(tree,label.offset=0, tip.col=col, type=type.dendro, direction = 'downwards', srt=90, adj = 0.5, cex = 1.4, y.lim=c(-0.3,tree$Nnode))
+	plot.phylo(tree,label.offset=0, tip.col=col, type=type.dendro, direction = 'downwards', srt=90, adj = 0.5, cex = 1, y.lim=c(-0.3,tree$Nnode))
 	par(mar=c(0,0,0,0))
 	d <- barplot(-sum.cl[tree.order], col=col, names.arg='', axes=FALSE, axisname=FALSE)
-	text(x=d, y=(-sum.cl[tree.order]+3), label=paste(round(sum.cl[tree.order],1),'%'), cex=1.4)
+	text(x=d, y=(-sum.cl[tree.order]+3), label=paste(round(sum.cl[tree.order],1),'%'), cex=1)
     for (i in tree.order) {
         par(mar=c(0,0,1,0),cex=0.7)
         #wordcloud(names(lclasses[[i]]), lclasses[[i]], scale = c(1.5, 0.2), random.order=FALSE, colors = colcloud[i])
         yval <- 1.1
         plot(0,0,pch='', axes = FALSE)
-        vcex <- norm.vec(lclasses[[i]], 1, 2)
+        vcex <- norm.vec(lclasses[[i]], 1, 3)
         for (j in 1:length(lclasses[[i]])) {
             yval <- yval-(strheight( names(lclasses[[i]])[j],cex=vcex[j])+0.02)
             text(-0.9, yval, names(lclasses[[i]])[j], cex = vcex[j], col = colcloud[i], adj=0)
@@ -795,7 +810,7 @@ plot.dendropr <- function(tree, classes, type.dendro="phylogram", histo=FALSE, f
 }
 #tree <- tree.cut1$tree.cl
 #to.plot <- di
-plot.dendro.lex <- function(tree, to.plot, bw=FALSE, lab=NULL, lay.width=c(3,3,2), colbar=NULL, classes=NULL, cmd=FALSE) {
+plot.dendro.lex <- function(tree, to.plot, bw=FALSE, lab=NULL, lay.width=c(3,3,2), colbar=NULL, classes=NULL, direction = 'rightwards', cmd=FALSE) {
     tree.order<- as.numeric(tree$tip.label)
 	if (!is.null(classes)) {
 		classes<-classes[classes!=0]
@@ -806,12 +821,27 @@ plot.dendro.lex <- function(tree, to.plot, bw=FALSE, lab=NULL, lay.width=c(3,3,2
 		sum.cl<-cbind(sum.cl,as.matrix(100-sum.cl[,1]))
 	}
     par(mar=c(0,0,0,0))
-	if (!is.null(classes)) {
-		matlay <- matrix(c(1,2,3,4),1,byrow=TRUE)
-		lay.width <- c(3,2,3,2)
-	} else {
-		matlay <- matrix(c(1,2,3),1,byrow=TRUE)
-	}
+    if (direction == 'rightwards') {
+        srt <- 0
+        adj <- NULL
+        horiz <- TRUE
+	    if (!is.null(classes)) {
+		    matlay <- matrix(c(1,2,3,4),1,byrow=TRUE)
+		    lay.width <- c(3,2,3,2)
+	    } else {
+		    matlay <- matrix(c(1,2,3),1,byrow=TRUE)
+	    }
+    } else {
+        srt <- 90
+        adj <- 0.5
+        horiz <- FALSE
+        if (!is.null(classes)) {
+            matlay <- matrix(c(1,2,3,4,4,4),3)
+        } else {
+            matlay <- matrix(c(1,2,3,3),2)
+        }
+        lay.width <- c(5,2)
+    }
     layout(matlay, widths=lay.width,TRUE)
 	par(mar=c(3,0,2,4),cex=1)
 	label.ori<-tree[[2]]
@@ -835,7 +865,7 @@ plot.dendro.lex <- function(tree, to.plot, bw=FALSE, lab=NULL, lay.width=c(3,3,2
         col.bars <- grey.colors(nrow(to.plot),0,0.8)
     }
     col <- col[tree.order]
-	plot.phylo(tree,label.offset=0.2,tip.col=col)
+	plot.phylo(tree,label.offset=0.2,tip.col=col, direction = direction, srt=srt, adj = 0.5, edge.width = 2)
 	if (!is.null(classes)) {
 		par(cex=0.7)
 		par(mar=c(3,0,2,1))
@@ -844,7 +874,7 @@ plot.dendro.lex <- function(tree, to.plot, bw=FALSE, lab=NULL, lay.width=c(3,3,2
 		text(x=to.plota, y=d[,1], label=paste(round(to.plota,1),'%'), adj=1.2)
 	}
     par(mar=c(3,0,2,1))
-    d <- barplot(to.plot,horiz=TRUE, col=col.bars, beside=TRUE, names.arg='', space = c(0.1,0.6), axisname=FALSE)
+    d <- barplot(to.plot,horiz=horiz, col=col.bars, beside=TRUE, names.arg='', space = c(0.1,0.6), axisname=FALSE)
     c <- colMeans(d)
     c1 <- c[-1]
     c2 <- c[-length(c)]
@@ -1085,23 +1115,36 @@ simi.to.gexf <- function(fileout, graph.simi, nodes.attr = NULL) {
 	g <- graph.simi$graph
 	nodes <- data.frame(cbind(1:nrow(lo), V(g)$name))
 	colnames(nodes) <- c('id', 'label')
-	print(nodes)
 	if (! is.null(nodes.attr)) {
 		nodesatt <- as.data.frame(nodes.attr)
 	} else {
 		nodesatt <- data.frame(cbind(lo[,1],lo[,2]))
 	}
 	edges <- as.data.frame(get.edges(g, c(1:ecount(g))))
-	col <- rep('red', nrow(lo))
+	col <- graph.simi$color
 	col <- t(sapply(col, col2rgb, alpha=TRUE))
-	write.gexf(nodes, edges, output=fileout, nodesAtt=nodesatt, nodesVizAtt=list(color=col,position=lo))
+	write.gexf(nodes, edges, output=fileout, nodesAtt=nodesatt, nodesVizAtt=list(color=col,position=lo, size=graph.simi$label.cex), edgesVizAtt=list(size=graph.simi$we.width))
+}
+
+graphml.to.file <- function(graph.path) {
+    library(igraph)
+    g <- read.graph(graph.path, format='graphml')
+    layout <- layout.fruchterman.reingold(g, dim=3)
+    #print(V(g)$color)
+    graph.simi <- list(graph=g, layout=layout, color = V(g)$color ,eff=V(g)$weight)
+    graph.simi
 }
 
 
-graph.to.file <- function(grah.simi, nodesfile = NULL, edgesfile = NULL, community = FALSE, color = NULL, sweight = NULL) {
+graph.to.file <- function(graph.simi, nodesfile = NULL, edgesfile = NULL, community = FALSE, color = NULL, sweight = NULL) {
 	require(igraph)
 	g <- graph.simi$graph
-	V(g)$weight <- graph.simi$eff
+    print(graph.simi$eff)
+    if (!is.null(graph.simi$eff)) {
+	    V(g)$weight <- graph.simi$eff
+    } else {
+        V(g)$weight <- graph.simi$label.cex
+    }
 	V(g)$x <- graph.simi$layout[,1]
 	V(g)$y <- graph.simi$layout[,2]
 	if (ncol(graph.simi$layout) == 3) {
@@ -1127,10 +1170,10 @@ graph.to.file <- function(grah.simi, nodesfile = NULL, edgesfile = NULL, communi
 	}
 	df <- get.data.frame(g, what='both')
 	if (!is.null(nodesfile)) {
-		write.table(df$vertices, nodesfile, sep='\t')
+		write.table(df$vertices, nodesfile, sep='\t', row.names=FALSE)
 	}
 	if (!is.null(edgesfile)) {
-		write.table(df$edges, edgesfile, sep='\t')
+		write.table(df$edges, edgesfile, sep='\t', row.names=FALSE)
 	}
 	if (is.null(edgesfile) & is.null(nodesfile)) {
 		df
