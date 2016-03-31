@@ -21,6 +21,7 @@ import datetime
 from copy import copy
 from shutil import copyfile
 import shelve
+import json
 #from dialog import BugDialog
 import logging
 
@@ -688,10 +689,14 @@ def check_Rresult(parent, pid) :
         else :
             return True
 
+
+def launchcommand(mycommand):
+    Popen(mycommand)
+
 def print_liste(filename,liste):
     with open(filename,'w') as f :
         for graph in liste :
-            f.write(';'.join(graph)+'\n')
+            f.write(';'.join(graph).encode(sys.getdefaultencoding())+'\n')
 
 def read_list_file(filename, encoding = sys.getdefaultencoding()):
     with codecs.open(filename,'rU', encoding) as f :
@@ -699,9 +704,6 @@ def read_list_file(filename, encoding = sys.getdefaultencoding()):
         ncontent=[line.replace('\n','').split(';') for line in content if line.strip() != '']
     return ncontent
         
-
-            
-
 def progressbar(self, maxi) :
     ira = wx.GetApp().GetTopWindow()
     parent = ira
@@ -767,3 +769,30 @@ def getallstcarac(corpus, analyse) :
    pathout = PathOut(analyse['ira'])
    profils =  ReadProfileAsDico(pathout['PROFILE_OUT'], Alceste, self.encoding)
    print profils
+
+def read_chd(filein, fileout):
+    with open(filein, 'r') as f :
+        content = f.read()
+    #content = [line[3:].replace('"',"").replace(' ','') for line in content.splitlines()]
+    content = [line.split('\t') for line in content.splitlines()]
+    print content
+    chd = {'name':1, 'children':[]}
+    mere={}
+    for i, line in enumerate(content) : 
+        if i == 0 :               
+            chd['children'] = [{'name': line[1],'size' : content[i+1][0]}, {'name':line[2], 'size': content[i+1][1]}]
+            mere[line[1]] = chd['children'][0]
+            mere[line[2]] = chd['children'][1]
+        elif not i % 2 :
+            if 'children' in mere[line[0]]:
+                mere[line[0]]['children'].append({'name': line[1],'size' : content[i+1][0]})
+                mere[line[1]] = mere[line[0]]['children'][-1]
+                mere[line[0]]['children'].append({'name': line[2],'size' : content[i+1][1]})
+                mere[line[2]] = mere[line[0]]['children'][-1]
+            else :
+                mere[line[0]]['children'] = [{'name': line[1],'size' : content[i+1][0]}, {'name':line[2], 'size': content[i+1][1]}]
+                mere[line[1]] = mere[line[0]]['children'][-2]
+                mere[line[2]] = mere[line[0]]['children'][-1]
+    with open(fileout, 'w') as f :
+        f.write(json.dumps(chd))
+                    

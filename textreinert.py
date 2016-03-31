@@ -107,7 +107,6 @@ class TgenProf(AnalyseText):
         self.parametres = parametres
         self.pathout = PathOut(dirout = self.parametres['pathout'])
         self.cluster_size = [len(classe) for classe in corpus.lc]
-        print cluster_size
         self.doanalyse()
         
     def doanalyse(self):    
@@ -121,6 +120,10 @@ class TgenProf(AnalyseText):
         tgenst = dict([[line[0], dict(zip(clnames, line[1:]))] for line in tgenst]) 
         self.tgen.writetable(self.parametres['tgeneff'], tgenst, et)
         self.parametres['tgenspec'] = os.path.join(self.parametres['pathout'], 'tgenchi2.csv')
+        self.parametres['tgenlemeff'] = os.path.join(self.parametres['pathout'], 'tgenlemeff.csv')
+        self.parametres['tgenlemspec'] = os.path.join(self.parametres['pathout'], 'tgenlemchi2.csv')
+        tgenlemeff = dict([[lem, dict(zip(clnames, self.corpus.tgenlem[lem]))] for lem in self.corpus.tgenlem]) 
+        self.tgen.writetable(self.parametres['tgenlemeff'], tgenlemeff, et)
         self.Rscript = TgenProfScript(self)
         self.Rscript.make_script()
         self.Rscript.write()

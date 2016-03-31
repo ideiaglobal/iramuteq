@@ -17,12 +17,12 @@ from ProfList import ProfListctrlPanel
 from guiparam3d import param3d, simi3d
 from PrintRScript import write_afc_graph, print_simi3d, PrintSimiScript
 from profile_segment import ProfileSegment
-from functions import ReadList
+from functions import ReadList, launchcommand
 from listlex import *
 from Liste import *
 from search_tools import SearchFrame
-from dialog import PrefGraph, PrefExport, PrefSimpleFile, PrefDendro, SimpleDialog
-from guifunct import SelectColumn, PrepSimi, PrefSimi
+from dialog import PrefGraph, PrefExport, PrefSimpleFile, PrefDendro, SimpleDialog, ImageViewer
+from guifunct import SelectColumn, PrepSimi, PrefSimi, redosimi
 from webexport import WebExport
 from corpus import Corpus
 from sheet import MySheet
@@ -33,6 +33,9 @@ from time import sleep
 import shutil
 import codecs
 import logging
+import gettext
+from graph_to_json import GraphToJson
+_ = gettext.gettext
 
 log = logging.getLogger('iramuteq.layout')
 
@@ -67,7 +70,8 @@ class GraphPanelAfc(wx.Panel):
                 if ext == '.svg' or ext == '.html':
                     self.listimg.append(hl.HyperLinkCtrl(self.panel_1, -1, os.path.join(self.dirout,list_graph[i][0]), URL=os.path.join(self.dirout,list_graph[i][0])))
                 else :
-                    self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
+                    self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY), name=`i-b`))
+                    self.listimg[-1].Bind(wx.EVT_RIGHT_DOWN, self.onrightclick)
                 if os.path.exists(os.path.join(self.dirout,list_graph[i][0] + '_notplotted.csv')) :
                     txt = _(u"List of not plotted points : ").decode('utf8') + '%s' % os.path.join(self.dirout,list_graph[i][0] + '_notplotted.csv')
                 else :
@@ -144,6 +148,7 @@ class GraphPanelAfc(wx.Panel):
             oldbut.Show(False)
             for i, but in enumerate(self.buts) :
                 but.SetName(`i`)
+                self.listimg[i].SetName(`i`)
             todel = self.list_graph.pop(image_id)
             os.remove(os.path.join(self.dirout, todel[0]))
             print_liste(self.Dict[self.itempath], self.list_graph)
@@ -151,7 +156,14 @@ class GraphPanelAfc(wx.Panel):
             self.Layout()
         else :
             dial.Destroy()
-        
+    
+    def onrightclick(self, event):
+        image_id = int(event.GetEventObject().GetName())
+        image_path = self.list_graph[image_id][0]
+        viewer = ImageViewer(self, {'tmpgraph' : os.path.join(self.dirout,image_path), 'svg': 'FALSE', 'wildcard': '*.*'}, self.labels[image_id].GetLabelText(), self.listimg[image_id].GetSize())
+        viewer.Show()
+        #print image_path        
+        #print self.labels[image_id].GetLabelText()
 
     def afc_graph(self,event):
         #dirout = os.path.dirname(self.Dict['ira'])
@@ -172,6 +184,8 @@ class GraphPanelAfc(wx.Panel):
                 typegraph = 2
             if typegraph == 2:
                 typefile = '.gexf'
+            if typegraph == 3 :
+                typefile = ''
             while os.path.exists(os.path.join(self.dirout,'graph_afc_'+str(self.afcnb)+typefile)):
                 self.afcnb +=1
             self.fileout = ffr(os.path.join(self.dirout,'graph_afc_'+str(self.afcnb)+typefile))
@@ -225,7 +239,7 @@ class GraphPanelAfc(wx.Panel):
                 f.write(txt)
             pid = exec_rcode(self.ira.RPath, filetmp)
             check_Rresult(self.ira, pid)
-            if self.param['typegraph'] in [0,2] :
+            if self.param['typegraph'] != 1 :
                 txt = 'Variables '
                 if self.param['qui'] == 0 : value = u'actives'
                 if self.param['qui'] == 1 : value = u'supplémentaires'
@@ -253,13 +267,20 @@ class GraphPanelAfc(wx.Panel):
                     }
                     web = WebExport(self.ira, parametres)
                     self.fileout = web.exportafc()              
-                self.list_graph.append([os.path.basename(self.fileout), txt])
+                if self.param['typegraph'] == 3 :
+                    fileout = os.path.join(os.path.basename(self.fileout), 'index.html')
+                else : 
+                    fileout = os.path.basename(self.fileout)
+                self.list_graph.append([fileout, txt])
                 print_liste(self.DictPathOut[self.itempath], self.list_graph)
                 if self.param['svg'] or self.param['typegraph'] == 2:
                     self.listimg.append(hl.HyperLinkCtrl(self.panel_1, -1, self.fileout, URL=self.fileout))
-
+                elif self.param['typegraph'] == 3 :
+                    fileout = os.path.join(self.fileout,'index.html')
+                    self.listimg.append(hl.HyperLinkCtrl(self.panel_1, -1, fileout, URL=fileout))
                 else :
-                    self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(self.fileout, wx.BITMAP_TYPE_ANY)))
+                    self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(self.fileout, wx.BITMAP_TYPE_ANY), name=`len(self.list_graph) - 1`))
+                    self.listimg[-1].Bind(wx.EVT_RIGHT_DOWN, self.onrightclick)
                 self.sizer_3.Add( self.listimg[-1], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
                 self.labels.append(wx.StaticText(self.panel_1,-1, txt))
                 self.sizer_3.Add(self.labels[-1], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
@@ -664,6 +685,10 @@ class TgenLayout :
         self.page.tgens, etoiles =  ReadList(parametres['tgenspec'], ira.syscoding, sep="\t")
         tgen = TGen(path = tgenpath, encoding = parametres['encoding'])
         tgen.read()
+        tgenlempath = os.path.join(parametres['pathout'], 'tgenlemchi2.csv')
+        if os.path.exists(tgenlempath) :
+            self.page.parametres['tgenlemspec'] = tgenlempath
+            self.page.tgenlem, etoiles = ReadList(self.page.parametres['tgenlemspec'], ira.syscoding, sep="\t")
         tgentab = False
         gparent = None
         if 'TabChdSim' in dir(page) :
@@ -681,11 +706,14 @@ class TgenLayout :
         if tgentab :
             self.page.tgentab.RefreshData(self.page.tgens)
             self.page.tgentab.tgens = tgen.tgen
+            self.page.tgentab.tgenlem = self.page.tgenlem
             page.SetSelection(i)
         else :
             self.page.tgentab = ListForSpec(ira, gparent, self.page.tgens, etoiles[1:])
             self.page.tgentab.tgen = True
             self.page.tgentab.tgens = tgen.tgen
+            if os.path.exists(tgenlempath) :
+                self.page.tgentab.tgenlem = self.page.tgenlem
             page.AddPage(self.page.tgentab, _(u'Tgens Specificities').decode('utf8'))
             page.SetSelection(page.GetPageCount() - 1)
 
@@ -1081,15 +1109,16 @@ class CopusPanel(wx.Panel) :
             self.fgSizer5.Add( text, 0, wx.ALL, 5 )
 
 class DefaultTextLayout :
-    def __init__(self, ira, corpus, parametres) :
+    def __init__(self, ira, corpus, parametres, cmd = False) :
         self.pathout = PathOut(dirout = parametres['pathout'])
         self.ira = ira
         self.parent = ira
         self.parametres = parametres
         self.corpus = corpus
+        self.cmd = cmd
         self.dolayout()
     
-    def dolayout(self) :
+    def dolayout(self, cmd) :
         log.info('no layout yet')
 
 class WordCloudLayout(DefaultTextLayout):
@@ -1108,6 +1137,35 @@ class WordCloudLayout(DefaultTextLayout):
         self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
         self.ira.ShowAPane("Tab_content")
 
+def blender(self):
+    nodesfile = self.pathout['nodes.csv']
+    edgesfile = self.pathout['edges.csv']
+    jsonout = self.pathout.makenew('graphe_json', 'json')
+    txt = """
+    library(igraph)
+    load("%s")
+    source("%s")
+    """ % (ffr(self.pathout['RData.RData']), ffr(self.parent.RscriptsPath['Rgraph']))
+    txt += """
+    nodesf <- "%s"
+    edgesf <- "%s"
+    """ % (ffr(nodesfile), ffr(edgesfile))
+    txt += """
+    if ("communities" %in% names(graph.simi)) {
+        community = TRUE
+    } else {
+        community = FALSE
+    }
+    graph.to.file(graph.simi, nodesfile = nodesf, edgesfile = edgesf, community = community)       
+    """
+    filetmp = tempfile.mktemp()
+    with open(filetmp, 'w') as f :
+        f.write(txt)
+    exec_rcode(self.ira.RPath, filetmp)        
+    GraphToJson(nodesfile, edgesfile, jsonout)
+    launchcommand(['/home/pierre/prog/blender-2.73-linux-glibc211-x86_64/blender', '-P', os.path.join(self.ira.AppliPath, 'network_to_blender.py'), jsonout])
+
+
 class SimiLayout(DefaultTextLayout) :
     def dolayout(self) :
         self.pathout.basefiles(simipath)
@@ -1117,78 +1175,81 @@ class SimiLayout(DefaultTextLayout) :
             list_graph = read_list_file(self.pathout['liste_graph'])
         else : 
             list_graph = [['','']]
-        notebook_flags =  aui.AUI_NB_DEFAULT_STYLE | aui.AUI_NB_TAB_EXTERNAL_MOVE | aui.AUI_NB_TAB_MOVE | aui.AUI_NB_TAB_FLOAT
-        self.tabsimi = aui.AuiNotebook(self.ira.nb, -1, wx.DefaultPosition)
-        self.tabsimi.SetAGWWindowStyleFlag(notebook_flags)
-        self.tabsimi.SetArtProvider(aui.ChromeTabArt())
-        self.tabsimi.corpus = self.corpus
-        self.tabsimi.parametres = self.parametres
-        self.graphpan = GraphPanelSimi(self.tabsimi, self.pathout, list_graph)
-        self.graphpan.Bind(wx.EVT_BUTTON, self.redosimi, self.graphpan.butafc)
-        self.graphpan.Bind(wx.EVT_BUTTON, self.export, self.graphpan.butexport)
-        self.tabsimi.AddPage(self.graphpan, 'Graph')
-        self.ira.nb.AddPage(self.tabsimi, _(u'Graph analysis').decode('utf8'))
-        self.ira.ShowTab(True)
-        self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
+        if not self.cmd : 
+            notebook_flags =  aui.AUI_NB_DEFAULT_STYLE | aui.AUI_NB_TAB_EXTERNAL_MOVE | aui.AUI_NB_TAB_MOVE | aui.AUI_NB_TAB_FLOAT
+            self.tabsimi = aui.AuiNotebook(self.ira.nb, -1, wx.DefaultPosition)
+            self.tabsimi.SetAGWWindowStyleFlag(notebook_flags)
+            self.tabsimi.SetArtProvider(aui.ChromeTabArt())
+            self.tabsimi.corpus = self.corpus
+            self.tabsimi.parametres = self.parametres
+            self.graphpan = GraphPanelSimi(self.tabsimi, self.pathout, list_graph)
+            self.graphpan.Bind(wx.EVT_BUTTON, self.redosimi, self.graphpan.butafc)
+            self.graphpan.Bind(wx.EVT_BUTTON, self.export, self.graphpan.butexport)
+            self.graphpan.Bind(wx.EVT_BUTTON, self.blender, self.graphpan.butblender)
+            self.tabsimi.AddPage(self.graphpan, 'Graph')
+            self.ira.nb.AddPage(self.tabsimi, _(u'Graph analysis').decode('utf8'))
+            self.ira.ShowTab(True)
+            self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
         
     def redosimi(self, evt) :
-        with open(self.pathout['selected.csv'],'r') as f :
-            selected = f.read()
-        selected = [int(val) for val in selected.splitlines()]
-        if self.actives is None :
-            with codecs.open(self.pathout['actives.csv'], 'r', self.parametres['encoding']) as f :
-                self.actives = f.read()
-            self.actives = self.actives.splitlines()#[act for act in self.actives.splitlines()]
-        if os.path.exists(self.pathout['actives_nb.csv']) :
-            with open(self.pathout['actives_nb.csv'], 'r') as f :
-                act_nb = f.read()
-                act_nb = act_nb.splitlines()
-            dictcol = dict([[i, [self.actives[i], int(act_nb[i])]] for i, val in enumerate(self.actives)])
-        else :
-            dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
-        #res = SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], selected = selected, dlg = True) 
-        #if res.ok :
-        prep = PrepSimi(self.ira, self, self.parametres,self.pathout['selected.csv'], self.actives, indices_simi, wordlist = dictcol, selected = selected)
-        if prep.val == wx.ID_OK :
-            self.parametres = prep.parametres
-
-            script = PrintSimiScript(self)
-            script.make_script()
-            pid = exec_rcode(self.ira.RPath, script.scriptout, wait = True)
-            check_Rresult(self.ira, pid)
-            if self.parametres['type_graph'] in [1,3] :
-                if self.parametres['svg'] :
-                    filename, ext = os.path.splitext(script.filename)
-                    fileout = filename + '.svg'
-                elif self.parametres['type_graph'] == 3 :
-                    fileout = script.filename
-                    parametres = {'gexffile' :  fileout,
-                                  'dirout' : os.path.dirname(fileout),
-                                  'titre': 'Le titre',
-                                  #'nodemin': self.param['txt_min'],
-                                  #'nodemax': self.param['txt_max'],
-                                  #'bargraphw' : 60*int(self.param['clnb']),
-                    }
-                    web = WebExport(self.ira, parametres)
-                    fileout = web.exportsimi()                         
-                else :
-                    fileout = script.filename
-                if os.path.exists(self.pathout['liste_graph']):
-                    graph_simi = read_list_file(self.pathout['liste_graph'])
-                    graph_simi.append([os.path.basename(fileout), script.txtgraph])
-                else :
-                    graph_simi = [[os.path.basename(fileout), script.txtgraph]]
-                print_liste(self.pathout['liste_graph'], graph_simi)
-            DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
-            if self.parametres['type_graph'] in [1,3] :
-                if self.parametres['svg'] or self.parametres['type_graph'] == 3 :
-                    self.graphpan.sizer_3.Add(hl.HyperLinkCtrl(self.graphpan.panel_1, -1, fileout, URL = fileout), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-                else :
-                    self.graphpan.sizer_3.Add(wx.StaticBitmap(self.graphpan.panel_1, -1, wx.Bitmap(fileout, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-                self.graphpan.sizer_3.Add(wx.StaticText(self.graphpan.panel_1,-1, script.txtgraph), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-                self.graphpan.sizer_3.Fit(self.graphpan.panel_1)
-                self.graphpan.Layout()
-                self.graphpan.panel_1.Scroll(0,self.graphpan.panel_1.GetScrollRange(wx.VERTICAL))
+        redosimi(self, evt)
+#         with open(self.pathout['selected.csv'],'r') as f :
+#             selected = f.read()
+#         selected = [int(val) for val in selected.splitlines()]
+#         if self.actives is None :
+#             with codecs.open(self.pathout['actives.csv'], 'r', self.parametres['encoding']) as f :
+#                 self.actives = f.read()
+#             self.actives = self.actives.splitlines()#[act for act in self.actives.splitlines()]
+#         if os.path.exists(self.pathout['actives_nb.csv']) :
+#             with open(self.pathout['actives_nb.csv'], 'r') as f :
+#                 act_nb = f.read()
+#                 act_nb = act_nb.splitlines()
+#             dictcol = dict([[i, [self.actives[i], int(act_nb[i])]] for i, val in enumerate(self.actives)])
+#         else :
+#             dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
+#         #res = SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], selected = selected, dlg = True) 
+#         #if res.ok :
+#         prep = PrepSimi(self.ira, self, self.parametres,self.pathout['selected.csv'], self.actives, indices_simi, wordlist = dictcol, selected = selected)
+#         if prep.val == wx.ID_OK :
+#             self.parametres = prep.parametres
+# 
+#             script = PrintSimiScript(self)
+#             script.make_script()
+#             pid = exec_rcode(self.ira.RPath, script.scriptout, wait = True)
+#             check_Rresult(self.ira, pid)
+#             if self.parametres['type_graph'] in [1,3] :
+#                 if self.parametres['svg'] :
+#                     filename, ext = os.path.splitext(script.filename)
+#                     fileout = filename + '.svg'
+#                 elif self.parametres['type_graph'] == 3 :
+#                     fileout = script.filename
+#                     parametres = {'gexffile' :  fileout,
+#                                   'dirout' : os.path.dirname(fileout),
+#                                   'titre': 'Le titre',
+#                                   #'nodemin': self.param['txt_min'],
+#                                   #'nodemax': self.param['txt_max'],
+#                                   #'bargraphw' : 60*int(self.param['clnb']),
+#                     }
+#                     web = WebExport(self.ira, parametres)
+#                     fileout = web.exportsimi()                         
+#                 else :
+#                     fileout = script.filename
+#                 if os.path.exists(self.pathout['liste_graph']):
+#                     graph_simi = read_list_file(self.pathout['liste_graph'])
+#                     graph_simi.append([os.path.basename(fileout), script.txtgraph])
+#                 else :
+#                     graph_simi = [[os.path.basename(fileout), script.txtgraph]]
+#                 print_liste(self.pathout['liste_graph'], graph_simi)
+#             DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
+#             if self.parametres['type_graph'] in [1,3] :
+#                 if self.parametres['svg'] or self.parametres['type_graph'] == 3 :
+#                     self.graphpan.sizer_3.Add(hl.HyperLinkCtrl(self.graphpan.panel_1, -1, fileout, URL = fileout), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+#                 else :
+#                     self.graphpan.sizer_3.Add(wx.StaticBitmap(self.graphpan.panel_1, -1, wx.Bitmap(fileout, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+#                 self.graphpan.sizer_3.Add(wx.StaticText(self.graphpan.panel_1,-1, script.txtgraph), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+#                 self.graphpan.sizer_3.Fit(self.graphpan.panel_1)
+#                 self.graphpan.Layout()
+#                 self.graphpan.panel_1.Scroll(0,self.graphpan.panel_1.GetScrollRange(wx.VERTICAL))
 
     def export(self, evt) :
         nb = 1
@@ -1208,7 +1269,7 @@ class SimiLayout(DefaultTextLayout) :
         } else {
             V(graph)$weight <- graph.simi$label.cex
         }
-        V(graph)$color <- vertex.label.color
+        V(graph)$rcolor <- vertex.label.color
         V(graph)$frequences <- graph.simi$mat.eff
         V(graph)$label <- as.character(graph.simi$v.label)
         E(graph)$weight <- graph.simi$we.width
@@ -1223,6 +1284,10 @@ class SimiLayout(DefaultTextLayout) :
         mss.CenterOnParent()
         mss.ShowModal()
         mss.Destroy()
+    
+    def blender(self, evt):
+        blender(self)
+    
 
 class DefaultMatLayout :
     def __init__(self, parent, tableau, parametres) :
@@ -1243,8 +1308,10 @@ class DefaultMatLayout :
 class FreqLayout(DefaultMatLayout) :
     def dolayout(self) :
         self.tab = wx.html.HtmlWindow(self.ira.nb, -1)
+        #self.tab = wx.html2.WebView.New(self)
         res = normpath_win32(self.pathout['resultats.html']).replace('\\','/')
         self.tab.LoadPage(res)
+        #self.tab.LoadURL(res)
         self.tab.parametres = self.parametres
         self.ira.nb.AddPage(self.tab, ' - '.join([_(u"Frequency").decode('utf8'), self.parametres['name']]))
 
@@ -1294,6 +1361,7 @@ class SimiMatLayout(DefaultMatLayout) :
         self.graphpan = GraphPanelSimi(self.tabsimi, self.pathout, list_graph)
         self.graphpan.Bind(wx.EVT_BUTTON, self.redosimi, self.graphpan.butafc)
         self.graphpan.Bind(wx.EVT_BUTTON, self.export, self.graphpan.butexport)
+        self.graphpan.Bind(wx.EVT_BUTTON, self.blender, self.graphpan.butblender)
         self.tabsimi.AddPage(self.graphpan, 'Graph')
         self.tabsimi.parametres = self.parametres
         self.parent.nb.AddPage(self.tabsimi, ' - '.join([_(u'Graph analysis').decode('utf8'), self.parametres['name']]))
@@ -1466,6 +1534,9 @@ class SimiMatLayout(DefaultMatLayout) :
         mss.CenterOnParent()
         mss.ShowModal()
         mss.Destroy()
+    
+    def blender(self, evt):
+        blender(self)
 
         
 class GraphPanelSimi(wx.Panel):
@@ -1485,6 +1556,10 @@ class GraphPanelSimi(wx.Panel):
         self.butafc = wx.BitmapButton(self, -1, afc_img)
         export_img = wx.Image(os.path.join(self.ira.images_path,'button_export.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.butexport = wx.BitmapButton(self, -1, export_img)
+        blender_img = wx.Image(os.path.join(self.ira.images_path,'button_blender.png'), wx.BITMAP_TYPE_ANY)
+        blender_img.Rescale(32,32)
+        blender_img = blender_img.ConvertToBitmap()
+        self.butblender = wx.BitmapButton(self, -1, blender_img)
         for i in range(0,len(list_graph)):
             if os.path.exists(os.path.join(self.dirout,list_graph[i][0])) :
                 filename, ext = os.path.splitext(list_graph[i][0])
@@ -1509,6 +1584,7 @@ class GraphPanelSimi(wx.Panel):
         self.sizer_3 = wx.BoxSizer(wx.VERTICAL)
         self.sizer_2.Add(self.butafc, 0, 0, 0)
         self.sizer_2.Add(self.butexport, 0, 0, 0)
+        self.sizer_2.Add(self.butblender, 0, 0, 0)
         for i in range(0, len(self.listimg)):
             self.sizer_3.Add(self.listimg[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
             self.sizer_3.Add(self.labels[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
