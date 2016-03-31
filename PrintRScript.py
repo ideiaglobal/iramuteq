@@ -946,7 +946,7 @@ class PrintSimiScript(PrintRScript) :
         seuil <- %s
         if (!is.null(seuil)) {
             if (method!='cooc') {
-                seuil <- seuil/100
+                seuil <- seuil/1000
             } 
         }
         """ % seuil
@@ -1266,10 +1266,18 @@ class TgenProfScript(PrintRScript):
         tgen <- read.csv2("%s", row.names = 1, sep = '\\t')
         """ % ffr(self.parametres['tgeneff'])
         txt += """
+        tgenlem <- read.csv2("%s", row.names = 1, sep = '\\t')
+        """ % ffr(self.parametres['tgenlemeff'])
+        txt += """
         res <- build.prof.tgen(tgen)
         write.table(res$chi2, file = "%s", sep='\\t', col.names = NA)
         write.table(res$pchi2, file = "%s", sep='\\t', col.names = NA)
         """ % (ffr(self.pathout['tgenchi2.csv']), ffr(self.pathout['tgenpchi2.csv']))
+        txt += """
+        reslem <- build.prof.tgen(tgenlem)
+        write.table(reslem$chi2, file = "%s", sep='\\t', col.names = NA)
+        write.table(reslem$pchi2, file = "%s", sep='\\t', col.names = NA)
+        """ % (ffr(self.pathout['tgenlemchi2.csv']), ffr(self.pathout['tgenlempchi2.csv']))        
         self.add(txt)
         
 class FreqMultiScript(PrintRScript):
