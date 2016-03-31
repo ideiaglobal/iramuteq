@@ -171,18 +171,30 @@ class Corpus :
         query = 'SELECT uces FROM uces where id IN (%s) ORDER BY id' % formesid
         res = self.cformes.execute(query)
         return list(set(list(itertools.chain(*[[int(val) for val in row[0].split()] if not isinstance(row[0], int) else [row[0]] for row in res]))))
-
+    
     def gettgenst(self, tgen):
-        formesid = ''
+        formesid = []
         for lem in tgen :
             if lem in self.lems :
-                formesid += ', '.join([`val` for val in self.lems[lem].formes])
+                formesid += self.lems[lem].formes
             else :
-                print 'abscent: ',lem
-        #formesid = ', '.join([`val` for lem in tgen for val in self.lems[lem].formes if lem in self.lems])
-        query = 'SELECT uces FROM uces where id IN (%s) ORDER BY id' % formesid
+                print 'abscent : %s' % lem
+        query = 'SELECT uces FROM uces where id IN %s ORDER BY id' % str(tuple(formesid))
         res = self.cformes.execute(query)
         return list(set(list(itertools.chain(*[[int(val) for val in row[0].split()] if not isinstance(row[0], int) else [row[0]] for row in res]))))
+
+    def gettgenstprof(self, tgen, classe, i, clnb):
+        tgenst = []
+        for lem in tgen :
+            if lem in self.lems :
+                lemst = self.getlemuces(lem)
+                tgenst += lemst
+                if not lem in self.tgenlem :
+                    self.tgenlem[lem] = [0] * clnb
+                self.tgenlem[lem][i] = len(set(lemst).intersection(classe))
+            else :
+                print 'abscent: ',lem
+        return list(set(tgenst))
     
     def gettgentxt(self, tgen):
         sts = self.gettgenst(tgen)
@@ -411,10 +423,13 @@ class Corpus :
     
     def make_tgen_profile(self, tgen, ucecl, uci = False) :
         log.info('tgen/classes')
+        self.tgenlem = {}
+        clnb = len(ucecl)
         if uci :
-            tab = [[lem] + [len(set(self.gettgentxt(tgen[lem])).intersection(classe)) for classe in ucecl] for lem in tgen]
+            #FIXME :  NE MARCHE PLUS CHANGER CA
+            tab = [[lem] + [len(set(self.gettgentxt(tgen[lem])).intersection(classe)) for i, classe in enumerate(ucecl)] for lem in tgen]
         else :
-            tab = [[lem] + [len(set(self.gettgenst(tgen[lem])).intersection(classe)) for classe in ucecl] for lem in tgen]
+            tab = [[lem] + [len(set(self.gettgenstprof(tgen[lem], classe, i, clnb)).intersection(classe)) for i, classe in enumerate(ucecl)] for lem in tgen]
         tab = [[line[0]] + [val for val in line[1:]] for line in tab if sum(line[1:]) >= 3]
         return tab
         #i = 0
@@ -680,7 +695,7 @@ class Corpus :
                     f.write(''.join([' '.join([`duces[uce]+1`,`i+1`,`1`]),'\n']))
             f.seek(0)
             with open(outfile, 'w') as ffin :        
-                ffin.write("%%%%MatrixMarket matrix coordinate integer general\n%i %i %i\n" % (self.getucenb(), len(actives), nbl))
+                ffin.write("%%%%MatrixMarket matrix coordinate integer general\n%i %i %i\n" % (len(uces), len(actives), nbl))
                 for line in f :
                     ffin.write(line)
         os.remove(outfile + '~')
