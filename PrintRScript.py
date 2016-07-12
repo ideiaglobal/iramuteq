@@ -1230,7 +1230,7 @@ class MergeGraphes(PrintRScript) :
             RData = os.path.join(path,'RData.RData')
             txt += load % (ffr(RData), gname)
         self.add(txt)
-        self.sources(['/home/pierre/workspace/iramuteq/Rscripts/simi.R'])
+        self.sources([self.analyse.parent.RscriptsPath['simi']])
         txt = """
         ng <- merge.graph(graphs)
         ngraph <- list(graph=ng, layout=layout.fruchterman.reingold(ng, dim=3), labex.cex=V(ng)$weight)
