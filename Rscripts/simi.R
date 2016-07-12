@@ -450,7 +450,7 @@ merge.graph <- function(graphs) {
         #rgbcol1 <- RGB(rbgcol1[1],rbgcol1[2],rbgcol1[3])
         rbgcol2 <- col2rgb(cols[i])
         rbgcol2 <- rbgcol2/255
-        rgbcol2 <- RGB(rbgcol2[1],rbgcol2[2],rbgcol2[3])       
+        #rgbcol2 <- RGB(rbgcol2[1],rbgcol2[2],rbgcol2[3])       
         for (j in totest) {
             alpha <- tocomp[j] /(V.weight[j] + tocomp[j])
             rbgcol1 <- col2rgb(V.color[j])
@@ -478,7 +478,6 @@ merge.graph <- function(graphs) {
         E.weight[fr2] <- tocomp[fr2]        
     }
     V(ng)$weight <- V.weight
-    print(V.color)
     V(ng)$color <- V.color
     E(ng)$weight <- E.weight
     ng
