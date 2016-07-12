@@ -45,6 +45,14 @@ class PathOut :
             tdirout = dirout + `nb`
         self.name = os.path.splitext(tdirout)[1]
         return tdirout
+    
+    def makenew(self, filename, ext):
+        nb = 1
+        newfile = '_'.join([os.path.join(self.dirout, filename), '%i' % nb]) + '.' + ext
+        while os.path.exists(newfile) :
+            nb += 1
+            newfile = '_'.join([os.path.join(self.dirout, filename), '%i' % nb]) + '.' + ext
+        return newfile
 
     def createdir(self, tdirout) :
         if not os.path.exists(tdirout) :
