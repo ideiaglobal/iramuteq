@@ -18,7 +18,7 @@ class PrintRScript :
         self.pathout = analyse.pathout
         self.analyse = analyse
         self.parametres = analyse.parametres
-        self.scriptout = self.pathout['temp']
+        self.scriptout = self.pathout['lastRscript.R']
         self.script =  u"#Script genere par IRaMuTeQ - %s\n" % datetime.now().ctime()
     
     def add(self, txt) :
