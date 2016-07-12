@@ -942,9 +942,9 @@ class GraphPanelDendro(wx.Panel):
         """ % (ffr(dendro_path), ffr(self.ira.RscriptsPath['Rgraph']),  ffr(classe_path))
         if dendro == 'simple' :
             txt += """
-            open_file_graph("%s", width=%i, height=%i)
+            open_file_graph("%s", width=%i, height=%i, svg=%s)
             plot.dendropr(tree.cut1$tree.cl, classes, type.dendro="%s", histo=%s, bw=%s, lab=NULL, tclasse=%s)
-            """ % (ffr(fileout), width, height, type_dendro, histo, bw, tclasse)
+            """ % (ffr(fileout), width, height, svg, type_dendro, histo, bw, tclasse)
         elif dendro == 'texte' :
             txt += """
             load("%s")
