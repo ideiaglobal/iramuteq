@@ -163,13 +163,15 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         """ % ffr(DicoPath['TableUc2'])
     txt += """
     log1 <- "%s"
-    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path, log.file = log1)
+    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method =
+    svd.method, libsvdc.path = libsvdc.path)#, log.file = log1)
     """ % ffr(DicoPath['log-chd1.txt'])
     
     if classif_mode == 0:
         txt += """
     log2 <- "%s"
-    chd2<-CHD(data2, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path, log.file = log2)
+    chd2<-CHD(data2, x = nbt, mode.patate = mode.patate, svd.method =
+    svd.method, libsvdc.path = libsvdc.path)#, log.file = log2)
     """ % ffr(DicoPath['log-chd2.txt'])
     
     txt += """
@@ -1209,10 +1211,10 @@ class MergeGraphes(PrintRScript) :
         self.pathout = PathOut()
         self.parametres = parametres
         self.scriptout = self.pathout['temp']
-        
+
     def make_script(self) :
         #FIXME
-        
+
         txt = """
         library(igraph)
         library(Matrix)
