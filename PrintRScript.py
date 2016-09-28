@@ -18,12 +18,13 @@ class PrintRScript :
         self.pathout = analyse.pathout
         self.analyse = analyse
         self.parametres = analyse.parametres
-        self.scriptout = self.pathout['lastRscript.R']
+        #self.scriptout = self.pathout['lastRscript.R']
+        self.scriptout = self.pathout['temp']
         self.script =  u"#Script genere par IRaMuTeQ - %s\n" % datetime.now().ctime()
-    
+
     def add(self, txt) :
         self.script = '\n'.join([self.script, txt])
-    
+
     def defvar(self, name, value) :
         self.add(' <- '.join([name, value]))
 
@@ -164,14 +165,14 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     txt += """
     log1 <- "%s"
     chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method =
-    svd.method, libsvdc.path = libsvdc.path)#, log.file = log1)
+    svd.method, libsvdc.path = libsvdc.path, log.file = log1)
     """ % ffr(DicoPath['log-chd1.txt'])
     
     if classif_mode == 0:
         txt += """
     log2 <- "%s"
     chd2<-CHD(data2, x = nbt, mode.patate = mode.patate, svd.method =
-    svd.method, libsvdc.path = libsvdc.path)#, log.file = log2)
+    svd.method, libsvdc.path = libsvdc.path) log.file = log2)
     """ % ffr(DicoPath['log-chd2.txt'])
     
     txt += """
