@@ -18,7 +18,7 @@ class PrintRScript :
         self.pathout = analyse.pathout
         self.analyse = analyse
         self.parametres = analyse.parametres
-        #self.scriptout = self.pathout['lastRscript.R']
+        #self.scriptout = ffr(self.pathout['lastRscript.R'])
         self.scriptout = self.pathout['temp']
         self.script =  u"#Script genere par IRaMuTeQ - %s\n" % datetime.now().ctime()
 
@@ -155,7 +155,7 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     data1 <- as(data1, "dgCMatrix")
     row.names(data1) <- 1:nrow(data1)
     """ % ffr(DicoPath['TableUc1'])
-    
+
     if classif_mode == 0:
         txt += """
         data2 <- readMM("%s")
@@ -167,28 +167,28 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method =
     svd.method, libsvdc.path = libsvdc.path, log.file = log1)
     """ % ffr(DicoPath['log-chd1.txt'])
-    
+
     if classif_mode == 0:
         txt += """
     log2 <- "%s"
     chd2<-CHD(data2, x = nbt, mode.patate = mode.patate, svd.method =
     svd.method, libsvdc.path = libsvdc.path) log.file = log2)
     """ % ffr(DicoPath['log-chd2.txt'])
-    
+
     txt += """
     #lecture des uce
     listuce1<-read.csv2("%s")
     """ % ffr(DicoPath['listeuce1'])
-    
+
     if classif_mode == 0:
         txt += """
         listuce2<-read.csv2("%s")
         """ % ffr(DicoPath['listeuce2'])
-        
+
     txt += """
     rm(data1)
     """
-    
+
     if classif_mode == 0:
         txt += """
         rm(data2)
@@ -208,14 +208,14 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     write.csv2(n1, file="%s")
     rm(n1)
     """ % (classif_mode, mincl, ffr(DicoPath['uce']), ffr(DicoPath['n1.csv']))
-    
+
     txt += """
     tree.tot1 <- make_tree_tot(chd1)
 #    open_file_graph("%s", widt = 600, height=400)
 #    plot(tree.tot1$tree.cl)
 #    dev.off()
     """ % ffr(DicoPath['arbre1'])
-    
+
     if classif_mode == 0:
         txt += """
         classeuce2 <- chd.result$cuce2
@@ -223,19 +223,19 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
 #        open_file_graph("%s", width = 600, height=400)
 #        plot(tree.tot2$tree.cl)
 #        dev.off()
-        """ % ffr(DicoPath['arbre2'] ) 
-              
+        """ % ffr(DicoPath['arbre2'] )
+
     txt += """
     tree.cut1 <- make_dendro_cut_tuple(tree.tot1$dendro_tuple, chd.result$coord_ok, classeuce1, 1, nbt)
     save(tree.cut1, file="%s")
-    
+
     open_file_graph("%s", width = 600, height=400)
     plot.dendropr(tree.cut1$tree.cl,classes, histo=TRUE)
     open_file_graph("%s", width = 600, height=400)
     plot(tree.cut1$dendro_tot_cl)
     dev.off()
     """ % (ffr(DicoPath['Rdendro']), ffr(DicoPath['dendro1']), ffr(DicoPath['arbre1']))
-    
+
     if classif_mode == 0:
         txt += """
         tree.cut2 <- make_dendro_cut_tuple(tree.tot2$dendro_tuple, chd.result$coord_ok, classeuce2, 2, nbt)
@@ -246,12 +246,12 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         plot(tree.cut2$dendro_tot_cl)
         dev.off()
         """ % (ffr(DicoPath['dendro2']), ffr(DicoPath['arbre2']))
-        
+
     txt += """
-    
+
     #save.image(file="%s")
     """ % (ffr(DicoPath['RData']))
-    
+
     fileout = open(DicoPath['Rchdtxt'], 'w')
     fileout.write(txt)
     fileout.close()
@@ -1307,4 +1307,28 @@ class FreqMultiScript(PrintRScript):
         dev.off()
         """ % ffr(self.pathout['barplotrow.png'])
         self.add(txt)
-        self.write()  
+        self.write()
+
+class LabbeScript(PrintRScript) :
+    def make_script(self) :
+        self.sources([self.analyse.parent.RscriptsPath['distance-labbe.R'],
+                      self.analyse.parent.RscriptsPath['Rgraph']])
+        txt = """
+        tab <- read.csv2("%s", header=TRUE, sep=';', row.names=1)
+        """ % (self.pathout['tableafcm.csv'])
+        txt += """
+        dist.mat <- dist.labbe(tab)
+        dist.mat <- as.dist(dist.mat, upper=F, diag=F)
+        write.table(as.matrix(dist.mat), "%s", sep='\t')
+        library(cluster)
+        library(ape)
+        chd <- hclust(dist.mat, method="ward.D2")
+        open_file_graph("%s", width=1000, height=1000, svg=F)
+        par(cex=1.2)
+        plot.phylo(as.phylo(chd), type='unrooted', lab4ut="axial")
+        dev.off()
+        """ % (self.pathout['distmat.csv'], self.pathout['dist-labbe.png'])
+        self.add(txt)
+        self.write()
+
+

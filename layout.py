@@ -82,8 +82,8 @@ class GraphPanelAfc(wx.Panel):
                 todel.append(i)
                 b += 1
         self.list_graph = [graph for i, graph in enumerate(self.list_graph) if i not in todel]
-                
-        self.param = { 'typegraph' : 0, 
+
+        self.param = { 'typegraph' : 0,
               'width' : 800,
               'height' : 800,
               'what' : 0,
@@ -94,7 +94,7 @@ class GraphPanelAfc(wx.Panel):
               'select_nb' : 50,
               'select_chi' : 4,
               'nbchic' : 30,
-              'over' : 0, 
+              'over' : 0,
               'cex_txt' : 0,
               'txt_min' : 5,
               'txt_max' : 40,
@@ -117,7 +117,7 @@ class GraphPanelAfc(wx.Panel):
         self.panel_1.SetScrollRate(20, 20)
         self.panel_1.SetFocus()
 
-    def __do_layout(self):    
+    def __do_layout(self):
         self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
         self.sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
         self.sizer_3 = wx.BoxSizer(wx.VERTICAL)
@@ -129,7 +129,7 @@ class GraphPanelAfc(wx.Panel):
             self.Bind(wx.EVT_BUTTON, self.on_delete_image, self.buts[i])
         self.panel_1.SetSizer(self.sizer_3)
         self.sizer_2.Add(self.panel_1, 1, wx.EXPAND, 0)
-        self.SetSizer(self.sizer_2) 
+        self.SetSizer(self.sizer_2)
 
     def on_delete_image(self, event) :
         image_id = int(event.GetEventObject().GetName())
@@ -156,7 +156,7 @@ class GraphPanelAfc(wx.Panel):
             self.Layout()
         else :
             dial.Destroy()
-    
+
     def onrightclick(self, event):
         image_id = int(event.GetEventObject().GetName())
         image_path = self.list_graph[image_id][0]
@@ -201,7 +201,7 @@ class GraphPanelAfc(wx.Panel):
                           'select_nb' : dial.spin_nb.GetValue(),
                           'select_chi' : dial.spin_chi.GetValue(),
                           'nbchic' : dial.spin_nbchic.GetValue(),
-                          'over' : dial.check3.GetValue(), 
+                          'over' : dial.check3.GetValue(),
                           'cex_txt' : dial.check4.GetValue(),
                           'txt_min' : dial.spin_min.GetValue(),
                           'txt_max' : dial.spin_max.GetValue(),
@@ -226,7 +226,7 @@ class GraphPanelAfc(wx.Panel):
                 afc <- afcf
                 afc_table <- afcf_table
                 chistabletot <- specfp
-                """ 
+                """
             elif self.itempath == 'liste_graph_afct' :
                 txt +="""
                 afc <- afct
@@ -266,10 +266,10 @@ class GraphPanelAfc(wx.Panel):
                                   'bargraphw' : 60*int(self.param['clnb']),
                     }
                     web = WebExport(self.ira, parametres)
-                    self.fileout = web.exportafc()              
+                    self.fileout = web.exportafc()
                 if self.param['typegraph'] == 3 :
                     fileout = os.path.join(os.path.basename(self.fileout), 'index.html')
-                else : 
+                else :
                     fileout = os.path.basename(self.fileout)
                 self.list_graph.append([fileout, txt])
                 print_liste(self.DictPathOut[self.itempath], self.list_graph)
@@ -288,7 +288,7 @@ class GraphPanelAfc(wx.Panel):
                 self.sizer_3.Add(self.buts[-1], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
                 self.sizer_3.Fit(self.panel_1)
                 self.Layout()
-    
+
                 self.panel_1.Scroll(0,self.panel_1.GetScrollRange(wx.VERTICAL))
 #             elif self.param['typegraph'] == 2 :
 #                 parametres = {'gexffile' :  self.fileout,
@@ -304,7 +304,7 @@ class GraphPanelAfc(wx.Panel):
 #                 dial.link.SetURL(afcout)
 #                 dial.Layout()
 #                 dial.ShowModal()
-            
+
 
 class GraphPanel(wx.ScrolledWindow):
     def __init__(self, parent, dico, list_graph, txt = '', style = wx.TAB_TRAVERSAL):
@@ -325,13 +325,13 @@ class GraphPanel(wx.ScrolledWindow):
                 else :
                     self.listimg.append(wx.StaticBitmap(self, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
                 self.labels.append(wx.StaticText(self, -1, list_graph[i][1]))
-        self.Bind(wx.EVT_MOTION, self.onMouseMove) 
+        self.Bind(wx.EVT_MOTION, self.onMouseMove)
         self.__set_properties()
         self.__do_layout()
 
     def __set_properties(self):
         self.EnableScrolling(True,True)
-        self.SetScrollRate(20, 20)   
+        self.SetScrollRate(20, 20)
         self.SetFocus()
 
 
@@ -339,7 +339,7 @@ class GraphPanel(wx.ScrolledWindow):
         self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
         self.sizer_2 = wx.BoxSizer(wx.VERTICAL)
         self.sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
-        self.sizer_1.Add(self.deb)   
+        self.sizer_1.Add(self.deb)
         for i in range(0, len(self.listimg)):
             self.sizer_1.Add(self.listimg[i], 1, wx.ALIGN_CENTER_HORIZONTAL, 0)
             self.sizer_1.Add(self.labels[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
@@ -349,7 +349,7 @@ class GraphPanel(wx.ScrolledWindow):
 
     def onMouseMove(self, event):
         self.SetFocus()
-       
+
 
 def open_antiprofil(panel, AntiProfile, encoding) :
     DictAnti = ReadProfileAsDico(AntiProfile, True, encoding)
@@ -376,7 +376,7 @@ class OpenCHDS():
         self.parametres = parametres
         self.pathout = PathOut(parametres['ira'])
         self.pathout.basefiles(ChdTxtPathOut)
-        DictPathOut = self.pathout 
+        DictPathOut = self.pathout
         self.DictPathOut = DictPathOut
         self.dictpathout = DictPathOut
         self.parent = parent
@@ -393,11 +393,11 @@ class OpenCHDS():
                 self.corpus.read_tableau(self.pathout['analyse.db'])
 
         clnb = parametres['clnb']
-        dlg = progressbar(self, maxi = 4 + clnb) 
-        self.clnb = clnb 
+        dlg = progressbar(self, maxi = 4 + clnb)
+        self.clnb = clnb
         print 'lecture des profils'
         dlg.Update(2, _(u"Reading profiles").decode('utf8'))
-  
+
         DictProfile = ReadProfileAsDico(Profile, Alceste, self.encoding)
         self.DictProfile = DictProfile
         self.cluster_size = []
@@ -1117,7 +1117,7 @@ class DefaultTextLayout :
         self.corpus = corpus
         self.cmd = cmd
         self.dolayout()
-    
+
     def dolayout(self, cmd) :
         log.info('no layout yet')
 
@@ -1131,6 +1131,22 @@ class WordCloudLayout(DefaultTextLayout):
             list_graph = [['nuage_1.png', 'Nuage']]
         self.TabStatTot = GraphPanel(self.ira.nb, self.pathout, list_graph)
         self.Tab.AddPage(self.TabStatTot, 'Nuage')
+        self.Tab.corpus = self.corpus
+        self.Tab.parametres = self.parametres
+        self.ira.nb.AddPage(self.Tab, '%s' % self.parametres['name'])
+        self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
+        self.ira.ShowAPane("Tab_content")
+
+class LabbeLayout(DefaultTextLayout):
+    def dolayout(self):
+        self.Tab = aui.AuiNotebook(self.ira.nb, -1, wx.DefaultPosition)
+        #if self.parametres['svg'] :
+        #    list_graph = [['nuage_1.svg', 'Nuage']]
+        #else :
+        #    list_graph = [['nuage_1.png', 'Nuage']]
+        list_graph = [['dist-labbe.png', _(u'Ward clustering (method ward2)').encode('utf8')]]
+        self.TabStatTot = GraphPanel(self.ira.nb, self.pathout, list_graph)
+        self.Tab.AddPage(self.TabStatTot, _(u"Labbé's distance").encode('utf8'))
         self.Tab.corpus = self.corpus
         self.Tab.parametres = self.parametres
         self.ira.nb.AddPage(self.Tab, '%s' % self.parametres['name'])

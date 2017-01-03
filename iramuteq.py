@@ -48,6 +48,7 @@ from tabsplitvar import SplitMatrixFromVar
 #from textdist import AnalysePam
 from textstat import Stat
 from textaslexico import Lexico
+from textlabbe import DistLabbe
 from textsimi import SimiTxt, SimiFromCluster
 from textwordcloud import WordCloud, ClusterCloud
 from textreinert import Reinert
@@ -103,6 +104,7 @@ ID_Fact_copy = wx.NewId()
 ID_exportmeta = wx.NewId()
 ID_importdmi = wx.NewId()
 ID_merge = wx.NewId()
+ID_labbe = wx.NewId()
 ##########################################################
 #elements de configuration
 ##########################################################
@@ -202,7 +204,8 @@ images_analyses = {
         'subcorpusthema' : 'subcorpusthema.png',
         'preferences' : 'preferences.png',
         'exportmetatable' : 'exportmetatable.png',
-        'importdmi' : 'twitter.png'
+        'importdmi' : 'twitter.png',
+        'labbe' : 'spec.png'
          }
 #####################################################################
 
@@ -268,18 +271,18 @@ class IraFrame(wx.Frame):
         item = wx.MenuItem(file_menu, ID_ImportTXM, _(u"Import from TXM").decode('utf8'), _(u"Import from TXM").decode('utf8'))
         item.SetBitmap(self.images_analyses['TXM'])
         file_menu.AppendItem(item)
-        
+
         item = wx.MenuItem(file_menu, ID_ImportEuro, _(u"Import from Europress").decode('utf8'), _(u"Import from Europress").decode('utf8'))
         item.SetBitmap(self.images_analyses['europress'])
-        file_menu.AppendItem(item)        
-        
+        file_menu.AppendItem(item)
+
         item = wx.MenuItem(file_menu, ID_importdmi, _(u"Import from DMI-TCAT (exp.)").decode('utf8'), _(u"Import from DMI-TCAT (exp.)").decode('utf8'))
         item.SetBitmap(self.images_analyses['importdmi'])
-        file_menu.AppendItem(item)        
-        
+        file_menu.AppendItem(item)
+
         item = wx.MenuItem(file_menu, ID_merge, _(u'Merge graphs').decode('utf8'), _(u'Merge graphs').decode('utf8'))
         file_menu.AppendItem(item)
-        
+
         menuFactiva = wx.Menu()
         fact_from_xml = wx.MenuItem(menuFactiva, ID_Fact_xml, _(u"from xml").decode('utf8'))
         fact_from_xml.SetBitmap(self.images_analyses['factiva_xml'])
@@ -304,19 +307,19 @@ class IraFrame(wx.Frame):
         self.ID_extractthem = extractthem.GetId()
         file_menu.AppendMenu(-1, _(u"Tools").decode('utf8'), menuTools)
 
-               
+
         #item = wx.MenuItem(file_menu, ID_SaveTab, _(u"Save tab as...").decode('utf8'), _(u"Save tab as...").decode('utf8'))
         #item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_SAVE_AS))
         #file_menu.AppendItem(item)
-        
+
         file_menu.Append(wx.ID_EXIT, _(u"Exit").decode('utf8'))
-        
+
         edit_menu = wx.Menu()
         pref = wx.MenuItem(edit_menu, wx.ID_PREFERENCES, _(u'Preferences').decode('utf8'))
         pref.SetBitmap(self.images_analyses['preferences'])
         edit_menu.AppendItem(pref)
         #edit_menu.Append(wx.ID_PREFERENCES, _(u'Preferences').decode('utf8'))
-        
+
         view_menu = wx.Menu()
         home = wx.MenuItem(view_menu, ID_ACCEUIL, _(u"Home page").decode('utf8'))
         home.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_GO_HOME, size = (16,16)))
@@ -338,7 +341,7 @@ class IraFrame(wx.Frame):
                        [ID_proto, _(u"Prototypical Analysis").decode('utf8'), 'proto'],
                        [ID_Splitfromvar, _(u"Split from variable").decode('utf8'), 'subcorpusmeta'],
                         ]
-        
+
         for analyse in matanalyses :
             if not isinstance(analyse, dict) :
                 item = wx.MenuItem(matrix_menu, analyse[0], analyse[1])
@@ -376,10 +379,11 @@ class IraFrame(wx.Frame):
         #menu_splittab.AppendItem(splitvar)
         #matrix_menu.AppendMenu(-1, _(u"Split matrix").decode('utf8'), menu_splittab)
         self.matrix_menu = matrix_menu
-        
+
         text_menu = wx.Menu()
         analyses_text = [[ID_TEXTSTAT, _(u"Statistics").decode('utf8'), 'stat'],
                          [ID_ASLEX, _(u"Specificities and CA").decode('utf8'), 'spec'],
+                         [ID_labbe, _(u"Labbe Distance").decode('utf8'),'labbe'],
                          {'name' : _(u"Clustering").decode('utf8'),
                           'content' : [[ID_TEXTREINERT, _(u"Reinert's Method").decode('utf8'), 'alceste']]},
                          [ID_SimiTxt, _(u"Similarities Analysis").decode('utf8'), 'simitxt'],
@@ -389,7 +393,7 @@ class IraFrame(wx.Frame):
                                        [ID_Subtxtfromthem, _(u'Sub corpus from thematic').decode('utf8'), 'subcorpusthema']]},
                          [ID_exportmeta, _(u"Export metadata table").decode('utf8'), 'exportmetatable'],
                          ]
-        
+
         for analyse in analyses_text :
             if not isinstance(analyse, dict) :
                 item = wx.MenuItem(text_menu, analyse[0], analyse[1])
@@ -414,7 +418,7 @@ class IraFrame(wx.Frame):
 #         
 #         text_menu.Append(ID_WC, _(u"WordCloud").decode('utf8'))
         self.text_menu = text_menu
-        
+
         help_menu = wx.Menu()
         about = wx.MenuItem(help_menu, wx.ID_ABOUT, _(u"About...").decode('utf8'))
         about.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_INFORMATION, size = (16,16)))
@@ -424,14 +428,14 @@ class IraFrame(wx.Frame):
         help.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_HELP, size = (16,16)))
         help_menu.AppendItem(help)
         #help_menu.Append(wx.ID_HELP, _(u"Online help...").decode('utf8'))
-        
+
         self.mb.Append(file_menu, _(u"File").decode('utf8'))
         self.mb.Append(edit_menu, _(u"Edition").decode('utf8'))
         self.mb.Append(view_menu, _(u"View").decode('utf8'))
         self.mb.Append(matrix_menu, _(u"Matrix analysis").decode('utf8'))
         self.mb.Append(text_menu, _(u"Text analysis").decode('utf8'))
         self.mb.Append(help_menu, _(u"Help").decode('utf8'))
-        
+
         self.SetMenuBar(self.mb)
 #--------------------------------------------------------------------
         self.statusbar = self.CreateStatusBar(2, wx.ST_SIZEGRIP)
@@ -459,7 +463,7 @@ class IraFrame(wx.Frame):
         tb1.AddLabelTool(ID_ImportEuro, "ImportEuro", self.images_analyses['europress'], shortHelp= _(u"Import from Europress").decode('utf8'), longHelp=_(u"Import from Europress").decode('utf8'))
         tb1.AddSeparator()
         tb1.AddLabelTool(ID_importdmi, "ImportDMI", self.images_analyses['importdmi'], shortHelp= _(u"Import from DMI-TCAT (exp.)").decode('utf8'), longHelp=_(u"Import from DMI-TCAT (exp.)").decode('utf8'))
-        tb1.AddSeparator()        
+        tb1.AddSeparator()
         tb1.AddLabelTool(ID_Fact_xml, "ImportFactxml", self.images_analyses['factiva_xml'], shortHelp= _(u"Factiva from xml").decode('utf8'), longHelp=_(u"Factiva from xml").decode('utf8'))
         tb1.AddLabelTool(ID_Fact_mail, "ImportFactmail", self.images_analyses['factiva_mail'], shortHelp= _(u"Factiva from mail").decode('utf8'), longHelp=_(u"Factiva from mail").decode('utf8'))
         tb1.AddLabelTool(ID_Fact_copy, "ImportFactcopy", self.images_analyses['factiva_copy'], shortHelp= _(u"Factiva from copy/paste").decode('utf8'), longHelp=_(u"Factiva from copy/paste").decode('utf8'))
@@ -469,7 +473,7 @@ class IraFrame(wx.Frame):
         tb1.AddLabelTool(ID_ACCEUIL, "Home", wx.ArtProvider_GetBitmap(wx.ART_GO_HOME, size = (16,16)), shortHelp= _(u"Home page").decode('utf8'), longHelp=_(u"Home page").decode('utf8'))
         tb1.AddLabelTool(ID_RESULT, "Results", wx.ArtProvider_GetBitmap(wx.ART_LIST_VIEW, size = (16,16)), shortHelp= _(u'Show results').decode('utf8'), longHelp=_(u'Show results').decode('utf8'))
         tb1.Realize()
-        
+
         tb_text = wx.ToolBar(self, -1, wx.DefaultPosition, wx.DefaultSize,
                          wx.TB_FLAT | wx.TB_NODIVIDER)
         for analyse in analyses_text :
@@ -479,7 +483,7 @@ class IraFrame(wx.Frame):
                 for subana in analyse['content'] :
                     tb_text.AddLabelTool(subana[0], subana[1], self.images_analyses.get(subana[2], wx.EmptyBitmap(16,16)), shortHelp = subana[1], longHelp = subana[1])
         tb_text.Realize()
-        
+
         tb_mat = wx.ToolBar(self, -1, wx.DefaultPosition, wx.DefaultSize,
                          wx.TB_FLAT | wx.TB_NODIVIDER)
         for analyse in matanalyses :
@@ -487,9 +491,9 @@ class IraFrame(wx.Frame):
                 tb_mat.AddLabelTool(analyse[0], analyse[1], self.images_analyses.get(analyse[2], wx.EmptyBitmap(16,16)), shortHelp = analyse[1], longHelp = analyse[1])
             else :
                 for subana in analyse['content'] :
-                    tb_mat.AddLabelTool(subana[0], subana[1], self.images_analyses.get(subana[2], wx.EmptyBitmap(16,16)), shortHelp = subana[1], longHelp = subana[1])        
+                    tb_mat.AddLabelTool(subana[0], subana[1], self.images_analyses.get(subana[2], wx.EmptyBitmap(16,16)), shortHelp = subana[1], longHelp = subana[1])
         tb_mat.Realize()
-        
+
         tb_help = wx.ToolBar(self, -1, wx.DefaultPosition, wx.DefaultSize,
                          wx.TB_FLAT | wx.TB_NODIVIDER)
         tb_help.AddLabelTool(wx.ID_ABOUT, "About", wx.ArtProvider_GetBitmap(wx.ART_INFORMATION, size=(16,16)), shortHelp=_(u"About...").decode('utf8'), longHelp=_(u"About...").decode('utf8'))
@@ -498,7 +502,7 @@ class IraFrame(wx.Frame):
 #------------------------------------------------------------------------------------------------
 
         self.text_ctrl_txt = wx.TextCtrl(self, -1, "", wx.Point(0, 0), wx.Size(200, 200), wx.NO_BORDER | wx.TE_MULTILINE | wx.TE_RICH2 | wx.TE_READONLY)
-                      
+
         #self._mgr.AddPane(self.text_ctrl_txt, wx.aui.AuiPaneInfo().
         #                  Name("Text").CenterPane())                      
         self._mgr.AddPane(self.text_ctrl_txt, aui.AuiPaneInfo().
@@ -515,7 +519,7 @@ class IraFrame(wx.Frame):
         self._mgr.AddPane(self.tree, aui.AuiPaneInfo().Name("lefttree").Caption(_(u"Historic").decode('utf8')).
                           Left().MinSize(wx.Size(200,500)).Layer(1).Position(1).CloseButton(False).MaximizeButton(True).
                           MinimizeButton(True))
-        
+
         #self.nb = wx.aui.AuiNotebook(self, -1, wx.DefaultPosition, wx.DefaultSize, wx.aui.AUI_NB_DEFAULT_STYLE | wx.aui.AUI_NB_TAB_EXTERNAL_MOVE | wx.aui.AUI_NB_TAB_MOVE | wx.aui.AUI_NB_TAB_FLOAT| wx.NO_BORDER)
         self.nb = aui.AuiNotebook(self, -1, wx.DefaultPosition, wx.DefaultSize, aui.AUI_NB_DEFAULT_STYLE | aui.AUI_NB_TAB_EXTERNAL_MOVE | aui.AUI_NB_TAB_MOVE | aui.AUI_NB_TAB_FLOAT| wx.NO_BORDER)
         notebook_flags =  aui.AUI_NB_DEFAULT_STYLE | aui.AUI_NB_TAB_EXTERNAL_MOVE | aui.AUI_NB_TAB_MOVE | aui.AUI_NB_TAB_FLOAT| wx.NO_BORDER
@@ -529,14 +533,14 @@ class IraFrame(wx.Frame):
         #                      CenterPane())
         self._mgr.AddPane(self.nb, aui.AuiPaneInfo().
                               Name("Tab_content").
-                              CenterPane())        
-        
+                              CenterPane())
+
         #self._mgr.AddPane(self.Sheet, wx.aui.AuiPaneInfo().Name("Data").CenterPane())
         #self._mgr.AddPane(self.Sheet, aui.AuiPaneInfo().Name("Data").CenterPane())
         self.nb.Bind(aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self.OnCloseTab)
         self.nb.Bind(aui.EVT_AUINOTEBOOK_PAGE_CHANGED, self.OnPageChanged)
         # add the toolbars to the manager
-                        
+
         #self._mgr.AddPane(tb1, wx.aui.AuiPaneInfo().
         #                  Name("tb1").Caption("Fichiers").
         #                  ToolbarPane().Top().
@@ -545,25 +549,25 @@ class IraFrame(wx.Frame):
                           Name("tb1").Caption("Fichiers").
                           ToolbarPane().Top().
                           LeftDockable(True).RightDockable(False))
-        
+
         self._mgr.AddPane(tb_text, aui.AuiPaneInfo().
                           Name("tb_text").Caption("analyse_text").
                           ToolbarPane().Top().
                           LeftDockable(True).RightDockable(False))
-        
+
         self._mgr.AddPane(tb_mat, aui.AuiPaneInfo().
                           Name("tb_mat").Caption("analyse_matrix").
                           ToolbarPane().Top().
                           LeftDockable(True).RightDockable(False))
-                
+
         self._mgr.AddPane(tb_help, aui.AuiPaneInfo().
                           Name("tb_help").Caption("help").
                           ToolbarPane().Top().
                           LeftDockable(True).RightDockable(False))
-                
+
         self._mgr.GetPane('tb_text').Hide()
         self._mgr.GetPane('tb_mat').Hide()
-        
+
         self.ShowAPane("Intro_Text")
         self._mgr.GetPane("lefttree").Show()
         self._mgr.GetPane("classif_tb").Hide()
@@ -598,6 +602,7 @@ class IraFrame(wx.Frame):
         #self.Bind(wx.EVT_MENU, self.OnCheckcorpus, id = ID_CHECKCORPUS)
         self.Bind(wx.EVT_MENU, self.OnTextStat, id=ID_TEXTSTAT)
         self.Bind(wx.EVT_MENU, self.OnTextSpec, id=ID_ASLEX)
+        self.Bind(wx.EVT_MENU, self.OnTextLabbe, id=ID_labbe)
         self.Bind(wx.EVT_MENU, self.OnTextAfcm, id=ID_TEXTAFCM)
         self.Bind(wx.EVT_MENU, self.OnTextReinert, id=ID_TEXTREINERT)
         self.Bind(wx.EVT_MENU, self.OnPamSimple, id=ID_TEXTPAM)
@@ -698,7 +703,7 @@ class IraFrame(wx.Frame):
                 with open(ConfigPath['path'], 'w') as f :
                     self.PathPath.write(f)
         else:
-            BestRPath = True 
+            BestRPath = True
         if BestRPath :
             self.RPath = self.PathPath.get('PATHS', 'rpath')
             if New :
@@ -737,18 +742,18 @@ class IraFrame(wx.Frame):
             if Show :
                 self._mgr.GetPane('tb_text').Show()
             else :
-                self._mgr.GetPane('tb_text').Hide()   
+                self._mgr.GetPane('tb_text').Hide()
         elif menu == 'matrix' :
             menu_pos = 3
             if Show :
                 self._mgr.GetPane('tb_mat').Show()
             else :
-                self._mgr.GetPane('tb_mat').Hide()           
+                self._mgr.GetPane('tb_mat').Hide()
         elif menu == 'view' :
             menu_pos = 2
         else :
             menu_pos = None
-            
+
         #menu_pos = self.mb.FindMenu(menu)
         if not menu_pos is None :
             self.mb.EnableTop(menu_pos, Show)
@@ -777,7 +782,7 @@ class IraFrame(wx.Frame):
                     self.tableau.make_content()
                     OpenAnalyse(self, self.tableau.parametres)
                     self.tree.OnItemAppend(self.tableau.parametres)
-                    del busy 
+                    del busy
                 except :
                     del busy
                     BugReport(self)
@@ -925,25 +930,25 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         self.x = self.x + 20
         x = self.x
         pt = self.ClientToScreen(wx.Point(0, 0))
-        
+
         return wx.Point(pt.x + x, pt.y + x)
-    
+
     def ShowAPane(self, panel):
         for pane in self._mgr.GetAllPanes() :
-            if not pane.IsToolbar() and pane.name != 'lefttree': 
+            if not pane.IsToolbar() and pane.name != 'lefttree':
                 pane.Hide()
         self._mgr.GetPane(panel).Show()
         self._mgr.Update()
-        
+
     def OnAcceuil(self, event):
         self.ShowAPane(u"Intro_Text")
         event.Skip()
-    
+
     def CreateHTMLCtrl(self):
         ctrl = wx.html.HtmlWindow(self, -1, wx.DefaultPosition, wx.Size(400, 300))
         if "gtk2" in wx.PlatformInfo:
             ctrl.SetStandardFonts()
-        ctrl.SetPage(u"text")        
+        ctrl.SetPage(u"text")
         return ctrl
 
     def ShowTab(self, evt):
@@ -963,16 +968,16 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         #print 'plus de bug@@@@@@@@@@@@@@@@@@@@@@'
             analyse(self, matrix, parametres = parametres, dlg = dlgnb)
         except:
-            BugReport(self)           
+            BugReport(self)
 
     def OnFreq(self, event, matrix = None):
         self.analyse_matrix(Frequences, analyse_type = 'freq', matrix = matrix, dlgnb = 3)
-    
+
     def OnFreqMulti(self, event, matrix = None):
         self.analyse_matrix(FreqMultiple, analyse_type = 'freqmulti', matrix = matrix, dlgnb = 3)
 
     def OnChi2(self, event, matrix = None):
-        self.analyse_matrix(ChiSquare, matrix = matrix, analyse_type = 'chi2', dlgnb = 3) 
+        self.analyse_matrix(ChiSquare, matrix = matrix, analyse_type = 'chi2', dlgnb = 3)
 
     def OnChi2McNemar(self, event, matrix = None):
         self.analyse_matrix(McNemar, matrix = matrix, analyse_type = 'chi2mcnemar', dlgnb = 3)
@@ -985,10 +990,10 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         #    matrix = self.tree.getmatrix()
         #AnalyseQuest(self, matrix, parametres = {'type' : 'reinertmatrix'}, dlg = 3)
         self.analyse_matrix(AnalyseQuest, matrix = matrix, analyse_type = 'reinertmatrix', dlgnb = 5)
-            
+
     def OnStudent(self, event):
         try:
-            MakeStudent(self) 
+            MakeStudent(self)
         except:
             BugReport(self)
 
@@ -1006,7 +1011,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
                 PlaySound(self)
         except:
             BugReport(self)
- 
+
 #     def OnCHDReinert(self, event):
 #         try:
 #          #   print('PLUS DE BUG SUR ALCESTE QUESTIONNAIRE')
@@ -1018,35 +1023,35 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
     def OnMergeGraph(self, evt):
         #FIXME
         AnalyseMerge(self, {'type': 'merge', 'fileout' : '/tmp/test.txt'}, dlg = 5)
-    
+
     def OnProto(self, evt, matrix = None) :
         self.analyse_matrix(Prototypical, matrix = matrix, analyse_type = 'proto', dlgnb = 3) 
         #Prototypical(self, {'type' : 'proto'})
-    
+
     def OnSplitVar(self, evt, matrix = None):
         if matrix is None :
             matrix = self.tree.getmatrix()
         self.analyse_matrix(SplitMatrixFromVar, matrix = matrix, analyse_type = 'splitvar', parametres = {'pathout': matrix.pathout.dirout}, dlgnb = 3)
         #matrix = self.tree.getmatrix()
-        
+
 
     def OnSimiTxt(self, evt, corpus = None) :
         #    print 'PLUS DE BUG SUR SIMITXT'
         try :
             #self.Text = SimiTxt(self)
             if corpus is None :
-                corpus = self.tree.getcorpus()            
+                corpus = self.tree.getcorpus()
             self.Text = SimiTxt(self, corpus, parametres = {'type': 'simitxt'}, dlg = 3)
             if self.Text.val == wx.ID_OK :
                 PlaySound(self)
         except :
             BugReport(self)
-    
+
     def OnWordCloud(self, evt, corpus = None) :
         #    print 'PLUS DE BUG SUR WORDCLOUD'
         try :
             if corpus is None :
-                corpus = self.tree.getcorpus()            
+                corpus = self.tree.getcorpus()
             self.Text = WordCloud(self, corpus, parametres = {'type' : 'wordcloud'}, dlg = 3)
             if self.Text.val == wx.ID_OK :
                 PlaySound(self)
@@ -1068,13 +1073,13 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             if corpus is None :
                 corpus = self.tree.getcorpus()
             self.Text = Stat(self, corpus, parametres = {'type': 'stat'}, dlg = 7)
-            
+
             if self.Text.val == wx.ID_OK :
                 PlaySound(self)
         except:
             BugReport(self)
-        
-    def OnTextSpec(self, event, corpus = None):  
+
+    def OnTextSpec(self, event, corpus = None):
         try:
             #self.Text = AsLexico(self)
             #print('ATTENTION : PLUS DE BUG SUR LEXICO')
@@ -1085,7 +1090,18 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
                 PlaySound(self)
         except:
             BugReport(self)
-    
+
+    def OnTextLabbe(self, event, corpus = None):
+        try:
+            if corpus is None :
+                corpus = self.tree.getcorpus()
+            self.Text = DistLabbe(self, corpus, parametres = {'type' : 'labbe'}, dlg = 3)
+            if self.Text.val == wx.ID_OK :
+                PlaySound(self)
+        except:
+            BugReport(self)
+
+
     def OnTextAfcm(self, event):
         try:
             AfcUci(self)
@@ -1116,23 +1132,23 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             ImportFactiva(self, 'txm')
         except :
             BugReport(self)
-    
+
     def OnImportEuropress(self, evt) :
         try :
             ImportFactiva(self, 'euro')
         except :
             BugReport(self)
-    
+
     def OnImportDMI(self, evt):
         ImportDMI(self, {})
-    
+
     def OnExportMeta(self, evt, corpus = None):
         if corpus is None :
             corpus = self.tree.getcorpus()
         try :
             ExportMetaTable(self, corpus)
         except :
-            BugReport(self) 
+            BugReport(self)
 
     def ExtractTools(self, evt) :
         ID = evt.GetId()
@@ -1148,7 +1164,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             #print('ATTENTION : PLUS DE BUG SUR ALCESTE')
             #RunAnalyse(self, corpus, Alceste, OptAlceste)
             if corpus is None :
-                corpus = self.tree.getcorpus()            
+                corpus = self.tree.getcorpus()
             self.Text = Reinert(self, corpus, parametres = {'type': 'alceste'}, dlg = 6)
             if self.Text.val == wx.ID_OK:
                 PlaySound(self)

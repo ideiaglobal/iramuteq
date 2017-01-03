@@ -5,12 +5,10 @@
 #License: GNU/GPL
 
 from chemins import ChdTxtPathOut, StatTxtPathOut, PathOut
-from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout, SimiMatLayout, ProtoLayout, MatLayout, FreqLayout, Chi2Layout
+from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout, SimiMatLayout, ProtoLayout, MatLayout, FreqLayout, Chi2Layout, LabbeLayout
 from corpus import Corpus, copycorpus
 from tableau import Tableau
 import os
-#import shelve
-#from tabsimi import DoSimi
 from functions import DoConf, ReadDicoAsDico
 from tableau import Tableau
 import logging
@@ -28,7 +26,7 @@ class OpenAnalyse():
             self.conf = DoConf(parametres).getoptions()
             self.path = parametres
             self.conf = self.redopath(self.conf, parametres)
-        
+
         if self.conf['type'] == 'corpus' :
             corpus = self.opencorpus()
         elif self.conf['type'] == 'matrix' :
@@ -39,7 +37,7 @@ class OpenAnalyse():
             else :
                 intree = False
             corpus = self.openanalyse()
-            
+
             if self.conf.get('lem',1) :
                 dolem = True
             else :
@@ -72,17 +70,17 @@ class OpenAnalyse():
         else :
             self.parent.tree.AddAnalyse(self.conf, bold = True)
         self.parent.history.addtab(self.conf)
-    
+
     def redopath(self, conf, path) :
         conf['ira'] = os.path.realpath(path)
         conf['pathout'] = os.path.dirname(os.path.realpath(path))
         DoConf(conf['ira']).makeoptions([conf['type']], [conf])
         return conf
-    
+
     def opencorpus(self) :
         log.info('open corpus')
         if self.conf['uuid'] not in self.parent.history.corpus :
-            self.parent.history.add(self.conf) 
+            self.parent.history.add(self.conf)
             log.info('add corpus to history')
             self.parent.tree.OnItemAppend(self.conf)
         if self.conf['uuid'] in self.parent.history.openedcorpus :
@@ -97,7 +95,7 @@ class OpenAnalyse():
             self.parent.history.openedcorpus[self.conf['uuid']] = corpus
             self.opencorpus_analyses()
             self.doopen(corpus)
-    
+
     def openmatrix(self):
         log.info('open matrix')
         if self.conf['uuid'] not in self.parent.history.ordermatrix :
@@ -114,7 +112,7 @@ class OpenAnalyse():
             matrix.open()
             self.parent.history.openedmatrix[self.conf['uuid']] = matrix
             self.openmatrix_analyses()
-            self.doopen(matrix)        
+            self.doopen(matrix)
             self.parent.history.addtab(self.conf)
 
     def opencorpus_analyses(self) :
@@ -132,7 +130,7 @@ class OpenAnalyse():
             self.parent.history.addmultiple(analyses)
         for analyse in analyses :
             self.parent.tree.AddAnalyse(analyse, bold = False)
-    
+
     def openmatrix_analyses(self):
         pass
 
@@ -149,11 +147,13 @@ class OpenAnalyse():
 
     def doopen(self, corpus) :
         if self.conf['type'] == 'corpus' :
-            OpenCorpus(self.parent, self.conf) 
+            OpenCorpus(self.parent, self.conf)
         elif self.conf['type'] == 'stat' :
             StatLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'spec' :
             dolexlayout(self.parent, corpus, self.conf)
+        elif self.conf['type'] == 'labbe' :
+            LabbeLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'alceste' :
             OpenCHDS(self.parent,  corpus, self.conf, Alceste = True)
         elif self.conf['type'] == 'simitxt' or self.conf['type'] == 'clustersimitxt' :
@@ -172,4 +172,3 @@ class OpenAnalyse():
             FreqLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'chi2' or self.conf['type'] == 'chi2mcnemar':
             Chi2Layout(self.parent, corpus, self.conf)
-        
