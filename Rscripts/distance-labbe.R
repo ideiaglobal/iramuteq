@@ -23,11 +23,14 @@ compute.labbe <- function(x, y, tab) {
     if (plus.grand == 1) {
         U <- N2/N1
         mini.tab[,1] <- mini.tab[,1] * U
+		col.plusgrand <- mini.tab[,1]
+		cs.plus.grand <- sum(col.plusgrand[col.plusgrand>=1])
     } else {
         U <- N1/N2
         mini.tab[,2] <- mini.tab[,2] * U
+		col.plusgrand <- mini.tab[,2]
+		cs.plus.grand <- sum(col.plusgrand[col.plusgrand>1])
     }
-
     commun <- which((mini.tab[,1] > 0) & (mini.tab[,2] > 0))
     deA <- which((mini.tab[,plus.petit] > 0) & (mini.tab[,plus.grand] == 0))
     deB <- which((mini.tab[,plus.petit] == 0)  & (mini.tab[,plus.grand] >= 1))
@@ -37,7 +40,7 @@ compute.labbe <- function(x, y, tab) {
     dist.deB <- abs(mini.tab[deB, plus.petit] - mini.tab[deB, plus.grand])
     dist.labbe <- sum(dist.commun) + sum(dist.deA) + sum(dist.deB)
 
-    indice.labbe <- dist.labbe/(cs[plus.petit] + sum(mini.tab[,plus.grand]))
+    indice.labbe <- dist.labbe/(cs[plus.petit] + cs.plus.grand)
     indice.labbe
 }
 
