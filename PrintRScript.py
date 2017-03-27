@@ -940,7 +940,7 @@ class PrintSimiScript(PrintRScript) :
         if self.parametres['film'] : 
             txt += """
             film <- "%s"
-            """ % self.pathout['film']
+            """ % ffr(self.pathout['film'])
         else : 
             txt += """
             film <- NULL
@@ -1207,11 +1207,12 @@ class ExportAfc(PrintRScript) :
         """
 
 class MergeGraphes(PrintRScript) :
-    def __init__(self, parametres):
+    def __init__(self, analyse):
         self.script = u"#Script genere par IRaMuTeQ - %s\n" % datetime.now().ctime()
         self.pathout = PathOut()
-        self.parametres = parametres
+        self.parametres = analyse.parametres
         self.scriptout = self.pathout['temp']
+        self.analyse = analyse 
 
     def make_script(self) :
         #FIXME
@@ -1227,7 +1228,7 @@ class MergeGraphes(PrintRScript) :
         V(g)$weight <- (graph.simi$mat.eff/nrow(dm))*100
         graphs[['%s']] <- g
         """
-        for i, graph in enumerate(self.parametres['lgraphes']) :
+        for i, graph in enumerate(self.parametres['graphs']) :
             path = os.path.dirname(graph)
             gname = ''.join(['g', `i`])
             RData = os.path.join(path,'RData.RData')
@@ -1328,6 +1329,144 @@ class LabbeScript(PrintRScript) :
         plot.phylo(as.phylo(chd), type='unrooted', lab4ut="axial")
         dev.off()
         """ % (self.pathout['distmat.csv'], self.pathout['dist-labbe.png'])
+        self.add(txt)
+        self.write()
+
+class ChronoChi2Script(PrintRScript) :
+    def make_script(self) :
+        self.sources([self.analyse.parent.RscriptsPath['Rgraph']])
+        print self.parametres
+        txt = """
+        inRData <- "%s"
+        dendrof <- "%s"
+        load(inRData)
+        load(dendrof)
+        """ % (self.pathout['RData.RData'], self.pathout['dendrogramme.RData'])
+        txt += """
+        svg <- %s
+        """ % self.parametres['svg']
+        txt += """
+        tc <- which(grepl("%s",rownames(chistabletot)))
+        rn <- rownames(chistabletot)[tc]
+        tc <- tc[order(rn)]
+        dpt <- chistabletot[tc,]
+        tot <- afctable[tc,]
+        tcp <- rowSums(tot)
+        ptc <- tcp/sum(tcp)
+        dpt <- t(dpt)
+        dd <- dpt
+        """ % self.parametres['var']
+        txt += """
+        classes <- n1[,ncol(n1)]
+        tcl <- table(classes)
+        if ('0' %in% names(tcl)) {
+            to.vire <- which(names(tcl) == '0')
+            tcl <- tcl[-to.vire]
+        }
+        tclp <- tcl/sum(tcl)
+
+        #chi2 colors
+        library(ape)
+        k <- 1e-02
+        lcol <- NULL
+        lk <- k
+        for (i in 1:5) {
+            lcol <- c(lcol, qchisq(1-k,1))
+            k <- k/10
+            lk <- c(lk,k)
+        }
+        lcol <- c(3.84, lcol)
+        lcol <- c(-Inf,lcol)
+        lcol <- c(lcol, Inf)
+        lk <- c(0.05,lk)
+        breaks <- lcol
+        alphas <- seq(0,1, length.out=length(breaks))
+        clod <- rev(as.numeric(tree.cut1$tree.cl$tip.label))
+        #end
+        """
+        txt += """
+        open_file_graph("%s", w=%i, h=%i, svg=svg)
+        """ % (ffr(self.parametres['tmpgraph']), self.parametres['width'], self.parametres['height'])
+        txt += """
+        par(mar=c(3,3,3,3))
+        mat.graphic <- matrix(c(rep(1,nrow(dd)),c(2:(nrow(dd)+1))), ncol=2)
+        mat.graphic <- rbind(mat.graphic, c(max(mat.graphic) + 1 , max(mat.graphic) + 2))
+        hauteur <- tclp[clod] * 0.9
+        heights.graphic <- append(hauteur, 0.1)
+        layout(mat.graphic, heights=heights.graphic, widths=c(0.15,0.85))
+        par(mar=c(0,0,0,0))
+        tree.toplot <- tree.cut1$tree.cl
+        tree.toplot$tip.label <- paste('classe ', tree.toplot$tip.label)
+        plot.phylo(tree.toplot,label.offset=0.1, cex=1.1, no.margin=T)
+        for (i in clod) {
+            print(i)
+            par(mar=c(0,0,0,0))
+            lcol <- cut(dd[i,], breaks, include.lowest=TRUE)
+            ulcol <- names(table(lcol))
+            lcol <- as.character(lcol)
+            for (j in 1:length(ulcol)) {
+                lcol[which(lcol==ulcol[j])] <- j
+            }
+            lcol <- as.numeric(lcol)
+            mcol <- rainbow(nrow(dd))[i]
+            last.col <- NULL
+            for (k in alphas) {
+                last.col <- c(last.col, rgb(r=col2rgb(mcol)[1]/255, g=col2rgb(mcol)[2]/255, b=col2rgb(mcol)[3]/255, a=k))
+            }
+            #print(last.col)
+
+            barplot(rep(1,ncol(dd)), width=ptc, names.arg=FALSE, axes=FALSE, col=last.col[lcol], border=rgb(r=0, g=0, b=0, a=0.3))
+        }
+        plot(0,type='n',axes=FALSE,ann=FALSE)
+        label.coords <- barplot(rep(1, ncol(dd)), width=ptc, names.arg = F, las=2, axes=F, ylim=c(0,1), plot=T, col='white')
+        text(x=label.coords, y=0.5, labels=rn[order(rn)], srt=90)
+        dev.off()
+        """
+        self.add(txt)
+        self.write()
+
+class ChronoPropScript(PrintRScript) :
+    def make_script(self) :
+        self.sources([self.analyse.parent.RscriptsPath['Rgraph']])
+        print self.parametres
+        txt = """
+        inRData <- "%s"
+        dendrof <- "%s"
+        load(inRData)
+        load(dendrof)
+        """ % (self.pathout['RData.RData'], self.pathout['dendrogramme.RData'])
+        txt += """
+        svg <- %s
+        """ % self.parametres['svg']
+        txt += """
+        tc <- which(grepl("%s",rownames(chistabletot)))
+        rn <- rownames(chistabletot)[tc]
+        tc <- tc[order(rn)]
+        dpt <- chistabletot[tc,]
+        tot <- afctable[tc,]
+        tcp <- rowSums(tot)
+        ptc <- tcp/sum(tcp)
+        dpt <- t(dpt)
+        dd <- dpt
+        """ % self.parametres['var']
+        txt += """
+        classes <- n1[,ncol(n1)]
+        tcl <- table(classes)
+        if ('0' %in% names(tcl)) {
+            to.vire <- which(names(tcl) == '0')
+            tcl <- tcl[-to.vire]
+        }
+        tclp <- tcl/sum(tcl)
+        """
+        txt += """
+        open_file_graph("%s", w=%i, h=%i, svg=svg)
+        """ % (ffr(self.parametres['tmpgraph']), self.parametres['width'], self.parametres['height'])
+        txt+= """
+        ptt <- prop.table(as.matrix(tot), 1)
+        par(mar=c(10,2,2,2))
+        barplot(t(ptt)[as.numeric(tree.cut1$tree.cl$tip.label),], col=rainbow(ncol(ptt))[as.numeric(tree.cut1$tree.cl$tip.label)], width=ptc, las=3, space=0.05, cex.axis=0.7, border=NA)
+        dev.off()
+        """
         self.add(txt)
         self.write()
 

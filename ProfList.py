@@ -18,7 +18,7 @@ import  wx
 import  wx.lib.mixins.listctrl  as  listmix
 from listlex import ListForSpec
 from chemins import ConstructPathOut, ffr
-from dialog import PrefUCECarac, SearchDial, message, BarFrame
+from dialog import PrefUCECarac, SearchDial, message, BarFrame, ChronoFrame
 from tableau import copymatrix
 from search_tools import SearchFrame
 import webbrowser
@@ -91,7 +91,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         self.attr2 = wx.ListItemAttr()
         self.attr2.SetBackgroundColour((190, 249, 236))
         self.attr2s = wx.ListItemAttr()
-        self.attr2s.SetBackgroundColour((211, 252, 244))        
+        self.attr2s.SetBackgroundColour((211, 252, 244))
         self.attr3 = wx.ListItemAttr()
         self.attr3.SetBackgroundColour((245, 180, 180))
         self.attr3s = wx.ListItemAttr()
@@ -106,7 +106,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         self.InsertColumn(5, "Type", wx.LIST_FORMAT_RIGHT)
         self.InsertColumn(6, "forme", wx.LIST_FORMAT_RIGHT)
         self.InsertColumn(7, "p", wx.LIST_FORMAT_RIGHT)
-        
+
 
         self.SetColumnWidth(0, 60)
         self.SetColumnWidth(1, 70)
@@ -122,7 +122,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         self.itemDataMap = dictdata
         self.itemIndexMap = dictdata.keys()
         self.SetItemCount(len(dictdata))
-        
+
         #mixins
         listmix.ListCtrlAutoWidthMixin.__init__(self)
         listmix.ColumnSorterMixin.__init__(self, len(classen[0]))
@@ -221,7 +221,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         items = list(self.itemDataMap.keys())
         items.sort(sorter)
         self.itemIndexMap = items
-        
+
         # redraw the list
         self.Refresh()
 
@@ -275,6 +275,8 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 self.idexporttropes = wx.NewId()
                 self.idexportowledge = wx.NewId()
                 self.onmaketgen = wx.NewId()
+                self.onchronochi2 = wx.NewId()
+                self.onchronoprop = wx.NewId()
             #    self.export_classes = wx.NewId()
    
                 self.Bind(wx.EVT_MENU, self.OnPopupOne, id=self.popupID1)
@@ -300,6 +302,8 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 self.Bind(wx.EVT_MENU, self.onexporttropes, id = self.idexporttropes)
                 self.Bind(wx.EVT_MENU, self.onexportowledge, id = self.idexportowledge)
                 self.Bind(wx.EVT_MENU, self.OnMakeTgen, id=self.onmaketgen)
+                self.Bind(wx.EVT_MENU, self.OnChronoChi2, id=self.onchronochi2)
+                self.Bind(wx.EVT_MENU, self.OnChronoProp, id=self.onchronoprop)
              #  self.Bind(wx.EVT_MENU, self.on_export_classes, id = self.export_classes)
    #            self.Bind(wx.EVT_MENU, self.OnPopupThree, id=self.popupID3)
     
@@ -309,9 +313,13 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             menu.Append(self.idtablex, _(u"Chi2 by cluster").decode('utf8'))
             menu.Append(self.idlexdendro, _(u"Chi2 by cluster on dendrogram").decode('utf8'))
             menu.Append(self.idchimod, _(u"Chi2 modalities of variable").decode('utf8'))
+            menu_chrono = wx.Menu()
+            menu_chrono.Append(self.onchronochi2, _(u'Chi2').decode('utf8'))
+            menu_chrono.Append(self.onchronoprop, _(u'Proportion').decode('utf8'))
+            menu.AppendMenu(-1, _(u"Chronological view").decode('utf8'), menu_chrono)
             menu.Append(self.idwordgraph, _(u"Word graph").decode('utf8'))
             #menu.Append(self.export_classes, u"Exporter le corpus...") 
-            
+
             #menu.Append(self.popupID10, u"Spécificités")
 
             menu_conc = wx.Menu()
@@ -320,7 +328,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             menu_conc.Append(self.popupID4, _(u"In all segments").decode('utf8'))
             menu.AppendMenu(-1, _(u"Concordance").decode('utf8'), menu_conc)
             menu.Append(self.onmaketgen, _(u"Make Tgen").decode('utf8'))
-            menu_cnrtl = wx.Menu()      
+            menu_cnrtl = wx.Menu()
             menu_cnrtl.Append(self.popupID5, _(u"Definition").decode('utf8'))
             menu_cnrtl.Append(self.popupID6, _(u"Etymology").decode('utf8'))
             menu_cnrtl.Append(self.popupID7, _(u"Synonymous").decode('utf8'))
@@ -338,7 +346,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             menu.Append(self.idexportowledge, _('Exporter for Owledge').decode('utf8'))
             #menu.Append(self.popupID2, u"Concordancier")
     #        menu.Append(self.popupID3, "recharger")
-    
+
             self.PopupMenu(menu)
             menu.Destroy()
         elif 'tableau' in dir(self.Source) :
@@ -380,7 +388,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         dial = wx.MessageDialog(self, self.Source.pathout['classe_%i_export.txt' % self.cl], u"Export", wx.OK|wx.ICON_INFORMATION)
         dial.ShowModal()
         dial.Destroy()
-    
+
     def onexporttropes(self, evt) :
         if 'corpus' in dir(self.Source):
             corpus = self.Source.corpus
@@ -390,7 +398,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             uci = True
         fileout = self.Source.pathout['export_tropes_classe_%i.txt' % self.cl]
         corpus.export_tropes(fileout, self.cl, uci = uci)
-    
+
     def onexportowledge(self, evt):
         if 'corpus' in dir(self.Source):
             corpus = self.Source.corpus
@@ -401,7 +409,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         repout = self.Source.pathout['export_owledge_classe_%i' % self.cl]
         if not os.path.exists(repout) :
             os.mkdir(repout)
-        corpus.export_owledge(repout, self.cl, uci = uci)        
+        corpus.export_owledge(repout, self.cl, uci = uci)
 
     def getselectedwords(self) :
         words = [self.getColumnText(self.GetFirstSelected(), 6)]
@@ -411,7 +419,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             words.append(self.getColumnText(last, 6))
         return words
 
-    def quest_var_mod(self, evt) :  
+    def quest_var_mod(self, evt) :
         word = self.getselectedwords()[0]
         if len(word.split('_')) <= 1 :
             dial = wx.MessageDialog(self, _(u"This is not a variable_modality form").decode('utf8'), _(u"Problem").decode('utf8'), wx.OK | wx.ICON_WARNING)
@@ -419,7 +427,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             dial.ShowModal()
             dial.Destroy()
             return
-            
+
         if 'corpus' in dir(self.Source):
             corpus = self.Source.corpus
             if word.startswith(u'-*') :
@@ -452,7 +460,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             dial.CenterOnParent()
             dial.ShowModal()
             dial.Destroy()
-            return            
+            return
         words.sort()
         tableout = []
         kwords = []
@@ -461,6 +469,85 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
                 tableout.append(vchistable[fchistable.index(word)])
                 kwords.append(word)
         BarFrame(self.Source.parent, tableout, title, kwords)
+
+    def OnChronoChi2(self, evt) :
+        word = self.getselectedwords()[0]
+        if len(word.split('_')) <= 1 :
+            dial = wx.MessageDialog(self, _(u"This is not a variable_modality form").decode('utf8'), _(u"Problem").decode('utf8'), wx.OK | wx.ICON_WARNING)
+            dial.CenterOnParent()
+            dial.ShowModal()
+            dial.Destroy()
+            return
+
+        if 'corpus' in dir(self.Source):
+            corpus = self.Source.corpus
+            if word.startswith(u'-*') :
+                if self.them_mod == {} :
+                    self.them_mod = self.Source.corpus.make_theme_dict()
+                var_mod = self.them_mod
+            else :
+                if self.var_mod == {} :
+                    self.var_mod = self.Source.corpus.make_etoiles_dict()
+                var_mod = self.var_mod
+        else :
+            corpus = self.Source.tableau
+            if self.var_mod == {} :
+                self.var_mod = treat_var_mod([val for val in corpus.actives] + [val for val in corpus.sups])
+            var_mod = self.var_mod
+        var = word.split('_')
+        #words = ['_'.join([var[0],word]) for word in self.var_mod[var[0]]]
+        try :
+            words = [word for word in var_mod[var[0]]]
+        except KeyError:
+            dial = wx.MessageDialog(self, _(u"This is not a meta-data").decode('utf8'), _(u"Problem").decode('utf8'), wx.OK | wx.ICON_WARNING)
+            dial.CenterOnParent()
+            dial.ShowModal()
+            dial.Destroy()
+            return
+        words.sort()
+        vartoplot = var[0] + '_'
+        parametres = {'var' : vartoplot}
+        ChronoFrame(self.Source.parent, parametres, self.Source.pathout, which = 'chi2')
+
+    def OnChronoProp(self, evt) :
+        word = self.getselectedwords()[0]
+        if len(word.split('_')) <= 1 :
+            dial = wx.MessageDialog(self, _(u"This is not a variable_modality form").decode('utf8'), _(u"Problem").decode('utf8'), wx.OK | wx.ICON_WARNING)
+            dial.CenterOnParent()
+            dial.ShowModal()
+            dial.Destroy()
+            return
+
+        if 'corpus' in dir(self.Source):
+            corpus = self.Source.corpus
+            if word.startswith(u'-*') :
+                if self.them_mod == {} :
+                    self.them_mod = self.Source.corpus.make_theme_dict()
+                var_mod = self.them_mod
+            else :
+                if self.var_mod == {} :
+                    self.var_mod = self.Source.corpus.make_etoiles_dict()
+                var_mod = self.var_mod
+        else :
+            corpus = self.Source.tableau
+            if self.var_mod == {} :
+                self.var_mod = treat_var_mod([val for val in corpus.actives] + [val for val in corpus.sups])
+            var_mod = self.var_mod
+        var = word.split('_')
+        #words = ['_'.join([var[0],word]) for word in self.var_mod[var[0]]]
+        try :
+            words = [word for word in var_mod[var[0]]]
+        except KeyError:
+            dial = wx.MessageDialog(self, _(u"This is not a meta-data").decode('utf8'), _(u"Problem").decode('utf8'), wx.OK | wx.ICON_WARNING)
+            dial.CenterOnParent()
+            dial.ShowModal()
+            dial.Destroy()
+            return
+        words.sort()
+        vartoplot = var[0] + '_'
+        parametres = {'var' : vartoplot}
+        ChronoFrame(self.Source.parent, parametres, self.Source.pathout, which = 'prop')
+
 
     def quest_simi(self, evt) :
         tableau = self.Source.tableau
@@ -530,7 +617,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             with open(self.tmpchi, 'w') as f:
                 f.write('\n'.join([str(val) for val in self.lchi]))
         index = self.la.index(word)
-        parametres = {'type' : 'clustersimitxt', 
+        parametres = {'type' : 'clustersimitxt',
                         'pathout' : self.Source.parametres['pathout'],
                         'word' : index ,
                         'lem' : self.Source.parametres['lem'],
@@ -545,7 +632,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             self.tmpchi = os.path.join(self.Source.parametres['pathout'],'chi_%i.csv' % self.cl)
             with open(self.tmpchi, 'w') as f:
                 f.write('\n'.join([str(val) for val in self.lchi]))
-        parametres = {'type' : 'clustersimitxt', 
+        parametres = {'type' : 'clustersimitxt',
                         'pathout' : self.Source.parametres['pathout'],
                         'lem' : self.Source.parametres['lem'],
                         'tmpchi' : self.tmpchi}
@@ -613,7 +700,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             #win.html = '<html>\n' + '<br>'.join(['<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table>' % ntab2[i][0], ucestxt[i]]) for i in range(0,len(ucestxt))]) + '\n</html>'
             #win.HtmlPage.SetPage(win.html)
             win.Show(True)
-    
+
     def on_tablex(self, evt):
         if 'corpus' in dir(self.Source):
             corpus = self.Source.corpus
@@ -658,12 +745,12 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             ListWord.append(self.getColumnText(last, 6))
         ucef = []
         if self.Source.parametres['classif_mode'] != 2 :
-            for word in ListWord : 
+            for word in ListWord :
                 uci = False
                 ucef += list(set(corpus.getlemuces(word)).intersection(uces))
         else :
-            for word in ListWord : 
-                ucef += list(set(corpus.getlemucis(word)).intersection(uces))            
+            for word in ListWord :
+                ucef += list(set(corpus.getlemucis(word)).intersection(uces))
                 uci = True
         ucis_txt, ucestxt = doconcorde(corpus, ucef, ListWord, uci = uci)
         items = dict([[i, '<br><br>'.join([ucis_txt[i], ucestxt[i]])] for i in range(0,len(ucestxt))])
@@ -676,13 +763,13 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             uces = corpus.lc[self.cl-1]
             win = self.make_concord(uces, ' - '.join([_(u"Concordance").decode('utf8'), "Classe %i" % self.cl]))
             win.Show(True)
-    
+
     def OnPopupThree(self, event):
         corpus = self.Source.corpus
         uces = [classe[i] for classe in corpus.lc for i in range(0,len(classe))]
         win = self.make_concord(uces, ' - '.join([_(u"Concordance").decode('utf8'), _(u"Segments of this clustering").decode('utf8')]))
         win.Show(True)
-        
+
     def OnPopupFour(self, event):
         corpus = self.Source.corpus
         uces = [classe[i] for classe in corpus.lc for i in range(0,len(classe))] + corpus.lc0
@@ -694,22 +781,22 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         lk = "http://www.cnrtl.fr/definition/" + word
         webbrowser.open(lk)
 
-    def OnPopupSix(self, event):  
+    def OnPopupSix(self, event):
         word = self.getColumnText(self.GetFirstSelected(), 6)
         lk = "http://www.cnrtl.fr/etymologie/" + word
         webbrowser.open(lk)
-        
-    def OnPopupSeven(self, event):        
+
+    def OnPopupSeven(self, event):
         word = self.getColumnText(self.GetFirstSelected(), 6)
         lk = "http://www.cnrtl.fr/synonymie/" + word
         webbrowser.open(lk)
-        
-    def OnPopupHeight(self, event):  
+
+    def OnPopupHeight(self, event):
         word = self.getColumnText(self.GetFirstSelected(), 6)
         lk = "http://www.cnrtl.fr/antonymie/" + word
         webbrowser.open(lk)
-        
-    def OnPopupNine(self, event):            
+
+    def OnPopupNine(self, event):
         word = self.getColumnText(self.GetFirstSelected(), 6)
         lk = "http://www.cnrtl.fr/morphologie/" + word
         webbrowser.open(lk)
@@ -744,9 +831,9 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         #win.html = '<html>\n' + '<br>'.join([' : '.join([str(val) for val in forme]) for forme in rep]) + '\n</html>'
         #win.HtmlPage.SetPage(win.html)
         win.Show(True)
-    
+
     def OnMakeTgen(self, evt):
-        self.parent.tree.OnTgenEditor(self.getselectedwords())    
+        self.parent.tree.OnTgenEditor(self.getselectedwords())
 
 
 class wliste(wx.Frame):
@@ -767,7 +854,7 @@ class wliste(wx.Frame):
         self.SetAutoLayout(True)
         self.SetSizer(sizer_1)
         self.Layout()
-        
+
     def OnCloseMe(self, event):
         self.Close(True)
 
