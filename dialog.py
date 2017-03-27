@@ -11,7 +11,7 @@ import locale
 from functions import DoConf, exec_rcode
 import os
 from shutil import copyfile
-from PrintRScript import barplot
+from PrintRScript import barplot, ChronoChi2Script, ChronoPropScript
 import tempfile
 import sys
 from KeyFrame import AlcOptFrame
@@ -3323,7 +3323,7 @@ class ImageViewer ( wx.Frame ):
         pass
     
     def OnCloseMe(self, event):
-        self.Destroy()    
+        self.Destroy()
 
     def OnSaveImage(self, event) :
         dlg = wx.FileDialog(
@@ -3341,7 +3341,7 @@ class BarFrame :
         if not tree :
             width = 100 + (10*len(rownames)) + (100 * len(colnames))
             height = len(rownames) * 15
-            if height < 400 : 
+            if height < 400 :
                 height = 400
         else :
             width = 500
@@ -3349,7 +3349,7 @@ class BarFrame :
         dial = BarGraphDialog(ira, width, height)
         val = dial.ShowModal()
         if val == wx.ID_OK :
-            tmpgraph = tempfile.mktemp(dir=ira.TEMPDIR)        
+            tmpgraph = tempfile.mktemp(dir=ira.TEMPDIR)
             if dial.format.GetSelection() == 0 :
                 svg = 'FALSE'
                 wildcard = "png|*.png"
@@ -3373,7 +3373,42 @@ class BarFrame :
             exec_rcode(ira.RPath, tmpscript, wait = True)
             win = ImageViewer(ira, parametres, _(u"Graphic").decode('utf8'), size=(700, 500))
             win.Show(True)
-        dial.Destroy()           
+        dial.Destroy()
+
+class ChronoFrame :
+    def __init__(self, ira, parametres, pathout, which = 'chi2'):
+        width = 800
+        height = 600
+        self.parametres = parametres
+        self.pathout = pathout
+        self.parent = ira
+        dial = BarGraphDialog(ira, width, height)
+        val = dial.ShowModal()
+        if val == wx.ID_OK :
+            tmpgraph = tempfile.mktemp(dir=ira.TEMPDIR)
+            if dial.format.GetSelection() == 0 :
+                svg = 'FALSE'
+                wildcard = "png|*.png"
+            else :
+                svg = 'TRUE'
+                wildcard = "svg|*.svg"
+            parametres = {'width' : dial.widthsp.GetValue(),
+                          'height': dial.heightsp.GetValue(),
+                          'tmpgraph' : tmpgraph,
+                          'svg' : svg,
+                          'wildcard' : wildcard}
+            self.parametres.update(parametres)
+            if which == 'chi2' :
+                script = ChronoChi2Script(self)
+            else :
+                script = ChronoPropScript(self)
+            script.make_script()
+            exec_rcode(ira.RPath, script.scriptout, wait = True)
+            win = ImageViewer(ira, self.parametres, _(u"Graphic").decode('utf8'), size=(700, 500))
+            win.Show(True)
+        dial.Destroy()
+
+
 
 class MergeDialog ( wx.Dialog ):
     
