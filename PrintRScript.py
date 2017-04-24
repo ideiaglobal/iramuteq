@@ -1448,7 +1448,7 @@ class ChronoPropScript(PrintRScript) :
         ptc <- tcp/sum(tcp)
         dpt <- t(dpt)
         dd <- dpt
-        """ % self.parametres['var']
+        """ % self.parametres['var'].replace(u'*', u"\\\\*")
         txt += """
         classes <- n1[,ncol(n1)]
         tcl <- table(classes)
