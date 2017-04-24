@@ -1144,9 +1144,11 @@ class LabbeLayout(DefaultTextLayout):
         #    list_graph = [['nuage_1.svg', 'Nuage']]
         #else :
         #    list_graph = [['nuage_1.png', 'Nuage']]
-        list_graph = [['dist-labbe.png', _(u'Ward clustering (method ward2)').encode('utf8')]]
+        list_graph = [['labbe-tree.png', _(u'Ward clustering (method ward2)').decode('utf8')],
+                     ['labbe-heatmap.png', _(u'Heatmap').decode('utf8')],
+                     ['labbe-matrix.png', _(u'Matrix').decode('utf8')]]
         self.TabStatTot = GraphPanel(self.ira.nb, self.pathout, list_graph)
-        self.Tab.AddPage(self.TabStatTot, _(u"Labbé's distance").encode('utf8'))
+        self.Tab.AddPage(self.TabStatTot, _(u"Labbé's distance").decode('utf8'))
         self.Tab.corpus = self.corpus
         self.Tab.parametres = self.parametres
         self.ira.nb.AddPage(self.Tab, '%s' % self.parametres['name'])
@@ -1172,12 +1174,12 @@ def blender(self):
     } else {
         community = FALSE
     }
-    graph.to.file(graph.simi, nodesfile = nodesf, edgesfile = edgesf, community = community)       
+    graph.to.file(graph.simi, nodesfile = nodesf, edgesfile = edgesf, community = community)
     """
     filetmp = tempfile.mktemp()
     with open(filetmp, 'w') as f :
         f.write(txt)
-    exec_rcode(self.ira.RPath, filetmp)        
+    exec_rcode(self.ira.RPath, filetmp)
     GraphToJson(nodesfile, edgesfile, jsonout)
     launchcommand(['/home/pierre/prog/blender-2.73-linux-glibc211-x86_64/blender', '-P', os.path.join(self.ira.AppliPath, 'network_to_blender.py'), jsonout])
 
@@ -1189,9 +1191,9 @@ class SimiLayout(DefaultTextLayout) :
         self.indices = indices_simi
         if os.path.exists(self.pathout['liste_graph']) :
             list_graph = read_list_file(self.pathout['liste_graph'])
-        else : 
+        else :
             list_graph = [['','']]
-        if not self.cmd : 
+        if not self.cmd :
             notebook_flags =  aui.AUI_NB_DEFAULT_STYLE | aui.AUI_NB_TAB_EXTERNAL_MOVE | aui.AUI_NB_TAB_MOVE | aui.AUI_NB_TAB_FLOAT
             self.tabsimi = aui.AuiNotebook(self.ira.nb, -1, wx.DefaultPosition)
             self.tabsimi.SetAGWWindowStyleFlag(notebook_flags)
@@ -1206,7 +1208,7 @@ class SimiLayout(DefaultTextLayout) :
             self.ira.nb.AddPage(self.tabsimi, _(u'Graph analysis').decode('utf8'))
             self.ira.ShowTab(True)
             self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
-        
+
     def redosimi(self, evt) :
         redosimi(self, evt)
 #         with open(self.pathout['selected.csv'],'r') as f :
