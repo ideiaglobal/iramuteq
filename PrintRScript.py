@@ -1316,7 +1316,7 @@ class LabbeScript(PrintRScript) :
                       self.analyse.parent.RscriptsPath['Rgraph']])
         txt = """
         tab <- read.csv2("%s", header=TRUE, sep=';', row.names=1)
-        """ % (self.pathout['tableafcm.csv'])
+        """ % (ffr(self.pathout['tableafcm.csv']))
         txt += """
         dist.mat <- dist.labbe(tab)
         dist.mat <- as.dist(dist.mat, upper=F, diag=F)
@@ -1328,7 +1328,7 @@ class LabbeScript(PrintRScript) :
         par(cex=1.2)
         plot.phylo(as.phylo(chd), type='unrooted', lab4ut="axial")
         dev.off()
-        """ % (self.pathout['distmat.csv'], self.pathout['dist-labbe.png'])
+        """ % (ffr(self.pathout['distmat.csv']), ffr(self.pathout['dist-labbe.png']))
         self.add(txt)
         self.write()
 
