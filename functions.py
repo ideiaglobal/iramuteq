@@ -119,7 +119,7 @@ class History :
         d['history'] = self.history
         d['matrix'] = self.matrix
         d.close()
-    
+
     def add(self, analyse) :
         log.info('add to history %s' % analyse.get('corpus_name', 'pas un corpus'))
         tosave = {'uuid' : analyse['uuid'], 'ira': analyse['ira'], 'type' : analyse['type']}
@@ -162,7 +162,7 @@ class History :
             self.matrix[self.ordermatrix[tosave['matrix']]]['analyses'].append(tosave)
         self.write()
         self.read()
-                
+
     def addmultiple(self, analyses) :
         log.info('add multiple')
         for analyse in analyses :
@@ -198,7 +198,7 @@ class History :
 
     def rmtab(self, analyse) :
         del self.opened[analyse['uuid']]
-    
+
     def update(self, analyse) :
         if 'matrix_name' in analyse :
             self.matrixanalyse[analyse['uuid']].update(analyse)
@@ -222,7 +222,7 @@ class History :
         for analyse in anatodel :
             print 'cleaning :', analyse['name']
             self.delete(analyse)
-    
+
     def __str__(self) :
         return str(self.history)
 
@@ -230,7 +230,7 @@ class DoConf :
     def __init__(self, configfile=None, diff = None, parametres = None) :
         self.configfile = configfile
         self.conf = ConfigParser()
-        
+
         if configfile is not None :
             configfile = normpath_win32(configfile)
             self.conf.readfp(codecs.open(configfile, 'r', 'utf8'))
@@ -264,7 +264,7 @@ class DoConf :
         if 'type' not in parametres :
             parametres['type'] = section
         return parametres
-            
+
     def makeoptions(self, sections, parametres, outfile = None) :
         txt = ''
         for i, section in enumerate(sections) :
@@ -331,7 +331,7 @@ class BugDialog(wx.Dialog):
         # begin wxGlade: MyDialog.__set_properties
         self.SetMinSize(wx.Size(500, 200))
         self.text_ctrl_1.SetMinSize(wx.Size(500, 200))
-        
+
         # end wxGlade
 
     def __do_layout(self):
@@ -703,7 +703,7 @@ def read_list_file(filename, encoding = sys.getdefaultencoding()):
         content=f.readlines()
         ncontent=[line.replace('\n','').split(';') for line in content if line.strip() != '']
     return ncontent
-        
+
 def progressbar(self, maxi) :
     ira = wx.GetApp().GetTopWindow()
     parent = ira
@@ -729,7 +729,7 @@ def treat_var_mod(variables) :
     for var in vars :
         mods = ['_'.join(v) for v in varmod if v[0] == var]
         var_mod[var] = mods
-    
+
 #     for variable in variables :
 #         if u'_' in variable :
 #             forme = variable.split(u'_')
@@ -763,7 +763,7 @@ def doconcorde(corpus, uces, mots, uci = False) :
             ucis_txt.append('<p><b>' + ' '.join(corpus.ucis[uce].etoiles) + '</b></p>')
         ucestxt.append(ucetxt)
     return ucis_txt, ucestxt
- 
+
 
 def getallstcarac(corpus, analyse) :
    pathout = PathOut(analyse['ira'])
@@ -775,11 +775,10 @@ def read_chd(filein, fileout):
         content = f.read()
     #content = [line[3:].replace('"',"").replace(' ','') for line in content.splitlines()]
     content = [line.split('\t') for line in content.splitlines()]
-    print content
     chd = {'name':1, 'children':[]}
     mere={}
-    for i, line in enumerate(content) : 
-        if i == 0 :               
+    for i, line in enumerate(content) :
+        if i == 0 :
             chd['children'] = [{'name': line[1],'size' : content[i+1][0]}, {'name':line[2], 'size': content[i+1][1]}]
             mere[line[1]] = chd['children'][0]
             mere[line[2]] = chd['children'][1]
@@ -795,4 +794,3 @@ def read_chd(filein, fileout):
                 mere[line[2]] = mere[line[0]]['children'][-1]
     with open(fileout, 'w') as f :
         f.write(json.dumps(chd))
-                    
