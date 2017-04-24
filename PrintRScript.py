@@ -1341,7 +1341,7 @@ class ChronoChi2Script(PrintRScript) :
         dendrof <- "%s"
         load(inRData)
         load(dendrof)
-        """ % (self.pathout['RData.RData'], self.pathout['dendrogramme.RData'])
+        """ % (ffr(self.pathout['RData.RData']), ffr(self.pathout['dendrogramme.RData']))
         txt += """
         svg <- %s
         """ % self.parametres['svg']
