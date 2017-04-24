@@ -1328,7 +1328,25 @@ class LabbeScript(PrintRScript) :
         par(cex=1.2)
         plot.phylo(as.phylo(chd), type='unrooted', lab4ut="axial")
         dev.off()
-        """ % (ffr(self.pathout['distmat.csv']), ffr(self.pathout['dist-labbe.png']))
+        """ % (ffr(self.pathout['distmat.csv']), ffr(self.pathout['labbe-tree.png']))
+        txt +="""
+        open_file_graph("%s", width=1000, height=1000, svg=F)
+        heatmap(as.matrix(dist.mat), symm = T, distfun=function(x) as.dist(x))
+        dev.off()
+        """ % ffr(self.pathout['labbe-heatmap.png'])
+        txt += """
+        #http://stackoverflow.com/questions/3081066/what-techniques-exists-in-r-to-visualize-a-distance-matrix
+        dst <- data.matrix(dist.mat)
+        dim <- ncol(dst)
+        rn <- row.names(as.matrix(dist.mat))
+        open_file_graph("%s", width=1500, height=1000, svg=F)
+        par(mar=c(10,10,3,3))
+        image(1:dim, 1:dim, dst, axes = FALSE, xlab="", ylab="")
+        axis(1, 1:dim, rn, cex.axis = 0.9, las=3)
+        axis(2, 1:dim, rn, cex.axis = 0.9, las=1)
+        text(expand.grid(1:dim, 1:dim), sprintf("%%0.2f", dst), cex=0.6)
+        dev.off()
+        """  % ffr(self.pathout['labbe-matrix.png'])
         self.add(txt)
         self.write()
 
@@ -1396,8 +1414,10 @@ class ChronoChi2Script(PrintRScript) :
         layout(mat.graphic, heights=heights.graphic, widths=c(0.15,0.85))
         par(mar=c(0,0,0,0))
         tree.toplot <- tree.cut1$tree.cl
+        num.label <- as.numeric(tree.cut1$tree.cl$tip.label)
+        col.tree <- rainbow(length(num.label))[num.label]
         tree.toplot$tip.label <- paste('classe ', tree.toplot$tip.label)
-        plot.phylo(tree.toplot,label.offset=0.1, cex=1.1, no.margin=T)
+        plot.phylo(tree.toplot,label.offset=0.1, cex=1.1, no.margin=T, x.lim=20, tip.color = col.tree)
         for (i in clod) {
             print(i)
             par(mar=c(0,0,0,0))
