@@ -165,14 +165,14 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     txt += """
     log1 <- "%s"
     chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method =
-    svd.method, libsvdc.path = libsvdc.path, log.file = log1)
+    svd.method, libsvdc.path = libsvdc.path)#, log.file = log1)
     """ % ffr(DicoPath['log-chd1.txt'])
 
     if classif_mode == 0:
         txt += """
     log2 <- "%s"
     chd2<-CHD(data2, x = nbt, mode.patate = mode.patate, svd.method =
-    svd.method, libsvdc.path = libsvdc.path) log.file = log2)
+    svd.method, libsvdc.path = libsvdc.path)#, log.file = log2)
     """ % ffr(DicoPath['log-chd2.txt'])
 
     txt += """
@@ -1331,6 +1331,7 @@ class LabbeScript(PrintRScript) :
         """ % (ffr(self.pathout['distmat.csv']), ffr(self.pathout['labbe-tree.png']))
         txt +="""
         open_file_graph("%s", width=1000, height=1000, svg=F)
+        par(mar=c(10,1,1,10))
         heatmap(as.matrix(dist.mat), symm = T, distfun=function(x) as.dist(x))
         dev.off()
         """ % ffr(self.pathout['labbe-heatmap.png'])

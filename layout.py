@@ -1148,10 +1148,10 @@ class LabbeLayout(DefaultTextLayout):
                      ['labbe-heatmap.png', _(u'Heatmap').decode('utf8')],
                      ['labbe-matrix.png', _(u'Matrix').decode('utf8')]]
         self.TabStatTot = GraphPanel(self.ira.nb, self.pathout, list_graph)
-        self.Tab.AddPage(self.TabStatTot, _(u"Labbé's distance").decode('utf8'))
+        self.Tab.AddPage(self.TabStatTot, _(u"Labbe's distance").decode('utf8'))
         self.Tab.corpus = self.corpus
         self.Tab.parametres = self.parametres
-        self.ira.nb.AddPage(self.Tab, '%s' % self.parametres['name'])
+        self.ira.nb.AddPage(self.Tab, u'%s' % self.parametres['name'])
         self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
         self.ira.ShowAPane("Tab_content")
 
