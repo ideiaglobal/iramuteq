@@ -130,7 +130,7 @@ user_home = os.getenv('HOME')
 if user_home is None :
     user_home = os.path.expanduser('~')
 
-UserConfigPath = os.path.abspath(os.path.join(user_home, '.iramuteq'))
+UserConfigPath = os.path.abspath(os.path.join(user_home, '.iramuteq-%s' % ConfigGlob.get('DEFAULT', 'version_nb')))
 #Si pas de fichiers de config utilisateur, on cree le repertoire
 CreateIraDirectory(UserConfigPath, AppliPath)
 #fichiers log pour windows (py2exe)
