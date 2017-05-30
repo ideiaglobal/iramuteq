@@ -107,7 +107,7 @@ PlotAfc2dCoul<- function(afc,chisqrtable,filename, what='coord',col=FALSE, axeto
     classes <- classes[order(cex.par, decreasing = TRUE)]
     cex.par <- cex.par[order(cex.par, decreasing = TRUE)]
     table.out <- stopoverlap(table.in, cex.par=cex.par, xlim = c(xmin,xmax), ylim = c(ymin,ymax))
-    table.in <- table.out$toplot
+	table.in <- table.out$toplot
     notplot <- table.out$notplot
     if (! is.null(notplot)) {
         write.csv2(notplot, file = paste(filename, '_notplotted.csv', sep = ''))
@@ -226,7 +226,7 @@ stopoverlap <- function(x, cex.par = NULL, xlim = NULL, ylim = NULL) {
 				isOverlaped <- FALSE
 			} else {
 				if(r>sqrt(.5)){
-					print(paste(words[i], "could not be fit on page. It will not be plotted."))
+					#print(paste(words[i], "could not be fit on page. It will not be plotted."))
                     notplot <- rbind(notplot,c(words[i], x[i,1], x[i,2], size[i], i))
 					isOverlaped <- FALSE
 				}
@@ -237,6 +237,8 @@ stopoverlap <- function(x, cex.par = NULL, xlim = NULL, ylim = NULL) {
 			}
 		}
     }
+	nbnot <- nrow(notplot)
+	print(paste(nbnot, ' not plotted'))
     row.names(toplot) <- words[toplot[,4]]
     return(list(toplot = toplot, notplot = notplot))
 }
@@ -341,6 +343,19 @@ getwordcloudcoord <- function(words,freq,scale=c(4,.5),min.freq=3,max.words=Inf,
 	row.names(toplot) <- words[toplot[,4]]
 	toplot <- toplot[,-4]
 	return(toplot)
+}
+
+new_tree_tot <- function(chd) {
+	lf <- chd$list_fille
+	m <- matrix(0, ncol=2)
+	for (val in 1:length(lf)) {
+		if (! is.null(lf[[val]])) {
+			print(c(val,lf[[val]][1]))
+			m <- rbind(m, c(val,lf[[val]][1]))
+			m <- rbind(m, c(val,lf[[val]][2]))
+		}
+	}
+	m[-1,]
 }
 
 make_tree_tot <- function (chd) {
@@ -582,7 +597,7 @@ del.yellow <- function(colors) {
     colors
 }
 
-make_afc_graph <- function(toplot, classes, clnb, xlab, ylab, cex.txt = NULL, leg = FALSE, cmd = FALSE, black = FALSE, xminmax=NULL, yminmax=NULL) {
+make_afc_graph <- function(toplot, classes, clnb, xlab, ylab, cex.txt = NULL, leg = FALSE, cmd = FALSE, black = FALSE, xminmax=NULL, yminmax=NULL, color=NULL) {
     
     rain <- rainbow(clnb)
     compt <- 1
@@ -606,6 +621,9 @@ make_afc_graph <- function(toplot, classes, clnb, xlab, ylab, cex.txt = NULL, le
     cl.color <- rain[classes]
     if (black) {
         cl.color <- 'black'
+    }
+    if (!is.null(color)) {
+        cl.color <- color
     }
 	plot(toplot[,1],toplot[,2], pch='', xlab = xlab, ylab = ylab, xlim=xminmax, ylim = yminmax)
 	abline(h=0, v=0, lty = 'dashed')
@@ -669,7 +687,7 @@ plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro
 	    tree[[2]]<-paste('classe ',tree[[2]])
     }
 	par(mar=c(2,1,0,1))
-	plot.phylo(tree,label.offset=0, tip.col=col, type=type.dendro, direction = 'downwards', srt=90, adj = 0.5, cex = 1, y.lim=c(-0.3,tree$Nnode))
+	plot.phylo(tree,label.offset=0, tip.col=col, type=type.dendro, direction = 'downwards', srt=90, adj = 0.5, cex = 1.5, y.lim=c(-0.3,tree$Nnode))
 	par(mar=c(0,0,0,0))
 	d <- barplot(-sum.cl[tree.order], col=col, names.arg='', axes=FALSE, axisname=FALSE)
 	text(x=d, y=(-sum.cl[tree.order]+3), label=paste(round(sum.cl[tree.order],1),'%'), cex=1)
@@ -678,7 +696,7 @@ plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro
         #wordcloud(names(lclasses[[i]]), lclasses[[i]], scale = c(1.5, 0.2), random.order=FALSE, colors = colcloud[i])
         yval <- 1.1
         plot(0,0,pch='', axes = FALSE)
-        vcex <- norm.vec(lclasses[[i]], 1, 3)
+        vcex <- norm.vec(lclasses[[i]], 2, 3)
         for (j in 1:length(lclasses[[i]])) {
             yval <- yval-(strheight( names(lclasses[[i]])[j],cex=vcex[j])+0.02)
             text(-0.9, yval, names(lclasses[[i]])[j], cex = vcex[j], col = colcloud[i], adj=0)
@@ -900,7 +918,7 @@ plot.dendro.lex <- function(tree, to.plot, bw=FALSE, lab=NULL, lay.width=c(3,3,2
     }    
     par(mar=c(0,0,0,0))
     plot(0, axes = FALSE, pch = '')
-    legend(x = 'center' , rownames(to.plot), fill = col.bars)
+    legend(x = 'center' , rev(rownames(to.plot)), fill = rev(col.bars))
     if (!cmd) {
         dev.off()
     }
@@ -1136,6 +1154,7 @@ graphml.to.file <- function(graph.path) {
 }
 
 
+
 graph.to.file <- function(graph.simi, nodesfile = NULL, edgesfile = NULL, community = FALSE, color = NULL, sweight = NULL) {
 	require(igraph)
 	g <- graph.simi$graph
@@ -1179,3 +1198,32 @@ graph.to.file <- function(graph.simi, nodesfile = NULL, edgesfile = NULL, commun
 		df
 	}
 }
+
+graph.to.file2 <- function(graph, layout, nodesfile = NULL, edgesfile = NULL, community = FALSE, color = NULL, sweight = NULL) {
+	require(igraph)
+	g <- graph
+	V(g)$x <- layout[,1]
+	V(g)$y <- layout[,2]
+	if (ncol(layout) == 3) {
+		V(g)$z <- layout[,3]
+	}
+	v.colors <- col2rgb(V(g)$color)
+	V(g)$r <- v.colors[1,]
+	V(g)$g <- v.colors[2,]
+	V(g)$b <- v.colors[3,]		
+	
+	if (!is.null(sweight)) {
+		V(g)$sweight <- sweight
+	}
+	df <- get.data.frame(g, what='both')
+	if (!is.null(nodesfile)) {
+		write.table(df$vertices, nodesfile, sep='\t', row.names=FALSE)
+	}
+	if (!is.null(edgesfile)) {
+		write.table(df$edges, edgesfile, sep='\t', row.names=FALSE)
+	}
+	if (is.null(edgesfile) & is.null(nodesfile)) {
+		df
+	}
+}
+
