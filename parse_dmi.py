@@ -74,7 +74,7 @@ class UnicodeWriter:
             self.writerow(row)
 
 class ParseDMI :
-    def __init__(self, filein, fileout, encodeout ='utf8', onlyrt = True, cleanurl = True, cleanRT = True, cleanAt = True):
+    def __init__(self, filein, fileout, encodeout ='utf8', onlyrt = True, cleanurl = True, cleanRT = True, cleanAt = True, lang= 'es'):
         self.outf = open(fileout, 'w')
         self.encodeout = encodeout
         with open(filein, 'rb') as f:
@@ -83,9 +83,9 @@ class ParseDMI :
             for row in reader:
                 if linenb == 0 :
                     first = row
-                    create_dateid = first.index('created_at')
+                    self.create_dateid = first.index('created_at')
                     textid = first.index('text')
-                    print first
+                    langid = first.index('lang')
                 else :
                     text = row[textid]
                     text = self.washtweet(text)
@@ -96,14 +96,21 @@ class ParseDMI :
                         text = self.cleanRT(text)
                     if cleanAt :
                         text = self.cleanAt(text)
-                    meta = self.makemetadata(row, {'date' : create_dateid})
                     if onlyrt and not isrt :
-                        self.write_tweet(meta, text)
-                    elif not onlyrt :
-                        self.write_tweet(meta, text)
+                        if lang == 'all' :
+                            self.write_tweet(row, text)
+                        elif row[langid] == lang :
+                            self.write_tweet(row, text)
+                    if not onlyrt :
+                        if lang == 'all' :
+                            self.write_tweet(row, text)
+                        elif row[langid] == lang :
+                            self.write_tweet(row, text)
                 linenb += 1
+        self.outf.close()
     
-    def write_tweet(self, meta, text):
+    def write_tweet(self, row, text):
+        meta = self.makemetadata(row, {'date' : self.create_dateid})
         self.outf.write('\n'.join([meta, text, '']).encode(self.encodeout))
     
     def makemetadata(self, row, parametres = {}):
@@ -136,10 +143,14 @@ class ParseDMI :
         return ' '.join([word for word in tweet.split() if not word.startswith('@')])
 
     def cleanRT(self, text) :
-        tweet = text.split()
-        tovire = [[i, i+1] for i, word in enumerate(tweet) if word == 'RT' and i!=len(tweet) - 1]
-        tovire = itertools.chain(*tovire)
-        text = ' '.join([word for i, word in enumerate(tweet) if i not in tovire])
+        text = ''.join([' ',text, ' '])
+        text.replace('rt','_rt_')
+        text = text.replace('RT', '_rt_')
+        text.strip()
+        #tweet = text.split()
+        #tovire = [[i, i+1] for i, word in enumerate(tweet) if word == 'RT' and i!=len(tweet) - 1]
+        #tovire = itertools.chain(*tovire)
+        #text = ' '.join([word for i, word in enumerate(tweet) if i not in tovire])
         return text
 
 class ImportDMI :
@@ -154,11 +165,15 @@ class ImportDMI :
         if val == wx.ID_OK :
             csvfile = self.dial.dbb.GetValue()
             corp_out = self.dial.fbb.GetValue()
+            nort = self.dial.paneldmi.check_removeR_rt.GetValue()
+            remove_url = self.dial.paneldmi.check_remove_url.GetValue()
+            remove_mention = self.dial.paneldmi.check_remove_mention.GetValue()
+            remove_rt_in_tweets = self.dial.paneldmi.check_remove_rt_in_tweets.GetValue()
             self.dial.Destroy()
             busy = wx.BusyInfo(_("Please wait...").decode('utf8'))
             wx.SafeYield()
             try :
-                ParseDMI(csvfile, corp_out, 'utf8')
+                ParseDMI(csvfile, corp_out, 'utf8', onlyrt=nort, cleanurl=remove_url, cleanAt=remove_mention, cleanRT=remove_rt_in_tweets)
                 del busy
                 msg = '\n'.join([_(u"Corpus created :").decode('utf8'), corp_out, _(u"Do you want to open it in IRaMuTeQ ?").decode('utf8')])
                 dlg = wx.MessageDialog(self.ira, msg, _(u'Information').decode('utf8'), wx.YES_NO | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
