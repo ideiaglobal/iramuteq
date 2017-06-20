@@ -60,20 +60,21 @@ nlf
 }
 
 getfille <- function(nlf, classe, pf) {
-    if (length(nlf[[classe]]) == 1) {
+    if (!length(nlf[[classe]])) {
         return(pf)
     } else {
-        pf <- c(pf, nlf[[classe]])
-        c1 <- nlf[[classe]][1]
-        c2 <- nlf[[classe]][2]
-        pf <- getfille(nlf, c1, pf)
-        pf <- getfille(nlf, c2, pf)
-    }
+		for (cl in nlf[[classe]]) {
+			pf <- c(pf, cl)
+			if (cl <= length(nlf)) {
+				pf <- getfille(nlf, cl, pf)
+			}
+		}
+	} 
     return(pf)
 }
 
 getmere <- function(list_mere, classe) {
-    i <- classe
+    i <- as.numeric(classe)
     pf <- NULL
     while (i != 1 ) {
         pf <- c(pf, list_mere[[i]])
@@ -84,6 +85,117 @@ getmere <- function(list_mere, classe) {
 
 getfillemere <- function(list_fille, list_mere, classe) {
     return(c(getfille(list_fille, classe, NULL), getmere(list_mere, classe)))
+}
+
+getlength <- function(n1, clnb) {
+	colnb <- (clnb %/%2)
+	tab <- table(n1[,colnb])
+	eff <- tab[which(names(tab) == as.character(clnb))]
+	return(eff)
+}
+
+
+find.terminales <- function(n1, list_mere, list_fille, mincl) {
+	tab <- table(n1[,ncol(n1)])
+	clnames <- rownames(tab)
+	terminales <- clnames[which(tab >= mincl)]
+	tocheck <- setdiff(clnames, terminales)
+	if ("0" %in% terminales) {
+		terminales <- terminales[which(terminales != 0)]
+	}
+	if (length(terminales) == 0) {
+		return('no clusters')
+	}
+	if ("0" %in% tocheck) {
+		tocheck <- tocheck[which(tocheck != "0")]
+	}
+	print(terminales)
+	print(tocheck)
+	while (length(tocheck)!=0) {
+		for (val in tocheck) {
+			print(val)
+			mere <- list_mere[[as.numeric(val)]]
+			print('mere')
+			print(mere)
+			if (mere != 1) {
+				ln.mere <- getlength(n1, mere)
+				print('ln.mere')
+				print(ln.mere)
+				filles.mere <- getfille(list_fille, mere, NULL)
+				print('fille mere')
+				print(filles.mere)
+				filles.mere <- filles.mere[which(filles.mere != val)]
+				print(filles.mere)
+				if ((ln.mere >= mincl) & (length(intersect(filles.mere, tocheck)) == 0) & (length(intersect(filles.mere, terminales)) == 0 )) {
+					print('mere ok')
+					terminales <- c(terminales, mere)
+					for (f in c(filles.mere, val, mere)) {
+						tocheck <- tocheck[which(tocheck != f)]
+					}	
+				} else if ((ln.mere >= mincl) & (length(intersect(filles.mere, terminales)) == 0) & (length(intersect(filles.mere, tocheck))!=0)){
+					print('mere a checke cause fille ds tocheck')
+					tocheck <- tocheck[which(tocheck != val)]
+					tocheck <- c(mere, tocheck)
+
+				} else {
+					print('pas ok on vire du check')
+					tocheck <- tocheck[which(tocheck != val)]
+				}
+			} else {
+				print('mere == 1')
+				tocheck <- tocheck[which(tocheck != val)]
+			}
+			print('tocheck')
+			print(tocheck)
+		}
+		print(tocheck)
+	}
+	terminales
+}
+
+make.classes <- function(terminales, n1, tree, lf) {
+	term.n1 <- unique(n1[,ncol(n1)])
+	tree.tip <- tree$tip.label
+	cl.n1 <- n1[,ncol(n1)]
+	classes <- rep(NA, nrow(n1))
+	cl.names <- 1:length(terminales)
+	new.cl <- list()
+	for (i in 1:length(terminales)) {
+		if (terminales[i] %in% term.n1) {
+			classes[which(cl.n1==terminales[i])] <- cl.names[i]
+			new.cl[[terminales[i]]] <- cl.names[i]
+			tree.tip[which(tree.tip==terminales[i])] <- paste('a', cl.names[i], sep='')
+		} else {
+			filles <- getfille(lf, as.numeric(terminales[i]), NULL)
+			tochange <- intersect(filles, term.n1)
+			for (cl in tochange) {
+				classes[which(cl.n1==cl)] <- cl.names[i]
+				new.cl[[cl]] <- cl.names[i]
+				tree.tip[which(tree.tip==cl)] <- paste('a', cl.names[i], sep='')
+			}
+		}
+	}
+	make.tip <- function(x) {
+		if (substring(x,1,1)=='a') {
+			return(substring(x,2))
+		} else { 
+			return(0)
+		}
+	}
+	tree$tip.label <- tree.tip
+	ntree <- tree
+	tree$tip.label <- sapply(tree.tip, make.tip)
+	tovire <- sapply(tree.tip, function(x) {substring(x,1,1)!='a'})
+	tovire <- which(tovire)
+	ntree <-  drop.tip(ntree, tip=tovire)
+	en.double <- ntree$tip.label[duplicated(ntree$tip.label)]
+	en.double <- unique(en.double)
+	tovire <- sapply(en.double, function(x) {which(ntree$tip.label == x)[1]})
+	ntree <-  drop.tip(ntree, tip=tovire)
+	ntree$tip.label <- sapply(ntree$tip.label, function(x) {substring(x,2)})
+	classes[which(is.na(classes))] <- 0
+	res <- list(dendro_tot_cl = tree, tree.cl = ntree, n1=as.matrix(classes))
+	res
 }
 
 #nbt nbcl = nbt+1 tcl=((nbt+1) *2) - 2  n1[,ncol(n1)], nchd1[,ncol(nchd1)]
@@ -162,14 +274,14 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
 	} else {
 		croise <- croiseeff( matrix(ncol=tcl,nrow=tcl), classeuce1, classeuce1)
 	}
-    print(croise)
+    #print(croise)
     if (classif_mode == 0) {ind <- (nbcl * 2)} else {ind <- nbcl}
 	if (mincl==0){
 		mincl<-round(nrow(classeuce1)/ind)
 	}
-	if (mincl<3){
-		mincl<-3
-	}
+	#if (mincl<3){
+	#	mincl<-3
+	#}
     print(mincl)	
 	#print('table1')
 	#print(croise)
@@ -278,7 +390,6 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
         xy
     }
     xy <- doxy(chicroise)
-    print(xy)
     listx <- xy$x
     listy <- xy$y
 
@@ -334,9 +445,8 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
 	    txt<-paste(listx[i]+1,listy[i]+1,sep=' ')
 	    txt<-paste(txt,croise[listy[i],listx[i]],sep=' ')
 	    txt<-paste(txt,chicroiseori[listy[i],listx[i]],sep=' ')
-	    print(txt)
+	    #print(txt)
 	}
-
 	#colonne de la classe
 	#trouver les filles et les meres 
 	trouvefillemere<-function(classe,chd) {
@@ -345,7 +455,7 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
 
 
 #----------------------------------------------------------------------
-    findbestcoord <- function(classeuce1, classeuce2) {
+    findbestcoord <- function(classeuce1, classeuce2, classif_mode, nbt) {
         #fillemere1 <- NULL
         #fillemere2 <- NULL
 
@@ -365,6 +475,8 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
             lf2 <- addallfille(chd2$list_fille)
         } else {
             lf2 <- lf1
+            listx<-listx[1:((nbt+1)*2)]
+            listy<-listy[1:((nbt+1)*2)]
         }
         lme1 <- chd1$list_mere
         if (classif_mode == 0) {
@@ -372,6 +484,9 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
         } else {
             lme2 <- lme1
         }
+        print('length listx')
+        print(length(listx))
+        #if (classif_mode == 0) {
         for (first in 1:length(listx)) {
             coordok <- NULL
             f1 <- NULL
@@ -413,6 +528,51 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
             #    listcoordok[[nb]] <- coordok
             #}
         }
+        #} else {
+#            stopid <- ((nbt+1) * 2) - 2
+#            for (first in 1:stopid) {
+#                coordok <- NULL
+#                f1 <- NULL
+#                f2 <- NULL
+#                listxp<-listx
+#                listyp<-listy
+#                
+#                #listxp<-listx[first:length(listx)]
+#                #listxp<-c(listxp,listx[1:(first-1)])
+#                #listyp<-listy[first:length(listy)]
+#                #listyp<-c(listyp,listy[1:(first-1)])
+#                listxp <- listxp[order(listx, decreasing = TRUE)]
+#                listyp <- listyp[order(listx, decreasing = TRUE)]
+#                #listxp<-c(listxp[first:length(listx)], listx[1:(first-1)])
+#                #listyp<-c(listyp[first:length(listy)], listy[1:(first-1)])
+#                for (i in 1:stopid) {
+#                    if( (!(listxp[i]+1) %in% f1) & (!(listyp[i]+1) %in% f2) ) {
+#                        #print(listyp[i]+1)
+#                        #print('not in')
+#                        #print(f2)
+#                        coordok <- rbind(coordok, c(listyp[i] + 1,listxp[i] + 1))
+#                        #print(c(listyp[i] + 1,listxp[i] + 1))
+#                        un1 <- getfillemere(lf2, chd2$list_mere, listxp[i] + 1)
+#                        f1 <- c(f1, un1)
+#                        f1 <- c(f1, listxp[i] + 1)
+#                        un2 <- getfillemere(lf1, chd1$list_mere, listyp[i] + 1)
+#                        f2 <- c(f2, un2)
+#                        f2 <- c(f2, listyp[i] + 1)
+#                    }
+#                    #print(coordok)
+#                }
+#                #if (nrow(coordok) > maxcl) {
+#                nb <- 1
+#                #    listcoordok <- list()
+#                listcoordok[[nb]] <- coordok
+#                #    maxcl <- nrow(coordok)
+#                #} else if (nrow(coordok) == maxcl) {
+#                nb <- nb + 1
+#                #    listcoordok[[nb]] <- coordok
+#                #}
+#            }            
+#        }
+        #print(listcoordok)
         listcoordok <- unique(listcoordok)
         print(listcoordok)
         best <- 1
@@ -475,7 +635,7 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
     			}
     	    }
     	    listcoordok<-unique(listcoordok)
-            print(listcoordok)
+            #print(listcoordok)
     		#si plusieurs ensemble avec le meme nombre de classe, on conserve
     		#la liste avec le plus fort chi2
     	    if (length(listcoordok)>1) {
@@ -507,7 +667,8 @@ Rchdtxt<-function(uceout, chd1, chd2 = NULL, mincl=0, classif_mode=0, nbt = 9) {
 	#findmaxclasse(listx,listy)
 	#coordok<-trouvecoordok(1)
     #coordok <- oldfindbestcoord(listx, listy)
-    coordok <- findbestcoord(listx, listy)
+    print('begin bestcoord')
+    coordok <- findbestcoord(listx, listy, classif_mode, nbt)
 
 
 	lfilletot<-function(classeuce,x) {
