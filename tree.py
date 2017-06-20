@@ -11,10 +11,10 @@ import logging
 from openanalyse import OpenAnalyse
 from corpus import Corpus, copycorpus
 from tableau import Tableau, copymatrix
-from functions import DoConf, GetTxtProfile, TGen, BugReport, open_folder
+from functions import DoConf, GetTxtProfile, TGen, BugReport, open_folder, translateprofile, ReadProfileAsDico, write_translation_profile
 from profile_segment import ProfileSegment, ProfilType
 from search_tools import SearchFrame
-from dialog import PrefSimpleFile, PrefExport
+from dialog import PrefSimpleFile, PrefExport, SearchCorpus, translate_dialog
 from layout import open_antiprofil, TgenLayout
 from guifunct import TGenFrame
 from textaslexico import TgenSpec
@@ -50,30 +50,32 @@ class InfoDialog ( wx.Dialog ):
         if len(parametres) > 30 :
             nb = 4
         else :
-            nb = 2       
+            nb = 2
         self.SetSizeHintsSz( wx.Size( 500,200 ), wx.DefaultSize )
-        
+
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
-        
+
         self.m_panel2 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
         bSizer2 = wx.BoxSizer( wx.VERTICAL )
-        
+
         self.m_staticText4 = wx.StaticText( self.m_panel2, wx.ID_ANY, txt, wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText4.Wrap( -1 )
         bSizer2.Add( self.m_staticText4, 0, wx.ALL, 5 )
-        
-        
+
         self.m_panel2.SetSizer( bSizer2 )
         self.m_panel2.Layout()
         bSizer2.Fit( self.m_panel2 )
         bSizer1.Add( self.m_panel2, 0, wx.EXPAND |wx.ALL, 5 )
-        
-        self.m_panel1 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+
+        self.m_panel1 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL|wx.VSCROLL )
 
         fgSizer1 = wx.FlexGridSizer( 0, nb, 0, 0 )
+        fgSizer1.AddGrowableCol( 1 )
+        if nb == 4 :
+            fgSizer1.AddGrowableCol( 3 )
         fgSizer1.SetFlexibleDirection( wx.BOTH )
-        fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
+        fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_NONE )
+
         txtctrl = []
         for val in parametres :
             fgSizer1.Add( wx.StaticText( self.m_panel1, wx.ID_ANY, val[0], wx.DefaultPosition, wx.DefaultSize, 0 ), 0, wx.ALL, 0)
@@ -88,22 +90,20 @@ class InfoDialog ( wx.Dialog ):
         self.m_panel1.SetSizer( fgSizer1 )
         self.m_panel1.Layout()
         fgSizer1.Fit( self.m_panel1 )
-        bSizer1.Add( self.m_panel1, 0, wx.EXPAND|wx.ALL, 3 )
-        
+        bSizer1.Add( self.m_panel1, 1, wx.EXPAND|wx.ALL, 3 )
+
         m_sdbSizer1 = wx.StdDialogButtonSizer()
         self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
         m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
         m_sdbSizer1.Realize();
-        
+
         bSizer1.Add( m_sdbSizer1, 0, wx.EXPAND, 5 )
-        
-        
+
         self.SetSizer( bSizer1 )
         self.Layout()
         bSizer1.Fit( self )
-        
         self.Centre( wx.BOTH )
-    
+
     def __del__( self ):
         pass
 
@@ -130,37 +130,40 @@ class LeftTree(CT.CustomTreeCtrl):
         self.events = events
         self.styles = treestyles
         self.item = None
-        
+
 
         self.il = wx.ImageList(16, 16)
         self.ild = {}
         for img in self.ira.images_analyses :
             self.ild[img] = self.il.Add(self.ira.images_analyses[img])
         self.SetImageList(self.il)
-        
+
         self.count = 0
         self.log = log
 
         self.history = parent.history
         self.h = self.history.history
-        
+
         idopenfolder = wx.NewId()
-        accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL,  ord('E'),  idopenfolder)])
-        self.SetAcceleratorTable(accel_tbl)
-        
+        #accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL,  ord('E'),  idopenfolder)])
         self.Bind(wx.EVT_MENU, self.OnOpenFolder, id=idopenfolder)
-        
+
+        idsearchcorpus = wx.NewId()
+        accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL,  ord('E'),  idopenfolder), (wx.ACCEL_CTRL,  ord('F'),  idsearchcorpus)])
+        self.Bind(wx.EVT_MENU, self.OnSearchCorpus, id=idsearchcorpus)
+        self.SetAcceleratorTable(accel_tbl)
+
         self.root = self.AddRoot("Iramuteq")
-        
+
         if not(self.GetAGWWindowStyleFlag() & CT.TR_HIDE_ROOT):
             self.SetPyData(self.root, None)
             self.SetItemImage(self.root, 24, CT.TreeItemIcon_Normal)
             self.SetItemImage(self.root, 13, CT.TreeItemIcon_Expanded)
-        
+
         self.textroot = self.AppendItem(self.root, _(u'Textual corpus'))
         self.SetPyData(self.textroot, {'uuid': 'textroot'})
         self.SetItemImage(self.textroot, self.ild['textroot'], CT.TreeItemIcon_Normal)
-        self.SetItemImage(self.textroot, self.ild['textroot'], CT.TreeItemIcon_Expanded)     
+        self.SetItemImage(self.textroot, self.ild['textroot'], CT.TreeItemIcon_Expanded)
 
         for corpus in reversed(self.h) :
             child = self.AppendItem(self.textroot, corpus['corpus_name'])
@@ -183,7 +186,7 @@ class LeftTree(CT.CustomTreeCtrl):
         self.SetPyData(self.matroot, {'uuid': 'matroot'})
         self.SetItemImage(self.matroot, self.ild['matroot'], CT.TreeItemIcon_Normal)
         self.SetItemImage(self.matroot, self.ild['matroot'], CT.TreeItemIcon_Expanded)
-        
+
         orphmat = []
         for matrix in reversed(self.history.matrix) :
             if 'matrix_name' in matrix :
@@ -202,7 +205,7 @@ class LeftTree(CT.CustomTreeCtrl):
                         self.SetItemImage(last, img, CT.TreeItemIcon_Normal)
                         self.SetItemImage(last, img, CT.TreeItemIcon_Expanded)
             else :
-                orphmat.append(matrix)     
+                orphmat.append(matrix)
 
         self.Bind(wx.EVT_LEFT_DCLICK, self.OnLeftDClick)
         #self.Bind(wx.EVT_IDLE, self.OnIdle)
@@ -219,7 +222,7 @@ class LeftTree(CT.CustomTreeCtrl):
                           'EVT_TREE_SEL_CHANGING': self.OnSelChanging, "EVT_TREE_ITEM_HYPERLINK": self.OnHyperLink}
 
         mainframe = wx.GetTopLevelParent(self)
-        
+
         if not hasattr(mainframe, "leftpanel"):
             #self.Bind(CT.EVT_TREE_ITEM_EXPANDED, self.OnItemExpanded)
             #self.Bind(CT.EVT_TREE_ITEM_COLLAPSED, self.OnItemCollapsed)
@@ -243,7 +246,7 @@ class LeftTree(CT.CustomTreeCtrl):
 
         value = choice.GetValue()
         text = choice.GetLabel()
-        
+
         evt = "CT." + text
         binder = self.eventdict[text]
 
@@ -268,13 +271,12 @@ class LeftTree(CT.CustomTreeCtrl):
 
         if self.GetAGWWindowStyleFlag() != style:
             self.SetAGWWindowStyleFlag(style)
-            
+
 
     def OnCompareItems(self, item1, item2):
-        
+
         t1 = self.GetItemText(item1)
         t2 = self.GetItemText(item2)
-        
 
         if t1 < t2:
             return -1
@@ -283,7 +285,6 @@ class LeftTree(CT.CustomTreeCtrl):
 
         return 1
 
-    
     def OnIdle(self, event):
 
     #    if self.gauge:
@@ -332,7 +333,7 @@ class LeftTree(CT.CustomTreeCtrl):
         if itemParent is None :
             itemParent = self.root
         child, cookie = self.GetFirstChild(itemParent)
-        
+
         while child :
             pydata = self.GetPyData(child)
             if pydata['uuid'] == uuid :
@@ -343,7 +344,6 @@ class LeftTree(CT.CustomTreeCtrl):
 
 
     def OnRightDown(self, event):
-        
         pt = event.GetPosition()
         item, flags = self.HitTest(pt)
 
@@ -356,7 +356,7 @@ class LeftTree(CT.CustomTreeCtrl):
     def OnRightUp(self, event):
 
         item = self.item
-        
+
         if not item:
             event.Skip()
             return
@@ -390,29 +390,29 @@ class LeftTree(CT.CustomTreeCtrl):
         text = self.GetItemText(item)
         pydata = self.GetPyData(item)
         self.pydata = pydata
-        
+
         self.current = item
         self.itemdict = {"ishtml": ishtml, "back": back, "fore": fore, "isbold": isbold,
                          "font": font, "normal": normal, "selected": selected, "expanded": expanded,
                          "selexp": selexp, "haswin": haswin, "children": children,
                          "itemtype": itemtype, "text": text, "pydata": pydata, "enabled": enabled}
-        
+
         if not item in [self.textroot, self.matroot] :
             menu = wx.Menu()
             info = wx.MenuItem(menu, wx.ID_ANY, _(u"Informations").decode('utf8'))
             info.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_INFORMATION, size = (16,16)))
             menu.AppendItem(info)
-            
+
             rename = wx.MenuItem(menu, wx.ID_ANY, _(u"Rename").decode('utf8'))
             rename.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_TIP, size = (16,16)))
             menu.AppendItem(rename)
- 
+
             openfolder = wx.MenuItem(menu, wx.ID_ANY, _(u"Open directory").decode('utf8'))
             openfolder.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FOLDER_OPEN, size = (16,16)))
-            menu.AppendItem(openfolder)           
-            
+            menu.AppendItem(openfolder)
+
             menu.AppendSeparator()
-    
+
             if 'corpus_name' in pydata :
                 buildmenu(menu, self.parent.text_menu)
                 menu.AppendSeparator()
@@ -423,7 +423,8 @@ class LeftTree(CT.CustomTreeCtrl):
                 openmenu = wx.Menu()
                 antipro = openmenu.Append(wx.ID_ANY, _(u"Antiprofiles").decode('utf8'))
                 menu.AppendMenu(wx.ID_ANY, _(u"Open ...").decode('utf8'), openmenu)
-    
+
+                translate = menu.Append(wx.ID_ANY, _(u"Translate Profile").decode('utf8'))
                 profsr = menu.Append(wx.ID_ANY, _(u"Repeated segments profiles").decode('utf8'))
                 profgram = menu.Append(wx.ID_ANY, _(u"POS profiles").decode('utf8'))
                 tgen = menu.Append(wx.ID_ANY, _(u"Tgen Editor").decode('utf8'))
@@ -437,6 +438,7 @@ class LeftTree(CT.CustomTreeCtrl):
                 subcorpusfromcl = menu.Append(wx.ID_ANY, _(u"Sub corpus from clusters").decode('utf8'))
                 menu.AppendSeparator()
                 self.Bind(wx.EVT_MENU, self.OpenAntipro, antipro)
+                self.Bind(wx.EVT_MENU, self.OnTranslate, translate)
                 self.Bind(wx.EVT_MENU, self.OnProfSR, profsr)
                 self.Bind(wx.EVT_MENU, self.OnProfGram, profgram)
                 self.Bind(wx.EVT_MENU, self.OnTgenEditor, tgen)
@@ -467,13 +469,13 @@ class LeftTree(CT.CustomTreeCtrl):
                 menu.AppendMenu(wx.ID_ANY, _(u"Open ...").decode('utf8'), openmenu)
                 self.Bind(wx.EVT_MENU, self.OpenAntipro, antipro)
                 self.Bind(wx.EVT_MENU, self.OnRapport, rapport)
-    
+
             itemdelete = wx.MenuItem(menu, wx.ID_ANY, _(u"Delete from history").decode('utf8'))
             itemdelete.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_DELETE, size = (16,16)))
             menu.AppendItem(itemdelete)
             #item11 = menu.Append(wx.ID_ANY, "Prepend An Item")
             #item12 = menu.Append(wx.ID_ANY, "Append An Item")
-    
+
             #self.Bind(wx.EVT_MENU, self.OnItemBackground, item1)
             #self.Bind(wx.EVT_MENU, self.OnItemForeground, item2)
             #self.Bind(wx.EVT_MENU, self.OnItemBold, item3)
@@ -488,7 +490,7 @@ class LeftTree(CT.CustomTreeCtrl):
             self.Bind(wx.EVT_MENU, self.OnOpenFolder, openfolder)
             #self.Bind(wx.EVT_MENU, self.OnItemPrepend, item11)
             #self.Bind(wx.EVT_MENU, self.OnItemAppend, item12)
-            
+
             self.PopupMenu(menu)
             menu.Destroy()
 
@@ -508,7 +510,7 @@ class LeftTree(CT.CustomTreeCtrl):
                 corpus = Corpus(self.parent, parametres = DoConf(irapath).getoptions('corpus'), read = True)
         del busy
         return corpus
-    
+
     def getmatrix(self):
         if 'matrix_name' in self.pydata :
             matrix = Tableau(self.parent, parametres = DoConf(self.pydata['ira']).getoptions('matrix'))
@@ -525,7 +527,7 @@ class LeftTree(CT.CustomTreeCtrl):
 
     def OnStat(self, evt) :
         self.parent.OnTextStat(evt, self.getcorpus())
-        
+
     def OnReinert(self, evt) :
         self.parent.OnTextReinert(evt, self.getcorpus())
 
@@ -537,13 +539,13 @@ class LeftTree(CT.CustomTreeCtrl):
 
     def OnWordCloud(self, evt) :
         self.parent.OnWordCloud(evt, self.getcorpus())
-    
+
 #    def OnFreq(self, evt):
 #        self.parent.OnFreq(evt, self.getmatrix())
-        
+
 #    def OnChiSquare(self, evt):
 #        self.parent.OnChi2(evt, self.getmatrix())
-        
+
 #    def OnSimiTab(self, evt): 
 #        self.parent.OnSimiTab(evt, self.getmatrix())
     
@@ -643,6 +645,25 @@ class LeftTree(CT.CustomTreeCtrl):
         if not find :
             open_antiprofil(self.page, self.page.dictpathout['ANTIPRO_OUT'], self.parent.syscoding)
             self.page.TabChdSim.SetSelection(self.page.TabChdSim.GetPageCount() - 1)
+
+    def OnTranslate(self, evt) :
+        dial = translate_dialog(self.parent)
+        dial.CenterOnParent()
+        res = dial.ShowModal()
+        if res == wx.ID_OK :
+            to_l = dial.getto_l()
+            from_l = dial.getfrom_l()
+            dial.Destroy()
+            busy = wx.BusyInfo(_("Please wait...").decode('utf8'), self.parent)
+            wx.SafeYield()
+            prof, lems = translateprofile(self.page.corpus, ReadProfileAsDico(self.page.dictpathout['PROFILE_OUT'], True, self.parent.syscoding), lf=from_l, lt=to_l)
+            write_translation_profile(prof, lems, to_l, self.page.dictpathout)
+            open_antiprofil(self.page, prof, 'utf8', title = _(u'Translation').decode('utf8') + ' %s' % to_l, translation = True, lems=lems)
+            del busy
+            self.page.lems = lems
+            self.page.TabChdSim.SetSelection(self.page.TabChdSim.GetPageCount() - 1)
+        else :
+            dial.Destroy()
 
     def OnRapport(self, evt) :
         dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.txt', 'title': _(u"Report").decode('utf8')})
@@ -757,6 +778,30 @@ class LeftTree(CT.CustomTreeCtrl):
             open_folder(os.path.dirname(self.pydata['ira']))
         except :
             print 'cannot open folder %s' % self.pydata.get('ira', 'noirapath')
+    
+    def GetCorpusByName(self, corpus_name) :
+        return [corpus for corpus in self.h if corpus_name in corpus['corpus_name']]
+    
+    def OnSearchCorpus(self, evt):
+        searchframe = SearchCorpus(self.ira, self, None, None)
+        searchframe.Show()
+        #res = self.GetCorpusByName('Ministres')
+        #print res
+        
+    def SetContentBackground(self, itemParent = None, uuid = None, color = True) :
+        if itemParent is None :
+            itemParent = self.root
+        child, cookie = self.GetFirstChild(itemParent)
+        while child :
+            pydata = self.GetPyData(child)
+            if pydata['uuid'] == uuid :
+                self.SelectItem(child)
+                if color :
+                    self.SetItemBackgroundColour(child, wx.Colour(15,234,56))
+                return
+            self.SetContentBackground(child, uuid, color)
+            child, cookie = self.GetNextChild(itemParent, cookie)
+         
 
     def OnItemBackground(self, event):
 
