@@ -114,7 +114,7 @@ BuildProf01<-function(x,classes) {
 	mat
 }
 
-do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.type = 'frutch', max.tree = TRUE, coeff.vertex=NULL, coeff.edge = NULL, minmaxeff=c(NULL,NULL), vcexminmax= c(NULL,NULL), cex = 1, coords = NULL, communities = NULL, halo = FALSE, fromcoords=NULL, forvertex=NULL) {
+do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.type = 'frutch', max.tree = TRUE, coeff.vertex=NULL, coeff.edge = NULL, minmaxeff=c(NULL,NULL), vcexminmax= c(NULL,NULL), cex = 1, coords = NULL, communities = NULL, halo = FALSE, fromcoords=NULL, forvertex=NULL, index.word=NULL) {
 	mat.simi <- x$mat
     mat.eff <- x$eff
     v.label <- colnames(mat.simi)
@@ -195,7 +195,18 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
     if (is.null(coords)) {
     	if (layout.type == 'frutch') {
             #lo <- layout_with_drl(g.toplot,dim=nd)
-            lo <- layout_with_fr(g.toplot,dim=nd, grid="grid", niter=10000, weights=1/E(g.toplot)$weight)#, start.temp = 1)#, )
+            #lo <- layout_with_fr(g.toplot,dim=nd, grid="grid", niter=10000, weights=1/E(g.toplot)$weight)#, start.temp = 1)#, )
+			if (nd==2) {
+				library(sna)
+				library(intergraph)
+				lo <- gplot.layout.fruchtermanreingold(asNetwork(g.toplot), list())
+				detach("package:intergraph", unload=TRUE)
+				detach("package:sna", unload=TRUE)
+				detach("package:network", unload=TRUE)
+				library(igraph)
+			} else {
+				lo <- layout_with_fr(g.toplot,dim=nd)
+			}
         }
     	if (layout.type == 'kawa') {
     		lo <- layout_with_kk(g.toplot,dim=nd, weights=1/E(g.toplot)$weight, start=fromcoords, epsilon=0, maxiter = 10000)
@@ -209,11 +220,15 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
     		lo <- layout_on_sphere(g.toplot)
         if (layout.type == 'graphopt')
             lo <- layout_as_tree(g.toplot, circular = TRUE)
+		if (layout.type == 'spirale')
+			lo <- spirale(g.toplot, E(g.toplot)$weight, index.word) 
+		if (layout.type == 'spirale3D')
+			lo <- spirale3D(g.toplot, E(g.toplot)$weight, index.word)
     } else {
         lo <- coords
     }
     if (!is.null(communities)) {
-        if (communities == 0 ){ #'edge.betweenness.community') {
+        if (communities == 0 ){ 
             com <- edge.betweenness.community(g.toplot)
         } else if (communities == 1) {
             com <- fastgreedy.community(g.toplot)
@@ -358,6 +373,9 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
 	} else if (p.type == 'web') {
 		library(rgexf)
         graph.simi$label.cex <- label.cex
+		if (length(vertex.col)==1) {
+			vertex.col <- rep(vertex.col, length(v.label))
+		}
         graph.simi$color <- vertex.col
         label <- v.label
         nodes.attr <- data.frame(label)
@@ -437,6 +455,7 @@ merge.graph <- function(graphs) {
     V.weight <- V(ng)$weight_1 
     E.weight <- E(ng)$weight_1
     cols <- rainbow(length(graphs))
+	print(cols)
     V.color <- rep(cols[1], length(V.weight))
     for (i in 2:length(graphs)) {
         tw <- paste('weight_', i, sep='')
@@ -457,7 +476,8 @@ merge.graph <- function(graphs) {
             rbgcol1 <- rbgcol1/255
             #mix.col <- mixcolor(alpha,rbgcol1, rbgcol2)
             mix.col <- mixcolor(alpha, RGB(rbgcol1[1],rbgcol1[2],rbgcol1[3]), RGB(rbgcol2[1],rbgcol2[2],rbgcol2[3]))
-            V.color[j] <- adjustcolor(hex(mix.col), 0.6)
+            V.color[j] <- hex(mix.col)
+			#V.color[j] <- adjustcolor(hex(mix.col), 0.6)
         }
         #to.change <- totest[which(resmax == 2)]
         #V.color[to.change] <- cols[i]
@@ -480,5 +500,93 @@ merge.graph <- function(graphs) {
     V(ng)$weight <- V.weight
     V(ng)$color <- V.color
     E(ng)$weight <- E.weight
+	colors <- col2rgb(V(ng)$color)
+	V(ng)$r <- colors["red", ]
+	V(ng)$g <- colors["green", ]
+	V(ng)$b <- colors["blue", ]
     ng
 }
+
+spirale <- function(g, weigth, center, miny=0.1) {
+	ncoord <- matrix(0, nrow=length(weigth)+1, ncol=2)
+	v.names <- V(g)$name 
+	center.name <- v.names[center]
+	first <- which.max(weigth)[1]
+	if (head_of(g, first)$name == center.name) {
+		n.name <- tail_of(g, first)
+	} else {
+		n.name <- head_of(g, first)
+	}
+	n.name <- n.name$name
+	nb <- length(weigth)
+	ncoord[which(v.names==n.name),] <- c(0,1)
+	weigth[first] <- 0
+	rs <- norm.vec(weigth,1, miny)
+	nbt <- nb %/% 50
+	if (nbt == 0) nbt <- 1
+	angler <- ((360 * nbt) / (nb- 1)) * (pi/180)
+	ang <- 90 * (pi/180)
+	rr <- (1-miny) / (nb-1)
+	r <- 1
+	while (max(weigth != 0)) {
+		first <- which.max(weigth)[1]
+		if (head_of(g, first)$name == center.name) {
+			n.name <- tail_of(g, first)
+		} else {
+			n.name <- head_of(g, first)
+		}
+		n.name <- n.name$name
+		#r <- rs[first]
+		r <- r - rr
+		ang <- ang + angler 
+		x <- r * cos(ang)
+		y <- r * sin(ang)
+		weigth[first] <- 0
+		ncoord[which(v.names==n.name),] <- c(x,y)
+	}
+	ncoord
+}
+
+spirale3D <- function(g, weigth, center, miny=0.1) {
+	ncoord <- matrix(0, nrow=length(weigth)+1, ncol=3)
+	v.names <- V(g)$name 
+	center.name <- v.names[center]
+	first <- which.max(weigth)[1]
+	if (head_of(g, first)$name == center.name) {
+		n.name <- tail_of(g, first)
+	} else {
+		n.name <- head_of(g, first)
+	}
+	n.name <- n.name$name
+	nb <- length(weigth)
+	ncoord[which(v.names==n.name),] <- c(0,0,1)
+	weigth[first] <- 0
+	rs <- norm.vec(weigth,1, miny)
+	nbt <- nb %/% 50
+	if (nbt == 0) nbt <- 1
+	angler <- ((360 * nbt) / (nb- 1)) * (pi/180)
+	theta <- 0
+	phi <- 90 * (pi/180)
+	rr <- (1-miny) / (nb-1)
+	r <- 1
+	while (max(weigth != 0)) {
+		first <- which.max(weigth)[1]
+		if (head_of(g, first)$name == center.name) {
+			n.name <- tail_of(g, first)
+		} else {
+			n.name <- head_of(g, first)
+		}
+		n.name <- n.name$name
+		#r <- rs[first]
+		r <- r - rr
+		theta <- theta + angler
+		phi <- phi + angler/2
+		x <- r * sin(theta) * cos(phi)
+		y <- r * sin(theta) * sin(phi)
+		z <- r * cos(theta)
+		weigth[first] <- 0
+		ncoord[which(v.names==n.name),] <- c(x,y,z)
+	}
+	ncoord
+}
+
