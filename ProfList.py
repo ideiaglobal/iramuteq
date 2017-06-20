@@ -31,12 +31,13 @@ from copy import copy
 
 #---------------------------------------------------------------------------
 class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
-    def __init__(self, parent, gparent, profclasse, Alceste=False, cl=0):
+    def __init__(self, parent, gparent, profclasse, Alceste=False, cl=0, translation = False):
         wx.ListCtrl.__init__( self, parent, -1, style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_HRULES|wx.LC_VRULES)
 
         self.parent = parent
         self.Alceste = Alceste
         self.Source = gparent
+        self.translation = translation
         self.cl = cl
         self.var_mod = {}
         self.them_mod = {}
@@ -714,7 +715,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         vchistable = [line[1:] for line in chistable]
         fchistable = [line[0] for line in chistable]
         words = self.getselectedwords()
-        tableout = [vchistable[fchistable.index(word)] for word in words]
+        tableout = [vchistable[fchistable.index(self.getword(word))] for word in words]
         tmpgraph = tempfile.mktemp(dir=self.Source.parent.TEMPDIR)
         nbcl = len(title)
         nbwords = len(words)
@@ -733,8 +734,14 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         vchistable = [line[1:] for line in chistable]
         fchistable = [line[0] for line in chistable]
         words = self.getselectedwords()
-        tableout = [vchistable[fchistable.index(word)] for word in words]
+        tableout = [vchistable[fchistable.index(self.getword(word))] for word in words]
         BarFrame(self.Source.parent, tableout, title, words, tree = self.Source.pathout['Rdendro'])
+
+    def getword(self, word) :
+        if self.translation :
+            return self.lems[word]
+        else :
+            return word
 
     def make_concord(self, uces, title, color = 'red') :
         corpus = self.Source.corpus
@@ -744,6 +751,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             last = self.GetNextSelected(last)
             ListWord.append(self.getColumnText(last, 6))
         ucef = []
+        ListWord = [self.getword(word) for word in ListWord]
         if self.Source.parametres['classif_mode'] != 2 :
             for word in ListWord :
                 uci = False
@@ -811,6 +819,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         #print 'ATTENTION PRINT ET TABLE'
         #corpus.make_et_table()
         word = self.getColumnText(self.GetFirstSelected(), 6)
+        word = self.getword(word)
         lems = corpus.getlems()
         uces = corpus.lc[self.cl-1]
         rep = []

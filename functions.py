@@ -794,3 +794,139 @@ def read_chd(filein, fileout):
                 mere[line[2]] = mere[line[0]]['children'][-1]
     with open(fileout, 'w') as f :
         f.write(json.dumps(chd))
+
+
+translation_languages = {"Afrikaans":"af", "Albanian":"sq", "Amharic":"am", "Arabic":"ar", "Armenian":"hy", "Azeerbaijani":"az", "Basque":"eu", "Belarusian":"be", "Bengali":"bn", "Bosnian":"bs", "Bulgarian":"bg", "Catalan":"ca", "Cebuano":"ceb", "Chichewa":"ny", "Chinese (Simplified)":"zh-CN", "Chinese (Traditional)":"zh-TW", "Corsican":"co", "Croatian":"hr", "Czech":"cs", "Danish":"da", "Dutch":"nl", "English":"en", "Esperanto":"eo", "Estonian":"et", "Filipino":"tl", "Finnish":"fi", "French":"fr", "Frisian":"fy", "Galician":"gl", "Georgian":"ka", "German":"de", "Greek":"el", "Gujarati":"gu", "Haitian Creole":"ht", "Hausa":"ha", "Hawaiian":"haw", "Hebrew":"iw", "Hindi":"hi", "Hmong":"hmn ", "Hungarian":"hu", "Icelandic":"is", "Igbo":"ig", "Indonesian":"id", "Irish":"ga", "Italian":"it", "Japanese":"ja", "Javanese":"jw", "Kannada":"kn", "Kazakh":"kk", "Khmer":"km", "Korean":"ko", "Kurdish":"ku", "Kyrgyz":"ky", "Lao":"lo", "Latin":"la", "Latvian":"lv", "Lithuanian":"lt", "Luxembourgish":"lb", "Macedonian":"mk", "Malagasy":"mg", "Malay":"ms", "Malayalam":"ml", "Maltese":"mt", "Maori":"mi", "Marathi":"mr", "Mongolian":"mn", "Burmese":"my", "Nepali":"ne", "Norwegian":"no", "Pashto":"ps", "Persian":"fa", "Polish":"pl", "Portuguese":"pt", "Punjabi":"ma", "Romanian":"ro", "Russian":"ru", "Samoan":"sm", "Scots Gaelic":"gd", "Serbian":"sr", "Sesotho":"st", "Shona":"sn", "Sindhi":"sd", "Sinhala":"si", "Slovak":"sk", "Slovenian":"sl", "Somali":"so", "Spanish":"es", "Sundanese":"su", "Swahili":"sw", "Swedish":"sv", "Tajik":"tg", "Tamil":"ta", "Telugu":"te", "Thai":"th", "Turkish":"tr", "Ukrainian":"uk", "Urdu":"ur", "Uzbek":"uz", "Vietnamese":"vi", "Welsh":"cy", "Xhosa":"xh", "Yiddish":"yi", "Yoruba":"yo", "Zulu":"zu", }
+
+
+def gettranslation(words, lf, lt) :
+    import urllib2
+    import json
+    agent = {'User-Agent':
+    "Mozilla/4.0 (\
+    compatible;\
+    MSIE 6.0;\
+    Windows NT 5.1;\
+    SV1;\
+    .NET CLR 1.1.4322;\
+    .NET CLR 2.0.50727;\
+    .NET CLR 3.0.04506.30\
+    )"}
+    base_link = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=%s&tl=%s&dt=t&q=%s"
+    print len(words)
+    totrans = urllib2.quote('\n'.join(words).encode('utf8'))
+    link = base_link % (lf, lt, totrans)
+    request = urllib2.Request(link, headers=agent)
+    raw_data = urllib2.urlopen(request).read()
+    data = json.loads(raw_data)
+    return [line[0].decode('utf8').replace(u"'", u'_').replace(u' | ', u'|').replace(u' ', u'_').replace(u'-',u'_').replace(u'\n','') for line in data[0]]
+
+def makenprof(prof, trans, deb=0) :
+    nprof=[]
+    if deb == 0 :
+        nprof.append(prof[0])
+    for i, val in enumerate(trans) :
+        line = prof[deb+i+1][:]
+        line[6] = val
+        nprof.append(line)
+    return nprof
+
+def treatempty(val) :
+    if val.strip() == '' :
+        return '_'
+    else :
+        return val
+
+def translateprofile(corpus, dictprofile, lf='it', lt='fr') :
+    nprof = {}
+    lems = {}
+    for i in range(len(dictprofile)) :
+        prof = dictprofile[`i+1`]
+        try :
+            lenact = prof.index([u'*****', u'*', u'*', u'*', u'*', u'*', '', ''])
+            lensup = -1
+        except ValueError:
+            try :
+                lenact = prof.index([u'*', u'*', u'*', u'*', u'*', u'*', '', ''])
+                lensup = 0
+            except ValueError:
+                lenact = len(prof)
+                lensup = 0
+        try :
+            lensup += prof.index([u'*', u'*', u'*', u'*', u'*', u'*', '', ''])
+            lensup = lensup - lenact
+        except ValueError:
+            lensup += len(prof) - lenact
+        if lenact != 0 :
+            if lenact > 400 :
+                nlenact = 400
+            else :
+                nlenact = lenact
+            actori = [line[6] for line in prof[1:nlenact]]
+            act = [val.replace(u'_', u' ') for val in actori]
+            act = gettranslation(act, lf, lt)
+            for j, val in enumerate(actori) :
+                if act[j] not in lems :
+                    lems[act[j]] = val
+                else :
+                    while act[j] in lems :
+                        act[j] = act[j] + u"+"
+                    lems[act[j]] = val
+            nprof[`i+1`] = makenprof(prof, act)
+
+        if lensup != 0 :
+            if lensup > 400 :
+                nlensup = 400
+            else :
+                nlensup = lensup
+            supori = [line[6] for line in prof[(1+lenact):(lenact+nlensup)]]
+            sup = [val.replace(u'_', u' ') for val in supori]
+            sup = [treatempty(val) for val in sup]
+            sup = gettranslation(sup, lf, lt)
+            for j, val in enumerate(supori) :
+                if sup[j] not in lems :
+                    lems[sup[j]] = val
+                else :
+                    while sup[j] in lems :
+                        sup[j] = sup[j] + u"+"
+                    lems[sup[j]] = val
+            nprof[`i+1`].append([u'*****', u'*', u'*', u'*', u'*', u'*', '', ''])
+            nprof[`i+1`] += makenprof(prof, sup, deb=lenact)
+
+        try :
+            lenet = prof.index([u'*', u'*', u'*', u'*', u'*', u'*', '', ''])
+            nprof[`i+1`].append([u'*', u'*', u'*', u'*', u'*', u'*', '', ''])
+            nprof[`i+1`] += prof[(lenet+1):]
+        except :
+            pass
+    return nprof, lems
+
+
+def write_translation_profile(prof, lems, language, dictpathout) :
+    if os.path.exists(dictpathout['translations.txt']) :
+        with codecs.open(dictpathout['translations.txt'], 'r', 'utf8') as f :
+            translist = f.read()
+        translist = [line.split('\t') for line in translist.splitlines()]
+    else :
+        translist = []
+    toprint = []
+    toprint.append(['','','','','',''])
+    toprint.append([u'***', u'nb classes', `len(prof)`, u'***', '', ''])
+    for i in range(len(prof)) :
+        toprint.append([u'**', u'classe', `i+1`, u'**', '', ''])
+        toprint.append([u'****'] + prof[`i+1`][0] + [u'****'])
+        rest = [[`line[1]`, `line[2]`, `line[3]`, `line[4]`, line[6], line[7].replace('< 0,0001', '0.00009').replace('NS (','').replace(')','')] for line in prof[`i+1`][1:]]
+        for i, line in enumerate(prof[`i+1`][1:]) :
+            if line[0] == u'*' :
+                rest[i] = [u'*', u'*', u'*', u'*', u'*', u'*']
+            elif line[0] == u'*****' :
+                rest[i] = [u'*****',u'*',u'*', u'*', u'*', u'*']
+        toprint += rest
+    with open(dictpathout['translation_profile_%s.csv' % language], 'w') as f :
+        f.write('\n'.join([';'.join(line) for line in toprint]).encode('utf8'))
+    with open(dictpathout['translation_words_%s.csv' % language], 'w') as f :
+        f.write('\n'.join(['\t'.join([val, lems[val]]) for val in lems]).encode('utf8'))
+    if 'translation_profile_%s.csv' % language not in [val[0] for val in translist] :
+        translist.append(['translation_profile_%s.csv' % language, 'translation_words_%s.csv' % language])
+        with open(dictpathout['translations.txt'], 'w') as f :
+            f.write('\n'.join(['\t'.join(line) for line in translist]).encode('utf8'))
