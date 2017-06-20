@@ -164,8 +164,10 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         """ % ffr(DicoPath['TableUc2'])
     txt += """
     log1 <- "%s"
-    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method =
-    svd.method, libsvdc.path = libsvdc.path)#, log.file = log1)
+    #print('FIXME : source newCHD')
+    #source('/home/pierre/workspace/iramuteq/Rscripts/newCHD.R')
+    #chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path, find='matrix', sample=20, amp=500)
+    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)#, log.file = log1)
     """ % ffr(DicoPath['log-chd1.txt'])
 
     if classif_mode == 0:
@@ -196,21 +198,29 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     txt += """
     classif_mode <- %i
     mincl <- %i
+    if (mincl == 0) {mincl <- round(nrow(chd1$n1)/(nbt+1))}
     uceout <- "%s"
+    write.csv2(chd1$n1, file="%s")
     if (classif_mode == 0) {
         chd.result <- Rchdtxt(uceout, chd1, chd2 = chd2, mincl = mincl,classif_mode = classif_mode, nbt = nbt)
+        classeuce1 <- chd.result$cuce1
+        tree.tot1 <- make_tree_tot(chd1)
+        tree.cut1 <- make_dendro_cut_tuple(tree.tot1$dendro_tuple, chd.result$coord_ok, classeuce1, 1, nbt)
+
     } else {
-        chd.result <- Rchdtxt(uceout, chd1, chd2 = chd1, mincl = mincl,classif_mode = classif_mode, nbt = nbt)
+        #chd.result <- Rchdtxt(uceout, chd1, chd2 = chd1, mincl = mincl,classif_mode = classif_mode, nbt = nbt)
+        tree.tot1 <- make_tree_tot(chd1)
+        terminales <- find.terminales(chd1$n1, chd1$list_mere, chd1$list_fille, mincl)
+        tree.cut1 <- make.classes(terminales, chd1$n1, tree.tot1$tree.cl, chd1$list_fille)
+        write.csv2(tree.cut1$n1, uceout)
+        chd.result <- tree.cut1
     }
-    n1 <- chd.result$n1
-    classeuce1 <- chd.result$cuce1
-    classes<-n1[,ncol(n1)]
-    write.csv2(n1, file="%s")
-    rm(n1)
-    """ % (classif_mode, mincl, ffr(DicoPath['uce']), ffr(DicoPath['n1.csv']))
+    classes<-chd.result$n1[,ncol(chd.result$n1)]
+    write.csv2(chd.result$n1, file="%s")
+    """ % (classif_mode, mincl, ffr(DicoPath['uce']), ffr(DicoPath['n1-1.csv']), ffr(DicoPath['n1.csv']))
 
     txt += """
-    tree.tot1 <- make_tree_tot(chd1)
+#    tree.tot1 <- make_tree_tot(chd1)
 #    open_file_graph("%s", widt = 600, height=400)
 #    plot(tree.tot1$tree.cl)
 #    dev.off()
@@ -226,8 +236,7 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         """ % ffr(DicoPath['arbre2'] )
 
     txt += """
-    tree.cut1 <- make_dendro_cut_tuple(tree.tot1$dendro_tuple, chd.result$coord_ok, classeuce1, 1, nbt)
-    save(tree.cut1, file="%s")
+        save(tree.cut1, file="%s")
 
     open_file_graph("%s", width = 600, height=400)
     plot.dendropr(tree.cut1$tree.cl,classes, histo=TRUE)
@@ -337,9 +346,14 @@ datasup<-read.csv2("%s", header = FALSE, sep = ';',quote = '\"', row.names = 1, 
 dataet<-read.csv2("%s", header = FALSE, sep = ';',quote = '\"', row.names = 1, na.strings = 'NA')
 """ % (ffr(DictChdTxtOut['Contout']), ffr(DictChdTxtOut['ContSupOut']), ffr(DictChdTxtOut['ContEtOut']))
     txt += """
-tablesqrpact<-BuildProf(as.matrix(dataact),n1,clnb)
-tablesqrpsup<-BuildProf(as.matrix(datasup),n1,clnb)
-tablesqrpet<-BuildProf(as.matrix(dataet),n1,clnb)
+print('ATTENTION NEW BUILD PROF')
+#tablesqrpact<-BuildProf(as.matrix(dataact),n1,clnb)
+#tablesqrpsup<-BuildProf(as.matrix(datasup),n1,clnb)
+#tablesqrpet<-BuildProf(as.matrix(dataet),n1,clnb)
+tablesqrpact<-new.build.prof(as.matrix(dataact),n1,clnb)
+tablesqrpsup<-new.build.prof(as.matrix(datasup),n1,clnb)
+tablesqrpet<-new.build.prof(as.matrix(dataet),n1,clnb)
+
 """
     txt += """
 PrintProfile(n1,tablesqrpact[4],tablesqrpet[4],tablesqrpact[5],tablesqrpet[5],clnb,"%s","%s",tablesqrpsup[4],tablesqrpsup[5])
@@ -723,6 +737,7 @@ class PrintSimiScript(PrintRScript) :
             else :
                 txt += """
                 word <- FALSE
+                index <- NULL
                 """
             txt += """
             dm <-readMM(dm.path)
@@ -847,10 +862,13 @@ class PrintSimiScript(PrintRScript) :
             txt += """
             mat <- graph.word(mat, index)
             cs <- colSums(mat)
-            if (length(cs)) mat <- mat[,-which(cs==0)]
+            if (length(which(cs==0))) mat <- mat[,-which(cs==0)]
             rs <- rowSums(mat)
-            if (length(rs)) mat <- mat[-which(rs==0),]
-            if (length(cs)) dm <- dm[, -which(cs==0)]
+            if (length(which(rs==0))) mat <- mat[-which(rs==0),]
+            if (length(which(cs==0))) dm <- dm[,-which(cs==0)]
+            if (word) {
+                index <- which(colnames(mat)==forme)
+            }
             """
 
         if self.parametres['layout'] == 0 : layout = 'random'
@@ -858,6 +876,8 @@ class PrintSimiScript(PrintRScript) :
         if self.parametres['layout'] == 2 : layout = 'frutch'
         if self.parametres['layout'] == 3 : layout = 'kawa'
         if self.parametres['layout'] == 4 : layout = 'graphopt'
+        if self.parametres['layout'] == 5 : layout = 'spirale'
+        if self.parametres['layout'] == 6 : layout = 'spirale3D'
 
 
         self.filename=''
@@ -877,7 +897,7 @@ class PrintSimiScript(PrintRScript) :
             while os.path.exists(os.path.join(dirout,'web_'+str(graphnb))):
                 graphnb +=1
             self.filename = ffr(os.path.join(dirout,'web_'+str(graphnb)))
-            os.mkdir(self.filename)        
+            os.mkdir(self.filename)
             self.filename = os.path.join(self.filename, 'gexf.gexf')
         if self.parametres['type_graph'] == 4 : 
             graphnb = 1
@@ -1064,7 +1084,7 @@ class PrintSimiScript(PrintRScript) :
         txt += """
         eff <- colSums(dm)
         x <- list(mat = mat, eff = eff)
-        graph.simi <- do.simi(x, method='%s', seuil = seuil, p.type = '%s', layout.type = '%s', max.tree = %s, coeff.vertex=%s, coeff.edge = %s, minmaxeff = minmaxeff, vcexminmax = vcexminmax, cex = cex, coords = coords, communities = communities, halo = halo)
+        graph.simi <- do.simi(x, method='%s', seuil = seuil, p.type = '%s', layout.type = '%s', max.tree = %s, coeff.vertex=%s, coeff.edge = %s, minmaxeff = minmaxeff, vcexminmax = vcexminmax, cex = cex, coords = coords, communities = communities, halo = halo, index.word=index)
         """ % (method, type, layout, arbremax, coeff_tv, coeff_te)
             
         if self.parametres.get('bystar',False) :
@@ -1332,7 +1352,7 @@ class LabbeScript(PrintRScript) :
         txt +="""
         open_file_graph("%s", width=1000, height=1000, svg=F)
         par(mar=c(10,1,1,10))
-        heatmap(as.matrix(dist.mat), symm = T, distfun=function(x) as.dist(x))
+        heatmap(as.matrix(dist.mat), symm = T, distfun=function(x) as.dist(x), margins=c(10,10))
         dev.off()
         """ % ffr(self.pathout['labbe-heatmap.png'])
         txt += """
@@ -1417,8 +1437,8 @@ class ChronoChi2Script(PrintRScript) :
         tree.toplot <- tree.cut1$tree.cl
         num.label <- as.numeric(tree.cut1$tree.cl$tip.label)
         col.tree <- rainbow(length(num.label))[num.label]
-        tree.toplot$tip.label <- paste('classe ', tree.toplot$tip.label)
-        plot.phylo(tree.toplot,label.offset=0.1, cex=1.1, no.margin=T, x.lim=20, tip.color = col.tree)
+        #tree.toplot$tip.label <- paste('classe ', tree.toplot$tip.label)
+        plot.phylo(tree.toplot,label.offset=0.1, cex=1.1, no.margin=T, tip.color = col.tree)
         for (i in clod) {
             print(i)
             par(mar=c(0,0,0,0))
@@ -1491,4 +1511,8 @@ class ChronoPropScript(PrintRScript) :
         self.add(txt)
         self.write()
 
+class ReDoProfScript(PrintRScript) :
+    def make_script(self) :
+        self.sources([self.analyse.parent.RscriptsPath['chdfunct.R']])
+        print self.parametres
 
