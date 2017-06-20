@@ -69,7 +69,7 @@ def get_table_param(self, filename) :
                      style=wx.DEFAULT_DIALOG_STYLE)
         dlg.CenterOnParent()
         val = dlg.ShowModal()
-        if val == wx.ID_OK:    
+        if val == wx.ID_OK:
             self.tableau.parametres['colsep'] = ';'
             self.tableau.parametres['txtsep'] = '\"'
             self.tableau.parametres['encodage'] = sys.getdefaultencoding()
@@ -80,13 +80,13 @@ def get_table_param(self, filename) :
                      style=wx.DEFAULT_DIALOG_STYLE)
         dlg.CenterOnParent()
         val = dlg.ShowModal()
-        if val == wx.ID_OK:          
+        if val == wx.ID_OK:
             self.tableau.parametres['colsep'] = ';'
             self.tableau.parametres['txtsep'] = '\"'
             self.tableau.parametres['filetype'] = 'ods'
     else :
         val = False
-    if val == wx.ID_OK:       
+    if val == wx.ID_OK:
         if dlg.radio_box_1.GetSelection() == 0:
             self.tableau.firstrowiscolnames = True
         else:
@@ -115,7 +115,7 @@ def getCorpus(page) :
         return copy(page.corpus)
     else :
         return None
-            
+
 class SelectColumn :
     def __init__(self, parent, dictcol, actives, pathout, selected = None, dlg = False) :
         self.ira = parent
@@ -136,7 +136,7 @@ class SelectColumn :
                 for row in selected :
                     listcol.Select(orderlex[actives[row]])
             dial.CenterOnParent()
-            val = dial.ShowModal()        
+            val = dial.ShowModal()
             if val == wx.ID_OK :
                 last = listcol.GetFirstSelected()
                 lastl = [listcol.GetFirstSelected()]
@@ -162,7 +162,7 @@ class SelectColumn :
 
 
 class PrefSimi ( wx.Dialog ):
-    
+
     def __init__( self, parent, ID, paramsimi, indices, wordlist = None, selected = None, actives = None):
         wx.Dialog.__init__ ( self, None, id = wx.ID_ANY, title = _(u"Settings").decode('utf8'), pos = wx.DefaultPosition, size = wx.Size( -1,-1 ), style = wx.DEFAULT_DIALOG_STYLE )
         self.parent = parent
@@ -171,7 +171,7 @@ class PrefSimi ( wx.Dialog ):
         self.indices = indices
 
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
-        
+
         bSizer16 = wx.BoxSizer( wx.HORIZONTAL )
         if wordlist is not None :
             self.listcol = ListForSpec(self, self, wordlist, ['eff'])
@@ -193,69 +193,71 @@ class PrefSimi ( wx.Dialog ):
                 self.orderlex = dict([[self.listcol.getColumnText(i,0),i] for i in range(0,self.listcol.GetItemCount())])
                 for row in selected :
                     self.listcol.Select(self.orderlex[actives[row]])
-        
+
 
         fgSizer10 = wx.FlexGridSizer( 2, 1, 0, 0 )
         fgSizer10.SetFlexibleDirection( wx.BOTH )
         fgSizer10.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
+
         self.m_notebook1 = wx.Notebook( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_panel2 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
         bSizer18 = wx.BoxSizer( wx.VERTICAL )
-        
+
         fgSizer3 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer3.SetFlexibleDirection( wx.BOTH )
         fgSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
+
         if not self.paramsimi['first'] :
 
             self.m_staticText271 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Use previous coordinates").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
             self.m_staticText271.Wrap( -1 )
             fgSizer3.Add( self.m_staticText271, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-            
+
             self.check_coord = wx.CheckBox( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
             fgSizer3.Add( self.check_coord, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-            
+
             self.m_staticline36 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
             fgSizer3.Add( self.m_staticline36, 0, wx.EXPAND, 5 )
-            
+
             self.m_staticline37 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
             fgSizer3.Add( self.m_staticline37, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText3 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Score").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
         fgSizer3.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         choice1Choices = []
         self.choice1 = wx.Choice( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, self.indices, 0 )
         self.choice1.SetSelection( 0 )
         fgSizer3.Add( self.choice1, 0, wx.ALL, 5 )
-        
+
         self.m_staticline293 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline293, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline292 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline292, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText4 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Layout").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText4.Wrap( -1 )
         fgSizer3.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         choice2Choices = [ u"random", u"cercle", u"fruchterman reingold", u"kamada kawai", u"graphopt" ]
+        if 'word' in self.paramsimi :
+            choice2Choices += [u"spirale", u'spirale3D']
         self.choice2 = wx.Choice( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice2Choices, 0 )
         self.choice2.SetSelection( 0 )
         fgSizer3.Add( self.choice2, 0, wx.ALL, 5 )
-        
+
         self.m_staticline294 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline294, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline295 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline295, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText5 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Graphic type").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText5.Wrap( -1 )
         fgSizer3.Add( self.m_staticText5, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         choice3Choices = [ u"dynamique", u"statique", u"3D", u'web2D', u"web3D" ]
         self.choice3 = wx.Choice( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice3Choices, 0 )
         self.choice3.SetSelection( 0 )
@@ -268,101 +270,101 @@ class PrefSimi ( wx.Dialog ):
         hsizer.Add(label_format, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
         hsizer.Add(self.choix_format, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
         fgSizer3.Add( hsizer, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.m_staticline296 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline296, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline297 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline297, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText8 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Maximum tree").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText8.Wrap( -1 )
         fgSizer3.Add( self.m_staticText8, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.check1 = wx.CheckBox( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer3.Add( self.check1, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.m_staticline298 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline298, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline299 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline299, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText91 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Edges threshold").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText91.Wrap( -1 )
         fgSizer3.Add( self.m_staticText91, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         bSizer21 = wx.BoxSizer( wx.HORIZONTAL )
-        
+
         self.check_seuil = wx.CheckBox( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer21.Add( self.check_seuil, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.spin_seuil = wx.SpinCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 1, 10000, 1 )
         bSizer21.Add( self.spin_seuil, 0, wx.ALL, 5 )
-        
-        
+
+
         fgSizer3.Add( bSizer21, 1, wx.EXPAND, 5 )
-        
+
         self.m_staticline2910 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline2910, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline2911 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline2911, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText19 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Text on vertex").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText19.Wrap( -1 )
         fgSizer3.Add( self.m_staticText19, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.check_vlab = wx.CheckBox( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer3.Add( self.check_vlab, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.m_staticline2912 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline2912, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline2913 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline2913, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText20 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Score on edges").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText20.Wrap( -1 )
         fgSizer3.Add( self.m_staticText20, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.check_elab = wx.CheckBox( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer3.Add( self.check_elab, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.m_staticline39 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline39, 0, wx.EXPAND |wx.ALL, 5 )
-        
+
         self.m_staticline40 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline40, 0, wx.EXPAND |wx.ALL, 5 )
-        
+
         self.m_staticText321 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Edge curved").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText321.Wrap( -1 )
         fgSizer3.Add( self.m_staticText321, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.check_curved = wx.CheckBox( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizer3.Add( self.check_curved, 0, wx.ALL, 5 )        
-        
+        fgSizer3.Add( self.check_curved, 0, wx.ALL, 5 )
+
         self.m_staticline2914 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline2914, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline2915 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline2915, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText27 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Text size").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText27.Wrap( -1 )
         fgSizer3.Add( self.m_staticText27, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.spin_cex = wx.SpinCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 100, 10 )
         fgSizer3.Add( self.spin_cex, 0, wx.ALL, 5 )
-        
+
         self.m_staticline2916 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline2916, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline2917 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer3.Add( self.m_staticline2917, 0, wx.EXPAND, 5 )
-        
+
         bsizer34 = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         comtext =  wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Communities").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         comtext.Wrap( -1 )
         bsizer34.Add(comtext, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -385,19 +387,19 @@ class PrefSimi ( wx.Dialog ):
             self.m_staticText40 = wx.StaticText( self.m_panel2, wx.ID_ANY, _(u"Select a variable").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
             self.m_staticText40.Wrap( -1 )
             fgSizer3.Add( self.m_staticText40, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-            
+
             self.check_bystar = wx.CheckBox( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
             fgSizer3.Add( self.check_bystar, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-            
+
             self.m_staticline3200 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
             fgSizer3.Add( self.m_staticline3200, 0, wx.EXPAND, 5 )
             self.m_staticline3201 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
             fgSizer3.Add( self.m_staticline3201, 0, wx.EXPAND, 5 )
 
-        
+
         bSizer18.Add( fgSizer3, 0, wx.EXPAND, 5 )
-        
-        
+
+
         self.m_panel2.SetSizer( bSizer18 )
         self.m_panel2.Layout()
         bSizer18.Fit( self.m_panel2 )
@@ -406,333 +408,333 @@ class PrefSimi ( wx.Dialog ):
         fgSizer5 = wx.FlexGridSizer( 0, 3, 0, 0 )
         fgSizer5.SetFlexibleDirection( wx.BOTH )
         fgSizer5.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
+
         fgSizer51 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer51.SetFlexibleDirection( wx.BOTH )
         fgSizer51.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
+
         self.m_staticText6 = wx.StaticText( self.m_panel3, wx.ID_ANY, _(u"Picture size").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText6.Wrap( -1 )
         fgSizer51.Add( self.m_staticText6, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         fgSizer31 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer31.SetFlexibleDirection( wx.BOTH )
         fgSizer31.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
+
         self.m_staticText9 = wx.StaticText( self.m_panel3, wx.ID_ANY, _(u"height").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText9.Wrap( -1 )
         fgSizer31.Add( self.m_staticText9, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.spin_height = wx.SpinCtrl( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 10, 100000, 800 )
         fgSizer31.Add( self.spin_height, 0, wx.ALL, 5 )
-        
+
         self.m_staticText10 = wx.StaticText( self.m_panel3, wx.ID_ANY, _(u"width").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText10.Wrap( -1 )
         fgSizer31.Add( self.m_staticText10, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.spin_width = wx.SpinCtrl( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 10, 100000, 800 )
         fgSizer31.Add( self.spin_width, 0, wx.ALL, 5 )
-        
-        
+
+
         fgSizer51.Add( fgSizer31, 1, wx.EXPAND, 5 )
-        
+
         self.m_staticline3 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline3, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline4 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline4, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText101 = wx.StaticText( self.m_panel3, wx.ID_ANY, _(u"Vertex size proportional to frequency").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText101.Wrap( -1 )
         fgSizer51.Add( self.m_staticText101, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         bSizer7 = wx.BoxSizer( wx.HORIZONTAL )
-        
+
         bSizer9 = wx.BoxSizer( wx.VERTICAL )
-        
+
         self.check2 = wx.CheckBox( self.m_panel3, wx.ID_ANY, u"eff.", wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer9.Add( self.check2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.checki = wx.CheckBox( self.m_panel3, wx.ID_ANY, u"chi2", wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer9.Add( self.checki, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
-        
+
+
         bSizer7.Add( bSizer9, 0, wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         fgSizer7 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer7.SetFlexibleDirection( wx.BOTH )
         fgSizer7.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
+
         self.m_staticText11 = wx.StaticText( self.m_panel3, wx.ID_ANY, u"min", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText11.Wrap( -1 )
         fgSizer7.Add( self.m_staticText11, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.spin_tvmin = wx.SpinCtrl( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 100, 0 )
         fgSizer7.Add( self.spin_tvmin, 0, wx.ALL, 5 )
-        
+
         self.m_staticText12 = wx.StaticText( self.m_panel3, wx.ID_ANY, u"max", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText12.Wrap( -1 )
         fgSizer7.Add( self.m_staticText12, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.spin_tvmax = wx.SpinCtrl( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 100, 0 )
         fgSizer7.Add( self.spin_tvmax, 0, wx.ALL, 5 )
-        
-        
+
+
         bSizer7.Add( fgSizer7, 1, wx.EXPAND, 5 )
-        
-        
+
+
         fgSizer51.Add( bSizer7, 1, wx.EXPAND, 5 )
-        
+
         self.m_staticline31 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline31, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline32 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline32, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText1011 = wx.StaticText( self.m_panel3, wx.ID_ANY, _(u"Vertex text size proportional to frequency").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1011.Wrap( -1 )
         fgSizer51.Add( self.m_staticText1011, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         bSizer71 = wx.BoxSizer( wx.HORIZONTAL )
-        
+
         bSizer8 = wx.BoxSizer( wx.VERTICAL )
-        
+
         self.check_vcex = wx.CheckBox( self.m_panel3, wx.ID_ANY, u"eff.", wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer8.Add( self.check_vcex, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.checkit = wx.CheckBox( self.m_panel3, wx.ID_ANY, u"chi2", wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer8.Add( self.checkit, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
-        
+
+
         bSizer71.Add( bSizer8, 0, wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         fgSizer71 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer71.SetFlexibleDirection( wx.BOTH )
         fgSizer71.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
+
         self.m_staticText111 = wx.StaticText( self.m_panel3, wx.ID_ANY, u"min", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText111.Wrap( -1 )
         fgSizer71.Add( self.m_staticText111, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.spin_vcexmin = wx.SpinCtrl( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 100, 0 )
         fgSizer71.Add( self.spin_vcexmin, 0, wx.ALL, 5 )
-        
+
         self.m_staticText121 = wx.StaticText( self.m_panel3, wx.ID_ANY, u"max", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText121.Wrap( -1 )
         fgSizer71.Add( self.m_staticText121, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.spin_vcexmax = wx.SpinCtrl( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 100, 0 )
         fgSizer71.Add( self.spin_vcexmax, 0, wx.ALL, 5 )
-        
-        
+
+
         bSizer71.Add( fgSizer71, 1, wx.EXPAND, 5 )
-        
-        
+
+
         fgSizer51.Add( bSizer71, 1, wx.EXPAND, 5 )
-        
+
         self.m_staticline321 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline321, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline322 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline322, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText10111 = wx.StaticText( self.m_panel3, wx.ID_ANY, _(u"Edges width proportional to score").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText10111.Wrap( -1 )
         fgSizer51.Add( self.m_staticText10111, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         bSizer711 = wx.BoxSizer( wx.HORIZONTAL )
-        
+
         self.check3 = wx.CheckBox( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer711.Add( self.check3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         fgSizer711 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer711.SetFlexibleDirection( wx.BOTH )
         fgSizer711.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
+
         self.m_staticText1111 = wx.StaticText( self.m_panel3, wx.ID_ANY, u"min", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1111.Wrap( -1 )
         fgSizer711.Add( self.m_staticText1111, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.spin_temin = wx.SpinCtrl( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 100, 0 )
         fgSizer711.Add( self.spin_temin, 0, wx.ALL, 5 )
-        
+
         self.m_staticText1211 = wx.StaticText( self.m_panel3, wx.ID_ANY, u"max", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1211.Wrap( -1 )
         fgSizer711.Add( self.m_staticText1211, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.spin_temax = wx.SpinCtrl( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 100, 0 )
         fgSizer711.Add( self.spin_temax, 0, wx.ALL, 5 )
-        
-        
+
+
         bSizer711.Add( fgSizer711, 1, wx.EXPAND, 5 )
-        
-        
+
+
         fgSizer51.Add( bSizer711, 1, wx.EXPAND, 5 )
-        
+
         self.m_staticline33 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline33, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline34 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline34, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText28 = wx.StaticText( self.m_panel3, wx.ID_ANY, _(u"Gray scale on text proportional to frequency (0=black, 1=white)").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText28.Wrap( -1 )
         fgSizer51.Add( self.m_staticText28, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         bSizer10 = wx.BoxSizer( wx.HORIZONTAL )
-        
+
         self.m_checkBox14 = wx.CheckBox( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer10.Add( self.m_checkBox14, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         bSizer11 = wx.BoxSizer( wx.VERTICAL )
-        
+
         bSizer12 = wx.BoxSizer( wx.HORIZONTAL )
-        
+
         self.m_staticText31 = wx.StaticText( self.m_panel3, wx.ID_ANY, u"min", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText31.Wrap( -1 )
         bSizer12.Add( self.m_staticText31, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.m_spinCtrl14 = wx.SpinCtrl( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 100, 0 )
         bSizer12.Add( self.m_spinCtrl14, 0, wx.ALL, 5 )
-        
-        
+
+
         bSizer11.Add( bSizer12, 1, wx.EXPAND, 5 )
-        
+
         bSizer13 = wx.BoxSizer( wx.HORIZONTAL )
-        
+
         self.m_staticText32 = wx.StaticText( self.m_panel3, wx.ID_ANY, u"max", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText32.Wrap( -1 )
         bSizer13.Add( self.m_staticText32, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.m_spinCtrl15 = wx.SpinCtrl( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 100, 10 )
         bSizer13.Add( self.m_spinCtrl15, 0, wx.ALL, 5 )
-        
-        
+
+
         bSizer11.Add( bSizer13, 1, wx.EXPAND, 5 )
-        
-        
+
+
         bSizer10.Add( bSizer11, 1, wx.EXPAND, 5 )
-        
-        
+
+
         fgSizer51.Add( bSizer10, 1, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
-        
+
         self.m_staticline3311 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline3311, 0, wx.EXPAND |wx.ALL, 5 )
-        
+
         self.m_staticline33111 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline33111, 0, wx.EXPAND |wx.ALL, 5 )
-        
+
         bSizer5 = wx.BoxSizer( wx.HORIZONTAL )
-        
+
         self.m_staticText21 = wx.StaticText( self.m_panel3, wx.ID_ANY, _(u"Vertex color").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText21.Wrap( -1 )
         bSizer5.Add( self.m_staticText21, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.cols = wx.ColourPickerCtrl( self.m_panel3, wx.ID_ANY, wx.Colour( 255, 0, 0 ), wx.DefaultPosition, wx.DefaultSize, wx.CLRP_DEFAULT_STYLE )
         bSizer5.Add( self.cols, 0, wx.ALL, 5 )
-        
-        
+
+
         fgSizer51.Add( bSizer5, 1, wx.EXPAND, 5 )
-        
+
         bSizer6 = wx.BoxSizer( wx.HORIZONTAL )
-        
+
         self.m_staticText22 = wx.StaticText( self.m_panel3, wx.ID_ANY, _(u"Edges color").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText22.Wrap( -1 )
         bSizer6.Add( self.m_staticText22, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.cola = wx.ColourPickerCtrl( self.m_panel3, wx.ID_ANY, wx.Colour( 208, 208, 208 ), wx.DefaultPosition, wx.DefaultSize, wx.CLRP_DEFAULT_STYLE )
         bSizer6.Add( self.cola, 0, wx.ALL, 5 )
-        
-        
+
+
         fgSizer51.Add( bSizer6, 1, wx.EXPAND, 5 )
-        
+
         self.m_staticline331 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline331, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline332 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline332, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText23 = wx.StaticText( self.m_panel3, wx.ID_ANY, _(u"Vertex size").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText23.Wrap( -1 )
         fgSizer51.Add( self.m_staticText23, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         bSizer72 = wx.BoxSizer( wx.HORIZONTAL )
-        
+
         self.check_s_size = wx.CheckBox( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer72.Add( self.check_s_size, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.spin_tv = wx.SpinCtrl( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 100, 10 )
         bSizer72.Add( self.spin_tv, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
-        
+
+
         fgSizer51.Add( bSizer72, 1, wx.EXPAND, 5 )
-        
+
         self.m_staticline333 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline333, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline334 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline334, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText24 = wx.StaticText( self.m_panel3, wx.ID_ANY, _(u"Spheres transparency").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText24.Wrap( -1 )
         fgSizer51.Add( self.m_staticText24, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.slider_sphere = wx.Slider( self.m_panel3, wx.ID_ANY, 10, 0, 100, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL|wx.SL_LABELS )
         fgSizer51.Add( self.slider_sphere, 0, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.m_staticline335 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline335, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline336 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline336, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticText25 = wx.StaticText( self.m_panel3, wx.ID_ANY, _(u"Make a movie").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText25.Wrap( -1 )
         fgSizer51.Add( self.m_staticText25, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.film = wx.CheckBox( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer51.Add( self.film, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-        
+
         self.m_staticline2918 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline2918, 0, wx.EXPAND, 5 )
-        
+
         self.m_staticline2919 = wx.StaticLine( self.m_panel3, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer51.Add( self.m_staticline2919, 0, wx.EXPAND, 5 )
-        
-        
+
+
         fgSizer51.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
-        
-        
+
+
         fgSizer5.Add( fgSizer51, 1, wx.EXPAND, 5 )
-        
-        
+
+
         self.m_panel3.SetSizer( fgSizer5 )
         self.m_panel3.Layout()
         fgSizer5.Fit( self.m_panel3 )
         self.m_notebook1.AddPage( self.m_panel3, _(u"Graphical settings").decode('utf8'), False )
-        
+
         fgSizer10.Add( self.m_notebook1, 1, wx.EXPAND |wx.ALL, 5 )
-        
+
         m_sdbSizer2 = wx.StdDialogButtonSizer()
         self.m_sdbSizer2OK = wx.Button( self, wx.ID_OK )
         m_sdbSizer2.AddButton( self.m_sdbSizer2OK )
         self.m_sdbSizer2Cancel = wx.Button( self, wx.ID_CANCEL )
         m_sdbSizer2.AddButton( self.m_sdbSizer2Cancel )
         m_sdbSizer2.Realize();
-        
+
         fgSizer10.Add( m_sdbSizer2, 1, wx.EXPAND, 5 )
-        
-        
+
+
         bSizer16.Add( fgSizer10, 1, wx.EXPAND, 5 )
-        
-        
+
+
         self.SetSizer( bSizer16 )
         self.Layout()
         bSizer16.Fit( self )
-        
+
         self.Centre( wx.BOTH )
         self.__set_properties()
- 
+
         # Connect Events
         if not self.paramsimi['first'] :
             self.check_coord.Bind( wx.EVT_CHECKBOX, self.OnKeepCoords )
@@ -748,7 +750,7 @@ class PrefSimi ( wx.Dialog ):
         self.listcol.Bind( wx.EVT_LIST_ITEM_DESELECTED, self.ChangeCount)
         self.butcount.Bind( wx.EVT_BUTTON, self.ChangeCount)
         self.ChangeCount(wx.EVT_BUTTON)
-        
+
 
     def __set_properties(self):
         self.choice1.SetSelection(self.paramsimi['coeff'])
@@ -797,7 +799,9 @@ class PrefSimi ( wx.Dialog ):
         self.choix_com.SetSelection(self.paramsimi['communities'])
         self.halo.SetValue(self.paramsimi['halo'])
         self.check_curved.SetValue(self.paramsimi.get('edgecurved', True))
-    
+        if self.paramsimi.get('word', False) and self.paramsimi['first'] :
+            self.choice2.SetSelection(5)
+
     def ChangeCount(self, evt) :
         self.textcount.SetValue('%i' % self.listcol.GetSelectedItemCount())
 
@@ -855,7 +859,7 @@ class PrefSimi ( wx.Dialog ):
             if 'checkit' in dir(self) :
                 if self.checkit.GetValue() :
                     self.checkit.SetValue(False)
-    
+
     def OnChangeType(self, event) :
         if event.GetInt() != 1 :
             self.spin_width.Enable(False)
@@ -891,17 +895,17 @@ class PrefSimi ( wx.Dialog ):
 
 
 class PrepSimi :
-    def __init__(self, parent, source, parametres, pathout, actives, indices_simi, wordlist = None, selected = None) :    
+    def __init__(self, parent, source, parametres, pathout, actives, indices_simi, wordlist = None, selected = None) :
         self.parametres = parametres
         self.etline = []
-        self.dial = PrefSimi(parent, -1, self.parametres, indices_simi, wordlist = wordlist, selected = selected, actives = actives) 
+        self.dial = PrefSimi(parent, -1, self.parametres, indices_simi, wordlist = wordlist, selected = selected, actives = actives)
         self.dial.CenterOnParent()
         self.val = self.dial.ShowModal()
         if self.val == wx.ID_OK :
             if 'bystar' in self.parametres :
                 if self.dial.check_bystar.GetValue() :
                     variables = treat_var_mod(self.parametres['stars'])
-                    vardial = OptLexi(parent, force_chi = True) 
+                    vardial = OptLexi(parent, force_chi = True)
                     vardial.listet = self.parametres['stars']
                     vardial.variables = [v for v in variables]
                     for et in vardial.variables :
@@ -990,7 +994,7 @@ class PrepSimi :
         self.parametres.update(param)
 
 class CreateTgenDialog ( wx.Frame ):
-    
+
     def __init__( self, parent, lemlist, tgen = None, tgens = None ):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = _(u'Tgen Creator').decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL|wx.FRAME_FLOAT_ON_PARENT|wx.STAY_ON_TOP )
         self.ira = wx.GetApp().GetTopWindow()
@@ -998,64 +1002,64 @@ class CreateTgenDialog ( wx.Frame ):
         self.tgens = tgens
         self.edit = False
         self.parent = parent
-        
+
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
-        
+
         bSizer2 = wx.BoxSizer( wx.VERTICAL )
-        
+
         namepan = wx.Panel(self, -1)
-        
+
         fgSizer3 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer3.SetFlexibleDirection( wx.BOTH )
         fgSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
+
         self.m_staticText3 = wx.StaticText( namepan, wx.ID_ANY, _(u"Name").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
-        
+
         fgSizer3.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
-        
+
         self.m_textCtrl1 = wx.TextCtrl( namepan, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_textCtrl1.SetMinSize( wx.Size( 250,-1 ) )
-        
+
         fgSizer3.Add( self.m_textCtrl1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         namepan.SetSizer( fgSizer3 )
-        
+
         bSizer2.Add( namepan, 1, wx.EXPAND, 5 )
-        
+
         self.ip = VItemsPicker(self,-1, lemlist, _(u'Forms').decode('utf8'), _('Selection').decode('utf8'))
         self.ip._source.SetMinSize( wx.Size( 350, 400 ) )
-        
+
         bSizer2.Add( self.ip, 0, wx.ALL, 5 )
-        
+
         butpanel = wx.Panel(self, -1)
-        
+
         m_sdbSizer3 = wx.StdDialogButtonSizer()
         self.m_sdbSizer3OK = wx.Button( butpanel, wx.ID_OK )
         m_sdbSizer3.AddButton( self.m_sdbSizer3OK )
         self.m_sdbSizer3Cancel = wx.Button( butpanel, wx.ID_CANCEL )
         m_sdbSizer3.AddButton( self.m_sdbSizer3Cancel )
         m_sdbSizer3.Realize();
-        
+
         butpanel.SetSizer( m_sdbSizer3 )
-        
+
         bSizer2.Add( butpanel, 1, wx.EXPAND, 5 )
-        
-        
+
+
         self.SetSizer( bSizer2 )
         self.Layout()
         bSizer2.Fit( self )
-        
+
         self.Centre( wx.BOTH )
-        
+
         self.m_textCtrl1.Bind( wx.EVT_TEXT, self.OnTextEnter )
         self.ip.Bind(EVT_IP_SELECTION_CHANGED, self.OnSelectionChange)
         self.m_sdbSizer3OK.Bind(wx.EVT_BUTTON, self.OnClose)
         self.m_sdbSizer3Cancel.Bind(wx.EVT_BUTTON, self.OnCancel)
-        
+
         #self.ip.SetItems(lemlist)
         self.m_sdbSizer3OK.Enable(False)
-        
+
         if tgen is not None :
             self.m_textCtrl1.SetValue(tgen)
             self.ip._destData = dict([[i,[word,'']] for i, word in enumerate(tgens[tgen])])
@@ -1065,10 +1069,10 @@ class CreateTgenDialog ( wx.Frame ):
             self.edit = True
         else :
             self.edit = False
-    
+
     def __del__( self ):
         pass
-    
+
     def OnTextEnter(self, evt):
         if self.m_textCtrl1.GetValue() != '' and self.m_textCtrl1.GetValue() not in self.tgens and self.ip.GetSelections() != []:
             self.m_sdbSizer3OK.Enable(True)
@@ -1076,7 +1080,7 @@ class CreateTgenDialog ( wx.Frame ):
             self.m_sdbSizer3OK.Enable(False)
         if self.m_textCtrl1.GetValue() != '' and self.ip.GetSelections() and self.edit:
             self.m_sdbSizer3OK.Enable(True)
-    
+
     def OnSelectionChange(self, evt):
         if self.ip.GetSelections() != [] and self.m_textCtrl1.GetValue() != '' and self.m_textCtrl1.GetValue() not in self.tgens :
             self.m_sdbSizer3OK.Enable(True)
@@ -1084,15 +1088,15 @@ class CreateTgenDialog ( wx.Frame ):
             self.m_sdbSizer3OK.Enable(False)
         if self.m_textCtrl1.GetValue() != '' and self.ip.GetSelections() and self.edit:
             self.m_sdbSizer3OK.Enable(True)
-    
+
     def OnClose(self, evt):
         self.Close()
-    
+
     def OnCancel(self, evt):
         self.Destroy()
 
 class TGenFrame ( wx.Frame ):
-    
+
     def __init__( self, parent, corpus, Tgen ):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Tgen", pos = wx.DefaultPosition, size = wx.Size( -1, -1 ), style = wx.CLOSE_BOX|wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL|wx.STAY_ON_TOP )
         self.ira = wx.GetApp().GetTopWindow()
@@ -1102,82 +1106,82 @@ class TGenFrame ( wx.Frame ):
         self.corpus = corpus
         self.activetgen = None
         self.panel = wx.Panel(self, wx.ID_ANY)
-        
+
         #self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
-        
+
         panelsizer = wx.BoxSizer( wx.VERTICAL )
-        
+
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
-        
+
         fgSizer1 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
+
         self.m_staticText1 = wx.StaticText( self.panel, wx.ID_ANY, u"Tgen", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText1.Wrap( -1 )
         fgSizer1.Add( self.m_staticText1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.m_staticText2 = wx.StaticText( self.panel, wx.ID_ANY, _(u"Content").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         tgensChoices = Tgen.tgen.keys()
         self.tgens = wx.ListBox( self.panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, tgensChoices, 0 )
         self.tgens.SetMinSize( wx.Size( 250,350 ) )
-        
+
         fgSizer1.Add( self.tgens, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
-        
+
         tgencontentChoices = []
         self.tgencontent = wx.ListBox( self.panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, tgencontentChoices, 0|wx.VSCROLL )
         self.tgencontent.SetMinSize( wx.Size( 250,350 ) )
-        
+
         fgSizer1.Add( self.tgencontent, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
-        
+
         fgSizer2 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer2.SetFlexibleDirection( wx.BOTH )
         fgSizer2.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
+
         self.but_new = wx.Button( self.panel, wx.ID_ANY, _(u"New...").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer2.Add( self.but_new, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.but_del = wx.Button( self.panel, wx.ID_ANY, _(u"Delete").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer2.Add( self.but_del, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
-        
+
+
         fgSizer1.Add( fgSizer2, 0, wx.EXPAND, 0 )
-        
+
         fgSizer3 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer3.SetFlexibleDirection( wx.BOTH )
         fgSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         self.but_edit = wx.Button( self.panel, wx.ID_ANY, _(u"Edit").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer3.Add( self.but_edit, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+
         self.but_compute = wx.Button( self.panel, wx.ID_ANY, _(u"Compute").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizer3.Add( self.but_compute, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )      
+        fgSizer3.Add( self.but_compute, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
         fgSizer1.Add( fgSizer3, 0, wx.EXPAND, 0 )
 
         bSizer1.Add( fgSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
-        
-        
+
+
         m_sdbSizer2 = wx.StdDialogButtonSizer()
         self.m_sdbSizer2OK = wx.Button( self.panel, wx.ID_OK )
         m_sdbSizer2.AddButton( self.m_sdbSizer2OK )
         #self.m_sdbSizer2Cancel = wx.Button( self, wx.ID_CANCEL )
         #m_sdbSizer2.AddButton( self.m_sdbSizer2Cancel )
         m_sdbSizer2.Realize();
-        
+
         bSizer1.Add( m_sdbSizer2, 0, wx.EXPAND, 5 )
-        
+
         #panelsizer.Add(bSizer1, 0, wx.EXPAND, 5 )
-        
+
         #panel.SetSizer( panelsizer )
         self.panel.SetSizer( bSizer1 )
         self.panel.Layout()
         bSizer1.Fit( self )
-        
+
         self.Centre( wx.BOTH )
-        
+
         # Connect Events
         self.tgens.Bind( wx.EVT_LISTBOX, self.GetContent )
         self.but_new.Bind( wx.EVT_BUTTON, self.OnNewTgen )
@@ -1185,7 +1189,7 @@ class TGenFrame ( wx.Frame ):
         self.but_edit.Bind( wx.EVT_BUTTON, self.OnEditTgen )
         self.but_compute.Bind(wx.EVT_BUTTON, self.OnCompute)
         self.m_sdbSizer2OK.Bind( wx.EVT_BUTTON, self.OnOK )
-        
+
     def __del__( self ):
         pass
 
@@ -1195,7 +1199,7 @@ class TGenFrame ( wx.Frame ):
             self.tgencontent.Clear()
             for word in self.Tgen[tgen] :
                 self.tgencontent.Append(word)
-    
+
     def OnNewTgen( self, event, tgen = None ):
         if tgen is None :
             self.dial = CreateTgenDialog(self, dict([[i, [lem, self.corpus.lems[lem].freq, self.corpus.lems[lem].gram]] for i, lem in enumerate(self.corpus.lems.keys())]), tgens = self.Tgen.tgen)
@@ -1205,7 +1209,7 @@ class TGenFrame ( wx.Frame ):
             self.activetgen = tgen
         self.dial.Show()
         self.dial.Bind(wx.EVT_CLOSE, self.OnDialClose)
-    
+
     def OnDeleteTgen( self, event ):
         if self.tgens.GetSelection() != -1 :
             tgens = self.tgens.GetItems()
@@ -1216,7 +1220,7 @@ class TGenFrame ( wx.Frame ):
             for val in self.Tgen.tgen :
                 self.tgens.Append(val)
         event.Skip()
-    
+
     def OnEditTgen( self, event ):
         if self.tgens.GetSelection() != -1 :
             tgens = self.tgens.GetItems()
@@ -1228,14 +1232,14 @@ class TGenFrame ( wx.Frame ):
             self.dial.ip._source.selected = dict(zip(self.Tgen.tgen[tgen], self.Tgen.tgen[tgen]))
             self.dial.Show()
         event.Skip()
-    
+
     def OnCompute(self, evt):
         ira = wx.GetApp().GetTopWindow()
         ira.tree.OnTgenCompute(evt)
-    
+
     def OnOK(self, evt):
         self.Destroy()
-    
+
     def OnDialClose(self, evt):
         if self.dial.edit :
             del self.Tgen.tgen[self.activetgen]
@@ -1265,7 +1269,7 @@ class ExportMetaTable :
             dlg.ShowModal()
             dlg.Destroy()
         else :
-            dial.Destroy()         
+            dial.Destroy()
 
 
 def redosimi(self, evt) :
@@ -1283,7 +1287,7 @@ def redosimi(self, evt) :
         dictcol = dict([[i, [self.actives[i], int(act_nb[i])]] for i, val in enumerate(self.actives)])
     else :
         dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
-    #res = SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], selected = selected, dlg = True) 
+    #res = SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], selected = selected, dlg = True)
     #if res.ok :
     if evt is not None :
         prep = PrepSimi(self.ira, self, self.parametres,self.pathout['selected.csv'], self.actives, indices_simi, wordlist = dictcol, selected = selected)
@@ -1317,7 +1321,7 @@ def redosimi(self, evt) :
                   #'bargraphw' : 60*int(self.param['clnb']),
                   }
                 web = WebExport(self.ira, parametres)
-                fileout = web.exportsimi()             
+                fileout = web.exportsimi()
             else :
                 fileout = script.filename
             if os.path.exists(self.pathout['liste_graph']):
