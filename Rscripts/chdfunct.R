@@ -98,12 +98,13 @@ AddCorrelationOk<-function(afc) {
 	rowcoord<-afc$rowcoord
 	colcoord<-afc$colcoord
 	factor <- ncol(rowcoord)
+	
 	hypo<-function(rowcoord,ligne) {
 		somme<-0
 		for (i in 1:factor) {
 			somme<-somme+(rowcoord[ligne,i])^2
 		}
-	sqrt(somme)
+		sqrt(somme)
 	}
 	cor<-function(d,hypo) {
 		d/hypo
@@ -117,8 +118,17 @@ AddCorrelationOk<-function(afc) {
 		}
 	out
 	}
-	afc$rowcrl<-CompCrl(rowcoord)
-	afc$colcrl<-CompCrl(colcoord)
+
+	get.corr <- function(rowcol) {
+		sqrowcol <- rowcol^2
+		sqrowcol <- sqrt(rowSums(sqrowcol))
+		corr <- rowcol / sqrowcol
+		corr
+	}
+	#afc$rowcrl<-CompCrl(rowcoord)
+	afc$rowcrl <- get.corr(rowcoord)
+	#afc$colcrl<-CompCrl(colcoord)
+	afc$colcrl<-get.corr(colcoord)
 	afc
 }
 
@@ -347,7 +357,79 @@ build.prof.tgen <- function(x) {
     res <- list(chi2 = chi2, pchi2 = pchi2)
 }
 
+
+new.build.prof <- function(x,dataclasse,clusternb,lim=2) {
+	cl <- dataclasse[,ncol(dataclasse)]
+	nst <- length(which(cl != 0))
+	rs <- rowSums(x)
+	mod.names<-rownames(x)
+	lnbligne <- list()
+	lchi <- list()
+	prof <- list()
+	aprof <- list()
+	for (classe in 1:clusternb) {
+		lnbligne[[classe]]<-length(which(cl==classe))
+		tmpprof <- data.frame()
+		tmpanti <- data.frame()
+		obs1 <- x[,classe] #1,1
+		obs2 <- rs - obs1 #1,2
+	    obs3 <- lnbligne[[classe]] - obs1	#2,1
+		obs4 <- nst - (obs1 + obs2 + obs3) #2,2
+		exp1 <- ((obs1 + obs3) * (obs1 + obs2)) / nst
+		exp2 <- ((obs2 + obs1) * (obs2 + obs4)) / nst
+		exp3 <- ((obs3 + obs4) * (obs3 + obs1)) / nst
+		exp4 <- ((obs4 + obs3) * (obs4 + obs2)) / nst
+		chi1 <- ((obs1 - exp1)^2) / exp1
+		chi2 <- ((obs2 - exp2)^2) / exp2
+		chi3 <- ((obs3 - exp3)^2) / exp3
+		chi4 <- ((obs4 - exp4)^2) / exp4
+		chi <- chi1 + chi2 + chi3 + chi4	
+		chi[which(is.na(chi)==T)] <- 0
+		tochange <- ifelse(obs1 > exp1, 1, -1)
+		lchi[[classe]] <- chi * tochange
+		tokeep <- which(lchi[[classe]] > lim)
+		if (length(tokeep)) {
+			tmpprof[1:length(tokeep),1] <- obs1[tokeep]
+			tmpprof[,2] <- rs[tokeep]
+			tmpprof[,3] <- round((obs1/rs)*100, digits=2)[tokeep]
+			tmpprof[,4] <- round(lchi[[classe]], digits=3)[tokeep]
+			tmpprof[,5] <- mod.names[tokeep] 
+			tmpprof[,6] <- pchisq(lchi[[classe]] ,1, lower.tail=F)[tokeep]
+		}
+		prof[[classe]] <- tmpprof
+		toanti <- which(lchi[[classe]] < -lim)
+		if (length(toanti)) {
+			tmpanti[1:length(toanti),1] <- obs1[toanti]
+			tmpanti[,2] <- rs[toanti]
+			tmpanti[,3] <- round((obs1/rs)*100, digits=2)[toanti]
+			tmpanti[,4] <- round(lchi[[classe]], digits=3)[toanti]
+			tmpanti[,5] <- mod.names[toanti] 
+			tmpanti[,6] <- pchisq(-lchi[[classe]] ,1, lower.tail=F)[toanti]
+		}
+		aprof[[classe]] <- tmpanti
+		if (length(prof[[classe]])!=0) {
+			prof[[classe]]<-prof[[classe]][order(prof[[classe]][,4],decreasing=TRUE),]
+		}
+		if (length(aprof[[classe]])!=0) {
+			aprof[[classe]]<-aprof[[classe]][order(aprof[[classe]][,4]),]	
+		}
+	}
+    tablechi <- do.call(cbind, lchi)
+	tablep <- pchisq(tablechi,1, lower.tail=F)
+	tablep <- round(tablep, digits=3)
+	tablechi <- round(tablechi, digits=3)
+	out <- list()
+	out[[1]] <- tablep
+	out[[2]] <- tablechi
+	out[[3]] <- cbind(x, rowSums(x))
+    out[[4]] <- prof	
+	out[[5]] <- aprof
+	out
+}
+
+
 BuildProf<- function(x,dataclasse,clusternb,lim=2) {
+	print('build prof')
 	####
 	#r.names<-rownames(x)
 	#x<-as.matrix(x)
@@ -453,6 +535,7 @@ BuildProf<- function(x,dataclasse,clusternb,lim=2) {
 			aprof[[classe]]<-aprof[[classe]][order(aprof[[classe]][,4]),]	
 		}
 	}
+	print('fini build prof')
 	output<-list()
 	output[[1]]<-tablep
 	output[[2]]<-tablesqr
