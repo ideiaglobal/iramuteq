@@ -20,7 +20,7 @@ def normpath_win32(path) :
     if sys.platform == 'win32' and path.startswith('\\') and not path.startswith('\\\\') :
         path = '\\' + path
     return path
-    
+
 class PathOut :
     def __init__(self, filename = None, analyse_type = '', dirout = None) :
         if filename is not None :
@@ -30,11 +30,11 @@ class PathOut :
             self.filename, self.fileext = os.path.splitext(self.filebasename)
         self.analyse = analyse_type
         #self.dirout = self.mkdirout(dirout)
-        if dirout is not None: 
+        if dirout is not None:
             self.dirout = os.path.abspath(dirout)
         elif filename is not None and dirout is None:
             self.dirout = os.path.abspath(self.directory)
-        self.d = {} 
+        self.d = {}
 
     def mkdirout(self) :
         dirout = os.path.join(self.dirout, self.filename + '_' + self.analyse + '_')
@@ -45,7 +45,7 @@ class PathOut :
             tdirout = dirout + `nb`
         self.name = os.path.splitext(tdirout)[1]
         return tdirout
-    
+
     def makenew(self, filename, ext):
         nb = 1
         newfile = '_'.join([os.path.join(self.dirout, filename), '%i' % nb]) + '.' + ext
