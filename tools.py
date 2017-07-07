@@ -214,4 +214,3 @@ def converttabletocorpus(table, fileout, enc='UTF8') :
 if __name__ == '__main__' :
     #SplitFromVar(parametres)
     ExtractMods(parametres, True)
-    #end
