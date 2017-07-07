@@ -11,6 +11,7 @@ class WebExport :
         self.parametres = parametres
         self.jspathin = os.path.join(self.parent.AppliPath, 'webexport','js')
         self.csspathin = os.path.join(self.parent.AppliPath, 'webexport', 'css')
+        self.imgpathin = os.path.join(self.parent.AppliPath, 'webexport', 'images')
         if not 'dirout' in self.parametres :
             self.pathout = PathOut(filename = self.parametres['gexffile'], analyse_type='webexport')
             dirout = self.pathout.mkdirout()
@@ -22,14 +23,19 @@ class WebExport :
     def makedirout(self) :
         jss = os.listdir(self.jspathin)
         css = os.listdir(self.csspathin)
+        img = os.listdir(self.imgpathin)
         jspathout = os.path.join(self.pathout.dirout, 'js')
         cssout =  os.path.join(self.pathout.dirout, 'css')
+        imgout = os.path.join(self.pathout.dirout, 'images')
         os.makedirs(jspathout)
         os.makedirs(cssout)
+        os.makedirs(imgout)
         for f in jss :
             copyfile(os.path.join(self.jspathin, f), os.path.join(jspathout, f))
         for f in css :
             copyfile(os.path.join(self.csspathin, f), os.path.join(cssout, f))
+        for f in img :
+            copyfile(os.path.join(self.imgpathin, f), os.path.join(imgout, f))
 
     def exportafc(self) :
         copyfile(self.parametres['gexffile'], os.path.join(self.pathout.dirout, os.path.basename(self.parametres['gexffile'])))
