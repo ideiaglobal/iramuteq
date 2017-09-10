@@ -24,7 +24,7 @@ import sys
 #          "green": (114, 195, 0), "red": (255, 0, 75),
 #          "blue": (0, 131, 255), "clear": (0, 131, 255),
 #          "yellow": (255, 187, 0), "light_gray": (118, 118, 118)}
- 
+
 
 # Normalize to [0,1] and make blender materials
 def make_colors(colors):
@@ -83,7 +83,7 @@ def draw_network(network, edge_thickness=0.25, node_size=3, directed=False, sphe
     # Keep separate references to shapes to be smoothed
     shapes_to_smooth = []
     #val to div coordonnate
-    divval = 0.1
+    divval = 0.05
 
     # Draw nodes
     for key, node in network["nodes"].items():
@@ -98,7 +98,7 @@ def draw_network(network, edge_thickness=0.25, node_size=3, directed=False, sphe
             node_sphere.data = sphere.data.copy()
             node_sphere.location = [val/divval for val in node["location"]]
             #node_sphere.dimensions = [node_size] * 3
-            node_sphere.dimensions = [node["weight"]/10] * 3
+            node_sphere.dimensions = [node["weight"]] * 3
             #newmat = bpy.data.materials[col]
             #newmat.alpha = 0.01
             node_sphere.active_material = bpy.data.materials[col + 'sphere']
@@ -114,15 +114,21 @@ def draw_network(network, edge_thickness=0.25, node_size=3, directed=False, sphe
         bpy.ops.object.editmode_toggle()
         bpy.ops.font.delete()
         bpy.ops.font.text_insert(text=key)
-        
         bpy.ops.object.editmode_toggle()
-        bpy.data.curves[bpy.context.active_object.name].size = node["weight"] /10
+        bpy.data.curves[bpy.context.active_object.name].size = node["weight"]/2
         bpy.data.curves[bpy.context.active_object.name].bevel_depth = 0.044
         bpy.data.curves[bpy.context.active_object.name].offset = 0
         bpy.data.curves[bpy.context.active_object.name].extrude = 0.2
         bpy.data.curves[bpy.context.active_object.name].align = "CENTER"
         bpy.context.active_object.rotation_euler = [1.5708,0,1.5708]
         bpy.context.active_object.active_material = bpy.data.materials[col]
+        #bpy.ops.object.mode_set(mode='OBJECT')
+
+        #Extrude the text
+        #bpy.context.object.data.extrude = 0.03
+
+        #Convert text to mesh
+        #bpy.context.active_object.convert(target='MESH', keep_original=False)
         const = bpy.context.active_object.constraints.new(type='TRACK_TO')
         const.target = bpy.data.objects['Camera']
         const.track_axis = "TRACK_Z"
@@ -156,7 +162,7 @@ def draw_network(network, edge_thickness=0.25, node_size=3, directed=False, sphe
         # Copy mesh primitive to create edge
         edge_cylinder = cylinder.copy()
         edge_cylinder.data = cylinder.data.copy()
-        edge_cylinder.dimensions = [float(edge['weight'])*10] * 2 + [mag - node_size]
+        edge_cylinder.dimensions = [float(edge['weight'])/10] * 2 + [mag - node_size]
         #edge_cylinder.dimensions = [edge_thickness] * 2 + [mag - node_size]
         edge_cylinder.location = cent
         edge_cylinder.rotation_mode = "AXIS_ANGLE"
