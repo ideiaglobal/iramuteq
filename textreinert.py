@@ -6,8 +6,8 @@
 import os
 from time import time
 from analysetxt import AnalyseText
-from OptionAlceste import OptionAlc 
-from PrintRScript import RchdTxt, ReinertTxtProf, TgenProfScript
+from OptionAlceste import OptionAlc
+from PrintRScript import RchdTxt, ReinertTxtProf, TgenProfScript, ReDoProfScript
 from layout import PrintRapport
 from chemins import ChdTxtPathOut, PathOut
 from functions import DoConf, print_liste, TGen
@@ -45,14 +45,17 @@ class Reinert(AnalyseText) :
         self.doR(Rscript, dlg=self.dlg, message='profils et A.F.C. ...')
         self.time = time() - self.t1
         minutes, seconds = divmod(self.time, 60)
-        hours, minutes = divmod(minutes, 60)            
+        hours, minutes = divmod(minutes, 60)
         self.parametres['time'] = '%.0fh %.0fm %.0fs' % (hours, minutes, seconds)
         self.print_graph_files()
 
     def preferences(self) :
+        print 'parametres en entree config alceste', self.parametres
         parametres = DoConf(self.parent.ConfigPath['reinert']).getoptions('ALCESTE')
+        print 'parametres apres doconf', parametres
         parametres['corpus'] = self.corpus
         parametres['pathout'] = self.pathout
+        parametres['lem'] = self.parametres['lem']
         self.dial = OptionAlc(self.parent, parametres)
         self.dial.CenterOnParent()
         self.dialok = self.dial.ShowModal()
@@ -71,7 +74,8 @@ class Reinert(AnalyseText) :
             DoConf(self.parent.ConfigPath['reinert']).makeoptions(['ALCESTE'], [parametres])
             self.dial.Destroy()
             print parametres
-            return parametres
+            self.parametres.update(parametres)
+            return self.parametres
         else :
             self.dial.Destroy()
             return None
@@ -108,29 +112,36 @@ class TgenProf(AnalyseText):
         self.pathout = PathOut(dirout = self.parametres['pathout'])
         self.cluster_size = [len(classe) for classe in corpus.lc]
         self.doanalyse()
-        
-    def doanalyse(self):    
+
+    def doanalyse(self):
         self.tgen = TGen(path = self.parametres['tgenpath'], encoding = self.ira.syscoding)
         self.tgen.read(self.tgen.path)
         #self.parametres['etoiles'].sort()
-        self.parametres['tgeneff'] = os.path.join(self.parametres['pathout'], 'tgeneff.csv') 
+        self.parametres['tgeneff'] = os.path.join(self.parametres['pathout'], 'tgeneff.csv')
         tgenst = self.corpus.make_tgen_profile(self.tgen.tgen, self.corpus.lc)
         clnames = ['cluster_%03d' % i for i in range(1, len(self.cluster_size) + 1)]
         et = dict(zip(clnames, self.cluster_size))
-        tgenst = dict([[line[0], dict(zip(clnames, line[1:]))] for line in tgenst]) 
+        tgenst = dict([[line[0], dict(zip(clnames, line[1:]))] for line in tgenst])
         self.tgen.writetable(self.parametres['tgeneff'], tgenst, et)
         self.parametres['tgenspec'] = os.path.join(self.parametres['pathout'], 'tgenchi2.csv')
         self.parametres['tgenlemeff'] = os.path.join(self.parametres['pathout'], 'tgenlemeff.csv')
         self.parametres['tgenlemspec'] = os.path.join(self.parametres['pathout'], 'tgenlemchi2.csv')
-        tgenlemeff = dict([[lem, dict(zip(clnames, self.corpus.tgenlem[lem]))] for lem in self.corpus.tgenlem]) 
+        tgenlemeff = dict([[lem, dict(zip(clnames, self.corpus.tgenlem[lem]))] for lem in self.corpus.tgenlem])
         self.tgen.writetable(self.parametres['tgenlemeff'], tgenlemeff, et)
         self.Rscript = TgenProfScript(self)
         self.Rscript.make_script()
         self.Rscript.write()
         self.doR(self.Rscript.scriptout, dlg = False, message = 'R...')
-        
-        
-        
-        
-        
-        
+
+class ReDoProfile(AnalyseText):
+    def __init__(self, ira, corpus, analyses, parametres):
+        self.ira = ira
+        self.corpus = corpus
+        self.parametres = parametres
+        self.analyse = analyse
+        self.pathout = PathOut(dirout = self.parametres['pathout'])
+        #self.cluster_size = [len(classe) for classe in corpus.lc]
+        self.doanalyse()
+
+    def Rscript(self) :
+       script = ReDoProfScript(self) 
