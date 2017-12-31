@@ -13,11 +13,14 @@ import logging
 log = logging.getLogger('iramuteq.printRscript')
 
 class PrintRScript :
-    def __init__ (self, analyse):
+    def __init__ (self, analyse, parametres = None):
         log.info('Rscript')
         self.pathout = analyse.pathout
         self.analyse = analyse
-        self.parametres = analyse.parametres
+        if parametres is None :
+            self.parametres = analyse.parametres
+        else :
+            self.parametres = parametres
         #self.scriptout = ffr(self.pathout['lastRscript.R'])
         self.scriptout = self.pathout['temp']
         self.script =  u"#Script genere par IRaMuTeQ - %s\n" % datetime.now().ctime()
@@ -164,10 +167,10 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         """ % ffr(DicoPath['TableUc2'])
     txt += """
     log1 <- "%s"
-    #print('FIXME : source newCHD')
-    #source('/home/pierre/workspace/iramuteq/Rscripts/newCHD.R')
-    #chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path, find='matrix', sample=20, amp=500)
-    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)#, log.file = log1)
+    print('FIXME : source newCHD')
+    source('/home/pierre/workspace/iramuteq/Rscripts/newCHD.R')
+    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path, find='matrix', select.next='size', sample=20, amp=500)
+    #chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)#, log.file = log1)
     """ % ffr(DicoPath['log-chd1.txt'])
 
     if classif_mode == 0:
@@ -464,12 +467,20 @@ def write_afc_graph(self):
     if self.param['svg'] : svg = 'TRUE'
     else : svg = 'FALSE'
 
+    if self.param['typegraph'] == 4 :
+        nodesfile = os.path.join(os.path.dirname(self.fileout),'nodes.csv')
+        edgesfile = os.path.join(os.path.dirname(self.fileout),'edges.csv')
+    else :
+        nodesfile = 'NULL'
+        edgesfile = 'NULL'
+
     with open(self.RscriptsPath['afc_graph'], 'r') as f:
         txt = f.read()
 
 #    self.DictPathOut['RData'], \
     scripts = txt % (ffr(self.RscriptsPath['Rgraph']),\
     self.param['typegraph'], \
+    edgesfile, nodesfile, \
     self.param['what'], \
     self.param['facteur'][0],\
     self.param['facteur'][1], \
@@ -606,7 +617,7 @@ def barplot(table, parametres, intxt = False) :
             height <- %i
             open_file_graph("%s",width = width, height = height, svg = %s)
         	par(mar=c(0,0,0,0))
-    	    layout(matrix(c(1,2),1,2, byrow=TRUE),widths=c(3,lcm(7)))
+    	    layout(matrix(c(1,2),1,2, byrow=TRUE),widths=c(3,lcm(12)))
             par(mar=c(8,4,1,0))
             yp = ifelse(length(toinf), 0.2, 0)
             ym = ifelse(length(tominf), 0.2, 0)
@@ -741,7 +752,7 @@ class PrintSimiScript(PrintRScript) :
                 """
             txt += """
             dm <-readMM(dm.path)
-            cn <- read.table(cn.path, sep='\t', quote='"')
+            cn <- read.table(cn.path, sep="\t", quote='"')
             colnames(dm) <- cn[,1]
             if (file.exists(selected.col)) {
                 sel.col <- read.csv2(selected.col, header = FALSE)
@@ -798,13 +809,20 @@ class PrintSimiScript(PrintRScript) :
             txt += """
             load("%s")
             """ % ffr(self.pathout['RData.RData'])
-        
+
         if self.parametres['coeff'] == 0 :
             method = 'cooc'
             if not self.parametres['keep_coord'] :
                 txt += """
                 method <- 'cooc'
                 mat <- make.a(dm)
+                """
+        elif self.analyse.indices[self.parametres['coeff']] == 'Jaccard' :
+            method = 'Jaccard'
+            if not self.parametres['keep_coord'] :
+                txt += """
+                method <- 'Jaccard'
+                mat <- sparse.jaccard(dm)
                 """
         else :
             if not self.parametres['keep_coord'] :
@@ -824,7 +842,7 @@ class PrintSimiScript(PrintRScript) :
                 method <- 'binomial'
                 mat <- binom.sim(dm)
                 """
-        elif self.parametres['coeff'] != 0 :
+        elif self.parametres['coeff'] != 0 and self.analyse.indices[self.parametres['coeff']] != 'Jaccard':
             method = self.analyse.indices[self.parametres['coeff']]
             if not self.parametres['keep_coord'] :
                 txt += """
@@ -1147,6 +1165,17 @@ class PrintSimiScript(PrintRScript) :
         """ % svg
         txt += """
         vertex.col <- cols
+        col.from.proto <- F
+        if (col.from.proto) {
+            proto.col <- read.table('/tmp/matcol.csv')
+            v.proto.names <- make.names(proto.col[,1])
+            v.proto.col <- as.character(proto.col[,2])
+            v.proto.col[which(v.proto.col=='black')] <- 'yellow'
+            v.names <- V(graph.simi$graph)$name
+            num.color <- sapply(v.names, function(x) {if (x %%in%% v.proto.names) {v.proto.col[which(v.proto.names==x)]} else {'pink'}})
+            vertex.col <- num.color
+            V(graph.simi$graph)$proto.color <- vertex.col
+        }
         if (!is.null(graph.simi$com)) {
             com <- graph.simi$com
             colm <- rainbow(length(com))
@@ -1212,7 +1241,7 @@ class ProtoScript(PrintRScript) :
         }
         mat <- read.csv2("%s", header = FALSE, row.names=1, sep='\t', quote='"', dec='.')
         open_file_graph("%s",height=800, width=1000)
-        prototypical(mat, mfreq = %s, mrank = %s, cloud = FALSE, cexrange=c(1,2.4), cexalpha= c(0.4, 1), type = '%s')
+        prototypical(mat, mfreq = %s, mrank = %s, cloud = FALSE, cexrange=c(1,2.4), cexalpha= c(0.4, 1), type = '%s', mat.col.path='/tmp/matcol.csv')
         dev.off()
         """ % (ffr(self.analyse.pathout['table.csv']), ffr(self.analyse.pathout['proto.png']), self.parametres['limfreq'], self.parametres['limrang'], self.parametres['typegraph'])
         self.add(txt)
@@ -1256,7 +1285,12 @@ class MergeGraphes(PrintRScript) :
         self.add(txt)
         self.sources([self.analyse.parent.RscriptsPath['simi']])
         txt = """
-        ng <- merge.graph(graphs)
+        merge.type <- 'proto'
+        if (merge.type == 'normal') {
+            ng <- merge.graph(graphs)
+        } else {
+            ng <- merge.graph.proto(graphs)
+        }
         ngraph <- list(graph=ng, layout=layout.fruchterman.reingold(ng, dim=3), labex.cex=V(ng)$weight)
         write.graph(ng, "%s", format = 'graphml')
         """ % ffr(self.parametres['grapheout'])
@@ -1362,12 +1396,27 @@ class LabbeScript(PrintRScript) :
         rn <- row.names(as.matrix(dist.mat))
         open_file_graph("%s", width=1500, height=1000, svg=F)
         par(mar=c(10,10,3,3))
-        image(1:dim, 1:dim, dst, axes = FALSE, xlab="", ylab="")
+        image(1:dim, 1:dim, dst, axes = FALSE, xlab="", ylab="", col=heat.colors(99), breaks=seq(0.01,1,0.01))
         axis(1, 1:dim, rn, cex.axis = 0.9, las=3)
         axis(2, 1:dim, rn, cex.axis = 0.9, las=1)
         text(expand.grid(1:dim, 1:dim), sprintf("%%0.2f", dst), cex=0.6)
         dev.off()
         """  % ffr(self.pathout['labbe-matrix.png'])
+        txt += """
+        library(igraph)
+        g <- graph.adjacency(as.matrix(1-dist.mat), mode="lower", weighted=T)
+        write.graph(g, file="%s", format='graphml')
+        open_file_graph("%s", width=1000, height=1000, svg=F)
+        plot(g)
+        dev.off()
+        E(g)$weight <- 1 - E(g)$weight
+        g <- minimum.spanning.tree(g)
+        E(g)$weight <- 1 - E(g)$weight
+        write.graph(g, file="%s", format='graphml')
+        open_file_graph("%s", width=1000, height=1000, svg=F)
+        plot(g)
+        dev.off()
+        """ % (ffr(self.pathout['graph_tot.graphml']), ffr(self.pathout['graph_tot.png']), ffr(self.pathout['graph_min.graphml']), ffr(self.pathout['graph_min.png']))
         self.add(txt)
         self.write()
 
@@ -1510,6 +1559,83 @@ class ChronoPropScript(PrintRScript) :
         """
         self.add(txt)
         self.write()
+
+class DendroScript(PrintRScript) :
+    def make_script(self) :
+        if self.parametres['svg'] :
+            typefile = '.svg'
+        else :
+            typefile = '.png'
+        fileout = self.parametres['fileout']
+        width = self.parametres['width']
+        height = self.parametres['height']
+        type_dendro = self.parametres['dendro_type']
+        if self.parametres['taille_classe'] :
+            tclasse = 'TRUE'
+        else :
+            tclasse = 'FALSE'
+        if self.parametres['color_nb'] == 0 :
+            bw = 'FALSE'
+        else :
+            bw = 'TRUE'
+        if self.parametres['type_tclasse'] == 0 :
+            histo='FALSE'
+        else :
+            histo = 'TRUE'
+        if self.parametres['svg'] :
+            svg = 'TRUE'
+        else :
+            svg = 'FALSE'
+        dendro_path = self.pathout['Rdendro']
+        classe_path = self.pathout['uce']
+        txt = """
+        library(ape)
+        load("%s")
+        source("%s")
+        classes <- read.csv2("%s", row.names=1)
+        classes <- classes[,1]
+        """ % (ffr(dendro_path), ffr(self.parametres['Rgraph']),  ffr(classe_path))
+        if self.parametres['dendro'] == 'simple' :
+            txt += """
+            open_file_graph("%s", width=%i, height=%i, svg=%s)
+            plot.dendropr(tree.cut1$tree.cl, classes, type.dendro="%s", histo=%s, bw=%s, lab=NULL, tclasse=%s)
+            """ % (ffr(fileout), width, height, svg, type_dendro, histo, bw, tclasse)
+        elif self.parametres['dendro'] == 'texte' :
+            txt += """
+            load("%s")
+            source("%s")
+            if (is.null(debsup)) {
+                debsup <- debet
+            }
+            chistable <- chistabletot[1:(debsup-1),]
+            """ % (ffr(self.pathout['RData.RData']), ffr(self.parametres['Rgraph']))
+            if self.parametres.get('translation', False) :
+                txt += """
+                rn <- read.csv2("%s", header=FALSE, sep='\t')
+                rnchis <- row.names(chistable)
+                commun <- intersect(rnchis, unique(rn[,2]))
+                idrnchis <- sapply(commun, function(x) {which(rnchis==x)})
+                idrn <- sapply(commun, function(x) {which(as.vector(rn[,2])==x)[1]})
+                rownames(chistable)[idrnchis] <- as.vector(rn[idrn,1])
+                """ % ffr(self.parametres['translation'])
+            txt += """
+            open_file_graph("%s", width=%i, height=%i, svg = %s)
+            plot.dendro.prof(tree.cut1$tree.cl, classes, chistable, nbbycl = 60, type.dendro="%s", bw=%s, lab=NULL)
+            """ % (ffr(fileout), width, height, svg, type_dendro, bw)
+        elif self.parametres['dendro'] == 'cloud' :
+            txt += """
+            load("%s")
+            source("%s")
+            if (is.null(debsup)) {
+                debsup <- debet
+            }
+            chistable <- chistabletot[1:(debsup-1),]
+            open_file_graph("%s", width=%i, height=%i, svg=%s)
+            plot.dendro.cloud(tree.cut1$tree.cl, classes, chistable, nbbycl = 300, type.dendro="%s", bw=%s, lab=NULL)
+            """ % (ffr(self.pathout['RData.RData']), ffr(self.parametres['Rgraph']), ffr(fileout), width, height, svg, type_dendro, bw)
+        self.add(txt)
+        self.write()
+
 
 class ReDoProfScript(PrintRScript) :
     def make_script(self) :
