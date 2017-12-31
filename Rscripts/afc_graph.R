@@ -6,6 +6,8 @@
 #fichier genere par IRaMuTeq
 source('%s', encoding = 'utf8')
 typegraph <- %i
+edgesfile <- "%s"
+nodesfile <- "%s"
 what <- %i
 x <- %i
 y <- %i
@@ -21,7 +23,7 @@ ptbycluster <- %i
 cex.txt <- %s
 txt.min <- %i
 txt.max <- %i
-fileout <- '%s'
+fileout <- "%s"
 width <- %i
 height <- %i
 taillecar <- %i
@@ -30,7 +32,7 @@ dofilm <- %s
 tchi <- %s
 tchi.min <- %i
 tchi.max <- %i
-dirout <- '%s'
+dirout <- "%s"
 do.svg <- %s
 xminmax <- NULL
 yminmax <- NULL
@@ -204,54 +206,93 @@ if (typegraph == 0 || typegraph == 2) {
     }
 
 } else {
-    library(rgl)
-    rn <- vire.nonascii(rownames(table.in))
-    rain = rainbow(clnb)
-    colors = rain[classes]
-    #rn <- rownames(table.in)
-    #rgl.open()
-    
-    text3d(table.in[,1], table.in[,2], table.in[,3], rn, col = colors , cex = cex.par)
-    rgl.bg(col = c('white', "#99bb99"), front = "lines", box=FALSE, sphere = TRUE)
-    par3d('userMatrix' = matrix(c(1,0,0,0, 0,1,0,0,0,0,1,0,0,0,0,1), ncol=4, nrow = 4))
-    par3d(cex=0.7)
-    #par3d(windowRect = c(100,100,600,600))
-    rgl.lines(c(rx), c(0, 0), c(0, 0), col = "#000000")
-    rgl.lines(c(0,0),c(ry),c(0,0),col = "#000000")
-    rgl.lines(c(0,0),c(0,0),c(rz),col = "#000000")
-    text3d(rx[2]+1,0,0, xlab)
-    text3d(0,ry[2]+1,0, ylab)
-    text3d(0,0,rz[2]+1, zlab)
-    
-     if (tchi) {
-        maxchi <- norm.vec(maxchi, tchi.min/100, tchi.max/100)
-    } else if (!is.null(cex.par)) {
-        maxchi <- norm.vec(cex.par, txt.min/100, txt.max/100)
-    } else {
-        maxchi <- 0.1
-    }
-    
-    
-    for (i in 1:clnb) {
-        text3d(rx[2],(ry[2]+(0.2*i)),0,paste('classe',i),col=rain[i])
-    }
-    #if (tchi) {
-    #    rgl.spheres(table.in, col = colors, radius = maxchi, alpha = alpha)
-    #}
-
-    if (dofilm) {
-        require(tcltk)
-        ReturnVal <- tkmessageBox(title="RGL 3 D",message="Cliquez pour commencer le film",icon="info",type="ok")
-
-        movie3d(spin3d(axis=c(0,1,0),rpm=6), movie = 'film', frames = "tmpfilm", duration=10, clean=TRUE, top = TRUE, dir = dirout)
-        ReturnVal <- tkmessageBox(title="RGL 3 D",message="Fini !",icon="info",type="ok")
-    }
-
-    if (typegraph == 1) {
-        require(tcltk)
-        ReturnVal <- tkmessageBox(title="RGL 3 D",message="Cliquez pour fermer",icon="info",type="ok")
-    } else {
-        writeWebGL(dir = fileout, width = width, height= height)
-    }
-    rgl.close()
+	if (typegraph == 4) {
+		library(igraph)
+		rain = rainbow(clnb)
+	    col = rain[classes]
+		g <- make_empty_graph()
+		vertex <- rownames(table.in)
+		g <- add.vertices(g, length(vertex), attr=list(weight=cex.par, names=vertex, color=col))
+		minx <- min(table.in[,1])
+		maxx <- max(table.in[,1])
+		miny <- min(table.in[,2])
+		maxy <- max(table.in[,2])
+		minz <- min(table.in[,3])
+		maxz <- max(table.in[,3])
+		table.in <- rbind(table.in, c(minx, 0, 0))
+		rminx <- nrow(table.in)
+		table.in <- rbind(table.in, c(maxx, 0, 0))
+		rmaxx <- nrow(table.in)
+		table.in <- rbind(table.in, c(0, miny, 0))
+		rminy <- nrow(table.in)
+		table.in <- rbind(table.in, c(0, maxy, 0))
+		rmaxy <- nrow(table.in)
+		table.in <- rbind(table.in, c(0, 0, minz))
+		rminz <- nrow(table.in)
+		table.in <- rbind(table.in, c(0, 0, maxz))
+		rmaxz <- nrow(table.in)
+		g <- add.vertices(g, 6, attr=list(weight=c(0.1,0.1,0.1,0.1,0.1,0.1), names=c(rminx,rmaxx,rminy,rmaxy,rminz,rmaxz), color=c('white','white','white','white','white','white')))
+		g <- g + edge(rminx, rmaxx, weight=0.1) + edge(rminy, rmaxy, weight=0.1) + edge(rminz, rmaxz, weight=0.1)
+		table.in <- layout.norm(table.in, -5,5,-5,5,-5,5)
+		graph.to.file2(g, table.in, nodesfile=nodesfile, edgesfile=edgesfile)
+	} else {
+	    library(rgl)
+	    rn <- vire.nonascii(rownames(table.in))
+	    rain = rainbow(clnb)
+	    colors = rain[classes]
+	    #rn <- rownames(table.in)
+	    #rgl.open()
+	    bg3d('white')
+	    #rgl.bg(col = c('white', "#99bb99"), front = "lines", box=FALSE, sphere = TRUE)
+	    
+	    par3d('userMatrix' = matrix(c(1,0,0,0, 0,1,0,0,0,0,1,0,0,0,0,1), ncol=4, nrow = 4))
+	    #par3d(cex=0.7)
+	    #par3d(windowRect = c(100,100,600,600))
+	    rgl.lines(c(rx), c(0, 0), c(0, 0), col = "#000000")
+	    rgl.lines(c(0,0),c(ry),c(0,0),col = "#000000")
+	    rgl.lines(c(0,0),c(0,0),c(rz),col = "#000000")
+	    text3d(rx[2]+1,0,0, xlab)
+	    text3d(0,ry[2]+1,0, ylab)
+	    text3d(0,0,rz[2]+1, zlab)
+	    splt <- split(seq_along(table.in[,1]), ceiling(seq_along(table.in[,1])/100))
+	    #colsplt <- split(seq_along(colors), ceiling(seq_along(colors)/100))
+	    #cexsplt <- split(seq_along(cex.par), ceiling(seq_along(cex.par)/100))
+	    for (i in splt) {
+	        rgl.texts(table.in[i,1], table.in[i,2], table.in[i,3], rn[i], col = colors[i] , cex = cex.par[i])
+	    }
+	    #rgl.texts(table.in[,1], table.in[,2], table.in[,3], rn, col = colors , cex = cex.par)
+	    
+	     if (tchi) {
+	        maxchi <- norm.vec(maxchi, tchi.min/100, tchi.max/100)
+	    } else if (!is.null(cex.par)) {
+	        maxchi <- norm.vec(cex.par, txt.min/100, txt.max/100)
+	    } else {
+	        maxchi <- 0.1
+	    }
+	    
+	    
+	    #for (i in 1:clnb) {
+	    #    text3d(rx[2],(ry[2]+(0.2*i)),0,paste('classe',i),col=rain[i])
+	    #}
+	    if (tchi) {
+	        rgl.spheres(table.in, col = colors, radius = maxchi, alpha = alpha)
+	    }
+	    par3d(skipRedraw=FALSE)
+	
+	    if (dofilm) {
+	        require(tcltk)
+	        ReturnVal <- tkmessageBox(title="RGL 3 D",message="Cliquez pour commencer le film",icon="info",type="ok")
+	
+	        movie3d(spin3d(axis=c(0,1,0),rpm=6), movie = 'film', frames = "tmpfilm", duration=10, clean=TRUE, top = TRUE, dir = dirout)
+	        ReturnVal <- tkmessageBox(title="RGL 3 D",message="Fini !",icon="info",type="ok")
+	    }
+	
+	    if (typegraph == 1) {
+	        require(tcltk)
+	        ReturnVal <- tkmessageBox(title="RGL 3 D",message="Cliquez pour fermer",icon="info",type="ok")
+	    } else {
+	        writeWebGL(dir = fileout, width = width, height= height)
+	    }
+	    rgl.close()
+	}
 }
