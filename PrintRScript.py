@@ -167,10 +167,10 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         """ % ffr(DicoPath['TableUc2'])
     txt += """
     log1 <- "%s"
-    print('FIXME : source newCHD')
-    source('/home/pierre/workspace/iramuteq/Rscripts/newCHD.R')
-    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path, find='matrix', select.next='size', sample=20, amp=500)
-    #chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)#, log.file = log1)
+    #print('FIXME : source newCHD')
+    #source('/home/pierre/workspace/iramuteq/Rscripts/newCHD.R')
+    #chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path, find='matrix', select.next='size', sample=20, amp=500)
+    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)#, log.file = log1)
     """ % ffr(DicoPath['log-chd1.txt'])
 
     if classif_mode == 0:
@@ -1184,6 +1184,12 @@ class PrintSimiScript(PrintRScript) :
                 vertex.col <- colm[membership(com)]
             } else {
                 vertex.label.color <- colm[membership(com)]
+            }
+        }
+        if (!is.null(graph.simi$elim)) {
+            vertex.label.color <- vertex.label.color[-graph.simi$elim]
+            if (length(label.cex > 1)) {
+                 label.cex <- label.cex[-graph.simi$elim]
             }
         }
         coords <- plot.simi(graph.simi, p.type='%s',filename="%s", vertex.label = label.v, edge.label = label.e, vertex.col = vertex.col, vertex.label.color = vertex.label.color, vertex.label.cex=label.cex, vertex.size = vertex.size, edge.col = cola, leg=leg, width = width, height = height, alpha = alpha, movie = film, edge.curved = edge.curved, svg = svg)
