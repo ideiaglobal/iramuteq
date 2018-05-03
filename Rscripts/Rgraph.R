@@ -799,11 +799,11 @@ plot.dendropr <- function(tree, classes, type.dendro="phylogram", histo=FALSE, f
         }
     }
 	par(mar=c(0,0,0,0),cex=1)
-	label.ori<-tree[[2]]
+	label.ori<-tree$tip.label
     if (!is.null(lab)) {
         tree$tip.label <- lab
     } else {
-	    tree[[2]]<-paste('classe ',tree[[2]])
+	    tree$tip.label<-paste('classe ',tree$tip.label)
     }
 	plot.phylo(tree,label.offset=0.1,tip.col=col, type=type.dendro)
     #cl.order <- as.numeric(label.ori)
@@ -1164,10 +1164,12 @@ graph.to.file <- function(graph.simi, nodesfile = NULL, edgesfile = NULL, commun
     } else {
         V(g)$weight <- graph.simi$label.cex
     }
-	V(g)$x <- graph.simi$layout[,1]
-	V(g)$y <- graph.simi$layout[,2]
-	if (ncol(graph.simi$layout) == 3) {
-		V(g)$z <- graph.simi$layout[,3]
+	layout <- layout.norm(graph.simi$layout,-5,5,-5,5,-5,5)
+	print(layout)
+	V(g)$x <- layout[,1]
+	V(g)$y <- layout[,2]
+	if (ncol(layout) == 3) {
+		V(g)$z <- layout[,3]
 	}
 	if (community) {
 		member <- graph.simi$communities$membership
@@ -1214,6 +1216,13 @@ graph.to.file2 <- function(graph, layout, nodesfile = NULL, edgesfile = NULL, co
 	
 	if (!is.null(sweight)) {
 		V(g)$sweight <- sweight
+	}
+	if (is.null(V(g)$weight)) {
+		if (!is.null(sweight)) {
+			V(g)$weight <- sweight
+		} else {
+			V(g)$weight <- 1
+		}
 	}
 	df <- get.data.frame(g, what='both')
 	if (!is.null(nodesfile)) {
