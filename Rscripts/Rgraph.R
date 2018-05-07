@@ -680,12 +680,12 @@ plot.dendro.prof <- function(tree, classes, chisqtable, nbbycl = 60, type.dendro
         colcloud <- rainbow(length(sum.cl))
         colcloud <- del.yellow(colcloud)
     }
-    label.ori<-tree[[2]]
+	label.ori<-tree$tip.label
     if (!is.null(lab)) {
         tree$tip.label <- lab
     } else {
-	    tree[[2]]<-paste('classe ',tree[[2]])
-    }
+	    tree$tip.label<-paste('classe ',tree$tip.label)
+	}
 	par(mar=c(2,1,0,1))
 	plot.phylo(tree,label.offset=0, tip.col=col, type=type.dendro, direction = 'downwards', srt=90, adj = 0.5, cex = 1.5, y.lim=c(-0.3,tree$Nnode))
 	par(mar=c(0,0,0,0))
@@ -748,12 +748,12 @@ plot.dendro.cloud <- function(tree, classes, chisqtable, nbbycl = 60, type.dendr
         colcloud <- rainbow(length(sum.cl))
     }
     par(mar=c(0,0,0,0))
-    label.ori<-tree[[2]]
+	label.ori<-tree$tip.label
     if (!is.null(lab)) {
         tree$tip.label <- lab
     } else {
-	    tree[[2]]<-paste('classe ',tree[[2]])
-    }
+	    tree$tip.label<-paste('classe ',tree$tip.label)
+	}
 	plot.phylo(tree,label.offset=0.1,tip.col=col, type=type.dendro)
     for (i in rev(tree.order)) {
         par(mar=c(0,0,1,0),cex=0.9)
@@ -862,11 +862,11 @@ plot.dendro.lex <- function(tree, to.plot, bw=FALSE, lab=NULL, lay.width=c(3,3,2
     }
     layout(matlay, widths=lay.width,TRUE)
 	par(mar=c(3,0,2,4),cex=1)
-	label.ori<-tree[[2]]
+	label.ori<-tree$tip.label
     if (!is.null(lab)) {
-        tree$tip.label <- lab[tree.order]
+        tree$tip.label <- lab
     } else {
-	    tree[[2]]<-paste('classe ',tree[[2]])
+	    tree$tip.label<-paste('classe ',tree$tip.label)
     }
     to.plot <- matrix(to.plot[,tree.order], nrow=nrow(to.plot), dimnames=list(rownames(to.plot), colnames(to.plot)))
     if (!bw) {
