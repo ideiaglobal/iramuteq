@@ -16,7 +16,7 @@ import logging
 from operator import itemgetter
 from uuid import uuid4
 from chemins import PathOut
-from dialog import CorpusPref, SubTextFromMetaDial
+from dialog import CorpusPref, SubTextFromMetaDial, MergeClusterFrame
 from copy import copy
 from colors import colors
 import datetime
@@ -42,6 +42,7 @@ def CopyUci(uci):
     nuci = Uci(uci.ident, '')
     nuci.etoiles = copy(uci.etoiles)
     nuci.uces = [CopyUce(uce) for uce in uci.uces]
+    nuci.paras = copy(uci.paras)
     return nuci
     
 
@@ -53,7 +54,7 @@ class Corpus :
     def __init__(self, parent, parametres = {}, read = False) :
         self.parent = parent
         self.parametres = parametres
-        self.cformes = None         
+        self.cformes = None
         self.connformes = None
         self.connuces = None
         self.conncorpus = None
@@ -93,7 +94,7 @@ class Corpus :
                 lem = word
             self.formes[word] =  Word(word, gramtype, len(self.formes), lem)
             self.idformesuces[self.formes[word].ident] = {self.ucis[-1].uces[-1].ident : 1}
-    
+
     def add_word_from_forme(self, word, stident):
         if word.forme in self.formes :
             self.formes[word.forme].freq += 1
@@ -106,7 +107,7 @@ class Corpus :
                 self.idformesuces[self.formes[word.forme].ident] = {stident: 1}
         else :
             self.formes[word.forme] = Word(word.forme, word.gram, len(self.formes), word.lem)
-            self.idformesuces[self.formes[word.forme].ident] = {stident : 1}       
+            self.idformesuces[self.formes[word.forme].ident] = {stident : 1}
 
     def conn_all(self): 
         """connect corpus to db"""
@@ -142,13 +143,13 @@ class Corpus :
         res = self.ccorpus.execute('SELECT * FROM formes;')
         self.formes = dict([[forme[1], Word(forme[1], forme[3], forme[0], lem = forme[2], freq = forme[4])] for forme in res])
         self.ccorpus.close()
-    
+
     def getworduces(self, wordid) :
         if isinstance(wordid, basestring) :
             wordid = self.formes[wordid].ident
         res = self.cformes.execute('SELECT uces FROM uces where id=? ORDER BY id;', (`wordid`,))
         return list(itertools.chain(*[[int(val) for val in row[0].split()] if not isinstance(row[0], int) else [row[0]] for row in res]))
-    
+
     def getworducis(self, wordid) :
         res = self.getworduces(wordid)
         return list(set([self.getucefromid(uce).uci for uce in res]))
@@ -164,14 +165,14 @@ class Corpus :
         formeuceeff = {}
         for i, uce in enumerate(uces) :
             formeuceeff[uce] = formeuceeff.get(uce, 0) + eff[i]
-        return formeuceeff    
+        return formeuceeff
 
     def getlemuces(self, lem) :
         formesid = ', '.join([`val` for val in self.lems[lem].formes])
         query = 'SELECT uces FROM uces where id IN (%s) ORDER BY id' % formesid
         res = self.cformes.execute(query)
         return list(set(list(itertools.chain(*[[int(val) for val in row[0].split()] if not isinstance(row[0], int) else [row[0]] for row in res]))))
-    
+
     def gettgenst(self, tgen):
         formesid = []
         for lem in tgen :
@@ -195,7 +196,7 @@ class Corpus :
             else :
                 print 'abscent: ',lem
         return list(set(tgenst))
-    
+
     def gettgentxt(self, tgen):
         sts = self.gettgenst(tgen)
         return list(set([self.getucefromid(val).uci for val in sts]))
@@ -245,14 +246,14 @@ class Corpus :
     def getucisize(self) :
         ucesize = self.getucesize()
         return [sum(ucesize[uci.uces[0].ident:(uci.uces[-1].ident + 1)]) for uci in self.ucis]
-    
+
     def getucesize(self) :
         res = self.getalluces()
         return [len(uce[1].split()) for uce in res]
 
     def getconcorde(self, uces) :
         return self.cuces.execute('select * from uces where id IN (%s) ORDER BY id;' % ', '.join([`i` for i in uces])) 
-    
+
     def getuciconcorde(self, ucis) :
         uces = [[val,[uce.ident for uce in self.ucis[val].uces]] for val in ucis]
         uces = [[val[0], '\n'.join([row[1] for row in self.getconcorde(val[1])])] for val in uces]
@@ -266,7 +267,7 @@ class Corpus :
 
     def getalluces(self) :
         return self.cuces.execute('SELECT * FROM uces')
-    
+
     def getallucis(self):
         uces = [row[1] for row in self.getalluces()]
         return [[uci.ident, '\n'.join([uces[uce.ident] for uce in uci.uces])] for uci in self.ucis]
@@ -683,7 +684,7 @@ class Corpus :
         if listuci :
             with open(listuci, 'w') as f :
                 f.write('\n'.join(['uci;uc'] + [';'.join([`i`,`i`]) for i in range(0, self.getucinb())]))
-                    
+
     def make_and_write_sparse_matrix_from_classe(self, actives, uces, outfile) :
         log.info('make_and_write_sparse_matrix_from_classe %s' % outfile)
         nbl = 0
@@ -744,7 +745,7 @@ class Corpus :
         if self.idformes is None :
             self.make_idformes()
         return [lem for lem in self.lems if self.getlemeff(lem) >= limit and self.lems[lem].act == key]
-    
+
     def make_actives_nb(self, nbmax, key) :
         log.info('make_actives_nb : %i - %i' % (nbmax,key))
         if self.idformes is None :
@@ -772,7 +773,7 @@ class Corpus :
                 stop = nbmax - 1
                 lim = effs[stop]
         log.info('nb actives = %i - eff min = %i ' % (stop + 1, lim))
-        return [val[1] for val in allactives[0:stop + 1]], lim
+        return [val[1] for val in allactives[0:stop]], lim
 
     def make_and_write_profile(self, actives, ucecl, fileout, uci = False) :
         log.info('formes/classes')
@@ -866,11 +867,11 @@ class Corpus :
     def make_colored_corpus(self, uci = False) :
         ucecl = {}
         for i, lc in enumerate(self.lc) :
-            for uce in lc : 
+            for uce in lc :
                 ucecl[uce] = i + 1
         for uce in self.lc0 :
             ucecl[uce] = 0
-        color = ['black'] + colors[len(self.lc) - 1]        
+        color = ['black'] + colors[len(self.lc) - 1]
         txt = '''<html>
         <meta http-equiv="content-Type" content="text/html; charset=%s" />
         <body>
@@ -930,7 +931,7 @@ class Corpus :
 
     def find_segments_in_classe(self, list_uce, taille_segment, taille_limite, uci = False):
         d={}
-        if not uci : 
+        if not uci :
             concorde = self.getconcorde
         else :
             concorde = self.getuciconcorde
@@ -943,7 +944,7 @@ class Corpus :
         if len(l) > taille_limite :
             l = l[-taille_limite:]
         return l
-            
+
     def make_segments_profile(self, fileout, lenmin = 3, lenmax = 10, effmin = 50, lem = False) :
         d = {}
         for b, classe in enumerate(self.lc) :
@@ -956,7 +957,7 @@ class Corpus :
         result = [[seg] + [str(val) for val in d[seg]] for seg in d if sum(d[seg]) >= effmin]
         with open(fileout, 'w') as f :
             f.write('\n'.join([';'.join(line) for line in result]))
-    
+
     def make_proftype(self, outf) :
         res = {}
         for lem in self.lems :
@@ -987,7 +988,7 @@ class Corpus :
         self.lc = [[uce[0] for uce in self.lc if uce[1] == i] for i in range(clnb+1)]
         self.lc0 = self.lc.pop(0)
         #return ucecl
-    
+
     def get_stat_by_cluster(self, outf, lclasses = None) :
         log.info('get_stat_by_cluster')
         if lclasses is None :
@@ -1007,7 +1008,7 @@ class Corpus :
                     formescl[i+1] += 1
                     if self.formes[forme].freq == 1 :
                         hapaxcl[i+1] += 1
-        log.info('%f' % (time() - t1))        
+        log.info('%f' % (time() - t1))
         if outf is not None :
             toprint = '\n'.join([';'.join([`i`, `occurrences[i]`, `formescl[i]`, `hapaxcl[i]`, `lenclasses[i]`, `float(hapaxcl[i])/float(formescl[i])`]) for i in occurrences])
             with open(outf, 'w') as f :
@@ -1090,7 +1091,7 @@ class Corpus :
         listlem.sort()
         with open(fileout, 'w') as f :
             f.write('\n'.join(['\t'.join(lem) for lem in listlem]).encode(syscoding))
-    
+
 
 
 class MakeUciStat :
@@ -1098,7 +1099,7 @@ class MakeUciStat :
         ucinb = corpus.getucinb()
         ucisize = corpus.getucisize()
         ucimean = float(sum(ucisize))/float(ucinb)
-        detoile = corpus.make_etoiles_dict() 
+        detoile = corpus.make_etoiles_dict()
 
 class Uci :
     def __init__(self, iduci, line, paraset = None) :
@@ -1149,12 +1150,12 @@ def decouperlist(chaine, longueur, longueurOptimale) :
     dsep = dict([[val[0],val[1]] for val in separateurs])
     trouve = False                 # si on a trouvé un bon séparateur
     iDecoupe = 0                # indice du caractere ou il faut decouper
-    
+
     longueur = min(longueur, len(chaine) - 1)
     chaineTravail = chaine[:longueur + 1]
     nbCar = longueur
     meilleur = ['', 0, 0]        # type, poids et position du meilleur separateur
-    
+
     try :
         indice = chaineTravail.index(u'$')
         trouve = True
@@ -1248,14 +1249,14 @@ class BuildCorpus :
             self.ucesize = self.corpus.parametres.get('ucesize', 240)
         log.info('method uce : %s' % method)
 
-    def dobuild(self) :    
+    def dobuild(self) :
         t1 = time()
         try :
             self.read_corpus(self.infile)
         except Warning, args :
             log.info('pas kool %s' % args)
             raise Warning
-        else :    
+        else :
             self.indexdb()
             self.corpus.parametres['ira'] = self.corpus.pathout['Corpus.cira']
             self.time = time() - t1
@@ -1332,7 +1333,7 @@ class BuildCorpus :
             if expression in txt :
                 txt = txt.replace(expression, self.expressions[expression][0])
         return txt
-    
+
     def dolower(self, txt) :
         return txt.lower()
 
@@ -1340,7 +1341,7 @@ class BuildCorpus :
         #rule = u"^a-zA-Z0-9àÀâÂäÄáÁéÉèÈêÊëËìÌîÎïÏòÒôÔöÖùÙûÛüÜçÇßœŒ’ñ.:,;!?*'_-"
         list_keep = u"[" + self.rule + "]+"
         return re.sub(list_keep, ' ', txt)
-    
+
     def doapos(self, txt) :
         return txt.replace(u'\'', u' ')
 
@@ -1364,7 +1365,7 @@ class BuildCorpus :
             toeff = [(`forme`, ' '.join([`val` for val in  self.corpus.idformesuces[forme].values()])) for forme in self.corpus.idformesuces]
             self.cf.executemany('INSERT INTO uces VALUES (?,?);', touce)
             self.cf.executemany('INSERT INTO eff VALUES (?,?);', toeff)
-        self.corpus.idformesuces = {}        
+        self.corpus.idformesuces = {}
         self.count = 1
 
     def backup_corpus(self) :
@@ -1372,7 +1373,7 @@ class BuildCorpus :
         t = time()
         for uci in self.corpus.ucis :
             self.ccorpus.execute('INSERT INTO etoiles VALUES (?,?,?);' ,(uci.ident,' '.join(uci.etoiles), ' '.join(uci.paras,)))
-            for uce in uci.uces : 
+            for uce in uci.uces :
                 self.ccorpus.execute('INSERT INTO luces VALUES (?,?,?);',(`uci.ident`,`uce.para`,`uce.ident`,))
         for forme in self.corpus.formes :
             self.ccorpus.execute('INSERT INTO formes VALUES (?,?,?,?,?);', (`self.corpus.formes[forme].ident`, forme, self.corpus.formes[forme].lem, self.corpus.formes[forme].gram, `self.corpus.formes[forme].freq`,))
@@ -1429,7 +1430,7 @@ class BuildSubCorpus(BuildCorpus):
                         nuci.paras = newpara
                         self.corpus.ucis.append(nuci)
                 else :
-                    idpara += 1  
+                    idpara += 1
         elif parametres.get('fromclusters', False) :
             self.parametres['uceids'] = [st for i in self.parametres['meta'] for st in self.parametres['lc'][i]]
             self.fromuceids()
@@ -1464,8 +1465,8 @@ class BuildSubCorpus(BuildCorpus):
                     nuci = CopyUci(uci)
                     nuci.uces = newuces
                     nuci.paras = newpara
-                    self.corpus.ucis.append(nuci)       
-    
+                    self.corpus.ucis.append(nuci)
+
     def read_corpus(self, infile = None):
         self.olduceid = [uce.ident for uci in self.corpus.ucis for uce in uci.uces]
         ident_uci = 0
@@ -1553,7 +1554,7 @@ class BuildFromAlceste(BuildCorpus) :
                     raise Exception('EmptyText %i' % linenb)
             if iduci != -1  and iduce != -1:
                 self.backup_uce()
-            else : 
+            else :
                 log.info(_(u"No Text in corpus. Are you sure of the formatting ?"))
                 raise Exception('TextBeforeTextMark %i' % linenb)
         except UnicodeDecodeError :
@@ -1599,7 +1600,7 @@ class BuildFromAlceste(BuildCorpus) :
                     out.append(uce)
                 reste, texte_uce, suite = self.decouper(suite, self.ucesize + 15, self.ucesize)
             uce = ' '.join([val for val in texte_uce if val not in self.ponctuation_espace])
-            if uce != '' : 
+            if uce != '' :
                 out.append(uce)
             return out
         else :
@@ -1695,6 +1696,185 @@ class SubBuilder :
             dial.Destroy()
         else :
             dial.Destroy()
-    
+
     def doanalyse(self):
         return BuildSubCorpus(self.ori, parametres = self.parametres, dlg = self.dlg).corpus
+
+class BuildMergeFromClusters(BuildCorpus):
+    def __init__(self, analyses, parametres, dlg = None) :
+        log.info('begin subcorpus...')
+        self.dlg = dlg
+        self.infile = None
+        self.corpus = Corpus(self, {'type' : 'corpus', 'originalpath' : 'MergeFromClusters', 'encoding' : 'merge'})
+        self.last = 0
+        self.analyses = analyses
+        self.lcl = []
+        self.parametres = parametres
+        #self.encoding = corpus.parametres['encoding']
+        self.corpus.parametres['corpus_name'] = parametres['corpus_name']
+        self.corpus.pathout = PathOut(filename = 'MFC', dirout = parametres['pathout'])
+        self.corpus.pathout.createdir(parametres['pathout'])
+        self.corpus.parametres['pathout'] = parametres['pathout']
+        self.corpus.parametres['meta'] = parametres.get('meta', False)
+        self.corpus.parametres['uuid'] = str(uuid4())
+        for i, analyse in enumerate(analyses) :
+            self.lcl.append([])
+            self.analyseid = i
+            corpus_uuid = analyse['corpus']
+            #if corpus_uuid not in self.parent.history.openedcorpus :
+            irapath = parametres['corpusira'][i]
+            corpus = Corpus(self, parametres = DoConf(irapath).getoptions('corpus'), read = True)
+            ucepath = os.path.join(analyse['pathout'], 'uce.csv')
+            corpus.make_ucecl_from_R(ucepath)
+            self.ori = corpus
+            for j, cl in enumerate(parametres['clusters'][i]) :
+               #print cl, self.ori.lc[cl-1]
+               self.parametres['uceids'] = self.ori.lc[cl-1]#[st for st in self.ori['lc'][cl-1]]
+               self.lcl[i] += self.ori.lc[cl-1]
+               self.et = parametres['newet'][i][j]
+               self.fromuceids()
+        #create database
+        self.connect()
+        self.dobuild()
+
+    def fromuceids(self):
+        print 'fromuceids'
+        dictucekeep = dict(zip(self.parametres['uceids'], self.parametres['uceids']))
+        idpara = 0
+        for uci in self.ori.ucis :
+            if uci.paras == [] :
+                keepuces = [CopyUce(uce) for uce in uci.uces if uce.ident in dictucekeep]
+                if keepuces != [] :
+                    nuci = CopyUci(uci)
+                    nuci.uces = keepuces
+                    nuci.etoiles.append(self.et)
+                    nuci.analyseid = self.analyseid
+                    self.corpus.ucis.append(nuci)
+                idpara += 1
+            else :
+                newuces = []
+                newpara = []
+                for et in uci.paras :
+                    keepuces = [CopyUce(uce) for uce in uci.uces if uce.ident in dictucekeep]
+                    idpara += 1
+                    if keepuces != [] :
+                        newuces += keepuces
+                        newpara.append(et)
+                if newuces != [] :
+                    nuci = CopyUci(uci)
+                    nuci.uces = newuces
+                    nuci.paras = newpara
+                    nuci.etoiles.append(self.et)
+                    nuci.analyseid = self.analyseid
+                    self.corpus.ucis.append(nuci)
+            #print nuci.etoiles, nuci.ident, nuci.uces
+
+    def read_corpus(self, infile = None):
+        #self.olduceid = [uce.ident for uci in self.corpus.ucis for uce in uci.uces]
+        ident_uci = 0
+        ident_uce = 0
+        ident_para = -1
+        lastpara = -1
+        newuceident = {}
+        print 'redo text, para and st ident'
+        for uci in self.corpus.ucis :
+            #print uci.ident, ident_uci, [uce.ident for uce in uci.uces], uci.etoiles
+            uci.ident = ident_uci
+            ident_uci += 1
+            for uce in uci.uces :
+                uce.uci = uci.ident
+                if uce.para != lastpara :
+                    ident_para += 1
+                    lastpara = uce.para
+                    uce.para = ident_para
+                else :
+                    uce.para = ident_para
+                newuceident['%i-%i' %(uci.analyseid, uce.ident)] = ident_uce
+                uce.ident = ident_uce
+                #print uce.ident
+                ident_uce += 1
+        print 'backup st text and forms'
+        rowid = 0
+        for i, analyse in enumerate(self.analyses) :
+            #print analyse, self.parametres['corpusira']
+            irapath = self.parametres['corpusira'][i]
+            old = Corpus(self, parametres = DoConf(irapath).getoptions('corpus'), read = True)
+            for row in old.getconcorde(self.lcl[i]) :
+                self.c.execute('INSERT INTO uces VALUES(?,?);', (newuceident['%i-%i' % (i,row[0])], row[1]))
+                for word in row[1].split() :
+                    self.corpus.add_word_from_forme(old.formes[word], newuceident['%i-%i' % (i,row[0])])
+                rowid += 1
+        self.backup_uce()
+        print 'done'
+
+
+class MergeClusters :
+    def __init__(self, parent, parametres = None, dlg = None):
+        self.parent = parent
+        #self.ori = corpus
+        self.dlg = dlg
+        corpus_name = 'MergeFromClusters'
+        if dlg is not None :
+            busy = wx.BusyInfo(_("Please wait...").decode('utf8'), self)
+            wx.SafeYield()
+        parametres['corpus_name'] = corpus_name
+        if dlg is not None :
+            del busy
+        dial = MergeClusterFrame(parent)
+        dial.m_textCtrl4.SetValue(corpus_name)
+        self.res = dial.ShowModal()
+        if self.res == 5100 :
+            self.analyses = {}
+            self.clusters = {}
+            self.newet = {}
+            self.corpusira = {}
+            if dial.m_textCtrl4.GetValue() != '' :
+                corpus_name = ''.join([l for l in dial.m_textCtrl4.GetValue() if l.isalnum() or l in ['_']])
+            if corpus_name != '' :
+                parametres['corpus_name'] = corpus_name
+            else :
+                parametres['corpus_name'] = 'MergeFromClusters'
+            for cl in dial.selected :
+                corpus_uuid = cl[1]
+                #if corpus_uuid not in self.parent.history.openedcorpus :
+                irapath = self.parent.history.corpus[corpus_uuid]['ira']
+                #corpus = Corpus(self.parent, parametres = DoConf(irapath).getoptions('corpus'), read = True)
+                #self.parent.history.openedcorpus[corpus_uuid] = corpus
+                if cl[0] not in self.analyses :
+                    analyse = DoConf(dial.irapath[cl[0]]).getoptions()
+                    #ucepath = os.path.join(os.path.dirname(dial.irapath[cl[0]]), 'uce.csv')
+                    #corpus = copycorpus(self.parent.history.openedcorpus[corpus_uuid])
+                    #corpus.make_ucecl_from_R(ucepath)
+                    self.analyses[cl[0]] = analyse
+                    self.clusters[cl[0]] = [cl[2]]
+                    self.newet[cl[0]] = [dial.selected[cl]]
+                    self.corpusira[cl[0]] = irapath
+                else :
+                    self.clusters[cl[0]].append(cl[2])
+                    self.newet[cl[0]].append(dial.selected[cl])
+
+
+            analyses = [val for val in self.clusters]
+            clusters = [self.clusters[val] for val in analyses]
+            self.newet = [self.newet[val] for val in analyses]
+            corpusira = [self.corpusira[val] for val in analyses]
+            analyses = [self.analyses[val] for val in analyses]
+            pathout = os.path.dirname(os.path.dirname(analyses[0]['pathout']))
+            self.analyses = analyses
+
+            pathout = os.path.join(pathout, parametres['corpus_name'])
+            i = 1
+            while os.path.exists(pathout + '_%i' % i) :
+                i += 1
+            parametres['pathout'] = pathout + '_%i' % i
+            self.parametres = parametres
+            self.parametres['clusters'] = clusters
+            self.parametres['newet'] = self.newet
+            self.parametres['corpusira'] = corpusira
+            dial.Destroy()
+        else :
+            dial.Destroy()
+
+    def doanalyse(self):
+        return BuildMergeFromClusters(self.analyses, parametres = self.parametres, dlg = self.dlg).corpus
+
