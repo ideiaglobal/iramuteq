@@ -183,7 +183,11 @@ overlap <- function(x1, y1, sw1, sh1, boxes) {
 }
 
 .overlap <- function(x11,y11,sw11,sh11,boxes1){
-    .Call("is_overlap",x11,y11,sw11,sh11,boxes1)
+	if (as.character(packageVersion('wordcloud')) >= '2.6') {
+		.Call("_wordcloud_is_overlap", x11,y11,sw11,sh11,boxes1)
+	} else {
+		.Call("is_overlap",x11,y11,sw11,sh11,boxes1)
+	}
 }
 ########################################################
 stopoverlap <- function(x, cex.par = NULL, xlim = NULL, ylim = NULL) {
@@ -923,6 +927,36 @@ plot.dendro.lex <- function(tree, to.plot, bw=FALSE, lab=NULL, lay.width=c(3,3,2
         dev.off()
     }
 	tree[[2]]<-label.ori
+}
+
+plot.spec <- function(spec, nb.word = 20) {
+	word.to.plot <- NULL
+	word.size <- NULL
+	rno <- rownames(spec)
+	cn <- colnames(spec)
+	if (nb.word > length(rno)) {nb.word <- length(rno)}
+	for (val in 1:ncol(spec)) {
+		rn <- rno[order(spec[,val], decreasing=T)][1:nb.word]
+		score <- spec[order(spec[,val], decreasing=T),val][1:nb.word]
+		word.to.plot <- cbind(word.to.plot, rn)
+		word.size <- cbind(word.size, score)
+	}
+	mat.lay <- matrix(1:ncol(spec),nrow=1,ncol=ncol(spec))
+	layout(mat.lay)
+	for (i in 1:ncol(spec)) {
+		col <- ifelse((i %% 2) == 0, 'red', 'blue')
+		par(mar=c(0,0,1,0),cex=0.7)
+	    yval <- 1.1
+	    plot(0,0,pch='', axes = FALSE)
+	    vcex <- norm.vec(word.size[,i], 2, 3)
+		text(-0.9, -0.5, cn[i], cex = 1, adj=0, srt=90, col='black')
+	    for (j in 1:length(word.size[,i])) {
+	        yval <- yval-(strheight(word.to.plot[j,i],cex=vcex[j])+0.02)
+	        text(-0.9, yval, word.to.plot[j,i], cex = vcex[j], col = col, adj=0)
+	    }
+	}
+
+
 }
 
 plot.alceste.graph <- function(rdata,nd=3,layout='fruke', chilim = 2) {
