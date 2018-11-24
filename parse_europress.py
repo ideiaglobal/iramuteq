@@ -67,7 +67,7 @@ class MyHTMLParser(HTMLParser):
                 elif attrs[0][1] == 'DocHeader' :
                     self.headercount += 1
                     self.currentattr = 'DocHeader'
-                elif attrs[0][1] in ['TitreArticleVisu', 'titreArticleVisu'] :
+                elif attrs[0][1] in ['TitreArticleVisu', 'titreArticleVisu', 'titreArticle'] :
                     self.outfile.write('\n\n')
                     self.meta.append('\n')
                     self.outfile.write(' '.join(self.meta).encode('utf8', errors='replace'))
@@ -82,6 +82,10 @@ class MyHTMLParser(HTMLParser):
             if len(attrs)>0 :
                 if attrs[0][1] == 'publiC-lblNodoc' :
                     self.currentattr = 'PubliC_lblNodoc'
+                elif attrs[0][1] == 'DocText' :
+                    self.currentattr = 'TitreArticleVisu'
+                elif attrs[0][1] == 'titreArticle' :
+                    self.currentattr = 'TitreArticleVisu'
         elif tag == 'p' :
             if len(attrs) > 0 :
                 if attrs[0][1] == 'titreArticleVisu' :
@@ -96,6 +100,7 @@ class MyHTMLParser(HTMLParser):
         pass
         #print "Encountered an end tag :", tag
     def handle_data(self, data):
+        #print self.currentattr
         if self.currentattr == 'DocPublicationName' :
             #print data
             PublicationName = data.strip().replace(' ', '_').replace('(','').replace(')','').replace('-','').replace('.','').replace('/','').replace("'",'').replace(';', '').replace(':', '').replace(u'·','').lower()
@@ -156,5 +161,5 @@ def ParseEuropress(txtdir, fileout, encodage_in, encodage_out) :
                 tot += parser.nb
         return tot
 
-#ParseEuropress('/home/pierre/fac/etudiant/DeNadai/corpus_loi_travail',
-#               '/home/pierre/fac/etudiant/DeNadai/corpus_loi_W.txt', 'utf8', 'utf8')     
+#ParseEuropress('/home/pierre/fac/HDR/psychanalyse',
+#               '/home/pierre/fac/HDR/psycha.txt', 'utf8', 'utf8')     
