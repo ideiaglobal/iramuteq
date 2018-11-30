@@ -167,11 +167,11 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         """ % ffr(DicoPath['TableUc2'])
     txt += """
     log1 <- "%s"
-    print('FIXME : source newCHD')
-    source('/home/pierre/workspace/iramuteq/Rscripts/newCHD.R')
-    nbproc <- %s
-    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path, find='matrix', select.next='size', sample=20, amp=500, proc.nb=nbproc)
-    #chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)#, log.file = log1)
+    #print('FIXME : source newCHD')
+    #source('/home/pierre/workspace/iramuteq/Rscripts/newCHD.R')
+    #nbproc <- %s
+    #chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path, find='matrix', select.next='size', sample=20, amp=500, proc.nb=nbproc)
+    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)#, log.file = log1)
     """ % (ffr(DicoPath['log-chd1.txt']), nbproc)
 
     if classif_mode == 0:
