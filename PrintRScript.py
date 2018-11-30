@@ -113,7 +113,7 @@ class Alceste2(PrintRScript) :
 #
 
 
-def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'svdR', libsvdc = False, libsvdc_path = None, R_max_mem = False, mode_patate = False):
+def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'svdR', libsvdc = False, libsvdc_path = None, R_max_mem = False, mode_patate = False, nbproc=1):
     txt = """
     source("%s")
     source("%s")
@@ -167,11 +167,12 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         """ % ffr(DicoPath['TableUc2'])
     txt += """
     log1 <- "%s"
-    #print('FIXME : source newCHD')
-    #source('/home/pierre/workspace/iramuteq/Rscripts/newCHD.R')
-    #chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path, find='matrix', select.next='size', sample=20, amp=500)
-    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)#, log.file = log1)
-    """ % ffr(DicoPath['log-chd1.txt'])
+    print('FIXME : source newCHD')
+    source('/home/pierre/workspace/iramuteq/Rscripts/newCHD.R')
+    nbproc <- %s
+    chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path, find='matrix', select.next='size', sample=20, amp=500, proc.nb=nbproc)
+    #chd1<-CHD(data1, x = nbt, mode.patate = mode.patate, svd.method = svd.method, libsvdc.path = libsvdc.path)#, log.file = log1)
+    """ % (ffr(DicoPath['log-chd1.txt']), nbproc)
 
     if classif_mode == 0:
         txt += """
@@ -1186,7 +1187,7 @@ class PrintSimiScript(PrintRScript) :
                 vertex.label.color <- colm[membership(com)]
             }
         }
-        if (!is.null(graph.simi$elim)) {
+        if (!length(graph.simi$elim)==0) {
             vertex.label.color <- vertex.label.color[-graph.simi$elim]
             if (length(label.cex > 1)) {
                  label.cex <- label.cex[-graph.simi$elim]
@@ -1561,6 +1562,58 @@ class ChronoPropScript(PrintRScript) :
         ptt <- prop.table(as.matrix(tot), 1)
         par(mar=c(10,2,2,2))
         barplot(t(ptt)[as.numeric(tree.cut1$tree.cl$tip.label),], col=rainbow(ncol(ptt))[as.numeric(tree.cut1$tree.cl$tip.label)], width=ptc, las=3, space=0.05, cex.axis=0.7, border=NA)
+        dev.off()
+        """
+        self.add(txt)
+        self.write()
+
+class ChronoggScript(PrintRScript) :
+    def make_script(self) :
+        self.sources([self.analyse.parent.RscriptsPath['Rgraph']])
+        print self.parametres
+        txt = """
+        library(ggplot2)
+        inRData <- "%s"
+        dendrof <- "%s"
+        load(inRData)
+        load(dendrof)
+        """ % (ffr(self.pathout['RData.RData']), ffr(self.pathout['dendrogramme.RData']))
+        txt += """
+        svg <- %s
+        """ % self.parametres['svg']
+        txt += """
+        tc <- which(grepl("%s",rownames(chistabletot)))
+        rn <- rownames(chistabletot)[tc]
+        tc <- tc[order(rn)]
+        dpt <- chistabletot[tc,]
+        tot <- afctable[tc,]
+        tcp <- rowSums(tot)
+        ptc <- tcp/sum(tcp)
+        dpt <- t(dpt)
+        dd <- dpt
+        """ % self.parametres['var'].replace(u'*', u"\\\\*")
+        txt += """
+        classes <- n1[,ncol(n1)]
+        tcl <- table(classes)
+        if ('0' %in% names(tcl)) {
+            to.vire <- which(names(tcl) == '0')
+            tcl <- tcl[-to.vire]
+        }
+        tclp <- tcl/sum(tcl)
+        ptt <- prop.table(as.matrix(tot), 1)
+        ptt <- ptt[,as.numeric(tree.cut1$tree.cl$tip.label)]
+        rownames(ptt) <- cumsum(ptc)
+        nptt<-as.data.frame(as.table(ptt))
+        nptt[,1]<-as.numeric(as.character(nptt[,1]))
+        col <- rainbow(ncol(ptt))[as.numeric(tree.cut1$tree.cl$tip.label)]
+        """
+        txt += """
+        open_file_graph("%s", w=%i, h=%i, svg=svg)
+        """ % (ffr(self.parametres['tmpgraph']), self.parametres['width'], self.parametres['height'])
+        txt+= """
+        par(mar=c(10,2,2,2))
+        gg <- ggplot(data=nptt, aes(x=Var1,y=Freq,fill=Var2)) + geom_area(alpha=1 , size=0.5, colour="black")
+        gg + scale_fill_manual(values=col)
         dev.off()
         """
         self.add(txt)
