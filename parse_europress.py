@@ -105,7 +105,8 @@ class MyHTMLParser(HTMLParser):
             #print data
             PublicationName = data.strip().replace(' ', '_').replace('(','').replace(')','').replace('-','').replace('.','').replace('/','').replace("'",'').replace(';', '').replace(':', '').replace(u'·','').lower()
             PublicationName = PublicationName.split(',')[0]
-            self.meta.append(u'*source_' + PublicationName)
+            if len([val for val in self.meta if val.startswith(u'*source_')]) == 0 :
+                self.meta.append(u'*source_' + PublicationName)
             self.currentattr = None
 #        elif self.currentattr == 'DocHeader' :
 #            date = finddate(data)
@@ -119,7 +120,7 @@ class MyHTMLParser(HTMLParser):
             self.content.append(' '.join(data.replace('\n', ' ').split()) + ' ')
             #self.outfile.write(' '.join(data.replace('\n', ' ').split()).encode('utf8', errors='replace') + ' ')
         elif self.currentattr == 'PubliC_lblNodoc' :
-            date = data[5:13]
+            date = data.split(u'·')[1]#data[5:13]
             date = makedate(date)
             self.meta += [u'*date_' + '-'.join(date), u'*am_' + '-'.join(date[0:2]), u'*annee_' + date[0]]
             self.meta.append('\n')
@@ -130,7 +131,7 @@ class MyHTMLParser(HTMLParser):
             self.meta = [u'****']
             self.nb += 1
             self.currentattr = None
-    
+
     def doinit(self, outfile):
         self.currentattr = None
         self.meta = [u'****']
@@ -138,28 +139,31 @@ class MyHTMLParser(HTMLParser):
         self.nb = 0
         self.outfile = outfile
         print 'init ok'
-        
+
 
 def ParseEuropress(txtdir, fileout, encodage_in, encodage_out) :
         files = []
-        for root, subfolders, subfiles in os.walk(txtdir) :
-            nf = [os.path.join(root, f) for f in subfiles if f.split('.')[-1] in ['html', 'HTML'] ]
-            nf.sort()
-            files += nf
-        if len(files) == 0 :
-            return 'nofile'
+        if os.path.isdir(txtdir) :
+            for root, subfolders, subfiles in os.walk(txtdir) :
+                nf = [os.path.join(root, f) for f in subfiles if f.split('.')[-1] in ['html', 'HTML'] ]
+                nf.sort()
+                files += nf
+            if len(files) == 0 :
+                return 'nofile'
+        elif os.path.isfile(txtdir) :
+            files.append(txtdir)
         tot = 0
         parser = MyHTMLParser()
-        with open(fileout,'w') as outf : 
-            for f in files : 
+        with open(fileout,'w') as outf :
+            for f in files :
                 print f
                 parser.doinit(outf)
-                with codecs.open(f, 'rU', encodage_in) as infile : 
-                    content = infile.read() 
+                with codecs.open(f, 'rU', encodage_in) as infile :
+                    content = infile.read()
                     content = HTMLParser().unescape(content)
                 parser.feed(content)
                 tot += parser.nb
         return tot
 
 #ParseEuropress('/home/pierre/fac/HDR/psychanalyse',
-#               '/home/pierre/fac/HDR/psycha.txt', 'utf8', 'utf8')     
+#               '/home/pierre/fac/HDR/psycha.txt', 'utf8', 'utf8')
