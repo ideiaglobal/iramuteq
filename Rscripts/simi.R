@@ -1,6 +1,6 @@
 #from proxy package
 #############################################################
-#a, b, c, and d are the counts of all (TRUE, TRUE), (TRUE, FALSE), (FALSE, TRUE), and (FALSE, FALSE) 
+#a, b, c, and d are the counts of all (TRUE, TRUE), (TRUE, FALSE), (FALSE, TRUE), and (FALSE, FALSE)
 # n <- a + b + c + d = nrow(x)
 
 make.a <- function(x) {
@@ -36,15 +36,34 @@ my.jaccard <- function(x) {
     jac
 }
 
+#Col-wise Jaccard similarity
+#http://stats.stackexchange.com/a/89947/2817
+sparse.jaccard <- function(x) {
+  A = crossprod(x)
+  ix = which(A > 0, arr.ind=TRUE)
+  b = colSums(x)
+  Aix = A[ix]
+  J = sparseMatrix(
+    i = ix[,1],
+    j = ix[,2],
+    x = Aix / (b[ix[,1]] + b[ix[,2]] - Aix),
+    dims = dim(A)
+  )
+  colnames(J) <- colnames(x)
+  rownames(J) <- row.names(x)
+  return(J)
+}
+
+
 
 prcooc <- function(x, a) {
-    prc <- (a / nrow(x)) 
+    prc <- (a / nrow(x))
     prc
 }
 
 make.bin <- function(cs, a, i, j, nb) {
     if (a[i, j] >= 1) {
-        ab <- a[i, j] - 1 
+        ab <- a[i, j] - 1
         res <- binom.test(ab, nb, (cs[i]/nb) * (cs[j]/nb), "less")
     } else {
         res <- NULL
@@ -167,7 +186,7 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
     }
     if (!is.null(coeff.edge)) {
         #FIXME
-        we.width <- norm.vec(abs(E(g.toplot)$weight), coeff.edge[1], coeff.edge[2]) 
+        we.width <- norm.vec(abs(E(g.toplot)$weight), coeff.edge[1], coeff.edge[2])
 	    #we.width <- abs((E(g.toplot)$weight/max(abs(E(g.toplot)$weight)))*coeff.edge)
     } else {
         we.width <- NULL
@@ -221,14 +240,14 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
         if (layout.type == 'graphopt')
             lo <- layout_as_tree(g.toplot, circular = TRUE)
 		if (layout.type == 'spirale')
-			lo <- spirale(g.toplot, E(g.toplot)$weight, index.word) 
+			lo <- spirale(g.toplot, E(g.toplot)$weight, index.word)
 		if (layout.type == 'spirale3D')
 			lo <- spirale3D(g.toplot, E(g.toplot)$weight, index.word)
     } else {
         lo <- coords
     }
     if (!is.null(communities)) {
-        if (communities == 0 ){ 
+        if (communities == 0 ){
             com <- edge.betweenness.community(g.toplot)
         } else if (communities == 1) {
             com <- fastgreedy.community(g.toplot)
@@ -244,14 +263,14 @@ do.simi <- function(x, method = 'cooc',seuil = NULL, p.type = 'tkplot',layout.ty
             com <- spinglass.community(g.toplot)
         } else if (communities == 7) {
             com <- walktrap.community(g.toplot)
-        } 
+        }
     } else {
         com <- NULL
     }
-    
+
 	out <- list(graph = g.toplot, mat.eff = mat.eff, eff = eff, mat = mat.simi, v.label = v.label, we.width = we.width, we.label=we.label, label.cex = label.cex, layout = lo, communities = com, halo = halo, elim=vec)
 }
-	
+
 plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities = NULL, vertex.col = 'red', edge.col = 'black', edge.label = TRUE, vertex.label=TRUE, vertex.label.color = 'black', vertex.label.cex= NULL, vertex.size=NULL, leg=NULL, width = 800, height = 800, alpha = 0.1, cexalpha = FALSE, movie = NULL, edge.curved = TRUE, svg = FALSE, bg='white') {
 	mat.simi <- graph.simi$mat
 	g.toplot <- graph.simi$graph
@@ -363,10 +382,11 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
         #play3d(spin3d(axis=c(0,1,0),rpm=6))
         if (p.type == 'rglweb') {
             writeWebGL(dir = filename, width = width, height= height)
-        } else {
+			#rglwidget()
+        }# else {
             require(tcltk)
             ReturnVal <- tkmessageBox(title="RGL 3 D",message="Cliquez pour fermer",icon="info",type="ok")
-        }
+        #}
         rgl.close()
 	#	while (rgl.cur() != 0)
 	#		Sys.sleep(0.5)
@@ -455,7 +475,6 @@ merge.graph <- function(graphs) {
     V.weight <- V(ng)$weight_1 
     E.weight <- E(ng)$weight_1
     cols <- rainbow(length(graphs))
-	print(cols)
     V.color <- rep(cols[1], length(V.weight))
     for (i in 2:length(graphs)) {
         tw <- paste('weight_', i, sep='')
@@ -506,6 +525,58 @@ merge.graph <- function(graphs) {
 	V(ng)$b <- colors["blue", ]
     ng
 }
+
+merge.graph.proto <- function(graphs) {
+    library(colorspace)
+    ng <- graph.union(graphs, byname=T)
+    V.weight <- V(ng)$weight_1 
+    E.weight <- E(ng)$weight_1
+	V.proto.color <- V(ng)$proto.color_1
+	cols <- rainbow(length(graphs))
+	V.color <- rep(cols[1], length(V.weight))
+    for (i in 2:length(graphs)) {
+        tw <- paste('weight_', i, sep='')
+        tocomp <- get.vertex.attribute(ng,tw)
+        totest <- intersect(which(!is.na(V.weight)), which(!is.na(tocomp)))
+        maxmat <- cbind(V.weight[totest], tocomp[totest])
+        resmax <- apply(maxmat, 1, which.max)
+        V.weight[totest] <- apply(maxmat, 1, max)
+        nas <- which(is.na(V.weight))
+        nas2 <- which(is.na(tocomp))
+        fr2 <- setdiff(nas,nas2)
+        V.weight[fr2] <- tocomp[fr2]
+
+		cw <- paste('proto.color_', i, sep='')
+		tocomp.col <- get.vertex.attribute(ng,cw)
+		which.sup <- which(resmax==2)
+		V.proto.color[totest[which.sup]] <- tocomp.col[totest[which.sup]]
+		V.proto.color[fr2] <- tocomp.col[fr2]
+
+		V.color[totest[which.sup]] <- cols[i]
+		V.color[fr2] <- cols[i]
+
+        tocomp <- get.edge.attribute(ng, tw)
+        totest <- intersect(which(!is.na(E.weight)), which(!is.na(tocomp)))
+        maxmat <- cbind(E.weight[totest], tocomp[totest])
+        resmax <- apply(maxmat, 1, which.max)
+        E.weight[totest] <- apply(maxmat, 1, max)
+        nas <- which(is.na(E.weight))
+        nas2 <- which(is.na(tocomp))
+        fr2 <- setdiff(nas,nas2)
+        E.weight[fr2] <- tocomp[fr2]        	
+	}
+    V(ng)$weight <- V.weight
+    V(ng)$proto.color <- V.proto.color
+	V(ng)$color <- V.proto.color
+    E(ng)$weight <- E.weight
+	V(ng)$ocolor <- V.color
+	colors <- col2rgb(V(ng)$color)
+	V(ng)$r <- colors["red", ]
+	V(ng)$g <- colors["green", ]
+	V(ng)$b <- colors["blue", ]
+    ng
+}
+
 
 spirale <- function(g, weigth, center, miny=0.1) {
 	ncoord <- matrix(0, nrow=length(weigth)+1, ncol=2)
