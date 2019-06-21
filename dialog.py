@@ -4,6 +4,7 @@
 #Copyright (c) 2008-2009 Pierre Ratinaud
 #License: GNU/GPL
 import  wx
+import wx.html
 import  wx.lib.colourselect as csel
 import wx.lib.sized_controls as sc
 import wx.lib.filebrowsebutton as filebrowse
@@ -11,11 +12,12 @@ import locale
 from functions import DoConf, exec_rcode, translation_languages
 import os
 from shutil import copyfile
-from PrintRScript import barplot, ChronoChi2Script, ChronoPropScript
+from PrintRScript import barplot, ChronoChi2Script, ChronoPropScript, ChronoggScript
 import tempfile
 import sys
 from KeyFrame import AlcOptFrame
 import wx.lib.hyperlink as hl
+
 #---------------------------------------------------------------------------
 provider = wx.SimpleHelpProvider()
 wx.HelpProvider_Set(provider)
@@ -96,7 +98,7 @@ class FileOptionDialog(wx.Dialog):
         elif sheet :
             label = wx.StaticText(self, -1, u"Feuille ")
             grid_sizer.Add(label, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
-            self.spin1 = wx.SpinCtrl(self, -1, '',size = (100,30), min=1, max=500)
+            self.spin1 = wx.SpinCtrl(self, -1, '',size = wx.DefaultSize, min=1, max=500)
             grid_sizer.Add(self.spin1, 1, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
 
         sizer.Add(grid_sizer, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
@@ -546,54 +548,54 @@ class PrefGraph(wx.Dialog):
         if self.paramgraph['clnb'] <= 3 :
             choix = [u'2D', 'web 2D']
         else :
-            choix=[u'2D' ,u'3D', 'web 2D', 'web 3D']
+            choix=[u'2D' ,u'3D', 'web 2D', 'web 3D', 'Blender']
         self.choicetype = wx.Choice(self, -1, (100,50), choices=choix)
         self.label_format = wx.StaticText(self, -1, _(u"Picture format").decode('utf8'))
         self.choix_format =  wx.Choice(self, -1, (100,50), choices = ['png', 'svg'])
         self.label_1 = wx.StaticText(self, -1, _(u"width").decode('utf8'))
-        self.spin1 = wx.SpinCtrl(self, -1, '',size = (100,30), min=100, max=5000)
+        self.spin1 = wx.SpinCtrl(self, -1, '',size = wx.DefaultSize, min=100, max=5000)
         self.label_2 = wx.StaticText(self, -1, _(u"height").decode('utf8'))
-        self.spin2 = wx.SpinCtrl(self, -1, '', size = (100,30), min=100, max=5000)
+        self.spin2 = wx.SpinCtrl(self, -1, '', size = wx.DefaultSize, min=100, max=5000)
         self.label_what = wx.StaticText(self, -1, _(u"Representation").decode('utf8'))
         self.choice1 = wx.Choice(self, -1, (100,50), choices=[_(u"coordinates").decode('utf8'),_(u"correlations").decode('utf8')])
         self.label_qui = wx.StaticText(self, -1, u'Variables')
         self.choice2 = wx.Choice(self, -1, (100,50), choices=[_(u"actives").decode('utf8') ,_(u"supplementaries").decode('utf8'), _(u"stars").decode('utf8'), _(u"clusters").decode('utf8')])
         self.label_3 = wx.StaticText(self, -1, _(u"Text size").decode('utf8'))
-        self.spin3 = wx.SpinCtrl(self, -1, '', size = (100,30), min=1, max=20)
+        self.spin3 = wx.SpinCtrl(self, -1, '', size = wx.DefaultSize, min=1, max=20)
         txt = _(u"Take the x first points").decode('utf8')
         self.label_4 = wx.StaticText(self, -1, txt)
         self.check1 = wx.CheckBox(self, -1)
-        self.spin_nb = wx.SpinCtrl(self, -1, '', size = (100,30), min=2, max=1000)
+        self.spin_nb = wx.SpinCtrl(self, -1, '', size = wx.DefaultSize, min=2, max=1000)
         txt = _(u"Take the x first points by cluster").decode('utf8')
         self.label_chic = wx.StaticText(self, -1, txt)
         self.check_chic = wx.CheckBox(self, -1)
-        self.spin_nbchic = wx.SpinCtrl(self, -1, '', size = (100,30), min=2, max=1000)
+        self.spin_nbchic = wx.SpinCtrl(self, -1, '', size = wx.DefaultSize, min=2, max=1000)
         txt = _(u"Limit points by cluster chi2").decode('utf8')
         self.label_5 = wx.StaticText(self, -1, txt)
         self.check2 = wx.CheckBox(self, -1)
-        self.spin_chi = wx.SpinCtrl(self, -1, '',size = (100,30),  min=2, max=1000)
+        self.spin_chi = wx.SpinCtrl(self, -1, '',size = wx.DefaultSize,  min=2, max=1000)
         self.label_6 = wx.StaticText(self, -1, _(u"Avoid overlay").decode('utf8'))
         self.check3 = wx.CheckBox(self, -1)
         txt = _(u"Text size proportional to frequency").decode('utf8')
         self.label_7 = wx.StaticText(self, -1, txt)
         self.check4 = wx.CheckBox(self, -1)
         self.label_min = wx.StaticText(self, -1, 'min')
-        self.spin_min = wx.SpinCtrl(self, -1, '',size = (100,30), min = 1, max = 100)
+        self.spin_min = wx.SpinCtrl(self, -1, '',size = wx.DefaultSize, min = 1, max = 100)
         self.label_max = wx.StaticText(self, -1, 'max')
-        self.spin_max = wx.SpinCtrl(self, -1, '',size = (100,30), min = 1, max = 100)
+        self.spin_max = wx.SpinCtrl(self, -1, '',size = wx.DefaultSize, min = 1, max = 100)
         txt = _(u"Text size proportional to chi2").decode('utf8')
         self.label_tchi = wx.StaticText(self, -1, txt)
         self.check_tchi = wx.CheckBox(self, -1)
         self.label_min_tchi = wx.StaticText(self, -1, 'min')
-        self.spin_min_tchi = wx.SpinCtrl(self, -1, '', size = (100,30), min = 1, max = 100)
+        self.spin_min_tchi = wx.SpinCtrl(self, -1, '', size = wx.DefaultSize, min = 1, max = 100)
         self.label_max_tchi = wx.StaticText(self, -1, 'max')
-        self.spin_max_tchi = wx.SpinCtrl(self, -1, '', size = (100,30), min = 1, max = 100)
+        self.spin_max_tchi = wx.SpinCtrl(self, -1, '', size = wx.DefaultSize, min = 1, max = 100)
         self.label_8 = wx.StaticText(self, -1, _(u"Factor x : ").decode('utf8'))
-        self.spin_f1 = wx.SpinCtrl(self, -1, '',size = (100,30), min=1, max=self.paramgraph['clnb']-1)
+        self.spin_f1 = wx.SpinCtrl(self, -1, '',size = wx.DefaultSize, min=1, max=self.paramgraph['clnb']-1)
         self.label_9 = wx.StaticText(self, -1, _(u"Factor y : ").decode('utf8'))
-        self.spin_f2 = wx.SpinCtrl(self, -1, '',size = (100,30), min=1, max=self.paramgraph['clnb']-1)
+        self.spin_f2 = wx.SpinCtrl(self, -1, '',size = wx.DefaultSize, min=1, max=self.paramgraph['clnb']-1)
         self.label_f3 = wx.StaticText(self, -1, _(u"Factor z : ").decode('utf8'))
-        self.spin_f3 = wx.SpinCtrl(self, -1, '',size = (100,30), min=1, max=self.paramgraph['clnb']-1)
+        self.spin_f3 = wx.SpinCtrl(self, -1, '',size = wx.DefaultSize, min=1, max=self.paramgraph['clnb']-1)
         self.label_sphere = wx.StaticText(self, -1, _(u"Spheres transparency").decode('utf8'))
         self.slider_sphere = wx.Slider(self, -1, 10, 1, 100, size = (255,-1), style = wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS)
 
@@ -1109,6 +1111,7 @@ class StatDialog ( wx.Dialog ):
     # Virtual event handlers, overide them in your derived class
     def OnKeys( self, event ):
         dial = AlcOptFrame(self, self.parent)
+        dial.corpus = self.corpus
         dial.CenterOnParent()
         dial.ShowModal()
         for i in range(0,len(dial.listlabel)):
@@ -1267,7 +1270,7 @@ class PrefSegProf(wx.Dialog) :
         self.m_staticText3.Wrap( -1 )
         fgSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
-        self.spin_min = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (100,30), wx.SP_ARROW_KEYS, 2, 30, 2 )
+        self.spin_min = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 2, 30, 2 )
         self.spin_min.SetValue(2)
         fgSizer1.Add( self.spin_min, 0, wx.ALL, 5 )
 
@@ -1275,7 +1278,7 @@ class PrefSegProf(wx.Dialog) :
         self.m_staticText4.Wrap( -1 )
         fgSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
-        self.spin_max = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (100,30), wx.SP_ARROW_KEYS, 2, 30, 10 )
+        self.spin_max = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 2, 30, 10 )
         self.spin_max.SetValue(10)
         fgSizer1.Add( self.spin_max, 0, wx.ALL, 5 )
 
@@ -1283,7 +1286,7 @@ class PrefSegProf(wx.Dialog) :
         self.m_staticText5.Wrap( -1 )
         fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
-        self.spin_eff = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (100,30), wx.SP_ARROW_KEYS, 4, 1000, 4 )
+        self.spin_eff = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 4, 1000, 4 )
         self.spin_eff.SetValue(4)
         fgSizer1.Add( self.spin_eff, 0, wx.ALL, 5 )
 
@@ -1755,7 +1758,7 @@ class OptLexi(wx.Dialog):
     def __init__(self, parent, force_chi = False):
         # begin wxGlade: MyDialog.__init__
         #kwds["style"] = wx.DEFAULT_DIALOG_STYLE
-        wx.Dialog.__init__(self, parent, style = wx.DEFAULT_DIALOG_STYLE)
+        wx.Dialog.__init__(self, parent, style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
         self.listet = None
         self.variables = None
         self.force_chi = force_chi
@@ -1770,7 +1773,7 @@ class OptLexi(wx.Dialog):
         self.label_var =  wx.StaticText(self, -1, _(u"Select by").decode('utf8'))
         self.choice = wx.Choice(self, -1, (100,50), choices = [_(u"variables").decode('utf8'), _(u"modalities").decode('utf8')])
         self.label1 =  wx.StaticText(self, -1, _(u"Choice").decode('utf8'))
-        self.list_box_1 = wx.ListBox(self, -1, choices=[],  size = wx.Size( 150,200 ), style=wx.LB_EXTENDED | wx.LB_HSCROLL)
+        self.list_box_1 = wx.ListBox(self, -1, choices=[],  size = wx.Size( 300,200 ), style=wx.LB_EXTENDED | wx.LB_HSCROLL)
         self.button_2 = wx.Button(self, wx.ID_CANCEL, "")
         self.button_1 = wx.Button(self, wx.ID_OK, "")
         if not self.force_chi :
@@ -1781,7 +1784,7 @@ class OptLexi(wx.Dialog):
         self.choice_indice =  wx.Choice(self, -1, (100,50), choices = indices)
         if not self.force_chi :
             self.label = wx.StaticText(self, -1, _(u"Minimum frequency").decode('utf8'))
-            self.spin = wx.SpinCtrl(self, -1, min = 1, max = 10000, initial = 10)
+            self.spin = wx.SpinCtrl(self, -1, min = 1, max = 10000, initial = 10, size=wx.DefaultSize)
         self.Bind(wx.EVT_CHOICE, self.onselect, self.choice)
         self.Bind(wx.EVT_LISTBOX, self.onchoose, self.list_box_1)
         self.__set_properties()
@@ -1812,7 +1815,7 @@ class OptLexi(wx.Dialog):
         sizer_2.Add(self.label_var, 0, wx.ALIGN_CENTER_VERTICAL, 3)
         sizer_2.Add(self.choice, 0, wx.ALIGN_CENTER_VERTICAL, 3)
         sizer_2.Add(self.label1, 0, wx.ALIGN_CENTER_VERTICAL, 3)
-        sizer_2.Add(self.list_box_1, 0, wx.ALIGN_RIGHT, 3)
+        sizer_2.Add(self.list_box_1, 0, wx.ALIGN_RIGHT|wx.EXPAND, 3)
         sizer_3.Add(self.button_2, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 3)
         sizer_3.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL, 3)
         sizer_2.Add(self.label_indice, 0, wx.ALIGN_CENTER_VERTICAL, 3)
@@ -1850,9 +1853,9 @@ class OptLexi(wx.Dialog):
 
 class PrefDendro ( wx.Dialog ):
 
-    def __init__( self, parent, param ):
+    def __init__( self, parent, parametres ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Dendrogram").decode('utf8'), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
-        self.param = param
+        self.parametres = parametres
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 
         fgSizer1 = wx.FlexGridSizer( 0, 2, 0, 0 )
@@ -1924,7 +1927,7 @@ class PrefDendro ( wx.Dialog ):
         self.m_staticline41 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
         fgSizer1.Add( self.m_staticline41, 0, wx.EXPAND |wx.ALL, 5 )
 
-        if self.param['typedendro'] == 'classique' :
+        if self.parametres['typedendro'] == 'classique' :
             self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, _(u"Color or black and white").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
             self.m_staticText5.Wrap( -1 )
             fgSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
@@ -1963,13 +1966,13 @@ class PrefDendro ( wx.Dialog ):
             self.m_staticline8 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
             fgSizer1.Add( self.m_staticline8, 0, wx.EXPAND |wx.ALL, 5 )
 
-        if self.param.get('translation', False) :
+        if self.parametres.get('translation', False) :
             self.m_staticText66 = wx.StaticText( self, wx.ID_ANY, _(u"Translation").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
             self.m_staticText66.Wrap( -1 )
             fgSizer1.Add( self.m_staticText66, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
             m_choice1Choices = [ u"phylogram", u"cladogram", u"fan", u"unrooted", u"radial" ]
-            self.trans = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ['None'] + [val[0] for val in self.param['translation']], 0 )
+            self.trans = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, ['None'] + [val[0] for val in self.parametres['translation']], 0 )
             self.trans.SetSelection( 0 )
             fgSizer1.Add( self.trans, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
 
@@ -1991,14 +1994,14 @@ class PrefDendro ( wx.Dialog ):
         self.Centre( wx.BOTH )
 
     def __set_properties(self):
-        self.m_spinCtrl2.SetValue(self.param['width'])
-        self.m_spinCtrl1.SetValue(self.param['height'])
-        self.m_choice1.SetSelection(self.param['type_dendro'])
-        self.choice_format.SetSelection(self.param['svg'])
-        if self.param['typedendro'] == 'classique' :
-            self.m_radioBox1.SetSelection(self.param['color_nb'])
-            self.m_checkBox1.SetValue(self.param['taille_classe'])
-            self.m_radioBox2.SetSelection(self.param['type_tclasse'])
+        self.m_spinCtrl2.SetValue(self.parametres['width'])
+        self.m_spinCtrl1.SetValue(self.parametres['height'])
+        self.m_choice1.SetSelection(self.parametres['type_dendro'])
+        self.choice_format.SetSelection(self.parametres['svg'])
+        if self.parametres['typedendro'] == 'classique' :
+            self.m_radioBox1.SetSelection(self.parametres['color_nb'])
+            self.m_checkBox1.SetValue(self.parametres['taille_classe'])
+            self.m_radioBox2.SetSelection(self.parametres['type_tclasse'])
 
     def __del__( self ):
         pass
@@ -2034,7 +2037,7 @@ class PrefWordCloud ( wx.Dialog ):
         self.m_staticText3.Wrap( -1 )
         bSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
 
-        self.spin_H = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 100,30 ), wx.SP_ARROW_KEYS, 0, 10000, 600 )
+        self.spin_H = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10000, 600 )
         self.spin_H.SetValue( 800 )
         bSizer1.Add( self.spin_H, 0, wx.ALL, 5 )
 
@@ -2046,7 +2049,7 @@ class PrefWordCloud ( wx.Dialog ):
         self.m_staticText4.Wrap( -1 )
         bSizer3.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
 
-        self.spin_L = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 100,30 ), wx.SP_ARROW_KEYS, 0, 10000, 600 )
+        self.spin_L = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10000, 600 )
         self.spin_L.SetValue( 800 )
         bSizer3.Add( self.spin_L, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
@@ -2674,6 +2677,7 @@ class ConcordList(wx.HtmlListBox):
 class message(wx.Frame):
     def __init__(self, parent, items, title, size, save = True, uceids = None):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.CLOSE_BOX|wx.DEFAULT_FRAME_STYLE|wx.FRAME_FLOAT_ON_PARENT|wx.TAB_TRAVERSAL )
+        self.parent = parent
         self.save = save
         self.uceids = uceids
         self.ira = wx.GetApp().GetTopWindow()
@@ -2692,6 +2696,8 @@ class message(wx.Frame):
         self.button_1 = wx.Button(self.panel, wx.ID_CANCEL)
 
         self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.button_1)
+        #self.HtmlPage.Bind(wx.wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, self.Download)
+        self.HtmlPage.Bind(wx.html.EVT_HTML_LINK_CLICKED, self.OnLink)
         if self.save :
             self.button_2 = wx.Button(self.panel, wx.ID_SAVE)
             self.Bind(wx.EVT_BUTTON, self.OnSavePage, self.button_2)
@@ -2730,6 +2736,19 @@ class message(wx.Frame):
             path = dlg.GetPath()
             with open(path, 'w') as f :
                 f.write(self.html)
+
+    def OnLink(self, evt):
+        corpus = self.ira.tree.page.corpus
+        link = evt.GetLinkInfo().GetHref().split('_')
+        uciid = int(link[0])
+        uceid = int(link[1])
+        et = '<b>' + ' '.join(corpus.ucis[uciid].etoiles) + '</b><br>\n'
+        txt = corpus.getuciconcorde_uces(uciid, uceid)
+        txt = '\n'.join([row[1] + '<br>' if row[0] != uceid else '<font color=red><b>%s</b></font><br>' % row[1] for row in txt])
+        txt = '<html>\n<body>\n' + et + txt + '\n</body>\n</html>'
+        fullframe = FullText(self.ira)
+        fullframe.m_htmlWin1.SetPage(txt)
+        fullframe.Show()
 
     def OnCloseMe(self, event):
         self.Close(True)
@@ -3336,7 +3355,7 @@ class ImageViewer ( wx.Frame ):
 
     def OnSaveImage(self, event) :
         dlg = wx.FileDialog(
-            self, message=_(u"Save as...").decode('utf8'), defaultDir=os.getcwd(),
+            self, message=_(u"Save as...").decode('utf8'), defaultDir=self.parametres.get('pathout',os.getcwd()),
             defaultFile= self.imagename, wildcard=self.parametres['wildcard'], style=wx.SAVE | wx.OVERWRITE_PROMPT
             )
         dlg.SetFilterIndex(0)
@@ -3362,9 +3381,12 @@ class BarFrame :
             if dial.format.GetSelection() == 0 :
                 svg = 'FALSE'
                 wildcard = "png|*.png"
+                fout = 'image.png'
             else :
                 svg = 'TRUE'
                 wildcard = "svg|*.svg"
+                fout = 'image.svg'
+            pathout = ira.tree.page.pathout[fout]
             parametres = {'width' : dial.widthsp.GetValue(),
                           'height': dial.heightsp.GetValue(),
                           'colnames' : colnames,
@@ -3372,7 +3394,9 @@ class BarFrame :
                           'tmpgraph' : tmpgraph,
                           'rgraph' : ira.RscriptsPath['Rgraph'],
                           'svg' : svg,
-                          'wildcard' : wildcard}
+                          'wildcard' : wildcard,
+                          'pathout': pathout
+                         }
             if tree :
                 parametres['tree'] = tree
             txt = barplot(table, parametres)
@@ -3409,8 +3433,10 @@ class ChronoFrame :
             self.parametres.update(parametres)
             if which == 'chi2' :
                 script = ChronoChi2Script(self)
-            else :
+            elif which == 'prop' :
                 script = ChronoPropScript(self)
+            elif which == 'gg' :
+                script = ChronoggScript(self)
             script.make_script()
             exec_rcode(ira.RPath, script.scriptout, wait = True)
             win = ImageViewer(ira, self.parametres, _(u"Graphic").decode('utf8'), size=(700, 500))
@@ -3795,4 +3821,48 @@ class MergeClusterFrame ( wx.Dialog ):
             del self.items[ref]
             self.m_listBox4.Delete(val)
         event.Skip()
+
+
+class FullText ( wx.Frame ):
+
+	def __init__( self, parent ):
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 500,600 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+
+		self.SetSizeHints( -1, -1 )
+
+		bSizer1 = wx.BoxSizer( wx.VERTICAL )
+
+		self.m_panel1 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		bSizer2 = wx.BoxSizer( wx.VERTICAL )
+
+		self.m_htmlWin1 = wx.html.HtmlWindow( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.html.HW_SCROLLBAR_AUTO )
+		bSizer2.Add( self.m_htmlWin1, 8, wx.ALL | wx.EXPAND, 5 )
+
+		#self.m_richText1 = wx.richtext.RichTextCtrl( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0|wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER|wx.WANTS_CHARS )
+		#bSizer2.Add( self.m_richText1, 9, wx.EXPAND |wx.ALL, 5 )
+
+		m_sdbSizer1 = wx.StdDialogButtonSizer()
+		self.m_sdbSizer1OK = wx.Button( self.m_panel1, wx.ID_OK )
+		m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
+		self.m_sdbSizer1Cancel = wx.Button( self.m_panel1, wx.ID_CANCEL )
+		m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
+		m_sdbSizer1.Realize();
+
+		bSizer2.Add( m_sdbSizer1, 0, wx.EXPAND, 5 )
+
+
+		self.m_panel1.SetSizer( bSizer2 )
+		self.m_panel1.Layout()
+		bSizer2.Fit( self.m_panel1 )
+		bSizer1.Add( self.m_panel1, 1, wx.EXPAND |wx.ALL, 5 )
+
+
+		self.SetSizer( bSizer1 )
+		self.Layout()
+
+		self.Centre( wx.BOTH )
+
+	def __del__( self ):
+		pass
+
 

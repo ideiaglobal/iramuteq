@@ -45,7 +45,7 @@ from tabsimi import DoSimi
 from tabrsimple import InputText
 from tabverges import Prototypical
 from tabsplitvar import SplitMatrixFromVar
-#from textdist import AnalysePam
+#frog textdist import AnalysePam
 from textstat import Stat
 from textaslexico import Lexico
 from textlabbe import DistLabbe
@@ -54,7 +54,7 @@ from textwordcloud import WordCloud, ClusterCloud
 from textreinert import Reinert
 #from textcheckcorpus import checkcorpus
 from openanalyse import OpenAnalyse
-from corpus import Builder, SubBuilder
+from corpus import Builder, SubBuilder, MergeClusters
 from checkinstall import CreateIraDirectory, CheckRPath, FindRPAthWin32, FindRPathNix, CheckRPackages, IsNew, UpgradeConf, CopyConf, RLibsAreInstalled
 from chemins import RscriptsPath, ConstructConfigPath, ConstructDicoPath, ConstructGlobalPath, PathOut
 from parse_factiva_xml import ImportFactiva
@@ -104,6 +104,7 @@ ID_Fact_copy = wx.NewId()
 ID_exportmeta = wx.NewId()
 ID_importdmi = wx.NewId()
 ID_merge = wx.NewId()
+ID_merge_clusters = wx.NewId()
 ID_labbe = wx.NewId()
 ##########################################################
 #elements de configuration
@@ -177,6 +178,7 @@ code_langues = {'french' : 'fr_FR',
 images_analyses = {
         'textroot' : 'textroot.png',
         'alceste' : 'reinert.png',
+        'reinert' : 'reinert.png',
         'corpus' : 'textcorpus.png',
         'wordcloud' :'wordcloud.png',
         'stat' :'stats.png',
@@ -211,8 +213,8 @@ images_analyses = {
 
 class IraFrame(wx.Frame):
     def __init__(self, parent, id= -1, title="", pos=wx.DefaultPosition,
-                 size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE | 
-                                            wx.SUNKEN_BORDER | 
+                 size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE |
+                                            wx.SUNKEN_BORDER |
                                             wx.CLIP_CHILDREN):
         log.info('Starting... ' )
         log.info('version : %s' % ConfigGlob.get('DEFAULT', 'version'))
@@ -242,7 +244,7 @@ class IraFrame(wx.Frame):
         self.setlangue()
         #self.presLan_fr = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['fr_FR'])
         #self.presLan_en = gettext.translation("iramuteq", os.path.join(AppliPath,'locale'), languages=['en'])
-        # tell FrameManager to manage this frame        
+        # tell FrameManager to manage this frame
         #self._mgr = wx.aui.AuiManager()
         self._mgr = aui.AuiManager()
         self._mgr.SetManagedWindow(self)
@@ -259,11 +261,11 @@ class IraFrame(wx.Frame):
         #item.SetBitmap(wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
         item.SetBitmap(self.images_analyses['matroot'])
         file_menu.AppendItem(item)
-        
+
         item = wx.MenuItem(file_menu, ID_OpenText, _(u"Open a text corpus").decode('utf8'), _(u"Open a text corpus").decode('utf8'))
         item.SetBitmap(self.images_analyses['textroot'])
         file_menu.AppendItem(item)
-        
+
         item = wx.MenuItem(file_menu, ID_OnOpenAnalyse, _(u"Open an analysis").decode('utf8'), _(u"Open an analysis").decode('utf8'))
         item.SetBitmap(self.images_analyses['iramuteq'])
         file_menu.AppendItem(item)
@@ -281,6 +283,9 @@ class IraFrame(wx.Frame):
         file_menu.AppendItem(item)
 
         item = wx.MenuItem(file_menu, ID_merge, _(u'Merge graphs').decode('utf8'), _(u'Merge graphs').decode('utf8'))
+        file_menu.AppendItem(item)
+
+        item = wx.MenuItem(file_menu, ID_merge_clusters, _(u'Corpus from merge clusters').decode('utf8'), _(u'Corpus from merge clusters').decode('utf8'))
         file_menu.AppendItem(item)
 
         menuFactiva = wx.Menu()
@@ -372,7 +377,7 @@ class IraFrame(wx.Frame):
         #matrix_menu.Append(ID_SIMI, _(u"Similarities Analysis").decode('utf8'))
         #matrix_menu.Append(ID_proto, _(u"Prototypical Analysis").decode('utf8'))
         ID_RCODE = wx.NewId()
-        #matrix_menu.Append(ID_RCODE, u"Code R...") 
+        #matrix_menu.Append(ID_RCODE, u"Code R...")
         #menu_splittab = wx.Menu()
         #ID_SPLITVAR = wx.NewId()
         #splitvar = wx.MenuItem(menu_splittab, ID_SPLITVAR, _(u"Split from variable").decode('utf8'))
@@ -414,8 +419,8 @@ class IraFrame(wx.Frame):
 #         menu_classiftxt.Append(ID_TEXTREINERT, _(u"Reinert's Method").decode('utf8'))
 #         #menu_classiftxt.Append(ID_TEXTPAM, u"Par matrice des distances")
 #         text_menu.AppendMenu(-1, _(u"Clustering").decode('utf8'), menu_classiftxt)
-#         text_menu.Append(ID_SimiTxt, _(u"Similarities Analysis").decode('utf8')) 
-#         
+#         text_menu.Append(ID_SimiTxt, _(u"Similarities Analysis").decode('utf8'))
+#
 #         text_menu.Append(ID_WC, _(u"WordCloud").decode('utf8'))
         self.text_menu = text_menu
 
@@ -504,7 +509,7 @@ class IraFrame(wx.Frame):
         self.text_ctrl_txt = wx.TextCtrl(self, -1, "", wx.Point(0, 0), wx.Size(200, 200), wx.NO_BORDER | wx.TE_MULTILINE | wx.TE_RICH2 | wx.TE_READONLY)
 
         #self._mgr.AddPane(self.text_ctrl_txt, wx.aui.AuiPaneInfo().
-        #                  Name("Text").CenterPane())                      
+        #                  Name("Text").CenterPane())
         self._mgr.AddPane(self.text_ctrl_txt, aui.AuiPaneInfo().
                           Name("Text").CenterPane())
         #self._mgr.AddPane(IntroPanel(self), wx.aui.AuiPaneInfo().Name("Intro_Text").
@@ -515,6 +520,7 @@ class IraFrame(wx.Frame):
         #    with open(os.path.join(UserConfigPath, 'history.db'), 'w') as f :
         #        f.write('')
         self.history = History(os.path.join(UserConfigPath, 'history.db'))
+        #self.history.dostat()
         self.tree = LeftTree(self)
         self._mgr.AddPane(self.tree, aui.AuiPaneInfo().Name("lefttree").Caption(_(u"Historic").decode('utf8')).
                           Left().MinSize(wx.Size(200,500)).Layer(1).Position(1).CloseButton(False).MaximizeButton(True).
@@ -571,11 +577,11 @@ class IraFrame(wx.Frame):
         self.ShowAPane("Intro_Text")
         self._mgr.GetPane("lefttree").Show()
         self._mgr.GetPane("classif_tb").Hide()
-        # "commit" all changes made to FrameManager   
+        # "commit" all changes made to FrameManager
         self._mgr.Update()
 
         # Show How To Use The Closing Panes Event
-##################################################################        
+##################################################################
         self.Bind(wx.EVT_MENU, self.OnAcceuil, id=ID_ACCEUIL)
         self.Bind(wx.EVT_MENU, self.ShowTab, id=ID_RESULT)
         self.Bind(wx.EVT_MENU, self.OnOpenData, id=ID_OpenData)
@@ -621,6 +627,7 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnImportDMI, id=ID_importdmi)
         self.Bind(wx.EVT_MENU, self.OnExportMeta, id=ID_exportmeta)
         self.Bind(wx.EVT_MENU, self.OnMergeGraph, id = ID_merge)
+        self.Bind(wx.EVT_MENU, self.OnMergeClusters, id = ID_merge_clusters)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 ##################################################################
         flags = self._mgr.GetAGWFlags()
@@ -662,7 +669,7 @@ class IraFrame(wx.Frame):
         self.ShowMenu('view', True)
         self.ShowMenu('matrix', False)
         self.ShowMenu('text', False)
-   
+
         self._mgr.Update()
 
         self.DataPop = False
@@ -799,7 +806,7 @@ class IraFrame(wx.Frame):
         self.filename = self.input_path[0]
         if inputname:
             self.OpenText()
-   
+
     def OnSubText(self, evt, corpus = None, parametres = None):
         if corpus is None :
             corpus = self.tree.getcorpus()
@@ -816,7 +823,7 @@ class IraFrame(wx.Frame):
             OpenAnalyse(self, corpus.parametres)
             self.tree.OnItemAppend(corpus.parametres)
             del busy
-            
+
     def OpenText(self):
         builder =  Builder(self, 5)
         if builder.res == wx.ID_OK :
@@ -840,7 +847,7 @@ class IraFrame(wx.Frame):
                 count += 1
                 keepGoing = builder.dlg.Update(count, u"Chargement du dictionnaire")
                 builder.dlg.Destroy()
-        
+
     def OnExit(self, event):
         self.Close()
 
@@ -851,7 +858,7 @@ class IraFrame(wx.Frame):
         info.Copyright = ConfigGlob.get('DEFAULT', 'copyright')
         info.Translators = ConfigGlob.get('DEFAULT', 'translators').decode('utf8').split(';')
         info.Description = u"""
-Interface de R pour les Analyses Multidimensionnelles 
+Interface de R pour les Analyses Multidimensionnelles
 de Textes et de Questionnaires
 
 Un logiciel libre
@@ -864,7 +871,7 @@ REPERE
         info.WebSite = ("http://www.iramuteq.org", u"Site web IRaMuTeQ")
         dev = ConfigGlob.get('DEFAULT', 'dev').decode('utf8').split(';')
         info.Developers = dev
-        info.License = u"""Iramuteq est un logiciel libre ; vous pouvez le diffuser et/ou le modifier 
+        info.License = u"""Iramuteq est un logiciel libre ; vous pouvez le diffuser et/ou le modifier
 suivant les termes de la Licence Publique Générale GNU telle que publiée 
 par la Free Software Foundation ; soit la version 2 de cette licence, 
 soit (à votre convenance) une version ultérieure.
@@ -915,7 +922,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 
         if self.nb.GetPageCount() == 1 and not notebook :
             self.LastTabClose()
-    
+
     def LastTabClose(self) :
         if self.nb.GetPageCount() == 1 :
             if self.DataTxt :
@@ -1023,6 +1030,17 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
     def OnMergeGraph(self, evt):
         #FIXME
         AnalyseMerge(self, {'type': 'merge', 'fileout' : '/tmp/test.txt'}, dlg = 5)
+
+    def OnMergeClusters(self, evt) :
+        builder = MergeClusters(self, {})
+        if builder.res == wx.ID_OK :
+            busy = wx.BusyInfo(_("Please wait...").decode('utf8'), self)
+            wx.SafeYield()
+            corpus = builder.doanalyse()
+            self.history.add(corpus.parametres)
+            OpenAnalyse(self, corpus.parametres)
+            self.tree.OnItemAppend(corpus.parametres)
+            del busy
 
     def OnProto(self, evt, matrix = None) :
         self.analyse_matrix(Prototypical, matrix = matrix, analyse_type = 'proto', dlgnb = 3) 
@@ -1183,7 +1201,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 
     def SimiCluster(self, parametres = {}, fromprof = False, tableau = None) :
         self.analyse_matrix(DoSimi, parametres = parametres, analyse_type = 'simiclustermatrix', matrix = tableau, dlgnb = 5)
-    
+
 #    def OnSimi(self,evt):
 #        try :
             #print 'ATTENTION !!!! VERGES'
@@ -1198,7 +1216,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 
     def OnHelp(self, event):
         webbrowser.open('http://www.iramuteq.org/documentation')
-    
+
     def OnPref(self, event):
         dlg = PrefDialog(self)
         dlg.CenterOnParent()
@@ -1209,7 +1227,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         if self.check_update:
             NewVersion(self)
         else:
-            print 'pas de verif'    
+            print 'pas de verif'
         #IsNew(self)
         #CheckRPackages(self)
 
@@ -1247,8 +1265,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
                 OpenAnalyse(self, self.filename)
         if not truepath:
             print 'This file does not exist'
-            
-        
+
 
 class IntroPanel(wx.Panel):
     def __init__(self, parent):
@@ -1270,7 +1287,7 @@ class IntroPanel(wx.Panel):
         grid_sizer_1 = wx.FlexGridSizer(1, 4, 0, 0)
         grid_sizer_3 = wx.FlexGridSizer(1, 4, 0, 0)
         grid_sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         iralink = hl.HyperLinkCtrl(self, wx.ID_ANY, u"http://www.iramuteq.org", URL="http://www.iramuteq.org")
         iralink.SetColours(linkcolor, linkcolor, "RED")
         iralink.SetBackgroundColour(bckgrdcolor)
@@ -1278,19 +1295,19 @@ class IntroPanel(wx.Panel):
         iralink.SetUnderlines(False, False, True)
         iralink.SetBold(True)
         iralink.UpdateLink()
-        
+
         PanelPres = wx.Panel(self)
         bckgrdcolor = wx.Colour(randint(0, 255), randint(0, 255), randint(0, 255))
         PanelPres.SetBackgroundColour(bckgrdcolor)
-        
+
         label_1 = wx.StaticText(self, -1, u"IRaMuTeQ", size=(-1, -1))
         label_1.SetFont(wx.Font(46, wx.TELETYPE, wx.NORMAL, wx.BOLD, 0, "Purisa"))
         label_1.SetForegroundColour(wx.RED)
-        
+
         iraicone = wx.Image(os.path.join(ImagePath,'iraicone100x100.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         but_ira = wx.StaticBitmap(self, -1, bitmap = iraicone)
 
-        
+
         label2 = wx.StaticText(PanelPres, -1 , u'\nVersion ' + ConfigGlob.get('DEFAULT', 'version') + '\n')
         label2.SetForegroundColour(txtcolour)
         label2.SetBackgroundColour(bckgrdcolor)
@@ -1301,11 +1318,11 @@ class IntroPanel(wx.Panel):
         self.hyper2.SetUnderlines(False, False, True)
         self.hyper2.SetBold(True)
         self.hyper2.UpdateLink()
-        
+
         label_lerass = wx.StaticText(PanelPres, -1, u'Laboratoire ')
         label_lerass.SetForegroundColour(txtcolour)
         label_lerass.SetBackgroundColour(bckgrdcolor)
-        
+
         self.hyper_lerass = hl.HyperLinkCtrl(PanelPres, -1, u'LERASS', URL="http://www.lerass.com")
         self.hyper_lerass.SetColours(linkcolor, linkcolor, "RED")
         self.hyper_lerass.SetBackgroundColour(bckgrdcolor)
@@ -1313,18 +1330,18 @@ class IntroPanel(wx.Panel):
         self.hyper_lerass.SetUnderlines(False, False, True)
         self.hyper_lerass.SetBold(True)
         self.hyper_lerass.UpdateLink()
-        
+
         blank = wx.StaticText(PanelPres, -1, u'\n')
         blank1 = wx.StaticText(PanelPres, -1, u'\n')
-        
+
         labellicence = wx.StaticText(PanelPres, -1, _(u"License GNU GPL").decode('utf8'))
         labellicence.SetForegroundColour(txtcolour)
         labellicence.SetBackgroundColour(bckgrdcolor)
-        
+
         labelcopy = wx.StaticText(PanelPres, -1, ConfigGlob.get('DEFAULT', 'copyright'))
         labelcopy.SetForegroundColour(txtcolour)
         labelcopy.SetBackgroundColour(bckgrdcolor)
-        
+
         python_img = wx.Image(os.path.join(ImagePath,'python-logo.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         r_img = wx.Image(os.path.join(ImagePath,'Rlogo.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         lexique_img = wx.Image(os.path.join(ImagePath,'LexTexte4.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
@@ -1334,13 +1351,12 @@ class IntroPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.OnPython, but_python)
         self.Bind(wx.EVT_BUTTON, self.OnLexique, but_lexique)
         self.Bind(wx.EVT_BUTTON, self.OnR, but_r)
-        
-        
+
         grid_sizer_1.Add(self.hyper2, 0, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 0)
         grid_sizer_3.Add(label_lerass, 0, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 0)
         grid_sizer_3.Add(self.hyper_lerass, 0, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 0)
         sizer4.Add(label_1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 5)
-        
+
         sizer2.Add(label2, 0, wx.ALIGN_CENTER, 5)
         sizer2.Add(wx.StaticText(PanelPres, -1, u''), 0, wx.ALIGN_CENTER, 5)
         sizer2.Add(wx.StaticText(PanelPres, -1, u''), 0, wx.ALIGN_CENTER, 5)
@@ -1357,18 +1373,18 @@ class IntroPanel(wx.Panel):
         grid_sizer_2.Add(but_python, 1, wx.ALIGN_BOTTOM)
         grid_sizer_2.Add(but_lexique, 1, wx.ALIGN_BOTTOM)
         grid_sizer_2.Add(but_r, 1,  wx.ALIGN_BOTTOM)
-        
+
         sizer1.Add(PanelPres, 0, wx.EXPAND |wx.ALL, 10)
         sizer1.Add(grid_sizer_2, 2, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 1)
         self.SetSizer(sizer1)
         sizer1.Fit(self)
-    
+
     def OnPython(self,evt):
         webbrowser.open('http://www.python.org')
-    
+
     def OnLexique(self,evt):
         webbrowser.open('http://www.lexique.org')
-        
+
     def OnR(self,evt):
         webbrowser.open('http://www.r-project.org')
 
@@ -1384,7 +1400,7 @@ class MySplashScreen(wx.SplashScreen):
     def OnClose(self, evt):
         evt.Skip()
         self.Hide()
-        
+
         if self.fc.IsRunning():
             self.fc.Stop()
             self.ShowMain()
@@ -1401,7 +1417,7 @@ class MySplashScreen(wx.SplashScreen):
 #        if self.fc.IsRunning():
 #            self.Raise()
         #wx.CallAfter(frame.ShowTip)
-        
+
 class MyApp(wx.App):
     def OnInit(self):
         """
@@ -1409,7 +1425,7 @@ class MyApp(wx.App):
         the main frame when it is time to do so.
         """
         wx.SystemOptions.SetOptionInt("mac.window-plain-transition", 1)
-        self.SetAppName("Iramuteq")       
+        self.SetAppName("Iramuteq")
         splash = MySplashScreen()
         splash.Show()
         return True
