@@ -118,13 +118,15 @@ class AlcOptFrame(wx.Dialog):
         
     def CreateList(self,type):
         if type=='ver_sup' or type=='ver':
-            liste=[descr[0] for item,descr in self.dico.iteritems() if descr[1]==type]
+            #liste=[descr[0] for item,descr in self.dico.iteritems() if descr[1]==type]
+            liste = [forme for forme in self.corpus.formes if self.corpus.formes[forme].gram==type]
             liste=list(set(liste))
         else:
-            liste=[item for item,descr in self.dico.iteritems() if descr[1]==type]
+            #liste=[item for item,descr in self.dico.iteritems() if descr[1]==type]
+            liste = [forme for forme in self.corpus.formes if self.corpus.formes[forme].gram==type]
         liste.sort()
         txt=('\n').join(liste)
-        ListViewFrame=ListView(self.parent.parent)
+        ListViewFrame=ListView(self.parent)
         ListViewFrame.text_ctrl_1.WriteText(txt)
         ListViewFrame.text_ctrl_1.SetSelection(0,0)
         ListViewFrame.text_ctrl_1.SetInsertionPoint(0)
