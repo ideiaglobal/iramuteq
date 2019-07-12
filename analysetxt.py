@@ -23,6 +23,7 @@ class AnalyseText :
         self.dlg = dlg
         self.dialok = True
         self.parametres = parametres
+        #print(parametres)
         self.lemdial = lemdial
         self.val = False
         self.keys = DoConf(self.ira.ConfigPath['key']).getoptions()
@@ -33,6 +34,7 @@ class AnalyseText :
         self.parametres = self.lemparam()
         if self.parametres is not None :
             self.parametres = self.make_config(parametres)
+        #print 'paramtre aprs make_config', self.parametres
         log.info(self.pathout.dirout)
         if self.parametres is not None :
             self.keys = DoConf(self.ira.ConfigPath['key']).getoptions()
@@ -48,6 +50,7 @@ class AnalyseText :
             self.parametres['encoding'] = self.ira.syscoding
             self.t1 = time()
             if not self.parametres.get('dictionary', False) :
+                print self.parametres
                 self.corpus.make_lems(lem=self.parametres['lem'])
             else :
                 print 'read new dico'
@@ -64,7 +67,7 @@ class AnalyseText :
             if result_analyse is None :
                 self.time = time() - self.t1
                 minutes, seconds = divmod(self.time, 60)
-                hours, minutes = divmod(minutes, 60)            
+                hours, minutes = divmod(minutes, 60)
                 self.parametres['time'] = '%.0fh %.0fm %.0fs' % (hours, minutes, seconds)
                 self.parametres['ira'] = self.pathout['Analyse.ira']
                 DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
@@ -95,26 +98,27 @@ class AnalyseText :
         if self.dlg and self.lemdial:
             dial = StatDialog(self.parent, self.keys)
             dial.CenterOnParent()
+            dial.corpus = self.corpus
             val = dial.ShowModal()
             if val == 5100 :
                 if dial.radio_lem.GetSelection() == 0 :
                     lem = 1
                 else :
-                    lem = 0            
+                    lem = 0
                 self.parametres['lem'] = lem
                 if dial.radio_dictchoice.GetSelection() == 1 :
-                    self.parametres['dictionary'] = dial.dictpath.GetValue() 
+                    self.parametres['dictionary'] = dial.dictpath.GetValue()
                 dial.Destroy()
                 return self.parametres
             else :
                 dial.Destroy()
-                return None        
+                return None
         else :
             return self.parametres
 
     def make_config(self, config) :
         if config is not None :
-            if not self.dlg : 
+            if not self.dlg :
                 return config
             else :
                 return self.preferences()
