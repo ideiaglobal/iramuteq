@@ -11,14 +11,15 @@ import logging
 from openanalyse import OpenAnalyse
 from corpus import Corpus, copycorpus
 from tableau import Tableau, copymatrix
-from functions import DoConf, GetTxtProfile, TGen, BugReport, open_folder, translateprofile, ReadProfileAsDico, write_translation_profile
+from functions import DoConf, GetTxtProfile, TGen, BugReport, open_folder, translateprofile, ReadProfileAsDico, write_translation_profile, progressbar, doconcorde
 from profile_segment import ProfileSegment, ProfilType
 from search_tools import SearchFrame
-from dialog import PrefSimpleFile, PrefExport, SearchCorpus, translate_dialog
+from dialog import PrefSimpleFile, PrefExport, SearchCorpus, translate_dialog, PrefUCECarac
 from layout import open_antiprofil, TgenLayout
 from guifunct import TGenFrame
 from textaslexico import TgenSpec
 from textreinert import TgenProf
+from mergeclustergraph import MergeClusterGraph
 
 log = logging.getLogger('iramuteq.tree')
 
@@ -44,7 +45,7 @@ def buildmenu(menu, parent_menu):
             menu.AppendItem(nitem)
 
 class InfoDialog ( wx.Dialog ):
-    
+
     def __init__( self, parent, txt, parametres ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Informations", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE )
         if len(parametres) > 30 :
@@ -116,6 +117,11 @@ class LeftTree(CT.CustomTreeCtrl):
                  agwStyle=CT.TR_HIDE_ROOT|CT.TR_HAS_BUTTONS|CT.TR_HAS_VARIABLE_ROW_HEIGHT):
 
         CT.CustomTreeCtrl.__init__(self, parent, id, pos, size, style, agwStyle)
+        #FIXME : test for bigger font on HIDPI screen
+        font = wx.Font(pointSize=16, family=wx.DEFAULT, style=wx.NORMAL, weight=wx.FONTWEIGHT_NORMAL,
+               underline=False, face="", encoding=wx.FONTENCODING_DEFAULT)
+        self.SetFont(font)
+        ##################
         self.log = log
         alldata = dir(CT)
         treestyles = []
@@ -427,8 +433,10 @@ class LeftTree(CT.CustomTreeCtrl):
                 translate = menu.Append(wx.ID_ANY, _(u"Translate Profile").decode('utf8'))
                 profsr = menu.Append(wx.ID_ANY, _(u"Repeated segments profiles").decode('utf8'))
                 profgram = menu.Append(wx.ID_ANY, _(u"POS profiles").decode('utf8'))
+                stcaract = menu.Append(wx.ID_ANY, _(u"Caracteristics text segments").decode('utf8'))
                 tgen = menu.Append(wx.ID_ANY, _(u"Tgen Editor").decode('utf8'))
                 computetgen = menu.Append(wx.ID_ANY, _(u"Compute Tgen").decode('utf8'))
+                mergeclustergraph = menu.Append(wx.ID_ANY, _(u"Merge Cluster Graph").decode('utf8'))
                 export_corpus = menu.Append(wx.ID_ANY, _(u"Export corpus").decode('utf8'))
                 colored = menu.Append(wx.ID_ANY, _(u"Colored corpus").decode('utf8'))
                 navig = menu.Append(wx.ID_ANY, _(u"Navigator").decode('utf8'))
@@ -441,8 +449,10 @@ class LeftTree(CT.CustomTreeCtrl):
                 self.Bind(wx.EVT_MENU, self.OnTranslate, translate)
                 self.Bind(wx.EVT_MENU, self.OnProfSR, profsr)
                 self.Bind(wx.EVT_MENU, self.OnProfGram, profgram)
+                self.Bind(wx.EVT_MENU, self.OnStCaract, stcaract)
                 self.Bind(wx.EVT_MENU, self.OnTgenEditor, tgen)
                 self.Bind(wx.EVT_MENU, self.OnTgenCompute, computetgen)
+                self.Bind(wx.EVT_MENU, self.OnMergeClusterGraph, mergeclustergraph)
                 self.Bind(wx.EVT_MENU, self.OnExportCorpus, export_corpus)
                 self.Bind(wx.EVT_MENU, self.OnColored, colored)
                 self.Bind(wx.EVT_MENU, self.OnNavig, navig)
@@ -453,8 +463,10 @@ class LeftTree(CT.CustomTreeCtrl):
             elif pydata.get('type', False) == 'stat'  and pydata['uuid'] in self.parent.history.opened :
                 export_dictionary =  menu.Append(wx.ID_ANY, _(u"Export dictionary").decode('utf8'))
                 export_lems =  menu.Append(wx.ID_ANY, _(u"Export lemma dictionary").decode('utf8'))
+                export_cut_corpus = menu.Append(wx.ID_ANY, _(u"Export segmented corpus").decode('utf8'))
                 self.Bind(wx.EVT_MENU, self.OnExportDictionary, export_dictionary)
                 self.Bind(wx.EVT_MENU, self.OnExportLems, export_lems)
+                self.Bind(wx.EVT_MENU, self.OnExportCutCorpus, export_cut_corpus)
                 menu.AppendSeparator()
             elif pydata.get('type', False) == 'spec'  and pydata['uuid'] in self.parent.history.opened :
                 tgen = menu.Append(wx.ID_ANY, _(u"Tgen Editor").decode('utf8'))
@@ -570,6 +582,49 @@ class LeftTree(CT.CustomTreeCtrl):
     def OnProfGram(self, evt) :
         ProfilType(self.parent, self.page.corpus, self.page.parametres)
 
+    def OnMergeClusterGraph(self, evt) :
+        MergeClusterGraph(self.parent, self.page.corpus, self.page.parametres)
+        print 'merge done !'
+
+    def OnStCaract(self, evt) :
+        dial = PrefUCECarac(self, self.parent)
+        dial.CenterOnParent()
+        if self.page.parametres['classif_mode'] != 2 :
+            uci = False
+        else :
+            uci = True
+
+        if dial.ShowModal() == wx.ID_OK :
+            limite = dial.spin_eff.GetValue()
+            atype = dial.radio_type.GetSelection()
+            dial.Destroy()
+            corpus = self.page.corpus
+            dlg = progressbar(self.ira, maxi = len(corpus.lc))
+            dlg.Update(1, 'wait...')
+            for i in range(0, len(corpus.lc)) :
+                page = self.page.ProfNB.GetPage(i)
+                rcl = page.cl - 1
+                dlg.Update(i, u'Cluster %i' % (i+1))
+                uces = corpus.lc[rcl]
+                tab = corpus.make_table_with_classe(uces, page.la, uci = uci)
+                tab.pop(0)
+                if atype == 0 :
+                    ntab = [round(sum([page.lchi[j] for j, word in enumerate(line) if word == 1]),2) for line in tab]
+                else :
+                    ntab = [round(sum([page.lchi[j] for j, word in enumerate(line) if word == 1])/float(sum(line)),2) if sum(line)!=0 else 0 for line in tab]
+                ntab2 = [[ntab[j], uces[j]] for j, val in enumerate(ntab)]
+                del ntab
+                ntab2.sort(reverse = True)
+                ntab2 = ntab2[:limite]
+                nuces = [val[1] for val in ntab2]
+                ucis_txt, ucestxt = doconcorde(corpus, nuces, page.la, uci = uci)
+                items = ['<br>'.join([ucis_txt[j], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table><br>' % ntab2[j][0], ucestxt[j]]) for j, uce in enumerate(nuces)]
+                filename = self.page.pathout['st_caract_cl_%i.html' % (rcl+1)]
+                with open(filename, 'w') as f :
+                    f.write('\n'.join(items))
+            dlg.Destroy()
+
+
     def OnExportCorpus(self, evt) :
         dial = PrefExport(self, self.parent)
         dial.fbb.SetValue(os.path.join(os.path.dirname(self.page.dictpathout['ira']), 'export_corpus.txt'))
@@ -591,6 +646,19 @@ class LeftTree(CT.CustomTreeCtrl):
             dlg.CenterOnParent()
             dlg.ShowModal()
             dlg.Destroy()
+
+    def OnExportCutCorpus(self, evt) :
+        uci = False
+        fileout = os.path.join(os.path.dirname(self.page.pathout['ira']), 'segmented_corpus.txt')
+        txt = self.page.corpus.make_cut_corpus(uci = uci)
+        with open(fileout, 'w') as f :
+            f.write(txt)
+        msg = '\n'.join([_(u"Done !").decode('utf8'), fileout])
+        dlg = wx.MessageDialog(self.parent, msg, _(u"Segmented corpus"), wx.OK | wx.ICON_INFORMATION)
+        dlg.CenterOnParent()
+        dlg.ShowModal()
+        dlg.Destroy()
+
 
     def OnColored(self, evt) :
         dial = PrefSimpleFile(self, self.parent, **{'mask' : '*.html', 'title': _(u"Colored corpus").decode('utf8')})
@@ -632,7 +700,7 @@ class LeftTree(CT.CustomTreeCtrl):
             dlg = wx.MessageDialog(self.parent, msg, _(u"Clusters statistics").decode('utf8'), wx.OK | wx.ICON_INFORMATION)
             dlg.CenterOnParent()
             if dlg.ShowModal() == wx.ID_OK :
-                dlg.Destroy()        
+                dlg.Destroy()
 
     def OpenAntipro(self, evt) :
         find = False
