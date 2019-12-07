@@ -4,7 +4,7 @@ import sys
 #sys.path.append(path)
 #import iracmd
 from functions import DoConf, read_chd, ReadProfileAsDico
-from export_html import DoHTML
+#from export_html import DoHTML
 from chemins import ConstructPathOut, ChdTxtPathOut, FFF, ffr, PathOut, StatTxtPathOut, simipath
 from layout import SimiLayout
 from textsimi import *
