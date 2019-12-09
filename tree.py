@@ -433,7 +433,7 @@ class LeftTree(CT.CustomTreeCtrl):
                 translate = menu.Append(wx.ID_ANY, _(u"Translate Profile").decode('utf8'))
                 profsr = menu.Append(wx.ID_ANY, _(u"Repeated segments profiles").decode('utf8'))
                 profgram = menu.Append(wx.ID_ANY, _(u"POS profiles").decode('utf8'))
-                stcaract = menu.Append(wx.ID_ANY, _(u"Caracteristics text segments").decode('utf8'))
+                stcaract = menu.Append(wx.ID_ANY, _(u"Characteristics text segments").decode('utf8'))
                 tgen = menu.Append(wx.ID_ANY, _(u"Tgen Editor").decode('utf8'))
                 computetgen = menu.Append(wx.ID_ANY, _(u"Compute Tgen").decode('utf8'))
                 mergeclustergraph = menu.Append(wx.ID_ANY, _(u"Merge Cluster Graph").decode('utf8'))
