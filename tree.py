@@ -118,7 +118,7 @@ class LeftTree(CT.CustomTreeCtrl):
 
         CT.CustomTreeCtrl.__init__(self, parent, id, pos, size, style, agwStyle)
         #FIXME : test for bigger font on HIDPI screen
-        font = wx.Font(pointSize=16, family=wx.DEFAULT, style=wx.NORMAL, weight=wx.FONTWEIGHT_NORMAL,
+        font = wx.Font(pointSize=12, family=wx.DEFAULT, style=wx.NORMAL, weight=wx.FONTWEIGHT_NORMAL,
                underline=False, face="", encoding=wx.FONTENCODING_DEFAULT)
         self.SetFont(font)
         ##################
@@ -433,7 +433,7 @@ class LeftTree(CT.CustomTreeCtrl):
                 translate = menu.Append(wx.ID_ANY, _(u"Translate Profile").decode('utf8'))
                 profsr = menu.Append(wx.ID_ANY, _(u"Repeated segments profiles").decode('utf8'))
                 profgram = menu.Append(wx.ID_ANY, _(u"POS profiles").decode('utf8'))
-                stcaract = menu.Append(wx.ID_ANY, _(u"Characteristic text segments").decode('utf8'))
+                stcaract = menu.Append(wx.ID_ANY, _(u"Typical text segments").decode('utf8'))
                 tgen = menu.Append(wx.ID_ANY, _(u"Tgen Editor").decode('utf8'))
                 computetgen = menu.Append(wx.ID_ANY, _(u"Compute Tgen").decode('utf8'))
                 mergeclustergraph = menu.Append(wx.ID_ANY, _(u"Merge Cluster Graph").decode('utf8'))
