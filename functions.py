@@ -37,7 +37,8 @@ def open_folder(folder):
         os.startfile(folder)
     else:
         opener ="open" if sys.platform == "darwin" else "xdg-open"
-        call([opener, folder])
+        #call([opener, folder])
+        call([u"%s %s &" % (opener, folder)], shell=True)
 
 def normpath_win32(path) :
     if not sys.platform == 'win32' :
@@ -53,10 +54,10 @@ class TGen :
         self.path = path
         self.tgen = {}
         self.encoding = encoding
-    
+
     def __getitem__(self, key):
         return self.tgen[key]
-    
+
     def read(self, path = None):
         if path is None :
             path = self.path
@@ -66,13 +67,13 @@ class TGen :
         tgen = dict([[line[0], line[1:]] for line in tgen])
         self.tgen = tgen
         self.path = path
-    
+
     def write(self, path = None):
         if path is None :
             path = self.path
         with open(path, 'w') as f :
             f.write('\n'.join(['\t'.join([val] + self.tgen[val]) for val in self.tgen]).encode(self.encoding))
-    
+
     def writetable(self, pathout, tgens, totocc):
         etoiles = totocc.keys()
         etoiles.sort()
@@ -190,6 +191,11 @@ class History :
             self.history[self.ordercorpus[analyse['corpus']]]['analyses'].pop(todel)
         elif analyse['uuid'] in self.matrixanalyse :
             self.matrix = [mat for mat in self.matrix if mat['uuid'] != analyse['uuid']]
+        elif analyse.get('matrix', False) in self.matrixanalyse :
+            analyses = self.matrix[self.ordermatrix[analyse['matrix']]]['analyses']
+            topop = [i for i, val in enumerate(analyses) if analyse['uuid'] == val['uuid']][0]
+            analyses.pop(topop)
+            self.matrix[self.ordermatrix[analyse['matrix']]]['analyses'] = analyses
         self.write()
         self.read()
 
@@ -222,6 +228,63 @@ class History :
         for analyse in anatodel :
             print 'cleaning :', analyse['name']
             self.delete(analyse)
+
+    def dostat(self):
+        todel = {}
+        tokens = 0
+        corpusnb = {}
+        subnb = 0
+        analysenb = 0
+        hours = 0
+        minutes = 0
+        secondes = 0
+        ha = 0
+        ma = 0
+        sa = 0
+        for corpus in self.history :
+            analysenb += len(corpus.get('analyses', []))
+            analyses = corpus.get('analyses', [])
+            for analyse in analyses :
+                if os.path.exists(analyse['ira']) :
+                    ana = DoConf(analyse['ira']).getoptions()
+                    if 'time' in ana :
+                        time = ana['time'].split()
+                        ha += int(time[0].replace('h','')) * 3600
+                        ma += int(time[1].replace('m','')) * 60
+                        sa += int(time[2].replace('s',''))
+            if os.path.exists(corpus['ira']) :
+                param = DoConf(corpus['ira']).getoptions()
+                time = param.get('time','0h 0m 0s')
+                time = time.split()
+                hours += int(time[0].replace('h','')) * 3600
+                minutes += int(time[1].replace('m','')) * 60
+                secondes += int(time[2].replace('s',''))
+                if param.get('originalpath', False) :
+                    if param['originalpath'] in corpusnb :
+                        corpusnb[param['originalpath']] += 1
+                        tokens += int(param['occurrences'])
+                    else :
+                        corpusnb[param['originalpath']] = 1
+                    #print param
+                else :
+                    subnb += 1
+            else :
+                if corpus['ira'] in todel :
+                    todel['ira'] += 1
+                else :
+                    todel['ira'] = 1
+        print u'Nbr total de corpus : %s' % len(self.history)
+        corpus_nb = len(corpusnb) + len(todel)
+        print u'Nbr de corpus différents : %s' % corpus_nb
+        lentodel = len(todel)
+        print u'Nbr de corpus à supprimer : %s' % lentodel
+        print u'Nbr de sous corpus : %s' % subnb
+        print u"Nbr total d'occurrences : %s" % tokens
+        print u'Moyenne occurrences par corpus : %f' % (tokens/corpus_nb)
+        print '---------------------'
+        print u"Nbr total d'analyses : %s" % analysenb
+        print u'Temps total indexation : %f h' % ((hours+minutes+secondes) / 3600)
+        print u'Temps total analyses :  %f h' % ((ha+ma+sa) / 3600)
 
     def __str__(self) :
         return str(self.history)
@@ -369,7 +432,7 @@ def sortedby(list, direct, *indices):
          sortedby(list,0) will return [[1, 2], [2, 3], [3, 1]]
     """
 
-    nlist = map(lambda x, indices=indices: 
+    nlist = map(lambda x, indices=indices:
                  map(lambda i, x=x: x[i], indices) + [x],
                  list)
     if direct == 1:
@@ -415,10 +478,10 @@ def ReadProfileAsDico(File, Alceste=False, encoding = sys.getdefaultencoding()):
     clusters = [row[2] for row in rows if row[0] == u'**']
     valclusters = [row[1:4] for row in rows if row[0] == u'****']
     lp = [i for i, line in enumerate(rows) if line[0] == u'****']
-    prof = [rows[lp[i] + 1:lp[i+1] - 1] for i in range(0, len(lp)-1)] + [rows[lp[-1] + 1:len(rows)]] 
+    prof = [rows[lp[i] + 1:lp[i+1] - 1] for i in range(0, len(lp)-1)] + [rows[lp[-1] + 1:len(rows)]]
     if Alceste :
         prof = [[add_type(row, dictlem) for row in pr] for pr in prof]
-        prof = [[treat_line_alceste(i,line) for i, line in enumerate(pr)] for pr in prof] 
+        prof = [[treat_line_alceste(i,line) for i, line in enumerate(pr)] for pr in prof]
     else :
         prof = [[line + [''] for line in pr] for pr in prof]
         prof = [[treat_line_alceste(i,line) for i, line in enumerate(pr)] for pr in prof]
@@ -458,13 +521,13 @@ def decoupercharact(chaine, longueur, longueurOptimale, separateurs = None) :
     separateurs = [[u'.', 60.0], [u'?', 60.0], [u'!', 60.0], [u'£$£', 60], [u':', 50.0], [u';', 40.0], [u',', 10.0], [u' ', 0.1]]
     trouve = False                 # si on a trouvé un bon séparateur
     iDecoupe = 0                # indice du caractere ou il faut decouper
-    
+
     # on découpe la chaine pour avoir au maximum 240 caractères
     longueur = min(longueur, len(chaine) - 1)
     chaineTravail = chaine[:longueur + 1]
     nbCar = longueur
     meilleur = ['', 0, 0]        # type, poids et position du meilleur separateur
-    
+
     # on vérifie si on ne trouve pas un '$'
     indice = chaineTravail.find(u'$')
     if indice > -1:
@@ -481,8 +544,8 @@ def decoupercharact(chaine, longueur, longueurOptimale, separateurs = None) :
             # on vérifie si le caractére courant est une marque de ponctuation
             for s in separateurs:
                 if caractere == s[0]:
-                    # si c'est une ponctuation 
-                    
+                    # si c'est une ponctuation
+
                     if s[1] / distance > float(meilleur[1]) / meilleureDistance:
                         # print nbCar, s[0]
                         meilleur[0] = s[0]
@@ -490,13 +553,13 @@ def decoupercharact(chaine, longueur, longueurOptimale, separateurs = None) :
                         meilleur[2] = nbCar
                         trouve = True
                         iDecoupe = nbCar
-                        
+
                     # et on termine la recherche
                     break
 
             # on passe au caractère précédant
             nbCar = nbCar - 1
-    
+
     # si on a trouvé
     if trouve:
         fin = chaine[iDecoupe + 1:]
@@ -510,13 +573,13 @@ exceptions = {'paragrapheOT' : u"Un problème de formatage (présence d'un marqu
               'EmptyText' : u"Texte vide (probablement un problème de formatage du corpus). Le problème est apparu à la ligne ",
               'CorpusEncoding' : u"Problème d'encodage.",
               'TextBeforeTextMark' : u"Problème de formatage : du texte avant le premier marqueur de texte (****). Le problème est survenu à la ligne ",
-              'MissingAnalyse' : u'Aucun fichier à cet emplacement :\n', 
+              'MissingAnalyse' : u'Aucun fichier à cet emplacement :\n',
 }
 
 def BugReport(parent, error = None):
     for ch in parent.GetChildren():
         if "<class 'wx._windows.ProgressDialog'>" == str(type(ch)):
-            ch.Destroy()   
+            ch.Destroy()
     excName, exc, excTb = formatExceptionInfo()
     if excName == 'Exception' :
         print exc
@@ -549,13 +612,13 @@ def BugReport(parent, error = None):
     dial.CenterOnParent()
     dial.ShowModal()
     dial.Destroy()
-    
+
 def PlaySound(parent):
     if parent.pref.getboolean('iramuteq', 'sound') :
         try:
             if "gtk2" in wx.PlatformInfo:
                 error = Popen(['aplay','-q',os.path.join(parent.AppliPath,'son_fin.wav')])
-            else :    
+            else :
                 sound = wx.Sound(os.path.join(parent.AppliPath, 'son_fin.wav'))
                 sound.Play(wx.SOUND_SYNC)
         except :
@@ -598,7 +661,7 @@ def ReadList(filein, encoding = sys.getdefaultencoding(), sep = ';'):
         for val in line[1:]:
             if val == u'NA' :
                 don = ''
-            else: 
+            else:
                 try:
                     don = int(val)
                 except:
@@ -696,7 +759,7 @@ def launchcommand(mycommand):
 def print_liste(filename,liste):
     with open(filename,'w') as f :
         for graph in liste :
-            f.write(';'.join(graph).encode(sys.getdefaultencoding())+'\n')
+            f.write(';'.join(graph).encode(sys.getdefaultencoding(), errors='replace')+'\n')
 
 def read_list_file(filename, encoding = sys.getdefaultencoding()):
     with codecs.open(filename,'rU', encoding) as f :
@@ -758,7 +821,8 @@ def doconcorde(corpus, uces, mots, uci = False) :
         ucetxt = ucestxt1[uce].split()
         ucetxt = ' '.join([dmots.get(mot, mot) for mot in ucetxt])
         if not uci :
-            ucis_txt.append('<p><b>' + ' '.join(corpus.ucis[corpus.getucefromid(uce).uci].etoiles) + '</b></p>')
+            uciid = corpus.getucefromid(uce).uci
+            ucis_txt.append('<p><b>' + ' '.join(corpus.ucis[corpus.getucefromid(uce).uci].etoiles) + '<a href="%i_%i"> *%i_%i</a></b></p>' % (uciid, uce, uciid, uce))
         else :
             ucis_txt.append('<p><b>' + ' '.join(corpus.ucis[uce].etoiles) + '</b></p>')
         ucestxt.append(ucetxt)
@@ -837,7 +901,7 @@ def treatempty(val) :
     else :
         return val
 
-def translateprofile(corpus, dictprofile, lf='it', lt='fr') :
+def translateprofile(corpus, dictprofile, lf='it', lt='fr', maxword = 50) :
     nprof = {}
     lems = {}
     for i in range(len(dictprofile)) :
@@ -858,8 +922,8 @@ def translateprofile(corpus, dictprofile, lf='it', lt='fr') :
         except ValueError:
             lensup += len(prof) - lenact
         if lenact != 0 :
-            if lenact > 400 :
-                nlenact = 400
+            if lenact > maxword :
+                nlenact = maxword
             else :
                 nlenact = lenact
             actori = [line[6] for line in prof[1:nlenact]]
@@ -875,8 +939,8 @@ def translateprofile(corpus, dictprofile, lf='it', lt='fr') :
             nprof[`i+1`] = makenprof(prof, act)
 
         if lensup != 0 :
-            if lensup > 400 :
-                nlensup = 400
+            if lensup > maxword :
+                nlensup = maxword
             else :
                 nlensup = lensup
             supori = [line[6] for line in prof[(1+lenact):(lenact+nlensup)]]
@@ -900,7 +964,6 @@ def translateprofile(corpus, dictprofile, lf='it', lt='fr') :
         except :
             pass
     return nprof, lems
-
 
 def write_translation_profile(prof, lems, language, dictpathout) :
     if os.path.exists(dictpathout['translations.txt']) :
@@ -930,3 +993,47 @@ def write_translation_profile(prof, lems, language, dictpathout) :
         translist.append(['translation_profile_%s.csv' % language, 'translation_words_%s.csv' % language])
         with open(dictpathout['translations.txt'], 'w') as f :
             f.write('\n'.join(['\t'.join(line) for line in translist]).encode('utf8'))
+
+def makesentidict(infile, language) :
+    #'/home/pierre/workspace/iramuteq/dev/langues/NRC/NRC-Emotion-Lexicon.csv'
+    with codecs.open(infile,'r', 'utf8') as f :
+        content = f.read()
+    content = [line.split('\t') for line in content.splitlines()]
+    titles = content.pop(0)
+    senti = ['Positive', 'Negative', 'Anger', 'Anticipation', 'Disgust', 'Fear', 'Joy', 'Sadness', 'Surprise', 'Trust']
+    sentid = {}
+    for sent in senti :
+        sentid[sent] = titles.index(sent)
+    frtitle = [val for val in titles if '(fr)' in val]
+    frid = titles.index(frtitle[0])
+    sentidict = [[line[frid].lower(), [line[sentid[sent]] for sent in senti]] for line in content]
+    pos = ['positive'] + [line[0] for line in sentidict if line[1][0] == '1']
+    neg = ['negative'] + [line[0] for line in sentidict if line[1][1] == '1']
+    anger = ['anger'] + [line[0] for line in sentidict if line[1][2] == '1']
+    anticipation = ['anticipation'] + [line[0] for line in sentidict if line[1][3] == '1']
+    disgust = ['disgust'] + [line[0] for line in sentidict if line[1][4] == '1']
+    fear = ['fear'] + [line[0] for line in sentidict if line[1][5] == '1']
+    joy = ['joy'] + [line[0] for line in sentidict if line[1][6] == '1']
+    sadness = ['sadness'] + [line[0] for line in sentidict if line[1][7] == '1']
+    surprise = ['surprise'] + [line[0] for line in sentidict if line[1][8] == '1']
+    trust = ['trust'] + [line[0] for line in sentidict if line[1][9] == '1']
+    with open('/tmp/tgenemo.csv', 'w') as f :
+        for val in [pos, neg, anger, anticipation, disgust, fear, joy, sadness, surprise, trust] :
+            f.write('\t'.join(val).encode('utf8') + '\n')
+
+def countsentfromprof(prof, encoding, sentidict) :
+    with codecs.open(prof, 'r', encoding) as f :
+        content = f.read()
+    content = [line.split(';') for line in content.splitlines()]
+    print content
+    content = [[line[0], [int(val) for val in line[1:]]] for line in content]
+    print content
+    content = dict(content)
+    print content
+
+def iratolexico(infile, outfile, encoding) :
+    with codecs.open(infile, 'r', encoding) as f :
+        for line in f :
+            if line.startswith(u'**** ') :
+                line = line.split()
+

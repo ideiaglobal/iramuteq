@@ -6,10 +6,12 @@
 
 from chemins import ffr
 from analysetxt import AnalyseText
-from functions import sortedby, progressbar, exec_rcode, check_Rresult 
+from functions import sortedby, progressbar, exec_rcode, check_Rresult
 import tempfile
 from time import sleep
 import logging
+import gettext
+_ = gettext.gettext
 
 logger = logging.getLogger('iramuteq.textstat')
 
@@ -37,10 +39,14 @@ class Stat(AnalyseText) :
         act = [[forme, formes[forme].freq, formes[forme].gram] for forme in formes if formes[forme].act == 1]
         act = sortedby(act, 2, 1)
         act = [[i, val] for i, val in enumerate(act)]
-        supp = [[forme, formes[forme].freq, formes[forme].gram] for forme in formes if formes[forme].act == 2]        
+        supp = [[forme, formes[forme].freq, formes[forme].gram] for forme in formes if formes[forme].act == 2]
         supp = sortedby(supp, 2, 1)
 
         supp = [[i, val] for i, val in enumerate(supp)]
+
+        ucesize = self.corpus.getucesize()
+        with open(self.pathout['stsize.csv'], 'w') as f :
+            f.write('\n'.join([`val` for val in ucesize]))
 
         self.result = {u'total' : dict(tot), u'formes_actives' : dict(act), u'formes_supplémentaires' : dict(supp), u'hapax' : dict(hapax), u'glob' : ''}
         occurrences = sum([val[1][1] for val in tot]) + len(hapax)
@@ -51,7 +57,7 @@ class Stat(AnalyseText) :
         txt += ''.join([_(u'Number of texts').decode('utf8'),' : ', '%i\n' % len(self.corpus.ucis)])
         txt += ''.join([_(u"Number of occurrences").decode('utf8'),' : %i\n' % occurrences])
         txt += ''.join([_(u'Number of forms').decode('utf8'), ' : %i\n' % (len(formes))])
-        txt += ''.join([_(u"Number of hapax").decode('utf8'),' : %i (%.2f%%' % (len(hapax),phapax), _(u'of occurrences').decode('utf8'), ' - %.2f%% ' % phapax_forme, _(u'of forms').decode('utf8'), ')\n']) 
+        txt += ''.join([_(u"Number of hapax").decode('utf8'),' : %i (%.2f%%' % (len(hapax),phapax), _(u'of occurrences').decode('utf8'), ' - %.2f%% ' % phapax_forme, _(u'of forms').decode('utf8'), ')\n'])
         #print float(occurrences), float(len(self.corpus.ucis))
         txt += ''.join([_(u"Mean of occurrences by text").decode('utf8'), ' : %.2f' % (float(occurrences)/float(len(self.corpus.ucis)))])
         if self.dlg :
@@ -73,6 +79,12 @@ class Stat(AnalyseText) :
         plot(tot[,1], log = 'xy', xlab='log(rangs)', ylab = 'log(frequences)', col = 'red', pch=16)
         dev.off()
         """ % (ffr(self.pathout['zipf.png']))
+        txt += """
+        stsize <- read.csv2("%s", header=F)
+        open_file_graph("%s", width = 400, height = 400)
+        barplot(table(stsize[,1]))
+        dev.off()
+        """ % (self.pathout['stsize.csv'], self.pathout['segments_size.png'])
         tmpscript = tempfile.mktemp(dir=self.parent.TEMPDIR)
         with open(tmpscript, 'w') as f :
             f.write(txt)
@@ -92,4 +104,4 @@ class Stat(AnalyseText) :
                     f.write('\n'.join([';'.join([val for val in ligne]) for ligne in toprint]).encode(self.parent.syscoding))
             else :
                 with open(self.pathout['%s.txt' % 'glob'], 'w') as f :
-                    f.write(self.result['glob'].encode(self.parent.syscoding))
+                    f.write(self.result['glob'].encode(self.parent.syscoding, errors='replace'))
