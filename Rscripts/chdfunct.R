@@ -49,7 +49,7 @@ PrintProfile<- function(dataclasse,profileactlist,profileetlist,antiproact,antip
 	cltot<-as.data.frame(as.character(cltot[,ncol(cltot)]))
 	tot<-nrow(cltot)
     classes<-as.data.frame(as.character(dataclasse[,ncol(dataclasse)]))
-    classes.s<-as.data.frame(summary(cltot[,1],maxsum=500))
+    classes.s<-as.data.frame(summary(as.factor(cltot[,1]),maxsum=500))
     profile<-rbind(profile,c('***','nb classes',clusternb,'***','',''))
     antipro<-rbind(antipro,c('***','nb classes',clusternb,'***','',''))
     for(i in 1:clusternb) {
