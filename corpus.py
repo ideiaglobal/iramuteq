@@ -36,7 +36,7 @@ def copycorpus(corpus) :
 
 def CopyUce(uce) :
     return Uce(uce.ident, uce.para, uce.uci)
-    
+
 
 def CopyUci(uci):
     nuci = Uci(uci.ident, '')
@@ -44,7 +44,7 @@ def CopyUci(uci):
     nuci.uces = [CopyUce(uce) for uce in uci.uces]
     nuci.paras = copy(uci.paras)
     return nuci
-    
+
 
 
 class Corpus :
@@ -259,6 +259,11 @@ class Corpus :
         uces = [[val[0], '\n'.join([row[1] for row in self.getconcorde(val[1])])] for val in uces]
         return uces
 
+    def getuciconcorde_uces(self, uciid, uceid) :
+        uces = [uce.ident for uce in self.ucis[uciid].uces]
+        uces = [row for row in self.getconcorde(uces)]
+        return uces
+
     def getwordconcorde(self, word) :
         return self.getconcorde(self.getworduces(word))
 
@@ -271,7 +276,7 @@ class Corpus :
     def getallucis(self):
         uces = [row[1] for row in self.getalluces()]
         return [[uci.ident, '\n'.join([uces[uce.ident] for uce in uci.uces])] for uci in self.ucis]
-        
+
     def getucesfrometoile(self, etoile) :
         return [uce.ident for uci in self.ucis for uce in uci.uces if etoile in uci.etoiles]
 
@@ -296,7 +301,7 @@ class Corpus :
             else :
                 idpara += 1
         return etoileuces
-    
+
     def getetoileucis(self):
         etoileuces = {}
         for uci in self.ucis :
@@ -343,7 +348,7 @@ class Corpus :
                     self.lems[self.formes[forme].lem] = Lem(self, self.formes[forme])
         else :
             self.lems = dict([[forme, Lem(self, self.formes[forme])] for forme in self.formes])
-    
+
     def make_lems_from_dict(self, dictionnaire, dolem = True) :
         log.info('make lems from dict')
         self.lems = {}
@@ -367,7 +372,7 @@ class Corpus :
                     self.lems[self.formes[forme].lem] = Lem(self, self.formes[forme])
             else :
                 self.lems[forme] = Lem(self, self.formes[forme])
-                
+
     def make_idformes(self) :
         self.idformes = dict([[self.formes[forme].ident, self.formes[forme]] for forme in self.formes])
 
@@ -376,6 +381,7 @@ class Corpus :
             self.iduces = dict([[uce.ident, uce] for uci in self.ucis for uce in uci.uces])
 
     def make_lexitable(self, mineff, etoiles, gram = 0) :
+        log.info('making lexical table...')
         if gram == 0 :
             grams = {1:'', 2:''}
         else :
@@ -398,7 +404,7 @@ class Corpus :
                 tab.append(line)
         tab.insert(0, [''] + etoiles)
         return tab
-    
+
     def make_tgen_table(self, tgen, etoiles, tot = None):
         lclasses = [self.getucesfrometoile(etoile) for etoile in etoiles]
         sets = [set(cl) for cl in lclasses]
@@ -600,7 +606,7 @@ class Corpus :
                 f.write(guce.encode(self.parametres['syscoding']) + '\n\n')
 
     def export_classe(self, outf, classe, lem = False, uci = False) :
-        sts = self.lc[classe - 1] 
+        sts = self.lc[classe - 1]
         if not uci :
             res = self.getconcorde(sts)
             self.make_iduces()
@@ -658,7 +664,7 @@ class Corpus :
                     nbl += 1
                     f.write(''.join([' '.join([`uce+1`, `i+1`,`1`]),'\n']))
             f.seek(0)
-            with open(outfile, 'w') as ffin :        
+            with open(outfile, 'w') as ffin :
                 ffin.write("%%%%MatrixMarket matrix coordinate integer general\n%i %i %i\n" % (self.getucenb(), len(actives), nbl))
                 for line in f :
                     ffin.write(line)
@@ -676,7 +682,7 @@ class Corpus :
                     nbl += 1
                     f.write(''.join([' '.join([`uci+1`, `i+1`,`1`]),'\n']))
             f.seek(0)
-            with open(outfile, 'w') as ffin :        
+            with open(outfile, 'w') as ffin :
                 ffin.write("%%%%MatrixMarket matrix coordinate integer general\n%i %i %i\n" % (self.getucinb(), len(actives), nbl))
                 for line in f :
                     ffin.write(line)
@@ -695,12 +701,12 @@ class Corpus :
                 for uce in uces_ok :
                     f.write(''.join([' '.join([`duces[uce]+1`,`i+1`,`1`]),'\n']))
             f.seek(0)
-            with open(outfile, 'w') as ffin :        
+            with open(outfile, 'w') as ffin :
                 ffin.write("%%%%MatrixMarket matrix coordinate integer general\n%i %i %i\n" % (len(uces), len(actives), nbl))
                 for line in f :
                     ffin.write(line)
         os.remove(outfile + '~')
-    
+
     def make_table_with_classe(self, uces, list_act, uci = False) :
         table_uce = [[0 for val in list_act] for line in range(0,len(uces))]
         uces = dict([[uce, i] for i, uce in enumerate(uces)])
@@ -713,8 +719,8 @@ class Corpus :
             for uce in lemuces :
                 table_uce[uces[uce]][i] = 1
         table_uce.insert(0, list_act)
-        return table_uce      
-    
+        return table_uce
+
     def make_pondtable_with_classe(self, uces, list_act) :
         table_uce = [[0 for val in list_act] for line in range(0,len(uces))]
         uces = dict([[uce, i] for i, uce in enumerate(uces)])
@@ -724,7 +730,7 @@ class Corpus :
             for uce in lemuces :
                 table_uce[uces[uce]][i] = uceseff[uce]
         table_uce.insert(0, list_act)
-        return table_uce 
+        return table_uce
 
     def parse_active(self, gramact, gramsup = None) :
         log.info('parse actives')
@@ -784,6 +790,7 @@ class Corpus :
         tab = [[line[0]] + [`val` for val in line[1:]] for line in tab if sum(line[1:]) >= 3]
         with open(fileout, 'w') as f :
             f.write('\n'.join([';'.join(line) for line in tab]).encode(self.parametres['syscoding']))
+            f.write('\n')
 
     def make_etoiles(self) :
         etoiles = set([])
@@ -857,8 +864,13 @@ class Corpus :
             etoileuces = self.getetoileuces()
         else :
             etoileuces = self.getetoileucis()
-        etoileuces = dict([[et, etoileuces[et]] for et in etoileuces if len(etoileuces[et]) > 1])
+        print 'etoilesuces ok'
+        etoileuces = dict([[et, etoileuces[et]] for et in etoileuces if
+                           len(etoileuces[et]) > 1 ]) #and not et.startswith(u'*reference_')
+        print len(etoileuces)
+        print 'etoilesuces ok2'
         with open(fileout, 'w') as f :
+            print 'write...'
             f.write('\n'.join([';'.join([et] + [`len(set(etoileuces[et]).intersection(classe))` for classe in ucecl]) for et in etoileuces]).encode(self.parametres['syscoding']))
         #etoiles = self.make_etoiles()
         #with open(fileout, 'w') as f :
@@ -899,6 +911,32 @@ class Corpus :
                 else :
                     txt += '<font color="%s">' % (color[ucecl[uce[0]]]) + uce[1] + '</font><br><br>'
         return txt + '\n</body></html>'
+
+    def make_cut_corpus(self, uci = False) :
+        txt = u''
+        if not uci :
+            res = self.getalluces()
+            self.make_iduces()
+            actuci = ''
+            actpara = False
+            for uce in res :
+                if self.iduces[uce[0]].uci != actuci :
+                    actuci = self.iduces[uce[0]].uci
+                    txt += u'\n' + ' '.join(self.ucis[self.iduces[uce[0]].uci].etoiles) + u'\n'
+                    txt += ''.join([u'\n',uce[1],u'\n'])
+                else :
+                    txt +=  ''.join([u'\n',uce[1],u'\n'])
+        else :
+            res = self.getallucis()
+            actuci = ''
+            for uce in res :
+                if self.ucis[uce[0]].ident != actuci :
+                    actuci = self.ucis[uce[0]].ident
+                    txt += u'\n' + ' '.join(self.ucis[self.ucis[uce[0]].ident].etoiles) + u'\n'
+                    txt +=  ''.join([u'\n',uce[1],u'\n'])
+                else :
+                    txt += ''.join([u'\n',uce[1],u'\n'])
+        return txt
 
     def count_from_list(self, l, d) :
         for val in l :
@@ -1456,7 +1494,7 @@ class BuildSubCorpus(BuildCorpus):
                 newuces = []
                 newpara = []
                 for et in uci.paras :
-                    keepuces = [CopyUce(uce) for uce in uci.uces if uce.ident in dictucekeep]
+                    keepuces = [CopyUce(uce) for uce in uci.uces if uce.ident in dictucekeep and uce.para == idpara]
                     idpara += 1
                     if keepuces != [] :
                         newuces += keepuces
