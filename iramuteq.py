@@ -3,7 +3,7 @@
 #Author: Pierre Ratinaud
 #Copyright (c) 2008-2016, Pierre Ratinaud
 #License: GNU GPL
-#test
+#test for python 3
 
 from optparse import OptionParser
 
