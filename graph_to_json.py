@@ -1,15 +1,17 @@
+# -*- coding: utf-8 -*-
+#Author: Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
+#License: GNU/GPL
 
-
+#------------------------------------
+# import des modules python
+#------------------------------------
 import codecs
 import os
 import json
 from random import randint
 
-
-#pathout = '/home/pierre/fac/lerass/charlie/charliehebdo-0107-0112-corpus_fr_com_corpus_3/charlie_0712_religion_1/charliehebdo-0107-0112-corpus_fr_com_simitxt_1'
-#edgesfile = os.path.join(pathout, 'edges.csv')
-#nodesfile = os.path.join(pathout,'nodes.csv')
-#jsonout = os.path.join(pathout,'network.json')
 
 class GraphToJson :
     def __init__(self, nodesfile, edgesfile, jsonout, parametres = {}):
@@ -73,6 +75,3 @@ class GraphToJson :
 
         with open(jsonout, 'w') as f :
             json.dump(graph, f)
-
-if __name__ == '__main__' :
-    GraphToJson('/home/pierre/workspace/iramuteq/dev/blender-graphs/nodes.csv', '/home/pierre/workspace/iramuteq/dev/blender-graphs/edges.csv', '/home/pierre/workspace/iramuteq/dev/blender-graphs/L2_L2.json', {})

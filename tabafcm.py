@@ -1,18 +1,32 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2009 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
-import wx
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
+import tempfile
+from time import sleep
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from chemins import ffr, ConstructAfcmPath, ConstructPathOut
 from functions import exec_rcode, check_Rresult
 from ProfList import *
 from dialog import PrefQuestAlc
-import tempfile
-from time import sleep
-        
+
+
 class AFCMQ():
+
     def __init__(self, parent, LISTNUMACTIVE, LISTVARSUP):
         #FIXME
         self.parent = parent
@@ -72,18 +86,20 @@ class AFCMQ():
         while pid.poll() == None :
             sleep(0.2)
         check_Rresult(self.parent, pid)
-        
+
     def DoLayout(self):
         #FIXME
         txt = '<img src="%s" />' % self.tempgraph
         return txt
-        
+
 #    def OnRGL(self, event):
 #        self.parent.text_ctrl_1.write('runrgl\n')
 #        RAFC3DRGL = os.path.join(self.PathFile, self.RAFC3DRGL)
 #        RunRgl(RAFC3DRGL)
-        
+
+
 class DoAFCM():
+
     def __init__(self, parent):
         dlg = PrefQuestAlc(parent, sim = True)
         #dlg = CHDDialog(parent, -1, u"AFCM", size=(350, 400), style=wx.DEFAULT_DIALOG_STYLE)
@@ -92,14 +108,14 @@ class DoAFCM():
         if self.val == wx.ID_OK:
             LISTNUMACTIVE = dlg.nactives
             LISTVARSUP = dlg.varsup
-            print LISTNUMACTIVE
-            print LISTVARSUP
+            print(LISTNUMACTIVE)
+            print(LISTVARSUP)
             afcm = AFCMQ(parent, LISTNUMACTIVE, LISTVARSUP)
             txtgraph = afcm.DoLayout()
             parent.newtab = wx.html.HtmlWindow(parent.nb, -1)
             if "gtk2" in wx.PlatformInfo:
                 parent.newtab.SetStandardFonts()
             parent.newtab.SetPage(txtgraph)
-            parent.nb.AddPage(parent.newtab, u"AFCM")
+            parent.nb.AddPage(parent.newtab, "AFCM")
             parent.nb.SetSelection(parent.nb.GetPageCount() - 1)
             parent.ShowTab(wx.EVT_BUTTON)

@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
-# Author: Pierre Ratinaud
-# lisence : GNU GPL
-# copyright : 2014 (c) Pierre Ratinaud
+#Author: Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
+#License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
 from time import time
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from analysetxt import AnalyseText
 from OptionAlceste import OptionAlc
 from PrintRScript import RchdTxt, ReinertTxtProf, TgenProfScript, ReDoProfScript
@@ -14,6 +22,7 @@ from functions import DoConf, print_liste, TGen
 
 
 class Reinert(AnalyseText) :
+
     def doanalyse(self) :
         self.parametres['type'] = 'alceste'
         self.pathout.basefiles(ChdTxtPathOut)
@@ -50,9 +59,9 @@ class Reinert(AnalyseText) :
         self.print_graph_files()
 
     def preferences(self) :
-        print 'parametres en entree config alceste', self.parametres
+        print('parametres en entree config alceste', self.parametres)
         parametres = DoConf(self.parent.ConfigPath['reinert']).getoptions('ALCESTE')
-        print 'parametres apres doconf', parametres
+        print('parametres apres doconf', parametres)
         parametres['corpus'] = self.corpus
         parametres['pathout'] = self.pathout
         parametres['lem'] = self.parametres['lem']
@@ -73,7 +82,7 @@ class Reinert(AnalyseText) :
             parametres['mode.patate'] = self.dial.check_patate.GetValue()
             DoConf(self.parent.ConfigPath['reinert']).makeoptions(['ALCESTE'], [parametres])
             self.dial.Destroy()
-            print parametres
+            print(parametres)
             self.parametres.update(parametres)
             return self.parametres
         else :
@@ -89,17 +98,17 @@ class Reinert(AnalyseText) :
         return self.pathout['RTxtProfGraph']
 
     def print_graph_files(self) :
-        mess_afc = u"La position des points n'est peut être pas exacte"
-        afc_graph_list = [[os.path.basename(self.pathout['AFC2DL_OUT']), u'Variables actives - coordonnées - 30 points par classes - facteurs 1 / 2 - %s' % mess_afc],
-                      [os.path.basename(self.pathout['AFC2DSL_OUT']), u'variables supplémentaires - coordonnées - 30 points par classes - facteurs 1 / 2 - %s' % mess_afc],
-                      [os.path.basename(self.pathout['AFC2DEL_OUT']), u'Variables illustratives - Coordonnées - 30 points par classes - facteur 1 / 2 - %s' % mess_afc],
-                      [os.path.basename(self.pathout['AFC2DCL_OUT']), u'Classes - Coordonnées - facteur 1 / 2']]
-        chd_graph_list = [[os.path.basename(self.pathout['dendro1']), u'dendrogramme à partir de chd1']]
+        mess_afc = "La position des points n'est peut être pas exacte"
+        afc_graph_list = [[os.path.basename(self.pathout['AFC2DL_OUT']), 'Variables actives - coordonnées - 30 points par classes - facteurs 1 / 2 - %s' % mess_afc],
+                      [os.path.basename(self.pathout['AFC2DSL_OUT']), 'variables supplémentaires - coordonnées - 30 points par classes - facteurs 1 / 2 - %s' % mess_afc],
+                      [os.path.basename(self.pathout['AFC2DEL_OUT']), 'Variables illustratives - Coordonnées - 30 points par classes - facteur 1 / 2 - %s' % mess_afc],
+                      [os.path.basename(self.pathout['AFC2DCL_OUT']), 'Classes - Coordonnées - facteur 1 / 2']]
+        chd_graph_list = [[os.path.basename(self.pathout['dendro1']), 'dendrogramme à partir de chd1']]
         if self.parametres['classif_mode'] == 0 :
-            chd_graph_list.append([os.path.basename(self.pathout['dendro2']), u'dendrogramme à partir de chd2'])
-        chd_graph_list.append([os.path.basename(self.pathout['arbre1']), u'chd1'])
+            chd_graph_list.append([os.path.basename(self.pathout['dendro2']), 'dendrogramme à partir de chd2'])
+        chd_graph_list.append([os.path.basename(self.pathout['arbre1']), 'chd1'])
         if self.parametres['classif_mode'] == 0 :
-            chd_graph_list.append([os.path.basename(self.pathout['arbre2']), u'chd2'])       
+            chd_graph_list.append([os.path.basename(self.pathout['arbre2']), 'chd2'])       
         print_liste(self.pathout['liste_graph_afc'], afc_graph_list)
         print_liste(self.pathout['liste_graph_chd'], chd_graph_list)
         PrintRapport(self, self.corpus, self.parametres)
@@ -120,20 +129,22 @@ class TgenProf(AnalyseText):
         self.parametres['tgeneff'] = os.path.join(self.parametres['pathout'], 'tgeneff.csv')
         tgenst = self.corpus.make_tgen_profile(self.tgen.tgen, self.corpus.lc)
         clnames = ['cluster_%03d' % i for i in range(1, len(self.cluster_size) + 1)]
-        et = dict(zip(clnames, self.cluster_size))
-        tgenst = dict([[line[0], dict(zip(clnames, line[1:]))] for line in tgenst])
+        et = dict(list(zip(clnames, self.cluster_size)))
+        tgenst = dict([[line[0], dict(list(zip(clnames, line[1:])))] for line in tgenst])
         self.tgen.writetable(self.parametres['tgeneff'], tgenst, et)
         self.parametres['tgenspec'] = os.path.join(self.parametres['pathout'], 'tgenchi2.csv')
         self.parametres['tgenlemeff'] = os.path.join(self.parametres['pathout'], 'tgenlemeff.csv')
         self.parametres['tgenlemspec'] = os.path.join(self.parametres['pathout'], 'tgenlemchi2.csv')
-        tgenlemeff = dict([[lem, dict(zip(clnames, self.corpus.tgenlem[lem]))] for lem in self.corpus.tgenlem])
+        tgenlemeff = dict([[lem, dict(list(zip(clnames, self.corpus.tgenlem[lem])))] for lem in self.corpus.tgenlem])
         self.tgen.writetable(self.parametres['tgenlemeff'], tgenlemeff, et)
         self.Rscript = TgenProfScript(self)
         self.Rscript.make_script()
         self.Rscript.write()
         self.doR(self.Rscript.scriptout, dlg = False, message = 'R...')
 
+
 class ReDoProfile(AnalyseText):
+
     def __init__(self, ira, corpus, analyses, parametres):
         self.ira = ira
         self.corpus = corpus

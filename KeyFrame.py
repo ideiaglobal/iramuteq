@@ -1,9 +1,21 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
 import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from functions import sortedby, DoConf
 
 # begin wxGlade: extracode
@@ -15,32 +27,32 @@ class AlcOptFrame(wx.Dialog):
         kwds["style"] = wx.DEFAULT_DIALOG_STYLE
         wx.Dialog.__init__(self, *args, **kwds)
         self.cle={
-        'adj_sup': [wx.NewId(),wx.NewId(),u"Adjectif supplémentaire"],
-        'art_ind': [wx.NewId(),wx.NewId(),u"Article indéfini"],
-        'adj_pos': [wx.NewId(),wx.NewId(),u"Adjectif possessif"],
-        'adv_sup': [wx.NewId(),wx.NewId(),u"Adverbe supplémentaire"],
-        'pro_dem': [wx.NewId(),wx.NewId(),u"Pronom démonstratif"],
-        'art_def': [wx.NewId(),wx.NewId(),u"Article défini"],
-        'con': [wx.NewId(),wx.NewId(),u"Conjonction"],
-        'pre': [wx.NewId(),wx.NewId(),u"Préposition"],
-        'ono': [wx.NewId(),wx.NewId(),u"Onomatopée"],
-        'adj_dem': [wx.NewId(),wx.NewId(),u"Adjectif démonstratif"],
-        'nom_sup': [wx.NewId(),wx.NewId(),u"Nom supplémentaire"],
-        'adv': [wx.NewId(),wx.NewId(),u"Adverbe"],
-        'pro_per': [wx.NewId(),wx.NewId(),u"Pronom personnel"],
-        'ver': [wx.NewId(),wx.NewId(),u"Verbe"],
-        'adj_num': [wx.NewId(),wx.NewId(),u"Adjectif numérique"],
-        'pro_rel': [wx.NewId(),wx.NewId(),u"Pronom relatif"],
-        'adj_ind': [wx.NewId(),wx.NewId(),u"Adjectif indéfini"],
-        'pro_ind': [wx.NewId(),wx.NewId(),u"Pronom indéfini"],
-        'pro_pos': [wx.NewId(),wx.NewId(),u"Pronom possessif"],
-        'aux': [wx.NewId(),wx.NewId(),u"Auxiliaire"],
-        'ver_sup': [wx.NewId(),wx.NewId(),u"Verbe supplémentaire"],
-        'adj': [wx.NewId(),wx.NewId(),u"Adjectif"],
-        'adj_int': [wx.NewId(),wx.NewId(),u"Adjectif interrogatif"],
-        'nom': [wx.NewId(),wx.NewId(),u"Nom commun"],
-        'num' : [wx.NewId(),wx.NewId(),u"Chiffre"],
-        'nr' : [wx.NewId(),wx.NewId(),u"Formes non reconnues"],
+        'adj_sup': [wx.NewId(),wx.NewId(),"Adjectif supplémentaire"],
+        'art_ind': [wx.NewId(),wx.NewId(),"Article indéfini"],
+        'adj_pos': [wx.NewId(),wx.NewId(),"Adjectif possessif"],
+        'adv_sup': [wx.NewId(),wx.NewId(),"Adverbe supplémentaire"],
+        'pro_dem': [wx.NewId(),wx.NewId(),"Pronom démonstratif"],
+        'art_def': [wx.NewId(),wx.NewId(),"Article défini"],
+        'con': [wx.NewId(),wx.NewId(),"Conjonction"],
+        'pre': [wx.NewId(),wx.NewId(),"Préposition"],
+        'ono': [wx.NewId(),wx.NewId(),"Onomatopée"],
+        'adj_dem': [wx.NewId(),wx.NewId(),"Adjectif démonstratif"],
+        'nom_sup': [wx.NewId(),wx.NewId(),"Nom supplémentaire"],
+        'adv': [wx.NewId(),wx.NewId(),"Adverbe"],
+        'pro_per': [wx.NewId(),wx.NewId(),"Pronom personnel"],
+        'ver': [wx.NewId(),wx.NewId(),"Verbe"],
+        'adj_num': [wx.NewId(),wx.NewId(),"Adjectif numérique"],
+        'pro_rel': [wx.NewId(),wx.NewId(),"Pronom relatif"],
+        'adj_ind': [wx.NewId(),wx.NewId(),"Adjectif indéfini"],
+        'pro_ind': [wx.NewId(),wx.NewId(),"Pronom indéfini"],
+        'pro_pos': [wx.NewId(),wx.NewId(),"Pronom possessif"],
+        'aux': [wx.NewId(),wx.NewId(),"Auxiliaire"],
+        'ver_sup': [wx.NewId(),wx.NewId(),"Verbe supplémentaire"],
+        'adj': [wx.NewId(),wx.NewId(),"Adjectif"],
+        'adj_int': [wx.NewId(),wx.NewId(),"Adjectif interrogatif"],
+        'nom': [wx.NewId(),wx.NewId(),"Nom commun"],
+        'num' : [wx.NewId(),wx.NewId(),"Chiffre"],
+        'nr' : [wx.NewId(),wx.NewId(),"Formes non reconnues"],
         }
         self.parent=parent
         self.keys=self.parent.keys
@@ -51,16 +63,16 @@ class AlcOptFrame(wx.Dialog):
         self.listids=[]
         self.listidb=[]
         
-        self.label_1 = wx.StaticText(self, -1, u"        Choix des clés d'analyse\n0=éliminé ; 1=active ; 2=supplémentaire\n")
+        self.label_1 = wx.StaticText(self, -1, "        Choix des clés d'analyse\n0=éliminé ; 1=active ; 2=supplémentaire\n")
         self.listcleori=[[cle]+self.cle[cle] for cle in self.cle]
         self.listcleori=sortedby(self.listcleori,1,3)
 
         for line in self.listcleori:
             cle,ids,idb,label=line
             self.listlabel.append(wx.StaticText(self, -1, label))
-            self.listspin.append(wx.SpinCtrl(self, ids,`self.keys[cle]`, min=0, max=2))
+            self.listspin.append(wx.SpinCtrl(self, ids,repr(self.keys[cle]), min=0, max=2))
             #if cle != 'nr' and cle!= 'num' : 
-            self.listbutton.append(wx.Button(self, idb, u"voir liste"))
+            self.listbutton.append(wx.Button(self, idb, "voir liste"))
             self.listids.append(ids)
             self.listidb.append(idb)
             self.listcle.append(cle)
@@ -81,7 +93,7 @@ class AlcOptFrame(wx.Dialog):
 
     def __set_properties(self):
         # begin wxGlade: AlcOptFrame.__set_properties
-        self.SetTitle(u"Clés d'analyse")
+        self.SetTitle("Clés d'analyse")
         # end wxGlade
 
     def __do_layout(self):

@@ -1,21 +1,33 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
 import sys
 import shutil
-from chemins import ConstructConfigPath, ConstructDicoPath
-from functions import exec_rcode, exec_RCMD
-import wx
-import tempfile
-from ConfigParser import *
 from time import sleep
 import logging
+import tempfile
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+from chemins import ConstructConfigPath, ConstructDicoPath
+from functions import exec_rcode, exec_RCMD
+from configparser import *
 
 log = logging.getLogger('iramuteq.checkinstall')
+
 
 def IsNew(self):
     version_glob = self.ConfigGlob.get('DEFAULT', 'version_nb').split('.')
@@ -70,8 +82,8 @@ def UpgradeConf(self) :
     log.info('upgrade conf')
     dictuser = self.ConfigPath
     dictappli = ConstructConfigPath(self.AppliPath, user = False)
-    for item,filein in dictuser.iteritems():
-        if not item == u'global' and not item == u'history':
+    for item,filein in dictuser.items():
+        if not item == 'global' and not item == 'history':
             shutil.copyfile(dictappli[item], filein)
     dicoUser = self.DictPath
     dicoAppli = ConstructDicoPath(self.AppliPath)
@@ -88,13 +100,13 @@ def CreateIraDirectory(UserConfigPath,AppliPath):
 def CopyConf(self) :
     DictUser = self.ConfigPath
     DictAppli = ConstructConfigPath(self.AppliPath,user=False)
-    for item, filein in DictUser.iteritems():
-        if not item == u'global' and not item == u'path' and not item == u'preferences' and not item == u'history' :
+    for item, filein in DictUser.items():
+        if not item == 'global' and not item == 'path' and not item == 'preferences' and not item == 'history' :
             shutil.copyfile(DictAppli[item],filein)
-        if item == u'path':
+        if item == 'path':
             if not os.path.exists(filein):
                 shutil.copyfile(DictAppli[item],filein)
-        if item == u'preferences' :
+        if item == 'preferences' :
             if not os.path.exists(filein) :
                 shutil.copyfile(DictAppli[item],filein)
     dicoUser = self.DictPath
@@ -170,7 +182,7 @@ def CheckRPackages(self):
     dlg.Destroy()
     if nolib != [] :
         txt = '\n'.join(nolib)
-        msg = u"""Les bibliothèques de R suivantes sont manquantes :
+        msg = """Les bibliothèques de R suivantes sont manquantes :
 %s
 
 Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
@@ -183,7 +195,7 @@ Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
 - ou laisser IRamuteq les installer automatiquement en cliquant sur VALIDER .
         Les bibliothèques seront téléchargées depuis le site miroir de R %s.
         """ % (txt, self.pref.get('iramuteq','rmirror'))
-        dial = wx.MessageDialog(self, msg, u"Installation incomplète", wx.OK | wx.CANCEL | wx.ICON_WARNING)
+        dial = wx.MessageDialog(self, msg, "Installation incomplète", wx.OK | wx.CANCEL | wx.ICON_WARNING)
         dial.CenterOnParent()
         val = dial.ShowModal()
         if val == wx.ID_OK :
@@ -194,12 +206,12 @@ Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
                                        style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT
                                        )
             dlg.Center()
-            dlg.Update(1, u"installation...") 
+            dlg.Update(1, "installation...") 
             compt = 0
 
             for bib in nolib :
                 compt += 1
-                dlg.Update(compt, u"installation librairie %s" % bib)
+                dlg.Update(compt, "installation librairie %s" % bib)
                 txt = """
                 userdir <- unlist(strsplit(Sys.getenv("R_LIBS_USER"), .Platform$path.sep))[1]
                 if (!file.exists(userdir)) {
@@ -219,7 +231,7 @@ Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
                     f.write(txt)
                 test = exec_rcode(self.RPath, tmpscript, wait = False)
                 while test.poll() == None :
-                    dlg.Pulse(u"installation librairie %s" % bib)
+                    dlg.Pulse("installation librairie %s" % bib)
                     sleep(0.2)
             dlg.Update(len(nolib) + 1, 'fin')
             dlg.Destroy()

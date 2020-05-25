@@ -1,20 +1,33 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
-# Author: Pierre Ratinaud
-# Copyright (c) 2010, Pierre Ratinaud
-# License: GNU/GPL
+#Author: Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
+#License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
 import tempfile
-from ProfList import *
+from time import sleep
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
 import wx
 import wx.lib.agw.aui as aui
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+from ProfList import *
 from functions import exec_rcode, check_Rresult, ReadProfileAsDico, ReadList
 from listlex import *
 from dialog import PrefSegProf, PrefProfTypes
-from time import sleep
 from chemins import ffr
 
+
 class ProfileSegment() :
+
     def __init__(self, parent, pathout, parametres, corpus) :
         self.parent = parent
         self.corpus = corpus
@@ -32,10 +45,10 @@ class ProfileSegment() :
             self.eff = dial.spin_eff.GetValue()
             dial.Destroy()
             self.dlg = progressbar(self, maxi=4)
-            self.dlg.Update(1, u'Recherche des segments')
+            self.dlg.Update(1, 'Recherche des segments')
             self.make_table()
             self.make_prof()
-            self.dlg.Update(3, u'ouverture des profils')
+            self.dlg.Update(3, 'ouverture des profils')
             self.do_layout()
             self.dlg.Update(4, 'fini')
             self.dlg.Destroy()
@@ -59,7 +72,7 @@ class ProfileSegment() :
             f.write(txt)
         pid = exec_rcode(self.parent.RPath, fo, wait=False)
         while pid.poll() == None :
-            self.dlg.Pulse(u'Construction des profils...')
+            self.dlg.Pulse('Construction des profils...')
             sleep(0.2)
         check_Rresult(self.parent, pid)
 
@@ -71,10 +84,12 @@ class ProfileSegment() :
         for i in range(0, len(self.corpus.lc)) :
             ntab = ProfListctrlPanel(self.parent, self, prof_seg[str(i + 1)], False, i + 1)
             prof_seg_nb.AddPage(ntab, 'classe %i' % (i + 1))
-        page.AddPage(prof_seg_nb, u'Profils des segements répétés')
+        page.AddPage(prof_seg_nb, 'Profils des segements répétés')
         page.SetSelection(page.GetPageCount() - 1)
 
+
 class ProfilType() :
+
     def __init__(self, parent, corpus, parametres) :
         self.parent = parent
         self.corpus = corpus
@@ -94,11 +109,11 @@ class ProfilType() :
             # else :
             #    self.corpus.parametre['outprof'] = {self.outprof: alceste}
             self.dlg = progressbar(self, maxi=4)
-            self.dlg.Update(1, u'Recherche des types')
+            self.dlg.Update(1, 'Recherche des types')
             self.make_table()
-            self.dlg.Update(1, u'Construction des profils')
+            self.dlg.Update(1, 'Construction des profils')
             self.make_prof(alceste=alceste)
-            self.dlg.Update(3, u'Ouverture des profils')
+            self.dlg.Update(3, 'Ouverture des profils')
             self.do_layout(alceste=alceste)
             self.dlg.Update(4, 'fini')
             self.dlg.Destroy()
@@ -111,7 +126,6 @@ class ProfilType() :
         load("%s")
         source("%s")
         """ % (ffr(self.corpus.dictpathout['RData']), ffr(self.parent.RscriptsPath['chdfunct']))
-
         txt += """
         dt <- read.csv2("%s", row.names = 1)
         """ % ffr(self.corpus.dictpathout['type_cl'])
@@ -132,7 +146,7 @@ class ProfilType() :
             f.write(txt)
         pid = exec_rcode(self.parent.RPath, fo, wait=False)
         while pid.poll() == None :
-            self.dlg.Pulse(u'Construction des profils...')
+            self.dlg.Pulse('Construction des profils...')
             sleep(0.2)
         check_Rresult(self.parent, pid)
 
@@ -148,8 +162,8 @@ class ProfilType() :
         else :
             self.DictSpec, first = ReadList(self.outprof)
             self.ListPan = ListForSpec(self.parent, self, self.DictSpec, first[1:])
-            prof_seg_nb.AddPage(self.ListPan, u'Spécificités')
+            prof_seg_nb.AddPage(self.ListPan, 'Spécificités')
 
-        page.AddPage(prof_seg_nb, u'Profils des types')
+        page.AddPage(prof_seg_nb, 'Profils des types')
         page.SetSelection(page.GetPageCount() - 1)
 

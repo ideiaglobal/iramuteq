@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Blender script. Draws a node-and-edge network in blender, randomly distributed
 spherically.
@@ -10,6 +11,9 @@ Written by Patrick Fuller, patrickfuller@gmail.com, 11 Sept 11
 
 modifications by Pierre Ratinaud Feb 2014
 """
+#------------------------------------
+# import des modules python
+#------------------------------------
 import bpy
 from math import acos, degrees, pi
 from mathutils import Vector
@@ -18,6 +22,7 @@ from copy import copy
 import json
 from random import choice
 import sys
+
 
 # Colors to turn into materials
 #colors = {"purple": (178, 132, 234), "gray": (11, 11, 11),
@@ -28,18 +33,16 @@ import sys
 
 # Normalize to [0,1] and make blender materials
 def make_colors(colors):
-    for key, value in colors.items():
+    for key, value in list(colors.items()):
         value = [x / 255.0 for x in value]
         bpy.data.materials.new(name=key)
         bpy.data.materials[key].diffuse_color = value
         bpy.data.materials[key].specular_intensity = 0.5
-     
         # Don't specify more parameters if these colors
         if key == "gray" or key == "light_gray":
             bpy.data.materials[key].use_transparency = True
             bpy.data.materials[key].transparency_method = "Z_TRANSPARENCY"
             bpy.data.materials[key].alpha = 0.2
-     
         # Transparency parameters
         else :
             bpy.data.materials[key].use_transparency = True
@@ -54,16 +57,13 @@ def make_colors(colors):
         #bpy.data.materials[key].raytrace_transparency.fresnel = 0.1
         #bpy.data.materials[key].raytrace_transparency.ior = 1.15
 
-
 def draw_network(network, edge_thickness=0.25, node_size=3, directed=False, spheres = True):
     """ Takes assembled network/molecule data and draws to blender """
-
     colors = [tuple(network["nodes"][node]['color']) for node in network["nodes"]]
     cols = list(set(colors))
-    colors = dict(zip([str(col) for col in cols],cols))
+    colors = dict(list(zip([str(col) for col in cols],cols)))
     colors.update({"light_gray": (118, 118, 118), "gray": (11, 11, 11)})
     make_colors(colors)
-    
     # Add some mesh primitives
     bpy.ops.object.select_all(action='DESELECT')
     #bpy.ops.mesh.primitive_uv_sphere_add()
@@ -76,21 +76,16 @@ def draw_network(network, edge_thickness=0.25, node_size=3, directed=False, sphe
     cone = bpy.context.object
     cone.active_material = bpy.data.materials["light_gray"]
     #bpy.ops.object.text_add(view_align=True)
-    
-
     # Keep references to all nodes and edges
     shapes = []
     # Keep separate references to shapes to be smoothed
     shapes_to_smooth = []
     #val to div coordonnate
     divval = 0.05
-
     # Draw nodes
-    for key, node in network["nodes"].items():
-
+    for key, node in list(network["nodes"].items()):
         # Coloring rule for nodes. Edit this to suit your needs!
         col = str(tuple(node.get("color", choice(list(colors.keys())))))
-
         # Copy mesh primitive and edit to make node
         # (You can change the shape of drawn nodes here)
         if spheres :
@@ -105,7 +100,6 @@ def draw_network(network, edge_thickness=0.25, node_size=3, directed=False, sphe
             bpy.context.scene.objects.link(node_sphere)
             shapes.append(node_sphere)
             shapes_to_smooth.append(node_sphere)
-        
         #node_text = text.copy()
         #node_text.data = text.data.copy()
         #node_text.location = node["location"]
@@ -123,42 +117,34 @@ def draw_network(network, edge_thickness=0.25, node_size=3, directed=False, sphe
         bpy.context.active_object.rotation_euler = [1.5708,0,1.5708]
         bpy.context.active_object.active_material = bpy.data.materials[col]
         #bpy.ops.object.mode_set(mode='OBJECT')
-
         #Extrude the text
         #bpy.context.object.data.extrude = 0.03
-
         #Convert text to mesh
         #bpy.context.active_object.convert(target='MESH', keep_original=False)
         const = bpy.context.active_object.constraints.new(type='TRACK_TO')
         const.target = bpy.data.objects['Camera']
         const.track_axis = "TRACK_Z"
         const.up_axis = "UP_Y"
-        
         #bpy.context.scene.objects.link(bpy.context.active_object)
         #shapes.append(bpy.context.active_object)
         #sha* 2 + [mag - node_size]
         shapes_to_smooth.append(bpy.context.active_object)        
-
     # Draw edges
     for edge in network["edges"]:
-
         # Get source and target locations by drilling down into data structure
         source_loc = network["nodes"][edge["source"]]["location"]
         source_loc = [val/divval for val in source_loc]
         target_loc = network["nodes"][edge["target"]]["location"]
         target_loc = [val / divval for val in target_loc]
-
         diff = [c2 - c1 for c2, c1 in zip(source_loc, target_loc)]
         cent = [(c2 + c1) / 2 for c2, c1 in zip(source_loc, target_loc)]
         mag = sum([(c2 - c1) ** 2
                   for c1, c2 in zip(source_loc, target_loc)]) ** 0.5
-
         # Euler rotation calculation
         v_axis = Vector(diff).normalized()
         v_obj = Vector((0, 0, 1))
         v_rot = v_obj.cross(v_axis)
         angle = acos(v_obj.dot(v_axis))
-
         # Copy mesh primitive to create edge
         edge_cylinder = cylinder.copy()
         edge_cylinder.data = cylinder.data.copy()
@@ -170,7 +156,6 @@ def draw_network(network, edge_thickness=0.25, node_size=3, directed=False, sphe
         bpy.context.scene.objects.link(edge_cylinder)
         shapes.append(edge_cylinder)
         shapes_to_smooth.append(edge_cylinder)
-
         # Copy another mesh primitive to make an arrow head
         if directed:
             arrow_cone = cone.copy()
@@ -181,34 +166,28 @@ def draw_network(network, edge_thickness=0.25, node_size=3, directed=False, sphe
             arrow_cone.rotation_axis_angle = [angle + pi] + list(v_rot)
             bpy.context.scene.objects.link(arrow_cone)
             shapes.append(arrow_cone)
-
     # Remove primitive meshes
     bpy.ops.object.select_all(action='DESELECT')
     sphere.select = True
     cylinder.select = True
     cone.select = True
     #text.select = True
-
     # If the starting cube is there, remove it
-    if "Cube" in bpy.data.objects.keys():
+    if "Cube" in list(bpy.data.objects.keys()):
         bpy.data.objects.get("Cube").select = True
     bpy.ops.object.delete()
-
     # Smooth specified shapes
     for shape in shapes_to_smooth:
         shape.select = True
     #bpy.context.scene.objects.active = shapes_to_smooth[0]
     #bpy.ops.object.shade_smooth()
-
     # Join shapes
     for shape in shapes:
         shape.select = True
     #bpy.context.scene.objects.active = shapes[0]
     #bpy.ops.object.join()
-
     # Center object origin to geometry
     bpy.ops.object.origin_set(type="ORIGIN_GEOMETRY", center="MEDIAN")
-
     # Refresh scene
     bpy.context.scene.update()
 

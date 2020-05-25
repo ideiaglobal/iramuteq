@@ -1,4 +1,11 @@
+# -*- coding: utf-8 -*-
+# usage ?
+
+#------------------------------------
+# import des modules python
+#------------------------------------
 from optparse import OptionParser
+
 
 parser = OptionParser()
 parser.add_option("-f", "--file", dest="filename",

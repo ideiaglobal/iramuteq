@@ -1,23 +1,34 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2012 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
 #License: GNU/GPL
 
-from HTMLParser import HTMLParser
-import wx.lib.sized_controls as sc
-import wx.lib.filebrowsebutton as filebrowse
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
 import codecs
 import sys
 import re
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
 import wx
+import wx.lib.sized_controls as sc
+import wx.lib.filebrowsebutton as filebrowse
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+from html.parser import HTMLParser
 
 
 htmldir = 'dev/factiva_html'
 
 
 class MyHTMLParser(HTMLParser):
+
     def __init__(self) :
         HTMLParser.__init__(self)
         self.recording = 0
@@ -27,7 +38,7 @@ class MyHTMLParser(HTMLParser):
         self.start = False
         self.text = False
         self.count = 0
-    
+
     def handle_starttag(self, tag, attrs):
         self.need=True
         if tag not in ['div', 'p', 'b'] :
@@ -35,7 +46,7 @@ class MyHTMLParser(HTMLParser):
             self.text = False
             return
         else :
-            print attrs
+            print(attrs)
             self.need = True
             if tag == 'div' :
                 if attrs != [] :
@@ -79,28 +90,22 @@ class MyHTMLParser(HTMLParser):
                 else :
                     self.count += 1
                     self.data[-1].append(data)
-
-
     #    print "Encountered a start tag:", tag
     #def handle_endtag(self, tag):
     #    print "Encountered an end tag :", tag
     #def handle_data(self, data):
     #    print "Encountered some data  :", data
 
-
+# execution en direct ???
 files = os.listdir(htmldir)
-
 parser = MyHTMLParser()
 for f in files :
     f= os.path.join(htmldir, f)
     with codecs.open(f, 'r', 'utf8') as infile :
         content = infile.read()
 parser.feed(content)
-
 out = [[' '.join(['****','*date_'+art[4].replace(' ','_'),'*s_'+art[5].replace(' ','_')]), ' '.join(art[10:len(art)-1])] for art in parser.data]
-
-for i in range(0,8) :
-    print parser.data[i]
-
+for i in range(0,8):
+    print(parser.data[i])
 out = [' '.join(art) for art in out]
-print '\n\n\n'.join(out).encode('utf8')
+print('\n\n\n'.join(out))

@@ -1,14 +1,19 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2009 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
-
+#------------------------------------
+# import des modules wx
+#------------------------------------
 from wx.lib import sheet
+
+# utilisé seulement dans layout.py
 
 
 class MySheet(sheet.CSheet):
+
     def __init__(self, parent):
         sheet.CSheet.__init__(self, parent)
         self.parent=parent

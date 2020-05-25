@@ -1,15 +1,27 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
-import wx
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
+import tempfile
+import time
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from chemins import ffr, ConstructPathOut,ChdTxtPathOut
 from functions import CreateIraFile, print_liste, exec_rcode, check_Rresult
 from dialog import PrefQuestAlc, ClusterNbDialog
-import tempfile
-import time
 
 
 def RchdFunct(self,parent, rep_out, CLASSIF, encode, RscriptsPath):
@@ -46,28 +58,24 @@ def RchdFunct(self,parent, rep_out, CLASSIF, encode, RscriptsPath):
     while pid.poll() == None :
         time.sleep(0.2)
     check_Rresult(parent, pid)
-    
-    f=open(fileout,'rU')
+    f=open(fileout,'r')
     lcl=f.readlines()
     f.close()
     ListClasseOk=[line.replace('\n','').replace('"','') for line in lcl]
     ListClasseOk.pop(0)
-
     clusterdlg = ClusterNbDialog(ListClasseOk, parent, -1, "Nombre de classe", size=(350, 200),
                      style = wx.DEFAULT_DIALOG_STYLE
                      )
     clusterdlg.CenterOnParent()
-
     # this does not return until the dialog is closed.
     val = clusterdlg.ShowModal()
-    
     if val == wx.ID_OK:
         if type(ListClasseOk)!=float :
             CLASSE_CH=ListClasseOk[clusterdlg.list_box_1.GetSelection()]
         else :
             CLASSE_CH=ListClasseOk
     else:
-        print "You pressed Cancel\n"
+        print("You pressed Cancel\n")
     clusterdlg.Destroy()
     ClusterNb=int(CLASSE_CH)
     txt=''
@@ -126,14 +134,12 @@ def RchdFunct(self,parent, rep_out, CLASSIF, encode, RscriptsPath):
     afc <-  summary.ca.dm(afc)
     afc_table <- create_afc_table(afc)
     """%RscriptsPath['Rgraph']
-    
     txt+="""
     dendo <- as.dendrogram(as.hclust(chd))
     hthr<-sortheight[clnb]
     dendocut<-cut(dendo,h=hthr)
     save.image("%s")
     """%rep_out['RData']
-    
 #    txt+="""
 #    PARCEX<-%s
 #    """%'0.9'
@@ -178,9 +184,10 @@ def RchdFunct(self,parent, rep_out, CLASSIF, encode, RscriptsPath):
 
 
 class AnalyseCHDS():
+
     def __init__(self, parent, numactives, varsup):
         self.t1=time.time()
-#------------------------------------------------------
+        #------------------------------------------------------
         self.dlg=wx.ProgressDialog("Traitements",
                                "Veuillez patienter...",
                                maximum = 7,
@@ -190,17 +197,18 @@ class AnalyseCHDS():
         self.dlg.Center()
         self.count = 1
         keepGoing = self.dlg.Update(self.count)
-#-------------------------------------------------------
+        #-------------------------------------------------------
         self.Filename=parent.filename
         self.parent=parent
         self.encode=parent.encode
         self.numactives=numactives
         self.varsup=varsup
-#-------------------------------------------------------
+        #-------------------------------------------------------
         self.count += 1
         keepGoing = self.dlg.Update(self.count)
         #self.OnAnalyse()
-#-------------------------------------------------------
+        #-------------------------------------------------------
+
     def OnAnalyse(self):
         PathOut=ConstructPathOut(self.parent.tableau.parametre['filename'],'CHDS')
         self.pathout = PathOut
@@ -208,9 +216,9 @@ class AnalyseCHDS():
         self.dictpathout=dictpathout
         self.parent.tableau.dictpathout = dictpathout
         self.RPath=self.parent.PathPath.get('PATHS','rpath')
-#-------------------------------------------------------
+        #-------------------------------------------------------
         self.count += 1
-        keepGoing = self.dlg.Update(self.count,u"lecture des données")
+        keepGoing = self.dlg.Update(self.count,"lecture des données")
         colact = self.parent.tableau.select_col(self.numactives)
         colsup = self.parent.tableau.select_col(self.varsup)
         self.parent.tableau.make_01_from_selection(self.numactives, self.varsup, False)
@@ -218,21 +226,19 @@ class AnalyseCHDS():
         savetxt(dictpathout['FILE_ACT_TEMP'],colact,fmt='%s',delimiter=';')
         dictpathout['FILE_ET_TEMP']=tempfile.mktemp(dir=self.parent.TEMPDIR)
         savetxt(dictpathout['FILE_ET_TEMP'],colsup,fmt='%s',delimiter=';')
-        
-#-------------------------------------------------------
+        #-------------------------------------------------------
         self.count += 1
-        keepGoing = self.dlg.Update(self.count,u"Analyse (patientez...)")
-#------------FIXME----------
+        keepGoing = self.dlg.Update(self.count,"Analyse (patientez...)")
+        #------------FIXME----------
         clnb=RchdFunct(self,self.parent,dictpathout, 'DIANA',self.parent.SysEncoding,self.parent.RscriptsPath)
         self.clnb=clnb
-#-------------------------------------------------------
+        #-------------------------------------------------------
         self.count += 1
-        keepGoing = self.dlg.Update(self.count,u"Ecriture des résultats")
+        keepGoing = self.dlg.Update(self.count,"Ecriture des résultats")
         return dictpathout,clnb
-        
-   
+
     def PrintResult(self,dictpathout,clnb):
-        with open(self.dictpathout['SbyClasseOut'], 'rU') as filein :
+        with open(self.dictpathout['SbyClasseOut'], 'r') as filein :
             content = filein.readlines()
         content.pop(0)
         for i, line in enumerate(content) :
@@ -245,29 +251,29 @@ class AnalyseCHDS():
         self.parent.tableau.dictpathout = self.dictpathout
         self.parent.tableau.save_tableau(self.dictpathout['db'])
         CreateIraFile(dictpathout,clnb, corpname = os.path.basename(self.Filename), section = 'chd_dist_quest')
-#-------------------------------------------------------
+        #-------------------------------------------------------
         self.count += 1
-        keepGoing = self.dlg.Update(self.count,u"Ouverture...")
-        afc_graph_list = [[os.path.basename(self.dictpathout['AFC2DL_OUT']), u'Variables actives - coordonnées - facteurs 1 / 2'],
-                          [os.path.basename(self.dictpathout['AFC2DSL_OUT']), u'variables illustratives - coordonnées - facteurs 1 / 2'],
-                          [os.path.basename(self.dictpathout['AFC2DCL_OUT']), u'Classes - Coordonnées - facteur 1 / 2'],
-                          [os.path.basename(self.dictpathout['AFC2DCoul']), u'Variables actives - Corrélation - facteur 1/2'],
-                          [os.path.basename(self.dictpathout['AFC2DCoulSup']), u'Variables illustratives - Corrélation - facteur 1 / 2'],
-                          [os.path.basename(self.dictpathout['AFC2DCoulCl']), u'Classes - Corrélations - facteurs 1 / 2'], ]
-        chd_graph_list = [[os.path.basename(self.dictpathout['dendro1']), u'dendrogramme à partir de chd1']]
-        #chd_graph_list.append(['arbre1', u'chd1'])
+        keepGoing = self.dlg.Update(self.count,"Ouverture...")
+        afc_graph_list = [[os.path.basename(self.dictpathout['AFC2DL_OUT']), 'Variables actives - coordonnées - facteurs 1 / 2'],
+                          [os.path.basename(self.dictpathout['AFC2DSL_OUT']), 'variables illustratives - coordonnées - facteurs 1 / 2'],
+                          [os.path.basename(self.dictpathout['AFC2DCL_OUT']), 'Classes - Coordonnées - facteur 1 / 2'],
+                          [os.path.basename(self.dictpathout['AFC2DCoul']), 'Variables actives - Corrélation - facteur 1/2'],
+                          [os.path.basename(self.dictpathout['AFC2DCoulSup']), 'Variables illustratives - Corrélation - facteur 1 / 2'],
+                          [os.path.basename(self.dictpathout['AFC2DCoulCl']), 'Classes - Corrélations - facteurs 1 / 2'], ]
+        chd_graph_list = [[os.path.basename(self.dictpathout['dendro1']), 'dendrogramme à partir de chd1']]
+        #chd_graph_list.append(['arbre1', 'chd1'])
         print_liste(self.dictpathout['liste_graph_afc'], afc_graph_list)
         print_liste(self.dictpathout['liste_graph_chd'], chd_graph_list)
         self.tableau = self.parent.tableau
         OpenAnalyse(self.parent, dictpathout['ira'], False)
-#-------------------------------------------------------
+        #-------------------------------------------------------
         self.count += 1
-        keepGoing = self.dlg.Update(self.count,u"Fini")
+        keepGoing = self.dlg.Update(self.count,"Fini")
 
 
 class ChdCluster():
-    def __init__(self,parent):
 
+    def __init__(self,parent):
         dlg = PrefQuestAlc(parent, sim = True)
         #dlg = CHDDialog(parent,-1, u"Classification", size=(350, 400),style = wx.DEFAULT_DIALOG_STYLE)
         dlg.CenterOnParent()
@@ -279,4 +285,3 @@ class ChdCluster():
             dictpathout,clnb=chd.OnAnalyse()
             chd.PrintResult(dictpathout,clnb)
             parent.ShowTab(wx.EVT_BUTTON)
-    

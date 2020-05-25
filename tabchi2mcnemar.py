@@ -1,23 +1,46 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2016 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
-import HTML
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
 import string
-import wx
-import os
 import sys
 import tempfile
-from chemins import ffr,FFF
-import wx.lib.sized_controls as sc
 from time import sleep
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+import wx.lib.sized_controls as sc
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+import HTML
+from chemins import ffr,FFF
 from functions import exec_rcode, check_Rresult
 from dialog import ChiDialog, PrefChi
 from analysematrix import AnalyseMatrix
-                    
+
+
+chioption = { 'valobs' : True,
+    'valtheo' : True,
+    'resi' : False,
+    'contrib' : True,
+    'pourcent' : False,
+    'pourcentl' : True,
+    'pourcentc' : True,
+    'graph' : True,
+    'bw' : False,
+}
+
+
 def make_res(line) :
     if float(line[5]) <= 0.05 and line[6] != 'warning':
         line.append('green')
@@ -34,7 +57,7 @@ def make_table(tabs, tab_title, res) :
     return ['<br>'.join(['<font color=%s>%s</font>' % (res[i][-1], tab_title), HTML.table(tab)]) for i,tab in enumerate(tabs)]
 
 def make_restab(res) :
-    return ['<br>'.join(['<font color=%s>%s</font>'% (line[-1], u'Résultats'),HTML.table([['chi', line[3]],['p', line[5]]])]) for i,line in enumerate(res)]
+    return ['<br>'.join(['<font color=%s>%s</font>'% (line[-1], 'Résultats'),HTML.table([['chi', line[3]],['p', line[5]]])]) for i,line in enumerate(res)]
 
 def make_htmlgraphs(graphs) :
     return ['<img src=%s>' % os.path.basename(val) for val in graphs]
@@ -46,22 +69,12 @@ def make_title(res, text) :
     return ['<a name=%i></a><br><font color=%s>%s</font><br><a href=#back_%i>retour</a><br>' % (i, val[-1], text[i], i) for i, val in enumerate(res)] 
 
 
-chioption = { 'valobs' : True,
-              'valtheo' : True,
-              'resi' : False,
-              'contrib' : True,
-              'pourcent' : False,
-              'pourcentl' : True,
-              'pourcentc' : True,
-              'graph' : True,
-              'bw' : False,
-              }
-
 class McNemar(AnalyseMatrix):
+
     def doparametres(self, dlg = None):
         if dlg is None :
             return
-        dial = ChiDialog(self.parent, -1, u"Chi2 McNemar", chioption, self.tableau, size=(400, 350),
+        dial = ChiDialog(self.parent, -1, "Chi2 McNemar", chioption, self.tableau, size=(400, 350),
                      style = wx.DEFAULT_DIALOG_STYLE
                      )
         dial.CenterOnParent()
@@ -88,10 +101,10 @@ class McNemar(AnalyseMatrix):
                 dial.dial.Destroy()
             dial.Destroy()
             self.parametres = None
-            
+
     def doanalyse(self):
         self.count = 1
-        keepGoing = self.dlg.Update(self.count,u"Analyse dans R...")
+        keepGoing = self.dlg.Update(self.count,"Analyse dans R...")
         self.OutFrame=tempfile.mktemp(dir=self.parent.TEMPDIR)
         self.encode=self.parent.encode
         self.TEMPDIR=self.parent.TEMPDIR
@@ -299,7 +312,7 @@ class McNemar(AnalyseMatrix):
         write.csv2(frameout,file="%s")
         """ % (ffr(self.parametres['pathout']),ffr(self.OutFrame))
         tmpfile=tempfile.mktemp(dir=self.TEMPDIR)
-        print tmpfile
+        print(tmpfile)
         tmpscript=open(tmpfile,'w')
         tmpscript.write(txt)
         tmpscript.close()
@@ -308,61 +321,57 @@ class McNemar(AnalyseMatrix):
             sleep(0.2)
         check_Rresult(self.parent, pid)            
         self.count += 1
-        keepGoing = self.dlg.Update(self.count,u"Ecriture des résultats")
+        keepGoing = self.dlg.Update(self.count,"Ecriture des résultats")
          
         listfileout = self.dolayout(self.chioption)
             #listfileout=dlg.ShowChi2(ColSel1,ColSel2)
             #parent.FreqNum += 1
             #parent.DictTab[u"Chi2_%s*"%parent.FreqNum]=listfileout
-#             parent.newtab = wx.html.HtmlWindow(parent.nb, -1)
-#             if "gtk2" in wx.PlatformInfo:
-#                 parent.newtab.SetStandardFonts()
-#             parent.newtab.LoadPage(listfileout[len(listfileout)-1])
-#             parent.nb.AddPage(parent.newtab,u"Chi2_%s*"%parent.FreqNum)
-#             parent.nb.SetSelection(parent.nb.GetPageCount()-1)
-#             parent.ShowTab(wx.EVT_BUTTON)
-#             parent.DisEnSaveTabAs(True)
-#        self.count += 1
-#        keepGoing = self.dlg.Update(self.count,u"Fini")
+            #parent.newtab = wx.html.HtmlWindow(parent.nb, -1)
+            #if "gtk2" in wx.PlatformInfo:
+                #parent.newtab.SetStandardFonts()
+                #parent.newtab.LoadPage(listfileout[len(listfileout)-1])
+                #parent.nb.AddPage(parent.newtab,u"Chi2_%s*"%parent.FreqNum)
+                #parent.nb.SetSelection(parent.nb.GetPageCount()-1)
+                #parent.ShowTab(wx.EVT_BUTTON)
+                #parent.DisEnSaveTabAs(True)
+            #self.count += 1
+            #keepGoing = self.dlg.Update(self.count,u"Fini")
 
     def dolayout(self, option):
         ListFile=[False]
-        file=open(self.OutFrame,'rU')
+        file=open(self.OutFrame,'r')
         content=file.readlines()
         file.close()
         lcont = [line.replace('"','').replace('\n','').split(';') for line in content]
-    
         lcont.pop(0)
         lcont.pop(0)
-        
         allcoord = []
         names = []
-
         res = [chi for chi in lcont if chi[0]=='res']
         res = [make_res(line) for line in res]
         coord_res = [i for i,chi in enumerate(lcont) if chi[0]=='res']
         if option['valobs']:
             allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*obs*'])
-            names.append(u'Valeurs observées')
+            names.append('Valeurs observées')
         if option['valtheo'] :
             allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*exp*'])
-            names.append(u'Valeurs théoriques')
+            names.append('Valeurs théoriques')
         if option['resi'] :
             allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*resi*'])
-            names.append(u'Residuals')
+            names.append('Residuals')
         if option['contrib'] :
             allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*contrib*'])
-            names.append(u'Contributions a posteriori')
+            names.append('Contributions a posteriori')
         if option['pourcent'] : 
             allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*pr*'])
-            names.append(u'Pourcentages')
+            names.append('Pourcentages')
         if option['pourcentl'] :
             allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*prl*'])
-            names.append(u'Pourcentages en ligne')
+            names.append('Pourcentages en ligne')
         if option['pourcentc'] :
             allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*prc*'])
-            names.append(u'Pourcentages en colonne')
-    
+            names.append('Pourcentages en colonne')
         allcoord.append(coord_res)
         allhtml = [[clean_line(lcont[allcoord[i][j]+1:allcoord[i+1][j]]) for j, line in enumerate(allcoord[i])] for i, tab in enumerate(allcoord) if i!=len(allcoord)-1]
         allhtml = [make_table(val,names[i],res) for i,val in enumerate(allhtml)]
@@ -371,14 +380,12 @@ class McNemar(AnalyseMatrix):
         allhtml.insert(0,html_res)
         titles = make_title(res, self.TextCroise)
         allhtml.insert(0,titles)
-        
         if option['graph'] :
             graphs = [line[7] for line in res]
             ListFile += graphs
             html_graphs = make_htmlgraphs(graphs)
             allhtml.append(html_graphs)
-
-        header=u"""
+        header="""
         <html>\n
         <meta http-equiv="content-Type" content="text/html; charset=%s" />\n
         <body>\n
@@ -391,11 +398,9 @@ class McNemar(AnalyseMatrix):
         <font color=red>p &gt; 0.05</font>
         </td></tr></table><br><br>
         """%self.parent.SysEncoding
-
         pretxt = '<br>\n'.join(links)+'<br><hr><br>\n'
         txt = '<br><hr><br>\n'.join(['<br><br>'.join([tab[i] for tab in allhtml]) for i,val in enumerate(res)])
         txt = header + pretxt + txt + '\n</body></html>'
-
         fileout=os.path.join(self.parametres['pathout'],'resultats-chi2.html')
         with open(fileout, 'w') as f :
             f.write(txt)

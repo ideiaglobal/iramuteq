@@ -1,11 +1,21 @@
+# -*- coding: utf-8 -*-
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
+
+#------------------------------------
+# import des modules python
+#------------------------------------
 import codecs
 from shutil import copyfile
 import os
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from chemins import PathOut
 
 
-
 class WebExport :
+
     def __init__(self, parent, parametres) :
         self.parent = parent
         self.parametres = parametres
@@ -48,7 +58,7 @@ class WebExport :
         with open(afcout, 'w') as f :
             f.write(content)
         return afcout
-        
+
     def exportsimi(self) :
         simifile = os.path.join(self.parent.AppliPath, 'webexport', 'graphe.html')
         simiout = os.path.join(self.pathout.dirout, 'graphe.html')
@@ -59,4 +69,3 @@ class WebExport :
         with open(simiout, 'w') as f :
             f.write(content)
         return simiout             
-        

@@ -1,14 +1,15 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2012 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
-import wx
+#------------------------------------
+# import des modules python
+#------------------------------------
 import re
-from ConfigParser import ConfigParser
 from subprocess import Popen, call, PIPE
-import thread
+import _thread
 import os
 import ast
 import sys
@@ -24,13 +25,24 @@ import shelve
 import json
 #from dialog import BugDialog
 import logging
+from operator import itemgetter
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+import wx.adv
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+from configparser import ConfigParser
+
 
 log = logging.getLogger('iramuteq')
 
 
-indices_simi = [u'cooccurrence' ,'pourcentage de cooccurrence',u'Russel',u'Jaccard', 'Kulczynski1', 'Kulczynski2', 'Mountford', 'Fager', 'simple matching', 'Hamman', 'Faith', 'Tanimoto', 'Dice', 'Phi', 'Stiles', 'Michael', 'Mozley', 'Yule', 'Yule2', 'Ochiai', 'Simpson', 'Braun-Blanquet','Chi-squared', 'Phi-squared', 'Tschuprow', 'Cramer', 'Pearson', 'binomial']
-
-
+indices_simi = ['cooccurrence' ,'pourcentage de cooccurrence','Russel','Jaccard', 'Kulczynski1', 'Kulczynski2', 'Mountford', 'Fager', 'simple matching', 'Hamman', 'Faith', 'Tanimoto', 'Dice', 'Phi', 'Stiles', 'Michael', 'Mozley', 'Yule', 'Yule2', 'Ochiai', 'Simpson', 'Braun-Blanquet','Chi-squared', 'Phi-squared', 'Tschuprow', 'Cramer', 'Pearson', 'binomial']
 
 def open_folder(folder):
     if sys.platform == "win32":
@@ -38,7 +50,7 @@ def open_folder(folder):
     else:
         opener ="open" if sys.platform == "darwin" else "xdg-open"
         #call([opener, folder])
-        call([u"%s %s &" % (opener, folder)], shell=True)
+        call(["%s %s &" % (opener, folder)], shell=True)
 
 def normpath_win32(path) :
     if not sys.platform == 'win32' :
@@ -72,24 +84,24 @@ class TGen :
         if path is None :
             path = self.path
         with open(path, 'w') as f :
-            f.write('\n'.join(['\t'.join([val] + self.tgen[val]) for val in self.tgen]).encode(self.encoding))
+            f.write('\n'.join(['\t'.join([val] + self.tgen[val]) for val in self.tgen]))
 
     def writetable(self, pathout, tgens, totocc):
-        etoiles = totocc.keys()
+        etoiles = list(totocc.keys())
         etoiles.sort()
         with open(pathout, 'w') as f :
-            line = '\t'.join([u'tgens'] + etoiles) + '\n'
-            f.write(line.encode(self.encoding))
+            line = '\t'.join(['tgens'] + etoiles) + '\n'
+            f.write(line)
             for t in tgens :
-                line = '\t'.join([t] + [`tgens[t][et]` for et in etoiles]) + '\n'
-                f.write(line.encode(self.encoding))
+                line = '\t'.join([t] + [repr(tgens[t][et]) for et in etoiles]) + '\n'
+                f.write(line)
             i = 0
             totname = 'total'
-            while totname + `i` in tgens :
+            while totname + repr(i) in tgens :
                 i += 1
-            totname = totname + `i`
-            line = '\t'.join([totname] + [`totocc[et]` for et in etoiles]) + '\n'
-            f.write(line.encode(self.encoding))
+            totname = totname + repr(i)
+            line = '\t'.join([totname] + [repr(totocc[et]) for et in etoiles]) + '\n'
+            f.write(line)
 
 class History :
     def __init__(self, filein, syscoding = 'utf8') :
@@ -220,13 +232,13 @@ class History :
 
     def clean(self) :
         corpustodel = [corpus for corpus in self.history if not os.path.exists(corpus['ira'])]
-        print corpustodel
+        print(corpustodel)
         for corpus in corpustodel :
-            print 'cleaning :', corpus['corpus_name']
+            print('cleaning :', corpus['corpus_name'])
             self.delete(corpus, corpus = True)
         anatodel = [analyse for corpus in self.history for analyse in corpus.get('analyses', []) if not os.path.exists(analyse.get('ira', '/'))]
         for analyse in anatodel :
-            print 'cleaning :', analyse['name']
+            print('cleaning :', analyse['name'])
             self.delete(analyse)
 
     def dostat(self):
@@ -273,18 +285,18 @@ class History :
                     todel['ira'] += 1
                 else :
                     todel['ira'] = 1
-        print u'Nbr total de corpus : %s' % len(self.history)
+        print('Nbr total de corpus : %s' % len(self.history))
         corpus_nb = len(corpusnb) + len(todel)
-        print u'Nbr de corpus différents : %s' % corpus_nb
+        print('Nbr de corpus différents : %s' % corpus_nb)
         lentodel = len(todel)
-        print u'Nbr de corpus à supprimer : %s' % lentodel
-        print u'Nbr de sous corpus : %s' % subnb
-        print u"Nbr total d'occurrences : %s" % tokens
-        print u'Moyenne occurrences par corpus : %f' % (tokens/corpus_nb)
-        print '---------------------'
-        print u"Nbr total d'analyses : %s" % analysenb
-        print u'Temps total indexation : %f h' % ((hours+minutes+secondes) / 3600)
-        print u'Temps total analyses :  %f h' % ((ha+ma+sa) / 3600)
+        print('Nbr de corpus à supprimer : %s' % lentodel)
+        print('Nbr de sous corpus : %s' % subnb)
+        print("Nbr total d'occurrences : %s" % tokens)
+        print('Moyenne occurrences par corpus : %f' % (tokens/corpus_nb))
+        print('---------------------')
+        print("Nbr total d'analyses : %s" % analysenb)
+        print('Temps total indexation : %f h' % ((hours+minutes+secondes) / 3600))
+        print('Temps total analyses :  %f h' % ((ha+ma+sa) / 3600))
 
     def __str__(self) :
         return str(self.history)
@@ -292,11 +304,11 @@ class History :
 class DoConf :
     def __init__(self, configfile=None, diff = None, parametres = None) :
         self.configfile = configfile
-        self.conf = ConfigParser()
+        self.conf = ConfigParser(interpolation=None) # pourquoi ce paramètre ???
 
         if configfile is not None :
             configfile = normpath_win32(configfile)
-            self.conf.readfp(codecs.open(configfile, 'r', 'utf8'))
+            self.conf.read_file(codecs.open(configfile, 'r', 'utf8'))
         self.parametres = {}
         if parametres is not None :
             self.doparametres(parametres)
@@ -336,10 +348,10 @@ class DoConf :
                 self.conf.add_section(section)
             for option in parametres[i] :
                 if isinstance(parametres[i][option], int) :
-                    self.conf.set(section, option, `parametres[i][option]`)
+                    self.conf.set(section, option, repr(parametres[i][option]))
                     txt += '%s = %i\n' % (option, parametres[i][option])
-                elif isinstance(parametres[i][option], basestring) :
-                    self.conf.set(section, option, parametres[i][option].encode('utf8'))
+                elif isinstance(parametres[i][option], str) :
+                    self.conf.set(section, option, parametres[i][option])
                     txt += '%s = %s\n' % (option, parametres[i][option])
                 elif isinstance(parametres[i][option], wx.Colour) :
                     self.conf.set(section, option, str(parametres[i][option]))
@@ -347,13 +359,13 @@ class DoConf :
                 elif option == 'analyses' :
                     pass
                 else :
-                    self.conf.set(section, option, `parametres[i][option]`)
-                    txt += '%s = %s\n' % (option, `parametres[i][option]`)
+                    self.conf.set(section, option, repr(parametres[i][option]))
+                    txt += '%s = %s\n' % (option, repr(parametres[i][option]))
         if outfile is None :
             outfile = self.configfile
         outfile = normpath_win32(outfile)
         with open(outfile, 'w') as f :
-            f.write(txt.encode('utf8'))
+            f.write(txt)
             #self.conf.write(f)
 
     def totext(self, parametres) :
@@ -361,19 +373,19 @@ class DoConf :
         txt = []
         for val in parametres :
             if isinstance(parametres[val], int) :
-                txt.append(' \t\t: '.join([val, `parametres[val]`]))
-            elif isinstance(parametres[val], basestring) :
+                txt.append(' \t\t: '.join([val, repr(parametres[val])]))
+            elif isinstance(parametres[val], str) :
                 txt.append(' \t\t: '.join([val, parametres[val]]))
             elif val in ['listet', 'stars'] :
                 pass
             else :
-                txt.append(' \t\t: '.join([val, `parametres[val]`]))
+                txt.append(' \t\t: '.join([val, repr(parametres[val])]))
         return '\n'.join(txt)
 
 
 def write_tab(tab, fileout) :
-        writer = csv.writer(open(fileout, 'wb'), delimiter=';', quoting = csv.QUOTE_NONNUMERIC)
-        writer.writerows(tab)
+        csvWriter = csv.writer(open(fileout, 'w'), delimiter=';', quoting = csv.QUOTE_NONNUMERIC)
+        csvWriter.writerows(tab)
 
 class BugDialog(wx.Dialog):
     def __init__(self, *args, **kwds):
@@ -420,7 +432,24 @@ def CreateIraFile(DictPathOut, clusternb, corpname='corpus_name', section = 'ana
     AnalyseConf.write(fileout)
     fileout.close()
 
-def sortedby(list, direct, *indices):
+def multisort(liste2d, ordre, indices_tri):
+
+    """
+    methode destinée à remplacer 'comp' qui a disparu en Python 3
+        tri de tuples sur l'un des éléments du tuple
+        en principe, elle doit renvoyer les éléments triés selon le principe d'avant
+        tel que décrit dans la docstring de 'sortedby'
+
+        probablement à améliorer pour la rendre d'usage plus général
+        en acceptant un nombre variable de parametres ???
+    """
+
+    indices_triTuple = indices_tri.Tuple(int, ...)
+    for key in reversed(indices_tri):
+        liste2d.sort(key=attrgetter(key), reverse=ordre)
+    return liste2d
+
+def sortedby(liste2d, direct, *indices):
 
     """
         sortedby: sort a list of lists (e.g. a table) by one or more indices
@@ -430,16 +459,36 @@ def sortedby(list, direct, *indices):
          for list = [[2,3],[1,2],[3,1]]:
          sortedby(list,1) will return [[3, 1], [1, 2], [2, 3]],
          sortedby(list,0) will return [[1, 2], [2, 3], [3, 1]]
+         
+         elle n'est pas remplacée par la méthode 'multisort' ???
+         
     """
 
-    nlist = map(lambda x, indices=indices:
-                 map(lambda i, x=x: x[i], indices) + [x],
-                 list)
-    if direct == 1:
-        nlist.sort()
-    elif direct == 2:
-        nlist.sort(reverse=True)
-    return map(lambda l: l[-1], nlist)
+# iramuteq original
+#    nlist = map(lambda x, indices=indices:
+#                 map(lambda i, x=x: x[i], indices) + [x],
+#                 list)
+
+# iramuteq passé à 2to3
+#    nlist = list(map(lambda x, indices=indices:
+#                 list(map(lambda i, x=x: x[i], indices)) + [x],
+#                 liste2d))
+
+    for key in reversed(indices):
+        liste2d.sort(key=itemgetter(key), reverse=(direct==2))
+    return liste2d
+
+
+#    if direct == 1:
+#        nlist.sort()
+#         sorted_list = multisort(liste2d, direct, *indices)
+
+#    elif direct == 2:
+#        nlist.sort(reverse=True)
+#         sorted_list = multisort(liste2d, direct, *indices)
+
+#    return [l[-1] for l in nlist]
+#    return sorted_list
 
 def add_type(line, dictlem):
     if line[4] in dictlem:
@@ -452,7 +501,7 @@ def treat_line_alceste(i, line) :
     if line[0] == '*' or line[0] == '*****' :
         return line + ['']
     if line[5] == 'NA':
-        print 'NA', line[5]
+        print('NA', line[5])
         pass
     elif float(line[5].replace(',', '.')) < 0.0001:
         line[5] = '< 0,0001'
@@ -464,7 +513,7 @@ def treat_line_alceste(i, line) :
 
 def ReadProfileAsDico(File, Alceste=False, encoding = sys.getdefaultencoding()):
     dictlem = {}
-    print 'lecture des profiles'
+    print('lecture des profiles')
     FileReader = codecs.open(File, 'r', encoding)
     Filecontent = FileReader.readlines()
     FileReader.close()
@@ -475,9 +524,9 @@ def ReadProfileAsDico(File, Alceste=False, encoding = sys.getdefaultencoding()):
     rows.pop(0)
     ClusterNb = rows[0][2]
     rows.pop(0)
-    clusters = [row[2] for row in rows if row[0] == u'**']
-    valclusters = [row[1:4] for row in rows if row[0] == u'****']
-    lp = [i for i, line in enumerate(rows) if line[0] == u'****']
+    clusters = [row[2] for row in rows if row[0] == '**']
+    valclusters = [row[1:4] for row in rows if row[0] == '****']
+    lp = [i for i, line in enumerate(rows) if line[0] == '****']
     prof = [rows[lp[i] + 1:lp[i+1] - 1] for i in range(0, len(lp)-1)] + [rows[lp[-1] + 1:len(rows)]]
     if Alceste :
         prof = [[add_type(row, dictlem) for row in pr] for pr in prof]
@@ -518,7 +567,7 @@ def decoupercharact(chaine, longueur, longueurOptimale, separateurs = None) :
         Si on trouve un '$', c'est fini.
         Sinon, on cherche le meilleur candidat. C'est-à-dire le rapport poids/distance le plus important.
     """
-    separateurs = [[u'.', 60.0], [u'?', 60.0], [u'!', 60.0], [u'£$£', 60], [u':', 50.0], [u';', 40.0], [u',', 10.0], [u' ', 0.1]]
+    separateurs = [['.', 60.0], ['?', 60.0], ['!', 60.0], ['£$£', 60], [':', 50.0], [';', 40.0], [',', 10.0], [' ', 0.1]]
     trouve = False                 # si on a trouvé un bon séparateur
     iDecoupe = 0                # indice du caractere ou il faut decouper
 
@@ -529,7 +578,7 @@ def decoupercharact(chaine, longueur, longueurOptimale, separateurs = None) :
     meilleur = ['', 0, 0]        # type, poids et position du meilleur separateur
 
     # on vérifie si on ne trouve pas un '$'
-    indice = chaineTravail.find(u'$')
+    indice = chaineTravail.find('$')
     if indice > -1:
         trouve = True
         iDecoupe = indice
@@ -569,11 +618,11 @@ def decoupercharact(chaine, longueur, longueurOptimale, separateurs = None) :
     return False, chaine.split(), ''
 
 
-exceptions = {'paragrapheOT' : u"Un problème de formatage (présence d'un marqueur de paragraphe (-*) en dehors d'un texte) est survenu à la ligne ",
-              'EmptyText' : u"Texte vide (probablement un problème de formatage du corpus). Le problème est apparu à la ligne ",
-              'CorpusEncoding' : u"Problème d'encodage.",
-              'TextBeforeTextMark' : u"Problème de formatage : du texte avant le premier marqueur de texte (****). Le problème est survenu à la ligne ",
-              'MissingAnalyse' : u'Aucun fichier à cet emplacement :\n',
+exceptions = {'paragrapheOT' : "Un problème de formatage (présence d'un marqueur de paragraphe (-*) en dehors d'un texte) est survenu à la ligne ",
+              'EmptyText' : "Texte vide (probablement un problème de formatage du corpus). Le problème est apparu à la ligne ",
+              'CorpusEncoding' : "Problème d'encodage.",
+              'TextBeforeTextMark' : "Problème de formatage : du texte avant le premier marqueur de texte (****). Le problème est survenu à la ligne ",
+              'MissingAnalyse' : 'Aucun fichier à cet emplacement :\n',
 }
 
 def BugReport(parent, error = None):
@@ -582,7 +631,7 @@ def BugReport(parent, error = None):
             ch.Destroy()
     excName, exc, excTb = formatExceptionInfo()
     if excName == 'Exception' :
-        print exc
+        print(exc)
         if len(exc.split()) == 2 :
             mss, linenb = exc.split()
             if mss in exceptions :
@@ -596,11 +645,11 @@ def BugReport(parent, error = None):
                 txt = exc
         title = "Information"
     else :
-        txt = u'            !== BUG ==!       \n'
-        txt += u'*************************************\n'
+        txt = '\n            !== BUG ==!       \n'
+        txt += '*************************************\n'
         txt += '\n'.join(excTb).replace('    ', ' ')
         txt += excName + '\n'
-        txt += `exc`
+        txt += repr(exc)
         title = "Bug"
 
     dial = BugDialog(parent, **{'title' : title})
@@ -619,15 +668,15 @@ def PlaySound(parent):
             if "gtk2" in wx.PlatformInfo:
                 error = Popen(['aplay','-q',os.path.join(parent.AppliPath,'son_fin.wav')])
             else :
-                sound = wx.Sound(os.path.join(parent.AppliPath, 'son_fin.wav'))
-                sound.Play(wx.SOUND_SYNC)
+                sound = wx.adv.Sound(os.path.join(parent.AppliPath, 'son_fin.wav'))
+                sound.Play(wx.adv.SOUND_SYNC)
         except :
-            print 'pas de son'
+            print('pas de son')
 
 def ReadDicoAsDico(dicopath):
     with codecs.open(dicopath, 'r', 'UTF8') as f:
         content = f.readlines()
-    lines = [line.rstrip('\n\r').replace(u'\n', '').replace('"', '').split('\t') for line in content if line != u'']
+    lines = [line.rstrip('\n\r').replace('\n', '').replace('"', '').split('\t') for line in content if line != '']
     return dict([[line[0], line[1:]] for line in lines])
 
 def ReadLexique(parent, lang = 'french', filein = None):
@@ -659,7 +708,7 @@ def ReadList(filein, encoding = sys.getdefaultencoding(), sep = ';'):
         #line = line.split(';')
         nline = [line[0]]
         for val in line[1:]:
-            if val == u'NA' :
+            if val == 'NA' :
                 don = ''
             else:
                 try:
@@ -689,7 +738,6 @@ def exec_rcode(rpath, rcode, wait = True, graph = False):
                 needX11 = False
         except :
             needX11 = False
-
     rpath = rpath.replace('\\','\\\\')
     env = os.environ.copy()
     if sys.platform == 'darwin' and 'LC_ALL' not in env:
@@ -699,13 +747,13 @@ def exec_rcode(rpath, rcode, wait = True, graph = False):
             if sys.platform == 'win32':
                 error = call(["%s" % rpath, "--vanilla","--slave","-f", "%s" % rcode])
             else :
-                error = call([rpath, '--slave', "--vanilla", "-f %s" % rcode, "--encoding=UTF-8"], env = env)
+                error = call([rpath, '--slave', "--vanilla", "--encoding=UTF-8", "-f %s" % rcode], env = env)
             return error
         else :
             if sys.platform == 'win32':
                 pid = Popen(["%s" % rpath, '--vanilla','--slave','-f', "%s" % rcode])
             else :
-                pid = Popen([rpath, '--slave', "--vanilla", "-f %s" % rcode, "--encoding=UTF-8"], stderr = PIPE, env = env)
+                pid = Popen([rpath, '--slave', "--vanilla", "--encoding=UTF-8", "-f %s" % rcode], stderr = PIPE, env = env, encoding='UTF-8') #PIPE ou STDOUT ?
             return pid
     else :
         if wait :
@@ -713,18 +761,18 @@ def exec_rcode(rpath, rcode, wait = True, graph = False):
                 error = call(["%s" % rpath, '--vanilla','--slave','-f', "%s" % rcode])
             elif sys.platform == 'darwin' and needX11:
                 os.environ['DISPLAY'] = ':0.0'
-                error = call([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"], env = env)
+                error = call([rpath, '--vanilla','--slave', "--encoding=UTF-8","-f %s" % rcode], env = env, encoding='UTF-8')
             else :
-                error = call([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"], env = env)
+                error = call([rpath, '--vanilla','--slave', "--encoding=UTF-8","-f %s" % rcode], env = env, encoding='UTF-8')
             return error
         else :
             if sys.platform == 'win32':
                 pid = Popen(["%s" % rpath, '--vanilla','--slave','-f', "%s" % rcode])
             elif sys.platform == 'darwin' and needX11:
                 os.environ['DISPLAY'] = ':0.0'
-                pid = Popen([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"], stderr = PIPE, env = env)
+                pid = Popen([rpath, '--vanilla','--slave', "--encoding=UTF-8","-f %s" % rcode], stderr = PIPE, env = env, encoding='UTF-8')
             else :
-                pid = Popen([rpath, '--vanilla','--slave',"-f %s" % rcode, "--encoding=UTF-8"], stderr = PIPE, env = env)
+                pid = Popen([rpath, '--vanilla','--slave', "--encoding=UTF-8","-f %s" % rcode], stderr = PIPE, env = env, encoding='UTF-8')
             return pid
 
 def check_Rresult(parent, pid) :
@@ -736,7 +784,7 @@ def check_Rresult(parent, pid) :
                 error[1] = 'None'
             parent.Rerror = '\n'.join([str(pid.returncode), '\n'.join(error)])
             try :
-                raise Exception('\n'.join([u'Erreur R', '\n'.join(error[1:])]))
+                raise Exception('\n'.join(['Erreur R', '\n'.join(error[1:])]))
             except :
                 BugReport(parent)
             return False
@@ -745,7 +793,7 @@ def check_Rresult(parent, pid) :
     else :
         if pid != 0 :
             try :
-                raise Exception(u'Erreur R')
+                raise Exception('Erreur R')
             except :
                 BugReport(parent)
             return False
@@ -759,20 +807,19 @@ def launchcommand(mycommand):
 def print_liste(filename,liste):
     with open(filename,'w') as f :
         for graph in liste :
-            f.write(';'.join(graph).encode(sys.getdefaultencoding(), errors='replace')+'\n')
-
+            f.write(';'.join(graph) +'\n')
 def read_list_file(filename, encoding = sys.getdefaultencoding()):
-    with codecs.open(filename,'rU', encoding) as f :
+    with codecs.open(filename,'r', encoding) as f:
         content=f.readlines()
         ncontent=[line.replace('\n','').split(';') for line in content if line.strip() != '']
     return ncontent
 
-def progressbar(self, maxi) :
+def progressbar(self, maxi):
     ira = wx.GetApp().GetTopWindow()
     parent = ira
-    try :
+    try:
         maxi = int(maxi)
-    except :
+    except:
         maxi = 1
     prog = wx.ProgressDialog("Traitements",
                              "Veuillez patienter...",
@@ -780,6 +827,8 @@ def progressbar(self, maxi) :
                              parent=parent,
                              style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT
                              )
+                             # parent ???
+    # le ABORT n'est pas géré à tous les coups ???
     prog.SetSize((400,150))
     #prog.SetIcon(ira._icon)
     return prog
@@ -794,8 +843,8 @@ def treat_var_mod(variables) :
         var_mod[var] = mods
 
 #     for variable in variables :
-#         if u'_' in variable :
-#             forme = variable.split(u'_')
+#         if '_' in variable :
+#             forme = variable.split('_')
 #             var = forme[0]
 #             mod = forme[1]
 #             if not var in var_mod :
@@ -816,7 +865,7 @@ def doconcorde(corpus, uces, mots, uci = False) :
     listmot = [corpus.getlems()[lem].formes for lem in mots]
     listmot = [corpus.getforme(fid).forme for lem in listmot for fid in lem]
     mothtml = ['<font color=red><b>%s</b></font>' % mot for mot in listmot]
-    dmots = dict(zip(listmot, mothtml))
+    dmots = dict(list(zip(listmot, mothtml)))
     for uce in uces :
         ucetxt = ucestxt1[uce].split()
         ucetxt = ' '.join([dmots.get(mot, mot) for mot in ucetxt])
@@ -832,7 +881,7 @@ def doconcorde(corpus, uces, mots, uci = False) :
 def getallstcarac(corpus, analyse) :
    pathout = PathOut(analyse['ira'])
    profils =  ReadProfileAsDico(pathout['PROFILE_OUT'], Alceste, self.encoding)
-   print profils
+   print(profils)
 
 def read_chd(filein, fileout):
     with open(filein, 'r') as f :
@@ -864,7 +913,7 @@ translation_languages = {"Afrikaans":"af", "Albanian":"sq", "Amharic":"am", "Ara
 
 
 def gettranslation(words, lf, lt) :
-    import urllib2
+    import urllib.request, urllib.error, urllib.parse
     import json
     agent = {'User-Agent':
     "Mozilla/4.0 (\
@@ -877,13 +926,13 @@ def gettranslation(words, lf, lt) :
     .NET CLR 3.0.04506.30\
     )"}
     base_link = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=%s&tl=%s&dt=t&q=%s"
-    print len(words)
-    totrans = urllib2.quote('\n'.join(words).encode('utf8'))
+    print(len(words))
+    totrans = urllib.parse.quote('\n'.join(words))
     link = base_link % (lf, lt, totrans)
-    request = urllib2.Request(link, headers=agent)
-    raw_data = urllib2.urlopen(request).read()
+    request = urllib.request.Request(link, headers=agent)
+    raw_data = urllib.request.urlopen(request).read()
     data = json.loads(raw_data)
-    return [line[0].decode('utf8').replace(u"'", u'_').replace(u' | ', u'|').replace(u' ', u'_').replace(u'-',u'_').replace(u'\n','') for line in data[0]]
+    return [line[0].replace("'", '_').replace(' | ', '|').replace(' ', '_').replace('-','_').replace('\n','') for line in data[0]]
 
 def makenprof(prof, trans, deb=0) :
     nprof=[]
@@ -905,19 +954,19 @@ def translateprofile(corpus, dictprofile, lf='it', lt='fr', maxword = 50) :
     nprof = {}
     lems = {}
     for i in range(len(dictprofile)) :
-        prof = dictprofile[`i+1`]
+        prof = dictprofile[repr(i+1)]
         try :
-            lenact = prof.index([u'*****', u'*', u'*', u'*', u'*', u'*', '', ''])
+            lenact = prof.index(['*****', '*', '*', '*', '*', '*', '', ''])
             lensup = -1
         except ValueError:
             try :
-                lenact = prof.index([u'*', u'*', u'*', u'*', u'*', u'*', '', ''])
+                lenact = prof.index(['*', '*', '*', '*', '*', '*', '', ''])
                 lensup = 0
             except ValueError:
                 lenact = len(prof)
                 lensup = 0
         try :
-            lensup += prof.index([u'*', u'*', u'*', u'*', u'*', u'*', '', ''])
+            lensup += prof.index(['*', '*', '*', '*', '*', '*', '', ''])
             lensup = lensup - lenact
         except ValueError:
             lensup += len(prof) - lenact
@@ -927,16 +976,16 @@ def translateprofile(corpus, dictprofile, lf='it', lt='fr', maxword = 50) :
             else :
                 nlenact = lenact
             actori = [line[6] for line in prof[1:nlenact]]
-            act = [val.replace(u'_', u' ') for val in actori]
+            act = [val.replace('_', ' ') for val in actori]
             act = gettranslation(act, lf, lt)
             for j, val in enumerate(actori) :
                 if act[j] not in lems :
                     lems[act[j]] = val
                 else :
                     while act[j] in lems :
-                        act[j] = act[j] + u"+"
+                        act[j] = act[j] + "+"
                     lems[act[j]] = val
-            nprof[`i+1`] = makenprof(prof, act)
+            nprof[repr(i+1)] = makenprof(prof, act)
 
         if lensup != 0 :
             if lensup > maxword :
@@ -944,7 +993,7 @@ def translateprofile(corpus, dictprofile, lf='it', lt='fr', maxword = 50) :
             else :
                 nlensup = lensup
             supori = [line[6] for line in prof[(1+lenact):(lenact+nlensup)]]
-            sup = [val.replace(u'_', u' ') for val in supori]
+            sup = [val.replace('_', ' ') for val in supori]
             sup = [treatempty(val) for val in sup]
             sup = gettranslation(sup, lf, lt)
             for j, val in enumerate(supori) :
@@ -952,15 +1001,15 @@ def translateprofile(corpus, dictprofile, lf='it', lt='fr', maxword = 50) :
                     lems[sup[j]] = val
                 else :
                     while sup[j] in lems :
-                        sup[j] = sup[j] + u"+"
+                        sup[j] = sup[j] + "+"
                     lems[sup[j]] = val
-            nprof[`i+1`].append([u'*****', u'*', u'*', u'*', u'*', u'*', '', ''])
-            nprof[`i+1`] += makenprof(prof, sup, deb=lenact)
+            nprof[repr(i+1)].append(['*****', '*', '*', '*', '*', '*', '', ''])
+            nprof[repr(i+1)] += makenprof(prof, sup, deb=lenact)
 
         try :
-            lenet = prof.index([u'*', u'*', u'*', u'*', u'*', u'*', '', ''])
-            nprof[`i+1`].append([u'*', u'*', u'*', u'*', u'*', u'*', '', ''])
-            nprof[`i+1`] += prof[(lenet+1):]
+            lenet = prof.index(['*', '*', '*', '*', '*', '*', '', ''])
+            nprof[repr(i+1)].append(['*', '*', '*', '*', '*', '*', '', ''])
+            nprof[repr(i+1)] += prof[(lenet+1):]
         except :
             pass
     return nprof, lems
@@ -974,28 +1023,27 @@ def write_translation_profile(prof, lems, language, dictpathout) :
         translist = []
     toprint = []
     toprint.append(['','','','','',''])
-    toprint.append([u'***', u'nb classes', `len(prof)`, u'***', '', ''])
+    toprint.append(['***', 'nb classes', repr(len(prof)), '***', '', ''])
     for i in range(len(prof)) :
-        toprint.append([u'**', u'classe', `i+1`, u'**', '', ''])
-        toprint.append([u'****'] + prof[`i+1`][0] + [u'****'])
-        rest = [[`line[1]`, `line[2]`, `line[3]`, `line[4]`, line[6], line[7].replace('< 0,0001', '0.00009').replace('NS (','').replace(')','')] for line in prof[`i+1`][1:]]
-        for i, line in enumerate(prof[`i+1`][1:]) :
-            if line[0] == u'*' :
-                rest[i] = [u'*', u'*', u'*', u'*', u'*', u'*']
-            elif line[0] == u'*****' :
-                rest[i] = [u'*****',u'*',u'*', u'*', u'*', u'*']
+        toprint.append(['**', 'classe', repr(i+1), '**', '', ''])
+        toprint.append(['****'] + prof[repr(i+1)][0] + ['****'])
+        rest = [[repr(line[1]), repr(line[2]), repr(line[3]), repr(line[4]), line[6], line[7].replace('< 0,0001', '0.00009').replace('NS (','').replace(')','')] for line in prof[repr(i+1)][1:]]
+        for i, line in enumerate(prof[repr(i+1)][1:]) :
+            if line[0] == '*' :
+                rest[i] = ['*', '*', '*', '*', '*', '*']
+            elif line[0] == '*****' :
+                rest[i] = ['*****','*','*', '*', '*', '*']
         toprint += rest
     with open(dictpathout['translation_profile_%s.csv' % language], 'w') as f :
-        f.write('\n'.join([';'.join(line) for line in toprint]).encode('utf8'))
+        f.write('\n'.join([';'.join(line) for line in toprint]))
     with open(dictpathout['translation_words_%s.csv' % language], 'w') as f :
-        f.write('\n'.join(['\t'.join([val, lems[val]]) for val in lems]).encode('utf8'))
+        f.write('\n'.join(['\t'.join([val, lems[val]]) for val in lems]))
     if 'translation_profile_%s.csv' % language not in [val[0] for val in translist] :
         translist.append(['translation_profile_%s.csv' % language, 'translation_words_%s.csv' % language])
         with open(dictpathout['translations.txt'], 'w') as f :
-            f.write('\n'.join(['\t'.join(line) for line in translist]).encode('utf8'))
+            f.write('\n'.join(['\t'.join(line) for line in translist]))
 
 def makesentidict(infile, language) :
-    #'/home/pierre/workspace/iramuteq/dev/langues/NRC/NRC-Emotion-Lexicon.csv'
     with codecs.open(infile,'r', 'utf8') as f :
         content = f.read()
     content = [line.split('\t') for line in content.splitlines()]
@@ -1019,21 +1067,21 @@ def makesentidict(infile, language) :
     trust = ['trust'] + [line[0] for line in sentidict if line[1][9] == '1']
     with open('/tmp/tgenemo.csv', 'w') as f :
         for val in [pos, neg, anger, anticipation, disgust, fear, joy, sadness, surprise, trust] :
-            f.write('\t'.join(val).encode('utf8') + '\n')
+            f.write('\t'.join(val) + '\n')
 
 def countsentfromprof(prof, encoding, sentidict) :
     with codecs.open(prof, 'r', encoding) as f :
         content = f.read()
     content = [line.split(';') for line in content.splitlines()]
-    print content
+    print(content)
     content = [[line[0], [int(val) for val in line[1:]]] for line in content]
-    print content
+    print(content)
     content = dict(content)
-    print content
+    print(content)
 
 def iratolexico(infile, outfile, encoding) :
     with codecs.open(infile, 'r', encoding) as f :
         for line in f :
-            if line.startswith(u'**** ') :
+            if line.startswith('**** ') :
                 line = line.split()
 

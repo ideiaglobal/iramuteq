@@ -1,33 +1,39 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
 #License: GNU/GPL
 
-
-from chemins import ffr
-from layout import MakeHeader,MakeStudentTable
+#------------------------------------
+# import des modules python
+#------------------------------------
 import string
-import wx
 import os
 import sys
 import tempfile
-from functions import exec_rcode, check_Rresult
 from time import sleep
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+from chemins import ffr
+from layout import MakeHeader,MakeStudentTable
+from functions import exec_rcode, check_Rresult
 
 
 class StudentDialog(wx.Dialog):
+
     def __init__(
             self, parent, ID, title, size=wx.DefaultSize, pos=wx.DefaultPosition, 
             style=wx.DEFAULT_DIALOG_STYLE
             ):
-
-        pre = wx.PreDialog()
-        pre.SetExtraStyle(wx.DIALOG_EX_CONTEXTHELP)
-        pre.Create(parent, ID, title, pos, size, style)
-
-        self.PostCreate(pre)
-        
+        wx.Dialog.__init__(self)                       # 1
+        self.SetExtraStyle(wx.DIALOG_EX_CONTEXTHELP)    # 2
+        self.Create(parent, ID, title)                 # 3
         Filename=parent.PATH[0]
         self.content=parent.table[:]
         self.HEADER=parent.header[:]
@@ -39,72 +45,68 @@ class StudentDialog(wx.Dialog):
         for line in self.content:
             i=0
             for val in line :
-                if val==u'':
-                    if vide.has_key(i):
+                if val=='':
+                    if i in vide:
                         vide[i]+=1
                     else:
                         vide[i]=1
                 else:
                     try:
                         int(val)
-                        if inb.has_key(i):
+                        if i in inb:
                             inb[i]+=1
                         else:
                             inb[i]=1
                     except:
                         try:
                             float(val)
-                            if fnb.has_key(i):
+                            if i in fnb:
                                 fnb[i]+=1
                             else:
                                 fnb[i]=1
                         except:
-                            if cnb.has_key(i):
+                            if i in cnb:
                                 cnb[i]+=1
                             else:
                                 cnb[i]=1
                 i+=1
         dicttot={}
-        for key,nb in vide.iteritems():
+        for key,nb in vide.items():
             dicttot[key]=['vide',nb]
-        print dicttot
-        for key,nb in inb.iteritems() :
-            if dicttot.has_key(key):
+        print(dicttot)
+        for key,nb in inb.items() :
+            if key in dicttot:
                 dicttot[key]=['int',dicttot[key][1]+nb]
             else:
                 dicttot[key]=['int',nb]
-        for key,nb in fnb.iteritems():
-            if dicttot.has_key(key):
+        for key,nb in fnb.items():
+            if key in dicttot:
                 dicttot[key]=['float',dicttot[key][1]+nb]
             else:
                 dicttot[key]=['float',nb]
-        for key,nb in cnb.iteritems():
-            if dicttot.has_key(key):
+        for key,nb in cnb.items():
+            if key in dicttot:
                 dicttot[key]=['char',dicttot[key][1]+nb]
             else:
                 dicttot[key]=['char',nb]
-
         acontent=array(self.content)
         self.ListGrp=[]
-
-        lg=[i for i,descr in dicttot.iteritems() if descr[0]=='char']
+        lg=[i for i,descr in dicttot.items() if descr[0]=='char']
         for i in lg:
             if len(unique(acontent[:,i]))==2:
                 self.ListGrp.append(i)
-            elif (u'' in unique(acontent[:,i]).tolist()) and len(unique(acontent[:,i]))==3:
+            elif ('' in unique(acontent[:,i]).tolist()) and len(unique(acontent[:,i]))==3:
                 self.ListGrp.append(i)
-
-        li=[i for i,descr in dicttot.iteritems() if descr[0]=='int']
-        lf=[i for i,descr in dicttot.iteritems() if descr[0]=='float']
+        li=[i for i,descr in dicttot.items() if descr[0]=='int']
+        lf=[i for i,descr in dicttot.items() if descr[0]=='float']
         self.ListNum=li+lf
-        print self.ListGrp, self.ListNum    
+        print(self.ListGrp, self.ListNum)    
         LABELLIST=[]
         for i in self.HEADER:
             if len(i)>60 :
                 LABELLIST.append(i[0:60])
             else:
                 LABELLIST.append(i)
-
         self.LabelListGrp=[]
         self.LabelListNum=[]
         for i in self.ListGrp :
@@ -115,22 +117,20 @@ class StudentDialog(wx.Dialog):
         self.list_box_2 = wx.ListBox(self, -1, choices=self.LabelListNum, style=wx.LB_MULTIPLE|wx.LB_HSCROLL)
         self.button_1 = wx.Button(self, wx.ID_OK)
         self.button_cancel = wx.Button(self, wx.ID_CANCEL)
-
         self.__set_properties()
         self.__do_layout()
-
         self.Bind(wx.EVT_LISTBOX, self.Select1, self.list_box_1)
         # end wxGlade
-        
         self.TEMPDIR=parent.TEMPDIR
         self.parent=parent
         self.Filename=parent.fileforR
-#--------------FIXME
+        #--------------FIXME
         self.num=parent.FreqNum
-#-------------------------------
+        #-------------------------------
+
     def __set_properties(self):
         # begin wxGlade: ConfChi2.__set_properties
-        self.SetTitle(u"Sélection des variables")
+        self.SetTitle("Sélection des variables")
         self.list_box_1.SetSelection(0)
         self.list_box_2.SetSelection(0)
         # end wxGlade
@@ -160,15 +160,15 @@ class StudentDialog(wx.Dialog):
         parent=self.parent
         self.encode=self.parent.SysEncoding
         #################################################
-#        max = len(select1)*len(select2)
-#        dlg = wx.ProgressDialog("Traitements",
-#                               "Veuillez patienter...",
-#                               maximum = max,
-#                               parent=self,
-#                               style = wx.PD_APP_MODAL
-#                                )
-#        dlg.Center()
-#        count = 0
+        #max = len(select1)*len(select2)
+        #dlg = wx.ProgressDialog("Traitements",
+        #                         "Veuillez patienter...",
+        #                         maximum = max,
+        #                         parent=self,
+        #                         style = wx.PD_APP_MODAL
+        #                       )
+        #dlg.Center()
+        #count = 0
         ###############################################
         Graph=True
         colgrp=[self.ListGrp[i] for i in select1]
@@ -253,8 +253,7 @@ class StudentDialog(wx.Dialog):
         while pid.poll() == None :
             sleep(0.2)
         check_Rresult(self.parent, pid)
-
-        file=open(restmp,'rU')
+        file=open(restmp,'r')
         res=file.readlines()
         file.close()
         resl=[line.replace('\n','').replace('"','').split(';') for line in res]
@@ -285,7 +284,6 @@ class StudentDialog(wx.Dialog):
                 listr.append(student)
                 student={}
             i+=1
-        
         txt2=''
         ancre=0
         LISTFILE=[]
@@ -317,8 +315,9 @@ class StudentDialog(wx.Dialog):
 
 
 class MakeStudent():
+
     def __init__(self,parent):
-        dlg = StudentDialog(parent, -1, u"Student", size=(350, 400),
+        dlg = StudentDialog(parent, -1, "Student", size=(350, 400),
                          style = wx.DEFAULT_DIALOG_STYLE
                          )
         dlg.CenterOnScreen()
@@ -328,13 +327,13 @@ class MakeStudent():
             ColSel2=dlg.list_box_2.GetSelections()
             listfileout=dlg.ShowStudent(ColSel1,ColSel2)
             parent.FreqNum+=1
-            parent.DictTab[u"t de student_%s*"%parent.FreqNum]=listfileout
+            parent.DictTab["t de student_%s*"%parent.FreqNum]=listfileout
             parent.FileTabList.append(listfileout)
             parent.newtab=wx.html.HtmlWindow(parent.nb, -1)
             if "gtk2" in wx.PlatformInfo:
                 parent.newtab.SetStandardFonts()
             parent.newtab.LoadPage(listfileout[len(listfileout)-1])
-            parent.nb.AddPage(parent.newtab,u"t de student_%s*"%parent.FreqNum)
+            parent.nb.AddPage(parent.newtab,"t de student_%s*"%parent.FreqNum)
             parent.nb.SetSelection(parent.nb.GetPageCount()-1)
             parent.ShowTab(wx.EVT_BUTTON)
             parent.DisEnSaveTabAs(True)

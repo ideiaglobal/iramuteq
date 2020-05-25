@@ -1,23 +1,35 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2009 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
+import os
+import sys
+import tempfile
+import time
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from chemins import ConstructPathOut, ChdTxtPathOut, ConstructAfcUciPath, ffr, PathOut
 from functions import sortedby, CreateIraFile, print_liste, exec_rcode, check_Rresult
 from PrintRScript import RchdQuest
 from layout import OpenCHDS, PrintRapport
 from dialog import PrefQuestAlc
 from analysematrix import AnalyseMatrix
-import os
-import sys
-import wx
-import tempfile
-import time
 
 
 class AnalyseQuest(AnalyseMatrix):
+
     def doparametres(self, dlg = None):
         if dlg is not None :
             dial = PrefQuestAlc(self.parent, self.tableau)
@@ -35,7 +47,7 @@ class AnalyseQuest(AnalyseMatrix):
             else :
                 self.parametres = None
             dial.Destroy()
-           # DoQuestAlceste(parent, parametres)
+            # DoQuestAlceste(parent, parametres)
 
 #class DoQuestAlceste(AnalyseMatrix):
     def doanalyse(self):
@@ -61,25 +73,20 @@ class AnalyseQuest(AnalyseMatrix):
         #                       parent=self.parent,
         #                       style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME
         #                        )
-
         #AnalyseMatrix.__init__(self, parent, parent.tableau, self.parametres, dlg = dlg)
- 
-
-
-#-----------------------------------------------------------
-#    def doanalyse(self) :
-#-------------------------------------------------------------------               
+        #-----------------------------------------------------------
+        #    def doanalyse(self) :
+        #------------------------------------------------------------
         #self.dictpathout = self.pathout
         self.pathout.basefiles(ChdTxtPathOut)
         self.tableau.pathout.basefiles(ChdTxtPathOut)
-#        self.parent.tableau.dictpathout = self.dictpathout
-
+        #self.parent.tableau.dictpathout = self.dictpathout
         self.dlg.Center()
         count = 1
         keepGoing = self.dlg.Update(count)
-#-------------------------------------------------------------------
+        #-------------------------------------------------------------------
         count += 1
-        self.dlg.Update(count, u"passage en O/1")
+        self.dlg.Update(count, "passage en O/1")
         if 'formatted' in self.parametres:
             self.tableau.make_01_alc_format(self.pathout['mat01.csv'])
         else:
@@ -90,23 +97,22 @@ class AnalyseQuest(AnalyseMatrix):
             file.write('%i;%i\n' % (i, i))
         file.close()
         self.nbind = len(self.tableau.linecontent)
-#------------------------------------------------------------
+        #------------------------------------------------------------
         RchdQuest(self.pathout, self.parent.RscriptsPath, self.parametres['nbcl_p1'], self.parametres['mincl'])
-#------------------------------------------------------------
+        #------------------------------------------------------------
         count += 1
-        self.dlg.Update(count, u"Analyse (patientez...)")
-        
+        self.dlg.Update(count, "Analyse (patientez...)")
         pid = exec_rcode(self.parent.RPath, self.pathout['Rchdquest'], wait = False)
         while pid.poll() == None :
-            self.dlg.Pulse(u"Analyse (patientez...)")
+            self.dlg.Pulse("Analyse (patientez...)")
             time.sleep(0.2)
         if not check_Rresult(self.parent, pid) :
             if self.dlg :
                 self.dlg.Destroy()
             return 'NOK'
-#------------------------------------------------------------
+        #------------------------------------------------------------
         count += 1
-        self.dlg.Update(count, u"Ecriture des résultats")
+        self.dlg.Update(count, "Ecriture des résultats")
         self.tableau.buildprofil()
         self.clnb = self.tableau.clnb
         self.parametres['clnb'] = self.clnb
@@ -116,23 +122,22 @@ class AnalyseQuest(AnalyseMatrix):
         PrintRapport(self, self, {}, istxt = False)
         self.tableau.save_tableau(self.pathout['db'])
         #CreateIraFile(self.dictpathout, self.clnb, corpname = os.path.basename(self.parent.filename), section = 'questionnaire')
-        afc_graph_list = [[os.path.basename(self.pathout['AFC2DL_OUT']), u'Variables actives - coordonnées - facteurs 1 / 2'],
-                         [os.path.basename(self.pathout['AFC2DSL_OUT']), u'variables illustratives - coordonnées - facteurs 1 / 2'],
-                         [os.path.basename(self.pathout['AFC2DCL_OUT']), u'Classes - Coordonnées - facteur 1 / 2'],]
-        chd_graph_list = [[os.path.basename(self.pathout['dendro1']), u'dendrogramme à partir de chd1']]
-        chd_graph_list.append([os.path.basename(self.pathout['arbre1']), u'chd1'])
+        afc_graph_list = [[os.path.basename(self.pathout['AFC2DL_OUT']), 'Variables actives - coordonnées - facteurs 1 / 2'],
+                         [os.path.basename(self.pathout['AFC2DSL_OUT']), 'variables illustratives - coordonnées - facteurs 1 / 2'],
+                         [os.path.basename(self.pathout['AFC2DCL_OUT']), 'Classes - Coordonnées - facteur 1 / 2'],]
+        chd_graph_list = [[os.path.basename(self.pathout['dendro1']), 'dendrogramme à partir de chd1']]
+        chd_graph_list.append([os.path.basename(self.pathout['arbre1']), 'chd1'])
         print_liste(self.pathout['liste_graph_afc'], afc_graph_list)
         print_liste(self.pathout['liste_graph_chd'], chd_graph_list)
-
         #self.tableau = self.parent.tableau
         #OpenCHDS(self.parent, self, self.dictpathout['ira'], False)
-#------------------------------------------------------------
-        print 'fini', time.time() - self.t1
+        #------------------------------------------------------------
+        print('fini', time.time() - self.t1)
         count += 1
         self.dlg.Update(count, "Fini")
-    
+
     def BuildProfile(self):
-        print 'build profile'
+        print('build profile')
         txt = ''
         txt += """
         source("%s")
@@ -183,7 +188,6 @@ class AnalyseQuest(AnalyseMatrix):
             afc<-AddCorrelationOk(afc)
             source("%s")
             """ % ffr(self.parent.RscriptsPath['Rgraph'])
-    
             txt += """
             afc <- summary.ca.dm(afc)
             afc_table <- create_afc_table(afc)
@@ -191,14 +195,12 @@ class AnalyseQuest(AnalyseMatrix):
             write.csv2(afc_table$colonne, file = "%s")
             write.csv2(afc_table$ligne, file = "%s")
             """ % (ffr(self.pathout['afc_facteur']), ffr(self.pathout['afc_col']), ffr(self.pathout['afc_row']))
-            
             txt += """
             xlab <- paste('facteur 1 - ', round(afc$facteur[1,2],2), sep = '')
             ylab <- paste('facteur 2 - ', round(afc$facteur[2,2],2), sep = '')
             xlab <- paste(xlab, ' %', sep = '')
             ylab <- paste(ylab, ' %', sep = '')
             """
-    
             txt += """
             PARCEX<-%s
             """ % "0.9"

@@ -1,10 +1,23 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
 import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+
+# utilisé seulement dans layout.py
 
 # begin wxGlade: extracode
 # end wxGlade
@@ -14,12 +27,12 @@ import wx
 class param3d(wx.Panel):
     def __init__(self, *args, **kwds):
         wx.Panel.__init__(self, *args, **kwds)
-        self.label_2 = wx.StaticText(self, -1, u"Paramètres")
-        self.label_3 = wx.StaticText(self, -1, u"Variables")
-        self.Check1 = wx.CheckBox(self, -1, u"actives")
-        self.Check2 = wx.CheckBox(self, -1, u"supplémentaires")
-        self.Check3 = wx.CheckBox(self, -1, u"étoilées")
-        self.radio_box_2 = wx.RadioBox(self, -1, u"représentation :", choices=[u"coordonnées", u"corrélations"], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
+        self.label_2 = wx.StaticText(self, -1, "Paramètres")
+        self.label_3 = wx.StaticText(self, -1, "Variables")
+        self.Check1 = wx.CheckBox(self, -1, "actives")
+        self.Check2 = wx.CheckBox(self, -1, "supplémentaires")
+        self.Check3 = wx.CheckBox(self, -1, "étoilées")
+        self.radio_box_2 = wx.RadioBox(self, -1, "représentation :", choices=["coordonnées", "corrélations"], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
         self.Bind(wx.EVT_RADIOBOX, self.EvtRadioBox2, self.radio_box_2)
         self.var="both"
         self.rep="coordonnees"
@@ -67,21 +80,21 @@ class param3d(wx.Panel):
 class simi3d(wx.Panel):
     def __init__(self, *args, **kwds):
         wx.Panel.__init__(self, *args, **kwds)
-        self.label_2 = wx.StaticText(self, -1, u"Paramètres")
-        self.label_7 = wx.StaticText(self, -1, u"Nombre de points (0 ou 1 = tous les points)")
+        self.label_2 = wx.StaticText(self, -1, "Paramètres")
+        self.label_7 = wx.StaticText(self, -1, "Nombre de points (0 ou 1 = tous les points)")
         self.spin_1 = wx.SpinCtrl(self, -1, "", min=0, max=5000)
-        self.label_3 = wx.StaticText(self, -1, u"Coefficient")
-        self.Choice_1 = wx.Choice(self, -1, (100,50), choices=[u'euclidean'])
-        self.label_4 = wx.StaticText(self, -1, u"Faire apparaître des sphères")
-        self.Check_1 = wx.CheckBox(self, -1, u"")
-        self.label_5 = wx.StaticText(self,-1, u"Taille des sphères proportionnelle aux effectifs")
-        self.Check_2 = wx.CheckBox(self,-1, u"")
-        self.label_6 = wx.StaticText(self, -1, u"Transparence des sphères")
+        self.label_3 = wx.StaticText(self, -1, "Coefficient")
+        self.Choice_1 = wx.Choice(self, -1, (100,50), choices=['euclidean'])
+        self.label_4 = wx.StaticText(self, -1, "Faire apparaître des sphères")
+        self.Check_1 = wx.CheckBox(self, -1, "")
+        self.label_5 = wx.StaticText(self,-1, "Taille des sphères proportionnelle aux effectifs")
+        self.Check_2 = wx.CheckBox(self,-1, "")
+        self.label_6 = wx.StaticText(self, -1, "Transparence des sphères")
         self.slider_1 = wx.Slider(self, -1, 10, 1, 100, size = (255,-1), style = wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS 
             )
-        self.label_layout = wx.StaticText(self, -1, u'layout')
-        self.Choice_2 = wx.Choice(self, -1, (100,50), choices=[u'random' ,u'cercle', u'fruchterman reingold', u'kamada kawai'])
-        self.slider_1.SetTickFreq(5, 1)
+        self.label_layout = wx.StaticText(self, -1, 'layout')
+        self.Choice_2 = wx.Choice(self, -1, (100,50), choices=['random' ,'cercle', 'fruchterman reingold', 'kamada kawai'])
+        self.slider_1.SetTickFreq(5)
         self.movie = wx.CheckBox(self, -1, "faire un film")
         self.__set_properties()
         self.__do_layout()

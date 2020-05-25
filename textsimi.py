@@ -1,28 +1,43 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2013 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
-from chemins import ffr, simipath
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
-from analysetxt import AnalyseText
-from guifunct import PrepSimi
-from functions import indices_simi, progressbar, treat_var_mod, read_list_file, print_liste, DoConf, exec_rcode, check_Rresult
-from PrintRScript import PrintSimiScript 
-import wx
 from copy import copy
 from operator import itemgetter
 import codecs
 import logging
 
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+from chemins import ffr, simipath
+from analysetxt import AnalyseText
+from guifunct import PrepSimi
+from functions import indices_simi, progressbar, treat_var_mod, read_list_file, print_liste, DoConf, exec_rcode, check_Rresult
+from PrintRScript import PrintSimiScript 
+
+
 log = logging.getLogger('iramuteq.textsimi')
 
+
 class SimiTxt(AnalyseText): 
+
     def doanalyse(self) :
         self.parametres['type'] = 'simitxt'
         self.pathout.basefiles(simipath)
         self.indices = indices_simi
-        if self.dlg :
+        if self.dlg : # quel est le lien ???
             self.makesimiparam()
         #FIXME
         self.actives = self.corpus.make_actives_limit(3)
@@ -34,21 +49,19 @@ class SimiTxt(AnalyseText):
             self.stars = copy(self.listet)
             self.parametres['stars'] = copy(self.listet)
             self.parametres['sfromchi'] = False
-            self.dlg.Destroy()
             prep = PrepSimi(self.ira, self, self.parametres, self.pathout['selected.csv'], self.actives, indices_simi, wordlist=dictcol)
             if prep.val == wx.ID_OK :
                 continu = True
                 self.parametres = prep.parametres
-                self.dlg = progressbar(self.ira, 4)
+#                self.dlg = progressbar(self.ira, 4)
             else :
                 return False
         else :
             order_actives = [[i, act, self.corpus.getlemeff(act)] for i, act in enumerate(self.actives)]
             order_actives = sorted(order_actives, key=itemgetter(2), reverse = True)
             with open(self.pathout['selected.csv'], 'w') as f :
-                f.write('\n'.join([`order_actives[val][0]` for val in self.parametres['selected']]))
+                f.write('\n'.join([repr(order_actives[val][0]) for val in self.parametres['selected']]))
             continu = True
-            
         if continu :
             self.makefiles()
             script = PrintSimiScript(self)
@@ -117,9 +130,11 @@ class SimiTxt(AnalyseText):
         self.parametres['fromprof'] = False
         self.corpus.make_and_write_sparse_matrix_from_uces(self.actives, self.pathout['mat01.csv'], self.pathout['listeuce1.csv'])
         with open(self.pathout['actives.csv'], 'w') as f :
-            f.write('\n'.join(self.actives).encode(self.ira.syscoding))
+            f.write('\n'.join(self.actives))
+
 
 class SimiFromCluster(SimiTxt) :
+
     def __init__(self, ira, corpus, actives, lfreq, lchi, numcluster, parametres = None, dlg = False) :
         self.actives = actives
         self.numcluster = numcluster
@@ -128,7 +143,7 @@ class SimiFromCluster(SimiTxt) :
         parametres['name'] = 'simi_classe_%i' % (numcluster + 1)
         dlg.Destroy()
         SimiTxt.__init__(self, ira, corpus, parametres, dlg=True, lemdial = False)
-    
+
     def preferences(self) :
         return self.parametres
 
@@ -142,11 +157,10 @@ class SimiFromCluster(SimiTxt) :
             del self.parametres['bystar']
         dictcol = dict([[i, [act, self.corpus.getlemclustereff(act, self.numcluster)]] for i, act in enumerate(self.actives)]) 
         continu = True
-        #print self.dlg
         if self.dlg :
-            self.dlg.Destroy()
-            self.stars = []#copy(self.listet)
-            self.parametres['stars'] = 0#copy(self.listet)
+#            self.dlg.Destroy()
+            self.stars = []
+            self.parametres['stars'] = 0
             self.parametres['sfromchi'] = 1
             prep = PrepSimi(self.ira, self, self.parametres, self.pathout['selected.csv'], self.actives, indices_simi, wordlist=dictcol)
             if prep.val == wx.ID_OK :
@@ -174,6 +188,7 @@ class SimiFromCluster(SimiTxt) :
                 else :
                     graph_simi = [[os.path.basename(fileout), script.txtgraph]]
                 print_liste(self.pathout['liste_graph'], graph_simi)
+            self.dlg.Destroy()
         else : 
             return False
 
@@ -183,12 +198,8 @@ class SimiFromCluster(SimiTxt) :
         self.parametres['fromprof'] = True
         self.corpus.make_and_write_sparse_matrix_from_classe(self.actives, self.corpus.lc[self.numcluster], self.pathout['mat01.csv'])
         with open(self.pathout['actives.csv'], 'w') as f :
-            f.write('\n'.join(self.actives).encode(self.ira.syscoding))        
+            f.write('\n'.join(self.actives))
         with open(self.pathout['actives_nb.csv'], 'w') as f :
-            f.write('\n'.join([`val` for val in self.lfreq]))
+            f.write('\n'.join([repr(val) for val in self.lfreq]))
         with open(self.pathout['actives_chi.csv'], 'w') as f :
-            f.write('\n'.join([`val` for val in self.lchi]))
-
-
-
-                
+            f.write('\n'.join([repr(val) for val in self.lchi]))

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2011, Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
 #License: GNU/GPL
 
 

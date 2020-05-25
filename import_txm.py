@@ -1,10 +1,12 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2013 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
-
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
 import xml.sax
 import glob
@@ -37,24 +39,24 @@ class TXMParser(xml.sax.ContentHandler) :
           
     def characters(self, content) :
         if self.name == 'txm:form' :
-            if content not in [u'', u' ', u'\n', '\r'] :
+            if content not in ['', ' ', '\n', '\r'] :
                 self.sent.append(content.rstrip('\n\r'))
             #self.fileout.write(content.encode('utf8'))
 
     def text2stars(self, attrs) :
-        stars = ['_'.join(val).replace(' ', '_').replace("'", '_').replace('/','').replace('.','').replace(';', '').replace(':', '').replace(u'·','') for val in attrs.items()]
-        stars = [''.join([u'*', val]) for val in stars]
-        stars = u'**** ' + ' '.join(stars)
-        self.fileout.write(stars.encode(self.encodage_out))
+        stars = ['_'.join(val).replace(' ', '_').replace("'", '_').replace('/','').replace('.','').replace(';', '').replace(':', '').replace('·','') for val in list(attrs.items())]
+        stars = [''.join(['*', val]) for val in stars]
+        stars = '**** ' + ' '.join(stars)
+        self.fileout.write(stars)
         self.fileout.write('\n')
 
     def printsent(self) :
         if self.sent != [] :
             sent = ' ' + ' '.join(self.sent)
-            for val in [u' .', u' ,', u' ;', u' :', u' ?', u' !', u' -'] :
+            for val in [' .', ' ,', ' ;', ' :', ' ?', ' !', ' -'] :
                 sent = sent.replace(val, val.strip())
             sent = sent.replace("' ", "'")
-            self.fileout.write(sent.encode(self.encodage_out))
+            self.fileout.write(sent)
         self.sent = []
 
 def TXM2IRA(pathin, fileout, encodage_in, encodage_out) :

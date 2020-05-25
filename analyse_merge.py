@@ -1,14 +1,26 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2015 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
+from time import sleep
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from chemins import PathOut
 from functions import exec_rcode, check_Rresult
 from dialog import MergeDialog
-import wx
-from time import sleep
 from PrintRScript import MergeGraphes
 
 def merge_graphes(lgraphes):
@@ -30,8 +42,7 @@ class AnalyseMerge :
         if self.doparametres(dlg=dlg) is not None :
             script = merge_graphes(self.parametres['graphs'])
             self.doR(script.scriptout, dlg=False)
-            print 'fini'
-            
+            print('fini')
 
     def doparametres(self, dlg=None):
         if dlg is not None :
@@ -40,6 +51,7 @@ class AnalyseMerge :
             if res == wx.ID_OK :
                 self.parametres['graphs'] = [graph.GetPath() for graph in dial.graphs if graph.GetPath() != '']
                 return True
+            # pas besoin d'un dial.Destroy() ???
         return True
             
     def doR(self, Rscript, wait = False, dlg = None, message = '') :

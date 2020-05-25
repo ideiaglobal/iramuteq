@@ -1,22 +1,35 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2009 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
 #License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
+import os
+from time import time, sleep
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from chemins import ConstructPathOut, ConstructAfcUciPath
 from layout import GraphPanel
 #from PrintRScript import RAfcUci 
 from corpus import Corpus
 from listlex import *
 from functions import ReadList, progressbar, exec_rcode, check_Rresult
-import wx
-import os
-from ConfigParser import RawConfigParser
-from time import time, sleep
+from configparser import RawConfigParser
+
 
 class AfcUci():
+
     def __init__(self, parent, cmd = False):
-#################################################################### 
+        #################################################################### 
         self.conf = None
         self.parent = parent
         self.type = 'afcuci'
@@ -36,7 +49,6 @@ class AfcUci():
         self.corpus.dictpathout = ConstructAfcUciPath(pathout)        
         self.corpus.supplementaires = [option for option in self.KeyConf.options('KEYS') if self.KeyConf.get('KEYS', option) == "2"]
         self.corpus.typeactive = [option for option in self.KeyConf.options('KEYS') if self.KeyConf.get('KEYS', option) == "1"]        
-
         self.read_alceste_parametre()
         ################################
         if not self.cmd :
@@ -48,15 +60,11 @@ class AfcUci():
         uces, orderuces = self.corpus.make_forms_and_uces()
         self.corpus.make_lems(self.parent.lexique)
         self.corpus.min_eff_formes()
-        
         self.corpus.make_var_actives() 
         self.corpus.make_var_supp()
-        print self.corpus.supp
-
+        print(self.corpus.supp)
         self.corpus.make_pondtable_with_uci(self.corpus.actives, self.corpus.dictpathout['TableCont'])
         self.corpus.make_pondtable_with_uci(self.corpus.supp, self.corpus.dictpathout['TableSup'])
-
-
         self.corpus.parametre['para'] = False
         self.corpus.make_etoiles([])
         self.corpus.make_tableet_with_uci(self.corpus.dictpathout['TableEt'])
@@ -64,12 +72,11 @@ class AfcUci():
         pid = exec_rcode(self.parent.RPath,self.corpus.dictpathout['Rafcuci'], wait = False)
         while pid.poll() == None :
             if not self.cmd :
-                self.dlg.Pulse(u'CHD...')
+                self.dlg.Pulse('CHD...')
                 sleep(0.2)
             else :
                 pass
         check_Rresult(self.parent, pid)
-
         if not self.cmd :
             self.dlg.Update(6, 'Affichage')
             self.DoLayout(parent, self.corpus.dictpathout)
@@ -83,7 +90,6 @@ class AfcUci():
                 self.corpus.parametre[option] = int(self.conf.get('ALCESTE', option))
             else :
                 self.corpus.parametre[option] = self.conf.get('ALCESTE', option)
-            
         list_bool = ['lem', 'expressions']
         for val in list_bool :
             if self.corpus.parametre[val] == 'True' :
@@ -100,23 +106,16 @@ class AfcUci():
                       [os.path.basename(DictAfcUciOut['AfcColEt']),''],
                       [os.path.basename(DictAfcUciOut['AfcRow']),'']]
         self.TabAfcTot = GraphPanel(self.TabAfcUci, DictAfcUciOut, list_graph, txt = '')
-        
         #self.TabAfcSplit = wx.html.HtmlWindow(self.TabAfcUci, -1)
         #txtafcsplit = MakeAfcSplitPage(1, 2, DictAfcUciOut, self.pathout, parent.encode)
         #if "gtk2" in wx.PlatformInfo:
         #    self.TabAfcSplit.SetStandardFonts()
         #self.TabAfcSplit.SetPage(txtafcsplit)
-        
         dictrow, first = ReadList(self.corpus.dictpathout['afc_row'])
         panel_list = ListForSpec(parent, self, dictrow, first[1:])
-
-        
-        
         self.TabAfcUci.AddPage(self.TabAfcTot, 'Graph Afc totale')
         #self.TabAfcUci.AddPage(self.TabAfcSplit, 'Graph AFC Split')
         self.TabAfcUci.AddPage(panel_list, 'Colonnes')
         parent.nb.AddPage(self.TabAfcUci, 'AFC Sur UCI')
-                
         parent.nb.SetSelection(parent.nb.GetPageCount() - 1)
         parent.ShowTab(True) 
-

@@ -1,17 +1,32 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2009 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
-import wx
+#------------------------------------
+# import des modules python
+#------------------------------------
 import shutil
+
+import langue
+langue.run()
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from KeyFrame import AlcOptFrame
 from chemins import ConstructConfigPath
 from functions import DoConf
 
 
-
 class OptionAlc(wx.Dialog):
+
     def __init__(self, parent, parametres, *args, **kwds):
         kwds['style'] = wx.DEFAULT_DIALOG_STYLE
         wx.Dialog.__init__(self, parent, *args, **kwds)
@@ -23,44 +38,41 @@ class OptionAlc(wx.Dialog):
         self.svdmethod = ['svdR', 'irlba']
         if self.parent.pref.getboolean('iramuteq','libsvdc') :
             self.svdmethod.append('svdlibc')
-        #self.label_1 = wx.StaticText(self, -1, u"Lemmatisation")
-        #self.radio_1 = wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
-
-        self.label_12 = wx.StaticText(self, -1, _(u"Clustering").decode('utf8'))
-        self.radio_box_2 = wx.RadioBox(self, -1, u"", choices=[_(u"double on RST").decode('utf8'), _(u"simple on text segments").decode('utf8'), _(u"simple on texts").decode('utf8')], majorDimension=0, style=wx.RA_SPECIFY_ROWS) #, u"simple sur UCE (non implemente)"
-        self.label_2 = wx.StaticText(self, -1, _(u"Size of rst1").decode('utf8'))
-        self.spin_ctrl_1 = wx.SpinCtrl(self, -1, _(u"actives forms").decode('utf8'),size = (100,30), min=0, max=1000000)
-        self.label_3 = wx.StaticText(self, -1, _(u"Size of rst2").decode('utf8'))
+        #self.label_1 = wx.StaticText(self, -1, "Lemmatisation")
+        #self.radio_1 = wx.RadioBox(self, -1, "", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
+        self.label_12 = wx.StaticText(self, -1, _("Clustering"))
+        self.radio_box_2 = wx.RadioBox(self, -1, "", choices=[_("double on RST"), _("simple on text segments"), _("simple on texts")], majorDimension=0, style=wx.RA_SPECIFY_ROWS) #, u"simple sur UCE (non implemente)"
+        self.label_2 = wx.StaticText(self, -1, _("Size of rst1"))
+        self.spin_ctrl_1 = wx.SpinCtrl(self, -1, _("actives forms"),size = (100,30), min=0, max=1000000)
+        self.label_3 = wx.StaticText(self, -1, _("Size of rst2"))
         self.spin_ctrl_2 = wx.SpinCtrl(self, -1, "",size = (100,30), min=0, max=1000000)
-        self.lab_nbcl = wx.StaticText(self, -1, _(u"Number of terminal clusters on phase 1").decode('utf8'))
+        self.lab_nbcl = wx.StaticText(self, -1, _("Number of terminal clusters on phase 1"))
         self.spin_nbcl = wx.SpinCtrl(self, -1, "",size = (100,30), min=2, max=1000000)
-        txt = _(u"Minimum frequency of text segments by clusters (0=automatic)").decode('utf8')
+        txt = _("Minimum frequency of text segments by clusters (0=automatic)")
         self.label_7 = wx.StaticText(self, -1, txt)
         self.spin_ctrl_4 = wx.SpinCtrl(self, -1, "",size = (100,30), min=0, max=1000000)       
-        txt = _(u"Minimum frequency of an analyzed form (2=automatic)").decode('utf8')
+        txt = _("Minimum frequency of an analyzed form (2=automatic)")
         self.label_8 = wx.StaticText(self, -1, txt)
         self.spin_ctrl_5 = wx.SpinCtrl(self, -1, "",size = (100,30), min=2, max=1000000)
-        self.label_max_actives =  wx.StaticText(self, -1, _(u"Maximum number of analyzed forms").decode('utf8'))
+        self.label_max_actives =  wx.StaticText(self, -1, _("Maximum number of analyzed forms"))
         self.spin_max_actives = wx.SpinCtrl(self, -1, "",size = (100,30), min=20, max=1000000)
-        self.label_svd = wx.StaticText(self, -1, _(u"svd method").decode('utf8'))
+        self.label_svd = wx.StaticText(self, -1, _("svd method"))
         self.choicesvd = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, self.svdmethod, 0 )
-        self.label_patate =  wx.StaticText(self, -1, _(u"Potato mode (less precise, faster)").decode('utf8'))
+        self.label_patate =  wx.StaticText(self, -1, _("Potato mode (less precise, faster)"))
         self.check_patate = wx.CheckBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         #self.label_4 = wx.StaticText(self, -1, u"Configuration \ndes clés d'analyse")
         #self.button_5 = wx.Button(self, wx.ID_PREFERENCES, "")
         self.button_1 = wx.Button(self, wx.ID_CANCEL, "")
-        self.button_2 = wx.Button(self, wx.ID_DEFAULT, _(u"Default values").decode('utf8'))
+        self.button_2 = wx.Button(self, wx.ID_DEFAULT, _("Default values"))
         self.button_4 = wx.Button(self, wx.ID_OK, "")
         self.static_line_1 = wx.StaticLine(self, -1)
-
         self.__set_properties()
         self.__do_layout()
-
         #self.Bind(wx.EVT_BUTTON, self.OnKeyPref, self.button_5)
         self.Bind(wx.EVT_BUTTON, self.OnDef, self.button_2)
-        
+
     def __set_properties(self):
-        self.SetTitle(_(u"Settings").decode('utf8'))
+        self.SetTitle(_("Settings"))
         #lang = self.AlcesteConf.get('ALCESTE', 'lang')
         #self.choice_dict.SetSelection(self.langues.index(lang))
         #DefaultLem = self.parametres['lem']
@@ -85,66 +97,55 @@ class OptionAlc(wx.Dialog):
         else :
             self.check_patate.SetValue(False)
 
-
     def __do_layout(self):
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
         sizer_2 = wx.BoxSizer(wx.VERTICAL)
         grid_sizer2 = wx.FlexGridSizer(0, 2, 0, 0)
         grid_button = wx.FlexGridSizer(1, 3, 0, 0)
-        
+        # éléments désactivés ???
         #grid_sizer2.Add(self.label_dict, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         #grid_sizer2.Add(self.choice_dict, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
-
         #grid_sizer2.Add(self.label_1, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         #grid_sizer2.Add(self.radio_1, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         #grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         #grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-
+        # ???
         grid_sizer2.Add(self.label_12, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.radio_box_2, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-
         grid_sizer2.Add(self.label_2, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.spin_ctrl_1, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-
         grid_sizer2.Add(self.label_3, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.spin_ctrl_2, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-
         grid_sizer2.Add(self.lab_nbcl, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.spin_nbcl, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-
         grid_sizer2.Add(self.label_7, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.spin_ctrl_4, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-
         grid_sizer2.Add(self.label_8, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.spin_ctrl_5, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-
         grid_sizer2.Add(self.label_max_actives, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.spin_max_actives, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-       
         grid_sizer2.Add(self.label_svd, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.choicesvd, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-
         grid_sizer2.Add(self.label_patate, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.check_patate, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-        
         grid_button.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
         grid_button.Add(self.button_2, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
         grid_button.Add(self.button_4, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
@@ -160,7 +161,7 @@ class OptionAlc(wx.Dialog):
         dial = AlcOptFrame(self.parent, self)
         dial.CenterOnParent()
         val = dial.ShowModal()
-    
+
     def OnDef(self, event):
         ConfOri = ConstructConfigPath(self.parent.AppliPath, user=False)
         ConfUser = ConstructConfigPath(self.parent.UserConfigPath)
@@ -171,10 +172,10 @@ class OptionAlc(wx.Dialog):
         self.parametres['corpus'] = corpus
         self.parametres['pathout'] = pathout
         self.__set_properties()
-        
-###################################################################################@
+
 
 class OptionPam(wx.Dialog):
+
     def __init__(self, parent, *args, **kwds):
         kwds['style'] = wx.DEFAULT_DIALOG_STYLE
         wx.Dialog.__init__(self, *args, **kwds)
@@ -183,25 +184,26 @@ class OptionPam(wx.Dialog):
         self.pamconf = parent.pamconf
         self.type = parent.type
         self.choose = False
-        
-        self.label_1 = wx.StaticText(self, -1, u"Lemmatisation")
-        self.radio_1 = wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
+        self.label_1 = wx.StaticText(self, -1, "Lemmatisation")
+        self.radio_1 = wx.RadioBox(self, -1, "", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
         #self.label_exp = wx.StaticText(self, -1, u"Utiliser le dict. des expressions")
         #self.radio_exp =  wx.RadioBox(self, -1, u"", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
-        txt = u"""Methode de construction
+        # pourquoi le retour à la ligne ???
+        txt = """Methode de construction
 de la matrice des distances"""
         self.label_12 = wx.StaticText(self, -1, txt)
-        self.distance = [u"binary", u"euclidean", u"maximum", u'manhattan', u'canberra', u'minkowski']
+        self.distance = ["binary", "euclidean", "maximum", 'manhattan', 'canberra', 'minkowski']
         self.choice_1 =  wx.Choice(self, -1, (100,50), choices=self.distance)
-        self.label_13 = wx.StaticText(self, -1, u'Analyse')
-        self.cltype = [u'k-means (pam)', u'fuzzy (fanny)']
-        self.radio_box_3 = wx.RadioBox(self, -1, u"", choices=self.cltype, majorDimension=0, style=wx.RA_SPECIFY_ROWS)
-        self.label_classif = wx.StaticText(self, -1, u"Classification")
-        self.radio_box_classif = wx.RadioBox(self, -1, u"", choices=[u"sur UCE", u"sur UCI"], majorDimension=0, style=wx.RA_SPECIFY_ROWS) 
+        self.label_13 = wx.StaticText(self, -1, 'Analyse')
+        self.cltype = ['k-means (pam)', 'fuzzy (fanny)']
+        self.radio_box_3 = wx.RadioBox(self, -1, "", choices=self.cltype, majorDimension=0, style=wx.RA_SPECIFY_ROWS)
+        self.label_classif = wx.StaticText(self, -1, "Classification")
+        self.radio_box_classif = wx.RadioBox(self, -1, "", choices=["sur UCE", "sur UCI"], majorDimension=0, style=wx.RA_SPECIFY_ROWS) 
         #self.label_2 = wx.StaticText(self, -1, "taille uc")
         #self.spin_ctrl_1 = wx.SpinCtrl(self, -1, "formes actives", min=0, max=100)
-        self.label_max_actives =  wx.StaticText(self, -1, u"Nombre maximum de formes analysées")
+        self.label_max_actives =  wx.StaticText(self, -1, "Nombre maximum de formes analysées")
         self.spin_max_actives = wx.SpinCtrl(self, -1, "",size = (100,30), min=20, max=10000)
+        # pourquoi le retour à la ligne ???
         txt = """Nombre de formes par uce
 (0 = automatique)"""
         self.label_6 = wx.StaticText(self, -1, txt)
@@ -209,16 +211,14 @@ de la matrice des distances"""
         txt = "Nombre de classes"
         self.label_7 = wx.StaticText(self, -1, txt)
         self.spin_ctrl_4 = wx.SpinCtrl(self, -1, "", size = (100,30), min=0, max=1000)        
-        self.label_4 = wx.StaticText(self, -1, u"Configuration \ndes clés d'analyse")
+        self.label_4 = wx.StaticText(self, -1, "Configuration \ndes clés d'analyse")
         self.button_5 = wx.Button(self, wx.ID_PREFERENCES, "")
         self.button_1 = wx.Button(self, wx.ID_CANCEL, "")
-        self.button_2 = wx.Button(self, wx.ID_DEFAULT, u"Valeurs par défaut")
+        self.button_2 = wx.Button(self, wx.ID_DEFAULT, "Valeurs par défaut")
         self.button_4 = wx.Button(self, wx.ID_OK, "")
         self.static_line_1 = wx.StaticLine(self, -1)
-
         self.__set_properties()
         self.__do_layout()
-
         self.Bind(wx.EVT_BUTTON, self.OnKeyPref, self.button_5)
         self.Bind(wx.EVT_BUTTON, self.OnDef, self.button_2)
 
@@ -235,7 +235,7 @@ de la matrice des distances"""
         #else :
         #    self.radio_exp.SetSelection(1)
         self.choice_1.SetSelection(self.distance.index(self.pamconf.get('pam', 'method')))
-        if self.pamconf.get('pam', 'cluster_type') == u'pam' :
+        if self.pamconf.get('pam', 'cluster_type') == 'pam' :
             self.radio_box_3.SetSelection(0)
         else :
             self.radio_box_3.SetSelection(1)
@@ -254,52 +254,44 @@ de la matrice des distances"""
         grid_sizer2.Add(self.radio_1, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-       
         grid_sizer2.Add(self.label_exp, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.radio_exp, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-
         grid_sizer2.Add(self.label_12, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.choice_1, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-
         grid_sizer2.Add(self.label_13, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.radio_box_3, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-
         grid_sizer2.Add(self.label_classif, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.radio_box_classif, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-        
+        # ???
         #grid_sizer2.Add(self.label_2, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         #grid_sizer2.Add(self.spin_ctrl_1, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         #grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         #grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-        
+        # ???
         grid_sizer2.Add(self.label_max_actives, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.spin_max_actives, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0) 
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-
         grid_sizer2.Add(self.label_6, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.spin_ctrl_3, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0) 
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-        
         grid_sizer2.Add(self.label_7, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.spin_ctrl_4, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-        
         grid_sizer2.Add(self.label_4, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(self.button_5, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 0)
         grid_sizer2.Add(wx.StaticLine(self), 0, wx.EXPAND | wx.ALL, 1)
         grid_sizer2.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.ALL, 1)
-        
         grid_button.Add(self.button_1, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
         grid_button.Add(self.button_2, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
         grid_button.Add(self.button_4, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
@@ -315,7 +307,7 @@ de la matrice des distances"""
         dial = AlcOptFrame(self.parent, self)
         dial.CenterOnParent()
         val = dial.ShowModal()
-    
+
     def OnDef(self, event):
         ConfOri = ConstructConfigPath(self.parent.parent.AppliPath, user=False)
         ConfUser = ConstructConfigPath(self.parent.parent.UserConfigPath)

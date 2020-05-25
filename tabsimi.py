@@ -1,9 +1,29 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2009-2010 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
+import os
+import tempfile
+import datetime
+from time import sleep
+from uuid import uuid4
+
+import langue
+langue.run()
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from chemins import ConstructPathOut, simipath, ffr, PathOut
 from functions import print_liste, exec_rcode, read_list_file, check_Rresult, indices_simi, treat_var_mod, normpath_win32
 from dialog import SelectColDial, FreqDialog
@@ -11,16 +31,11 @@ from guifunct import PrefSimi
 from analysematrix import AnalyseMatrix
 from PrintRScript import PrintSimiScript
 from listlex import *
-import wx
-import os
-import tempfile
-import datetime
-from ConfigParser import RawConfigParser
-from time import sleep
-from uuid import uuid4
+from configparser import RawConfigParser
 
 
 class DoSimi(AnalyseMatrix):
+
     def doparametres(self, dlg = None) :
         self.fromprof = self.parametres.get('fromprof', False)
         self.wordgraph = self.parametres.get('wordgraph', False)
@@ -69,13 +84,12 @@ class DoSimi(AnalyseMatrix):
         self.Source = None
         if self.dirout :
             self.pathout = PathOut(dirout = self.dirout)
-
         if not self.parametres.get('isopen', False) :
             if self.tableau is None :
                 self.tableau = parent.tableau
             self.tableau.parametres['mineff'] = 0
             if not self.fromprof :
-                dialcol = FreqDialog(self.parent, self.tableau.get_colnames(), _(u"Select columns").decode('utf8'), size=(600, 250), showNA = False)
+                dialcol = FreqDialog(self.parent, self.tableau.get_colnames(), _("Select columns"), size=(600, 250), showNA = False)
                 dialcol.CenterOnParent()            
                 res = dialcol.ShowModal()
             else :
@@ -127,21 +141,20 @@ class DoSimi(AnalyseMatrix):
     def doanalyse(self) :
         self.pathout.basefiles(simipath)
         with open(normpath_win32(self.pathout['selected.csv']), 'w') as f :
-            f.write('\n'.join([`val` for val in self.column]))
-
+            f.write('\n'.join([repr(val) for val in self.column]))
         count = 1
         keepGoing = self.dlg.Update(count)
-    #----------------------------------------------------------------
+        #----------------------------------------------------------------
         self.DictForme = {}
         self.Min = 10
         self.Linecontent = []
-    #--------------------------------------------------------
+        #--------------------------------------------------------
         count += 1
         #if not self.fromprof :
             #self.pathout = ConstructPathOut(self.tableau.parametres['filename'], 'Simi')
             #self.DictPathOut = construct_simipath(self.pathout)
         self.tableau.dictpathout = self.pathout
-        self.dlg.Update(count, u"passage en O/1")
+        self.dlg.Update(count, "passage en O/1")
         if not self.fromprof :
             self.tableau.make_01_from_selection(self.tableau.selected_col)
             #self.Linecontent = parent.table
@@ -155,7 +168,7 @@ class DoSimi(AnalyseMatrix):
         self.script.make_script()
         #self.PrintScript()
         count += 1
-        self.dlg.Update(count, u"R...") 
+        self.dlg.Update(count, "R...") 
         #self.DoR(script.scriptout, dlg = self.dlg, message = 'R...')
         self.tmpfile = self.script.scriptout
         self.DoR(self.dlg)
@@ -171,7 +184,6 @@ class DoSimi(AnalyseMatrix):
             fromprof = True
         else:
             fromprof = False
-         
 
     def make_param(self) :
         if self.paramsimi['first'] :
@@ -179,7 +191,6 @@ class DoSimi(AnalyseMatrix):
         else :
             keep_coord = self.dial.check_coord.GetValue()
         #self.select = self.dial.check_colch.GetValue()
-
         paramsimi = {'coeff' : self.dial.choice1.GetSelection(),
                           'layout' : self.dial.choice2.GetSelection(),
                           'type_graph' : self.dial.choice3.GetSelection(),
@@ -225,8 +236,7 @@ class DoSimi(AnalyseMatrix):
         if 'tmpchi' in self.paramsimi :
             paramsimi['tmpchi'] = self.paramsimi['tmpchi']
         return paramsimi
-        
-#        
+
     def addgraph(self) :
         if self.parametres['type_graph'] == 1:
             if self.parametres['svg'] :
@@ -240,7 +250,7 @@ class DoSimi(AnalyseMatrix):
             else :
                 graph_simi = [[os.path.basename(fileout), self.script.txtgraph]]
             print_liste(self.DictPathOut['liste_graph'], graph_simi)
-        
+
     def DoR(self, dlg):
         if self.paramsimi['type_graph'] == 1 :
             graph = False
@@ -252,10 +262,8 @@ class DoSimi(AnalyseMatrix):
         if self.paramsimi['type_graph'] == 1 :
             while pid.poll() == None :
                     if not self.cmd :
-                        dlg.Pulse(u'R ...')
+                        dlg.Pulse('R ...')
                         sleep(0.2)
                     else :
                         sleep(0.2)
             check_Rresult(self.parent, pid)
-    
-

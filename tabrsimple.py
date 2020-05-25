@@ -1,17 +1,30 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2011 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
-from chemins import ffr, FFF
-from functions import exec_rcode, check_Rresult
+#------------------------------------
+# import des modules python
+#------------------------------------
 import tempfile
-import wx
 from time import sleep
 import os
 
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+from chemins import ffr, FFF
+from functions import exec_rcode, check_Rresult
+
+
 class InputText :
+
     def __init__(self, parent):
         #wx.Frame.__init__(self, parent, size=wx.Size(400,300))
         self.tempdir = parent.TEMPDIR
@@ -22,21 +35,20 @@ class InputText :
         self.Intro = wx.StaticText(self.panel, -1, """dm <- read.csv2("%s", header=TRUE, row.names=1, na.string='')""" % (self.fileforR))
         self.splitter = wx.SplitterWindow(self.panel, -1)
         self.TextPage=wx.TextCtrl(self.splitter, style=wx.TE_MULTILINE | wx.TE_RICH2)
-        self.TextPage.SetFont(wx.Font(11, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "courier"))
+        self.TextPage.SetFont(wx.Font(11, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "courier"))
         self.OutPage = wx.TextCtrl(self.splitter, style=wx.TE_MULTILINE | wx.TE_RICH2 | wx.TE_READONLY)
-        self.OutPage.SetFont(wx.Font(11, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "courier"))
+        self.OutPage.SetFont(wx.Font(11, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "courier"))
         self.OutPage.SetBackgroundColour(wx.BLACK)
         self.OutPage.SetForegroundColour(wx.WHITE)
         self.SimpleCommand =  wx.TextCtrl(self.panel, style=wx.TE_RICH2|wx.TE_PROCESS_ENTER)
-        self.SimpleCommand.SetFont(wx.Font(11, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "courier"))
+        self.SimpleCommand.SetFont(wx.Font(11, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "courier"))
         self.splitter.SplitVertically(self.TextPage, self.OutPage)
         self.button_1 = wx.Button(self.panel, -1, "Executer")
-        self.button_2 = wx.Button(self.panel, -1, u"Enregistrer...")
+        self.button_2 = wx.Button(self.panel, -1, "Enregistrer...")
         self.__do_layout()
         self.parent.nb.AddPage(self.panel, 'R Code...')
         self.parent.nb.SetSelection(parent.nb.GetPageCount() - 1)
         self.parent.ShowAPane("Tab_content")
-
         self.panel.Bind(wx.EVT_BUTTON, self.OnSavePage, self.button_2)
         self.panel.Bind(wx.EVT_BUTTON, self.OnExecute, self.button_1)
         self.panel.Bind(wx.EVT_TEXT_ENTER, self.OnEnter, self.SimpleCommand)
@@ -96,15 +108,14 @@ class InputText :
             self.done = True
         except Exception as prob :
             self.done = False
-            print 'zerzerzerzer', prob
+            print('zerzerzerzer', prob)
             mess = wx.MessageDialog(self.parent, prob[1], 'Erreur dans le code R',wx.OK|wx.ICON_INFORMATION)
             mess.ShowModal()
-
         with open(tempres, 'r') as tmpin :
             res = tmpin.read()
         self.OutPage.write(res)
         self.OutPage.ScrollLines(-1)
-    
+
     def OnEnter(self, evt) :
         self.OnExecute(evt, self.SimpleCommand.GetValue())
         if self.done :

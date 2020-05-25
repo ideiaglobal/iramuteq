@@ -1,31 +1,47 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2014, Pierre Ratinaud
-#License: GNU GPL
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
+#License: GNU/GPL
 
-import csv, codecs, cStringIO
+#appel seulement par iramuteq.py : from parse_dmi import ImportDMI
+
+#------------------------------------
+# import des modules python
+#------------------------------------
+import csv, codecs, io
 import itertools
-from parse_factiva_xml import PrefImport
-import wx
 import os
+
+import langue
+langue.run()
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+from parse_factiva_xml import PrefImport
 from functions import BugReport
 
-#filein = '/home/pierre/workspace/iramuteq/dev/dmi-tcat/travail_dmi.csv'
-#fileout = '/home/pierre/workspace/iramuteq/dev/dmi-tcat/corpus.txt'
 
 class UTF8Recoder:
     """
     Iterator that reads an encoded stream and reencodes the input to UTF-8
     """
+
     def __init__(self, f, encoding):
         self.reader = codecs.getreader(encoding)(f)
 
     def __iter__(self):
         return self
 
-    def next(self):
-        return self.reader.next().encode("utf-8")
+    def __next__(self):
+        return self.reader.next() #.encode("utf-8")
+
 
 class UnicodeReader:
     """
@@ -37,9 +53,9 @@ class UnicodeReader:
         f = UTF8Recoder(f, encoding)
         self.reader = csv.reader(f, dialect=dialect, **kwds)
 
-    def next(self):
-        row = self.reader.next()
-        return [unicode(s, "utf-8") for s in row]
+    def __next__(self):
+        row = next(self.reader)
+        return [str(s, "utf-8") for s in row]
 
     def __iter__(self):
         return self
@@ -52,13 +68,13 @@ class UnicodeWriter:
 
     def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
         # Redirect output to a queue
-        self.queue = cStringIO.StringIO()
+        self.queue = io.StringIO()
         self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
         self.stream = f
         self.encoder = codecs.getincrementalencoder(encoding)()
 
     def writerow(self, row):
-        self.writer.writerow([s.encode("utf-8") for s in row])
+        self.writer.writerow([s for s in row])
         # Fetch UTF-8 output from the queue ...
         data = self.queue.getvalue()
         data = data.decode("utf-8")
@@ -73,11 +89,13 @@ class UnicodeWriter:
         for row in rows:
             self.writerow(row)
 
+
 class ParseDMI :
+
     def __init__(self, filein, fileout, encodeout ='utf8', onlyrt = True, cleanurl = True, cleanRT = True, cleanAt = True, lang= 'es'):
         self.outf = open(fileout, 'w')
         self.encodeout = encodeout
-        with open(filein, 'rb') as f:
+        with open(filein, 'r') as f:
             reader = UnicodeReader(f)
             linenb = 0
             for row in reader:
@@ -108,24 +126,24 @@ class ParseDMI :
                             self.write_tweet(row, text)
                 linenb += 1
         self.outf.close()
-    
+
     def write_tweet(self, row, text):
         meta = self.makemetadata(row, {'date' : self.create_dateid})
-        self.outf.write('\n'.join([meta, text, '']).encode(self.encodeout))
-    
+        self.outf.write('\n'.join([meta, text, '']))
+
     def makemetadata(self, row, parametres = {}):
-        line = [u'****']
+        line = ['****']
         for val in parametres :
             if val == 'date' :
-                line.append('_'.join([u'*date', row[parametres[val]].split()[0]]))
+                line.append('_'.join(['*date', row[parametres[val]].split()[0]]))
             else :
                 line.append('_'.join([val,row[parametres[val]]]))
         return ' '.join(line)
-    
+
     def washtweet(self, text) :
-        text = text.replace(u'RT“', u'RT ')
-        text = text.replace(u'*', ' ')
-        for val in u'”«»“"' :
+        text = text.replace('RT“', 'RT ')
+        text = text.replace('*', ' ')
+        for val in '”«»“"' :
             text = text.replace(val, ' " ')
         text.strip()
         return text
@@ -147,18 +165,21 @@ class ParseDMI :
         text.replace('rt','_rt_')
         text = text.replace('RT', '_rt_')
         text.strip()
+        # ???
         #tweet = text.split()
         #tovire = [[i, i+1] for i, word in enumerate(tweet) if word == 'RT' and i!=len(tweet) - 1]
         #tovire = itertools.chain(*tovire)
         #text = ' '.join([word for i, word in enumerate(tweet) if i not in tovire])
         return text
 
+
 class ImportDMI :
+
     def __init__(self, parent, parametres):
         self.ira = parent
         self.parametres = parametres
         self.parse()
-    
+
     def parse(self):
         self.dial =  PrefImport(self.ira, methode='dmi')
         val = self.dial.ShowModal()
@@ -170,13 +191,13 @@ class ImportDMI :
             remove_mention = self.dial.paneldmi.check_remove_mention.GetValue()
             remove_rt_in_tweets = self.dial.paneldmi.check_remove_rt_in_tweets.GetValue()
             self.dial.Destroy()
-            busy = wx.BusyInfo(_("Please wait...").decode('utf8'))
+            busy = wx.BusyInfo(_("Please wait..."))
             wx.SafeYield()
             try :
                 ParseDMI(csvfile, corp_out, 'utf8', onlyrt=nort, cleanurl=remove_url, cleanAt=remove_mention, cleanRT=remove_rt_in_tweets)
                 del busy
-                msg = '\n'.join([_(u"Corpus created :").decode('utf8'), corp_out, _(u"Do you want to open it in IRaMuTeQ ?").decode('utf8')])
-                dlg = wx.MessageDialog(self.ira, msg, _(u'Information').decode('utf8'), wx.YES_NO | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
+                msg = '\n'.join([_("Corpus created :"), corp_out, _("Do you want to open it in IRaMuTeQ ?")])
+                dlg = wx.MessageDialog(self.ira, msg, _('Information'), wx.YES_NO | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
                 dlg.CenterOnParent()
                 val = dlg.ShowModal()
                 if val == wx.ID_YES :
@@ -190,5 +211,4 @@ class ImportDMI :
                 BugReport(self.ira)
         else :
             self.dial.Destroy()       
-        
-#ParseDMI(filein, fileout, 'utf8')
+

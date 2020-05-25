@@ -1,13 +1,28 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2009, Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
-import urllib2
+#------------------------------------
+# import des modules python
+#------------------------------------
+import urllib.request, urllib.error, urllib.parse #migration de module PY3
 import socket
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
 import wx
-   
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+
+
+# utilisé seulement depuis iramuteq.py
+
+
 def NewVersion(parent):
     version = parent.version.split(' ')
     if len(version) == 3:
@@ -18,9 +33,9 @@ def NewVersion(parent):
         versionsub = False
     erreur = False
     new = False
-    req = urllib2.Request("http://www.iramuteq.org/current_version")
+    req = urllib.request.Request("http://www.iramuteq.org/current_version")
     try:
-        LastVersion = urllib2.urlopen(req,'',3)
+        LastVersion = urllib.request.urlopen(req,'',3)
         lastversion = LastVersion.readlines()
         lastversion = lastversion[0].replace('\n', '').split('-')
         if len(lastversion) == 2 :
@@ -35,15 +50,13 @@ def NewVersion(parent):
             elif (float(lastversion[0]) > versionnb) and not versionsub :
                 new = True
     except :
-        erreur = u"la page n'est pas accessible"
+        erreur = "la page n'est pas accessible"
     if not erreur and new :
-        msg = u"""
+        msg = """
 Une nouvelle version d'IRaMuTeQ (%s) est disponible.
 Vous pouvez la télécharger à partir du site web iramuteq :
 http://www.iramuteq.org""" % '-'.join(lastversion)
-        dlg = wx.MessageDialog(parent, msg, u"Nouvelle version disponible", wx.OK | wx.ICON_WARNING)
+        dlg = wx.MessageDialog(parent, msg, "Nouvelle version disponible", wx.OK | wx.ICON_WARNING)
         dlg.CenterOnParent()
         if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
              evt.Veto()
-
-#print NewVersion('0.1-alpha18')

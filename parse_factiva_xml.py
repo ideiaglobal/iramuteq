@@ -1,26 +1,38 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2010 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
 import xml.dom.minidom
-import wx.lib.filebrowsebutton as filebrowse
 import os
 import codecs
 import re
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
 import wx
+import wx.lib.filebrowsebutton as filebrowse
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from parse_factiva_mail import ParseFactivaMail
 from parse_factiva_txt import ParseFactivaPaste
 from parse_europress import ParseEuropress
 from import_txm import TXM2IRA
 from functions import BugReport
 
+
 def ParseDocument(filename) :
     with codecs.open(filename, 'r', 'utf-8') as f :
         content = f.read()
     content = content.replace('<hlt>', ' ').replace('</hlt>', ' ')
-    dom = xml.dom.minidom.parseString(content.encode("utf-8"))
+    dom = xml.dom.minidom.parseString(content)
     result = []
     articles = dom.getElementsByTagName("article")
     for article in articles :
@@ -56,11 +68,11 @@ def ParseDocument(filename) :
         else :
             val_tailParagraphs = []
         inter = [' '.join(val_headline), val_sourceName,' '.join(val_publicationDate), ' '.join(val_leadParagraph), ' '.join(val_tailParagraphs)]
-        inter = [re.sub(ur'[ "\n\r]+', ' ',  val).replace('"',' ').replace('\n', ' ').replace('\r', ' ')  for val in inter]
+        inter = [re.sub(r'[ "\n\r]+', ' ',  val).replace('"',' ').replace('\n', ' ').replace('\r', ' ')  for val in inter]
         #inter = ['"' + val +'"' for val in inter]
         result.append(inter)
     return result
-    
+
 def getcorpus_from_xml(xmldir, corpus_out):
     files = os.listdir(xmldir)
     files = [os.path.join(xmldir,f) for f in files if os.path.splitext(f)[1] == '.xml']
@@ -73,26 +85,27 @@ def getcorpus_from_xml(xmldir, corpus_out):
         #dates = [[date[0],date[1],date[2].split('T')[0]] for date in dates]
         #txt = '\n'.join(['\n'.join([' '.join([u'****', '*%s' % row[1].replace(' ','_').replace('\'','_'), '*%s' % row[2].replace('-','_')]), row[3], row[4]]) for row in rs])
         #avec la date decompose
-        txt = '\n'.join(['\n'.join([' '.join([u'****', '*s_%s' % row[1].replace(' ','').replace('\'',''), '*annee_%s' % row[2].split('-')[0], '*mois_%s' % row[2].split('-')[1], '*jour_%s' % row[2].split('-')[2].split('T')[0]]), row[3], row[4]]) for row in rs])
+        txt = '\n'.join(['\n'.join([' '.join(['****', '*s_%s' % row[1].replace(' ','').replace('\'',''), '*annee_%s' % row[2].split('-')[0], '*mois_%s' % row[2].split('-')[1], '*jour_%s' % row[2].split('-')[2].split('T')[0]]), row[3], row[4]]) for row in rs])
         fileout.write(txt+'\n\n')
     fileout.close()
     return 'ok'
 
+
 class PrefImport(wx.Dialog):
+
     def __init__(self, parent, size=wx.DefaultSize, pos=wx.DefaultPosition, style=wx.DEFAULT_DIALOG_STYLE, methode = 'mail'):
-        pre = wx.PreDialog()
-        pre.SetExtraStyle(wx.DIALOG_EX_CONTEXTHELP)
-        pre.Create(parent, -1, '', pos, size, style)
-        self.PostCreate(pre)
+        wx.Dialog.__init__(self)                       # 1
+        self.SetExtraStyle(wx.DIALOG_EX_CONTEXTHELP)    # 2
+        self.Create(parent, -1, '')                 # 3
         self.methode = methode
         if methode in ['xml', 'txm'] :
-            txt = _(u'Select a directory of xml files').decode('utf8')
+            txt = _('Select a directory of xml files')
         elif methode == 'euro' :
-            txt = _(u'Select a directory of html files').decode('utf8')
+            txt = _('Select a directory of html files')
         elif methode == 'dmi' :
-            txt = _(u'Select a csv file').decode('utf8')
+            txt = _('Select a csv file')
         else :
-            txt = _(u'Select a directory of txt files').decode('utf8')
+            txt = _('Select a directory of txt files')
         self.parent = parent
         self.txt1 = wx.StaticText(self, -1, txt)
         if methode != 'dmi' :
@@ -100,27 +113,22 @@ class PrefImport(wx.Dialog):
         else :
             self.dbb = filebrowse.FileBrowseButton(self, -1, size=(450, -1), fileMode = 2, changeCallback = self.fbbCallback)
         self.dbb.SetLabel("")
-        self.txt2 = wx.StaticText(self, -1, _(u'Output file').decode('utf8'))
+        self.txt2 = wx.StaticText(self, -1, _('Output file'))
         self.fbb = filebrowse.FileBrowseButton(self, -1, size=(450, -1), fileMode = 2)
         self.fbb.SetLabel("")
-
         self.btnsizer = wx.StdDialogButtonSizer()
         btn_ok = wx.Button(self, wx.ID_OK)
         btn = wx.Button(self, wx.ID_CANCEL)
         self.btnsizer.AddButton(btn_ok)
         self.btnsizer.AddButton(btn)
         self.btnsizer.Realize()
-
-
         self.Bind(wx.EVT_BUTTON, self.checkfile, btn_ok)
-
         #self.SetButtonSizer(self.CreateStdDialogButtonSizer(wx.OK | wx.CANCEL))
         self.Bind(wx.EVT_BUTTON, self.checkfile)
-
         self. __do_layout()
         #self.Fit()
         self.SetMinSize(self.GetSize())
-    
+
     def __do_layout(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
         grid_sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -136,7 +144,6 @@ class PrefImport(wx.Dialog):
         sizer.Fit(self)
         self.Layout()
 
-   
     def fbbCallback(self, evt):
         if self.fbb.GetValue() == "" :
             if self.methode != 'dmi' :
@@ -151,27 +158,28 @@ class PrefImport(wx.Dialog):
                 if self.methode == 'dmi' :
                     if not os.path.exists(self.dbb.GetValue()) :
                         dlg = wx.MessageDialog(self, 
-                        ' : '.join([self.dbb.GetValue(), _(u"this file doesn't exist")]), 'ATTENTION', wx.NO | wx.YES | wx.ICON_WARNING)
+                        ' : '.join([self.dbb.GetValue(), _("this file doesn't exist")]), 'ATTENTION', wx.NO | wx.YES | wx.ICON_WARNING)
                         dlg.CenterOnParent()
                         if dlg.ShowModal() not in [wx.ID_NO, wx.ID_CANCEL]:
                             self.EndModal(wx.ID_OK)
                 if os.path.exists(self.fbb.GetValue()):
                     dlg = wx.MessageDialog(self, 
-                    u"%s\nCe fichier existe, continuer quand même ?" % self.fbb.GetValue(), 'ATTENTION', wx.NO | wx.YES | wx.ICON_WARNING)
+                    "%s\nCe fichier existe, continuer quand même ?" % self.fbb.GetValue(), 'ATTENTION', wx.NO | wx.YES | wx.ICON_WARNING)
                     dlg.CenterOnParent()
                     if dlg.ShowModal() not in [wx.ID_NO, wx.ID_CANCEL]:
                         self.EndModal(wx.ID_OK)
                 else :
                     self.EndModal(wx.ID_OK)
             else :
-                dlg = wx.MessageDialog(self, u"Vous devez choisir le répertoire contenant le ou les fichier(s) xml", 'ATTENTION', wx.OK | wx.ICON_WARNING)
+                dlg = wx.MessageDialog(self, "Vous devez choisir le répertoire contenant le ou les fichier(s) xml", 'ATTENTION', wx.OK | wx.ICON_WARNING)
                 dlg.CenterOnParent()
                 dlg.ShowModal()
-
         else :
             self.EndModal(wx.ID_CANCEL)
 
+
 class ImportFactiva():
+
     def __init__(self, parent, methode):
         self.dial =  PrefImport(parent, methode=methode)
         self.dial.CenterOnParent()
@@ -180,7 +188,7 @@ class ImportFactiva():
             xmldir = self.dial.dbb.GetValue()
             corp_out = self.dial.fbb.GetValue()
             self.dial.Destroy()
-            busy = wx.BusyInfo(_("Please wait...").decode('utf8'))
+            busy = wx.BusyInfo(_("Please wait..."))
             wx.SafeYield()
             try :
                 if methode == 'xml' :
@@ -195,13 +203,13 @@ class ImportFactiva():
                     res = ParseEuropress(xmldir, corp_out, 'utf8', 'utf8')
                 del busy
                 if res == 'nofile' :
-                    dlg = wx.MessageDialog(parent, u"Pas de fichiers dans %s" % xmldir, 'ATTENTION', wx.OK | wx.ICON_WARNING)
+                    dlg = wx.MessageDialog(parent, "Pas de fichiers dans %s" % xmldir, 'ATTENTION', wx.OK | wx.ICON_WARNING)
                     dlg.CenterOnParent()
                     dlg.ShowModal()
                     dlg.Destroy()
                 else :
-                    msg = '\n'.join([_(u"Corpus created :").decode('utf8'), corp_out, _(u"Do you want to open it in IRaMuTeQ ?").decode('utf8')])
-                    dlg = wx.MessageDialog(parent, msg, _(u'Information').decode('utf8'), wx.YES_NO | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
+                    msg = '\n'.join([_("Corpus created :"), corp_out, _("Do you want to open it in IRaMuTeQ ?")])
+                    dlg = wx.MessageDialog(parent, msg, _('Information'), wx.YES_NO | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
                     dlg.CenterOnParent()
                     val = dlg.ShowModal()
                     if val == wx.ID_YES :
@@ -215,4 +223,3 @@ class ImportFactiva():
                 BugReport(parent)
         else :
             self.dial.Destroy()
-                

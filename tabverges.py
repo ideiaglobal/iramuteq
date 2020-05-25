@@ -1,24 +1,36 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2012 Pierre Ratinaud
-#License: GNU GPL
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
+#License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
 import string
-import wx
-import os
 import sys
 import tempfile
-from chemins import ffr,FFF, ConstructPathOut
-import wx.lib.sized_controls as sc
 from time import sleep
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+import wx.lib.sized_controls as sc
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+from chemins import ffr,FFF, ConstructPathOut
 from functions import exec_rcode, check_Rresult, progressbar
 from PrintRScript import ProtoScript
 from analysematrix import AnalyseMatrix
 from dialog import ProtoDial
 
+
 class Prototypical(AnalyseMatrix) :
+
 #     def __init__(self, parent, parametres):
 #         self.parent = parent
 #         self.tableau = self.parent.tableau
@@ -29,18 +41,16 @@ class Prototypical(AnalyseMatrix) :
 #         dlg = progressbar(self.parent, 2)
 #         self.colnames = self.tableau.get_colnames()
 #         AnalyseMatrix.__init__(self, parent, parent.tableau, self.parametres, dlg = dlg)
-    
+
     def doparametres(self, dlg = None):
         self.dial = ProtoDial(self.ira, self.tableau.colnames)
         self.dial.CenterOnParent()
-
         self.val = self.dial.ShowModal()
         if self.val==wx.ID_OK :
                 self.ColSel1 = self.dial.variables.GetSelections()
                 self.ColSel2 = self.dial.rangs.GetSelections()
-
                 if len(self.ColSel1) != len(self.ColSel2) :
-                    print 'pas meme taille'
+                    print('pas meme taille')
                     self.check_val()
                 else :
                     if self.dial.choix_freq.GetSelection() == 0 :
@@ -64,7 +74,7 @@ class Prototypical(AnalyseMatrix) :
         else :
             self.dial.Destroy()               
             self.parametres = None
-    
+
     def doanalyse(self) :
         table_assoc, table_rank = self.dotable()
         self.makedatas(table_assoc, table_rank)
@@ -91,7 +101,7 @@ class Prototypical(AnalyseMatrix) :
                             words[word] = [1, []]
         res = [[word, words[word][0], float(sum(words[word][1])) / len(words[word][1])] for word in words if len(words[word][1]) != 0 and words[word][0] >= self.parametres['freqmin']]
         with open(self.pathout['table.csv'], 'w') as f :
-            f.write('\n'.join(['\t'.join(['"' + val[0] +'"', `val[1]`, `val[2]`]) for val in res]))
+            f.write('\n'.join(['\t'.join(['"' + val[0] +'"', repr(val[1]), repr(val[2])]) for val in res]))
         #self.parent.tableau.parametres = self.parent.tableau.parametre
         #self.parent.tableau.save_tableau(self.pathout['analyse.db'])
 
@@ -99,5 +109,3 @@ class Prototypical(AnalyseMatrix) :
         script = ProtoScript(self)
         script.make_script()
         self.doR(script.scriptout) 
-        
-                

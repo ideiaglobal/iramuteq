@@ -1,5 +1,5 @@
 #Author: Pierre Ratinaud
-#Copyright (c) 20010-2013 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
 #License: GNU/GPL
 
 

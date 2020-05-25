@@ -1,24 +1,21 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2012 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
 import codecs
-
-
-#txtdir = 'dev/factiva_txt' #repertoire des textes
-#txtdir = 'corpus/jeunesdebanlieues'
-#fileout = 'dev/factiva_txt_out.txt'
-#encodage_in = 'utf8'
-#encodage_out = 'utf8'
 
 
 def parsetxtmail(txt):
     """
     parser de texte pour factiva
     """
+
     no = ['NS','RE','IPD','CO','IN']  # les balises qui signalent une fin
     txt = txt.splitlines() #met le texte dans une liste de lignes
     txt.pop(0) # la premiere ligne sert a rien
@@ -30,12 +27,12 @@ def parsetxtmail(txt):
             ucis.append([['****'],'']) # c'est une nouvelle uci
             keepline = False
         elif line.startswith('SN  ') : #source
-            source = '*source_' + line[4:].replace(' ','').replace('\'','').replace(u'´','').replace(u'’','').replace('-','').lower()
+            source = '*source_' + line[4:].replace(' ','').replace('\'','').replace('´','').replace('’','').replace('-','').lower()
             ucis[-1][0].append(source)
         elif line.startswith('PD ') : #date
-            mois_annee = u'*ma_' + line[4:].split(' ')[1] + line[4:].split(' ')[2]
+            mois_annee = '*ma_' + line[4:].split(' ')[1] + line[4:].split(' ')[2]
             ucis[-1][0].append(mois_annee)
-            annee = u'*annee_' + line[4:].split(' ')[2]
+            annee = '*annee_' + line[4:].split(' ')[2]
             ucis[-1][0].append(annee)
         elif line in no : #fin
             keepline = False
@@ -49,13 +46,14 @@ def parsetxtmail(txt):
             ucis[-1][1] = '\n'.join([ucis[-1][1],line])
     return ucis
 
-
 def print_ucis(ucis, ofile, encodage) :
     ucis = [uci for uci in ucis if uci[1].strip() != '']
     toprint = '\n'.join(['\n'.join([' '.join(uci[0]),uci[1]]) for uci in ucis])
-    ofile.write(toprint.encode(encodage))
+    ofile.write(toprint)
+
 
 class ParseFactivaMail :
+
     def __init__(self, txtdir, fileout, encodage_in, encodage_out) :
         files = os.listdir(txtdir) #liste des fichiers dans txtdir
         with open(fileout,'w') as outf : #ouverture du fichier en sortie

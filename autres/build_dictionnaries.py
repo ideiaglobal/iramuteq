@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
+# usage ?
 
-
+#------------------------------------
+# import des modules python
+#------------------------------------
 import codecs
 import os
 from time import time

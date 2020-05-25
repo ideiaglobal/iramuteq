@@ -1,39 +1,49 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2011 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
-from chemins import ConstructPathOut, StatTxtPathOut, PathOut, ffr
-#from corpus import Corpus
-from analysetxt import AnalyseText
-import wx
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
-#import sys
-#from listlex import *
-from functions import exec_rcode, progressbar, check_Rresult, CreateIraFile, print_liste, treat_var_mod, write_tab, DoConf, TGen
-from dialog import OptLexi#, StatDialog 
-#from openanalyse import OpenAnalyse
 import tempfile
-#from ConfigParser import RawConfigParser
-#from guifunct import getPage, getCorpus
-from PrintRScript import TgenSpecScript
 from time import sleep
 import logging
 
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+from chemins import ConstructPathOut, StatTxtPathOut, PathOut, ffr
+from analysetxt import AnalyseText
+from functions import exec_rcode, progressbar, check_Rresult, CreateIraFile, print_liste, treat_var_mod, write_tab, DoConf, TGen
+from dialog import OptLexi #, StatDialog 
+from PrintRScript import TgenSpecScript
+
+
 log = logging.getLogger('iramuteq.spec')
 
+
 class Lexico(AnalyseText) :
+
     def doanalyse(self) :
         pathout = self.pathout.dirout
         self.dictpathout = StatTxtPathOut(pathout)
         self.parametres['ira'] = self.dictpathout['ira']
+        self.dlg = progressbar(self, 3)
         self.make_lexico()
         if self.dlg :
             try :
                 self.dlg.Destroy()
             except :
                 pass
-   
+
     def DoR(self):
         nbligne = 5
         colonne = 1
@@ -134,7 +144,6 @@ class Lexico(AnalyseText) :
             debet <- NULL
             clnb <-  ncol(specf)
             """ % (ffr(self.dictpathout['afcf_row']), ffr(self.dictpathout['afcf_col']), ffr(self.dictpathout['afct_row']), ffr(self.dictpathout['afct_col']), ffr(self.dictpathout['afcf_facteur_csv']), ffr(self.dictpathout['afcf_col_csv']), ffr(self.dictpathout['afcf_row_csv']), ffr(self.dictpathout['afct_facteur_csv']), ffr(self.dictpathout['afct_col_csv']), ffr(self.dictpathout['afct_row_csv']))
-
         txt += """
         save.image("%s")
         """ % ffr(self.dictpathout['RData'])
@@ -190,33 +199,33 @@ class Lexico(AnalyseText) :
         #log.warning('ATTENTION : hapax par etoile')
         #tabout.append(['hapax'] + self.corpus.gethapaxbyet(self.listet))
         write_tab(tabout, self.dictpathout['tableafcm'])
-        
         #log.warning('ATTENTION : gethapaxuces')
         #self.corpus.gethapaxuces()
-
         tabout = self.corpus.make_efftype_from_etoiles(self.listet)
         write_tab(tabout, self.dictpathout['tabletypem'])
         if self.dlg :
-            self.dlg.Update(2, u'R...')
+            self.dlg.Update(2, 'R...')
         self.DoR()
         if self.dlg :
-            self.dlg.Update(3, u'Chargement...')
-        afcf_graph_list = [[os.path.basename(self.dictpathout['afcf_row']), u'lignes'],\
-                            [os.path.basename(self.dictpathout['afcf_col']), u'colonnes']]
-        afct_graph_list = [[os.path.basename(self.dictpathout['afct_row']), u'lignes'],\
-                            [os.path.basename(self.dictpathout['afct_col']), u'colonnes']]
+            self.dlg.Update(3, 'Chargement...')
+        afcf_graph_list = [[os.path.basename(self.dictpathout['afcf_row']), 'lignes'],\
+                            [os.path.basename(self.dictpathout['afcf_col']), 'colonnes']]
+        afct_graph_list = [[os.path.basename(self.dictpathout['afct_row']), 'lignes'],\
+                            [os.path.basename(self.dictpathout['afct_col']), 'colonnes']]
         print_liste(self.dictpathout['liste_graph_afcf'],afcf_graph_list)
         print_liste(self.dictpathout['liste_graph_afct'],afct_graph_list)
         #DoConf().makeoptions(['spec'],[self.parametres], self.dictpathout['ira'])
 
+
 class TgenSpec(AnalyseText):
+
     def __init__(self, ira, corpus, parametres):
         self.ira = ira
         self.corpus = corpus
         self.parametres = parametres
         self.pathout = PathOut(dirout = self.parametres['pathout'])
         self.doanalyse()
-        
+
     def doanalyse(self):
         self.tgen = TGen(path = self.parametres['tgenpath'], encoding = self.ira.syscoding)
         self.tgen.read(self.tgen.path)
@@ -229,5 +238,3 @@ class TgenSpec(AnalyseText):
         self.Rscript.make_script()
         self.Rscript.write()
         self.doR(self.Rscript.scriptout, dlg = False, message = 'R...')
-
-    

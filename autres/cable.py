@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2010, Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
 #Lisense: GNU/GPL
+# usage ?
+# encodage est utilisé - mais utf-8 est par défaut dans PY3
 
-
+#------------------------------------
+# import des modules python
+#------------------------------------
 import codecs
+
+
 filein = '/home/pierre/fac/cablegate/allcables-all.txt'
 enc = 'utf-8'
 

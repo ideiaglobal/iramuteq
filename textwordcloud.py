@@ -1,31 +1,43 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2009 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
+import tempfile
+import os
+import logging
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from analysetxt import AnalyseText
 from guifunct import getPage, getCorpus, SelectColumn
-#from ConfigParser import RawConfigParser
 from functions import sortedby, progressbar 
 from dialog import StatDialog, PrefWordCloud
 from PrintRScript import WordCloudRScript
-#from ttparser import * 
-import tempfile
-#from time import sleep
-import wx
-import os
-import logging
+
 
 logger = logging.getLogger('iramuteq.textwordcloud')
 
 
 class WordCloud(AnalyseText):
+
     def doanalyse(self) :
         self.parametres['type'] = 'wordcloud'
         #FIXME
         limit = 3
-        self.dlg.Destroy()
+
+#        self.dlg.Destroy()
+
         res = self.make_option()
         if res == wx.ID_OK :
             if self.parametres['mode'] == 2 :
@@ -43,11 +55,12 @@ class WordCloud(AnalyseText):
                 script = WordCloudRScript(self)
                 script.make_script()
                 self.doR(script.scriptout, dlg = self.dlg, message = 'R...')
+                self.dlg.Destroy()
             else :
                 return 'NOK'
         else :
             return 'NOK'
-    
+
     def make_option(self, fromcluster = False) :
         dial = PrefWordCloud(self.ira, fromcluster)
         dial.CenterOnParent()
@@ -81,32 +94,39 @@ class WordCloud(AnalyseText):
         return res
 
     def make_wordcloud(self) :
-        act = ['\t'.join([act, `self.corpus.getlemeff(act)`]) for act in self.actives]
+        act = ['\t'.join([act, repr(self.corpus.getlemeff(act))]) for act in self.actives]
         with open(self.pathout['actives_eff.csv'], 'w') as f :
-            f.write('\n'.join(act).encode(self.ira.syscoding))
+            f.write('\n'.join(act))
 
 
-class ClusterCloud(WordCloud) :
-    def doanalyse(self) :
+class ClusterCloud(WordCloud):
+
+    def doanalyse(self):
+        print('ClusterCloud')
         self.parametres['type'] = 'clustercloud'
         #FIXME
         limit = 2
-        res = self.make_option(True)
+        res = self.make_option(True) #dialogue d'options de WordCloud.make_option
         if res == wx.ID_OK :
             prof = self.parametres['clusterprof']
             del self.parametres['clusterprof']
-            if self.parametres['indice'] == 0 :
+            if self.parametres['indice'] == 0:
                 tokeep = 1
-            else : 
+            else: 
                 tokeep = 2
             prof = [[val[0], int(round(val[tokeep]))] for val in prof]
             with open(self.pathout['actives_eff.csv'], 'w') as f :
-                f.write('\n'.join(['\t'.join([val[0], `val[1]`]) for val in prof]).encode(self.ira.syscoding))
+                f.write('\n'.join(['\t'.join([val[0], repr(val[1])]) for val in prof]))
             dictcol = dict([[i, val] for i, val in enumerate(prof)])
             self.actives = [val[0] for val in prof]
             SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], dlg = True)
             script = WordCloudRScript(self)
             script.make_script()
-            self.doR(script.scriptout, dlg = self.dlg, message = 'R...')
-        else :
+
+            dialProgression = progressbar(self.ira, self.dlg)
+            self.doR(script.scriptout, dlg = dialProgression, message = 'R...')
+            dialProgression.Destroy()
+
+        else:
             return 'NOK'
+

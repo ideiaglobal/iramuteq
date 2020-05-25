@@ -1,21 +1,30 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2012, Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
+import os
+import logging
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from chemins import ChdTxtPathOut, StatTxtPathOut, PathOut
 from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout, SimiMatLayout, ProtoLayout, MatLayout, FreqLayout, Chi2Layout, LabbeLayout
 from corpus import Corpus, copycorpus
 from tableau import Tableau
-import os
 from functions import DoConf, ReadDicoAsDico
-from tableau import Tableau
-import logging
+
 
 log = logging.getLogger('iramuteq.openanalyse')
 
+
 class OpenAnalyse():
+
     def __init__(self, parent, parametres, Alceste=True, simifromprof = False):
         log.info('OpenAnalyse')
         self.parent = parent
@@ -26,7 +35,6 @@ class OpenAnalyse():
             self.conf = DoConf(parametres).getoptions()
             self.path = parametres
             self.conf = self.redopath(self.conf, parametres)
-
         if self.conf['type'] == 'corpus' :
             corpus = self.opencorpus()
         elif self.conf['type'] == 'matrix' :
@@ -37,7 +45,6 @@ class OpenAnalyse():
             else :
                 intree = False
             corpus = self.openanalyse()
-
             if self.conf.get('lem',1) :
                 dolem = True
             else :
@@ -56,6 +63,7 @@ class OpenAnalyse():
             corpus = None
             matrix = Tableau(self.parent, parametres = self.parent.history.matrix[self.parent.history.ordermatrix[self.conf['matrix']]])
             matrix.open()
+
             #if isinstance(parametres, dict) :
             #    tableau = Tableau(parent, parametres['ira'])
             #else :
@@ -65,6 +73,7 @@ class OpenAnalyse():
             #tableau.dictpathout.basefiles(ChdTxtPathOut)
             #tableau.read_tableau(tableau.dictpathout['db'])
             #if self.parent.tree.IsInTree(uuid = self.conf['uuid']) :
+
             self.parent.tree.GiveFocus(uuid = self.conf['uuid'], bold = True)
             self.doopen(matrix)
         else :

@@ -1,23 +1,41 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2009 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
+import datetime
+import sys
+import tempfile
+from time import sleep
+import shutil
+import codecs
+import logging
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
 import wx
-import wx.lib.hyperlink as hl
+import wx.lib.agw.hyperlink as hl
 import wx.lib.agw.aui as aui
 import wx.lib.agw.labelbook as LB
 from wx.lib.agw.fmresources import *
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from chemins import ConstructPathOut, ChdTxtPathOut, FFF, ffr, PathOut, StatTxtPathOut, simipath
-from ConfigParser import ConfigParser
-from functions import ReadProfileAsDico, GetTxtProfile, read_list_file, ReadList, exec_rcode, print_liste, BugReport, DoConf, indices_simi, check_Rresult, progressbar, normpath_win32, TGen
+from configparser import ConfigParser
+from functions import ReadProfileAsDico, GetTxtProfile, read_list_file, ReadList, exec_rcode, print_liste, BugReport, DoConf,\
+ indices_simi, check_Rresult, progressbar, normpath_win32, TGen, ReadList, launchcommand
 from ProfList import ProfListctrlPanel
 from guiparam3d import param3d, simi3d
 from PrintRScript import write_afc_graph, print_simi3d, PrintSimiScript
 from profile_segment import ProfileSegment
-from functions import ReadList, launchcommand
 from listlex import *
 from Liste import *
 from search_tools import SearchFrame
@@ -26,21 +44,20 @@ from guifunct import SelectColumn, PrepSimi, PrefSimi, redosimi
 from webexport import WebExport
 from corpus import Corpus
 from sheet import MySheet
-import datetime
-import sys
-import tempfile
-from time import sleep
-import shutil
-import codecs
-import logging
-import gettext
 from graph_to_json import GraphToJson
-_ = gettext.gettext
+
+
+import langue
+langue.run()
+
+
 
 log = logging.getLogger('iramuteq.layout')
 
 
+
 class GraphPanelAfc(wx.Panel):
+
     def __init__(self, parent, dico, list_graph, clnb, itempath = 'liste_graph_afc', coding = sys.getdefaultencoding()):
         wx.Panel.__init__(self,parent)
         self.afcnb = 1
@@ -48,8 +65,8 @@ class GraphPanelAfc(wx.Panel):
         self.Dict = dico
         self.coding = coding
         self.itempath = itempath
-        self.parent = self.GetParent()#parent
-        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "Arial"))
+        self.parent = self.GetParent()
+        self.SetFont(wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Arial"))
         self.labels = []
         self.listimg = []
         self.buts = []
@@ -70,19 +87,18 @@ class GraphPanelAfc(wx.Panel):
                 if ext == '.svg' or ext == '.html':
                     self.listimg.append(hl.HyperLinkCtrl(self.panel_1, -1, os.path.join(self.dirout,list_graph[i][0]), URL=os.path.join(self.dirout,list_graph[i][0])))
                 else :
-                    self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY), name=`i-b`))
+                    self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY), name=repr(i-b)))
                     self.listimg[-1].Bind(wx.EVT_RIGHT_DOWN, self.onrightclick)
                 if os.path.exists(os.path.join(self.dirout,list_graph[i][0] + '_notplotted.csv')) :
-                    txt = _(u"List of not plotted points : ").decode('utf8') + '%s' % os.path.join(self.dirout,list_graph[i][0] + '_notplotted.csv')
+                    txt = _("List of not plotted points : ") + '%s' % os.path.join(self.dirout,list_graph[i][0] + '_notplotted.csv')
                 else :
                     txt = ''
                 self.labels.append(wx.StaticText(self.panel_1, -1, list_graph[i][1] + txt))
-                self.buts.append(wx.Button(self.panel_1, wx.ID_DELETE, name = `i - b`))
+                self.buts.append(wx.Button(self.panel_1, wx.ID_DELETE, name = repr(i - b)))
             else :
                 todel.append(i)
                 b += 1
         self.list_graph = [graph for i, graph in enumerate(self.list_graph) if i not in todel]
-
         self.param = { 'typegraph' : 0,
               'width' : 800,
               'height' : 800,
@@ -107,7 +123,6 @@ class GraphPanelAfc(wx.Panel):
               'clnb' : clnb,
               'svg' : 0,
                }
-
         self.__set_properties()
         self.__do_layout()
 
@@ -134,7 +149,7 @@ class GraphPanelAfc(wx.Panel):
     def on_delete_image(self, event) :
         image_id = int(event.GetEventObject().GetName())
         image_path = self.list_graph[image_id][0]
-        message = _(u'This file will be delete : ') + '%s.\n' % os.path.join(self.dirout, image_path) + _('Are you sure ?')
+        message = _('This file will be delete : ') + '%s.\n' % os.path.join(self.dirout, image_path) + _('Are you sure ?')
         dial = wx.MessageDialog(self, message, style = wx.YES_NO)
         res = dial.ShowModal()
         if res == wx.ID_YES :
@@ -147,8 +162,8 @@ class GraphPanelAfc(wx.Panel):
             oldbut = self.buts.pop(image_id)
             oldbut.Show(False)
             for i, but in enumerate(self.buts) :
-                but.SetName(`i`)
-                self.listimg[i].SetName(`i`)
+                but.SetName(repr(i))
+                self.listimg[i].SetName(repr(i))
             todel = self.list_graph.pop(image_id)
             os.remove(os.path.join(self.dirout, todel[0]))
             print_liste(self.Dict[self.itempath], self.list_graph)
@@ -241,19 +256,19 @@ class GraphPanelAfc(wx.Panel):
             check_Rresult(self.ira, pid)
             if self.param['typegraph'] != 1 :
                 txt = 'Variables '
-                if self.param['qui'] == 0 : value = u'actives'
-                if self.param['qui'] == 1 : value = u'supplémentaires'
-                if self.param['qui'] == 2 : value = u'étoilées'
-                if self.param['qui'] == 3 : value = u'classes'
+                if self.param['qui'] == 0 : value = 'actives'
+                if self.param['qui'] == 1 : value = 'supplémentaires'
+                if self.param['qui'] == 2 : value = 'étoilées'
+                if self.param['qui'] == 3 : value = 'classes'
                 txt += value + ' - '
-                if self.param['what'] == 0 : value = u'Coordonnées'
-                if self.param['what'] == 1 : value = u'Corrélations'
-                txt += value + u' - facteur %i / %i' % (self.param['facteur'][0], self.param['facteur'][1])
-                if self.param['do_select_nb'] : txt += u' - sélection de %i variables' % self.param['select_nb']
-                if self.param['do_select_chi'] : txt += u' - sélection des variables avec chi2 > %i ' % self.param['select_chi']
-                if self.param['over'] : txt += u' - Eviter les recouvrements'
-                if self.param['cex_txt'] : txt += u' - taille du texte proportionnel à la masse'
-                if self.param['tchi'] : txt += u' - taille du texte proportionnel au chi2 d\'association'
+                if self.param['what'] == 0 : value = 'Coordonnées'
+                if self.param['what'] == 1 : value = 'Corrélations'
+                txt += value + ' - facteur %i / %i' % (self.param['facteur'][0], self.param['facteur'][1])
+                if self.param['do_select_nb'] : txt += ' - sélection de %i variables' % self.param['select_nb']
+                if self.param['do_select_chi'] : txt += ' - sélection des variables avec chi2 > %i ' % self.param['select_chi']
+                if self.param['over'] : txt += ' - Eviter les recouvrements'
+                if self.param['cex_txt'] : txt += ' - taille du texte proportionnel à la masse'
+                if self.param['tchi'] : txt += ' - taille du texte proportionnel au chi2 d\'association'
                 #list_graph = read_list_file(self.DictPathOut[self.itempath], self.coding)
                 if self.param['svg'] :
                     filename, ext = os.path.splitext(self.fileout)
@@ -279,40 +294,41 @@ class GraphPanelAfc(wx.Panel):
                     fileout = os.path.join(self.fileout,'index.html')
                     self.listimg.append(hl.HyperLinkCtrl(self.panel_1, -1, fileout, URL=fileout))
                 else :
-                    self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(self.fileout, wx.BITMAP_TYPE_ANY), name=`len(self.list_graph) - 1`))
+                    self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(self.fileout, wx.BITMAP_TYPE_ANY), name=repr(len(self.list_graph) - 1)))
                     self.listimg[-1].Bind(wx.EVT_RIGHT_DOWN, self.onrightclick)
                 self.sizer_3.Add( self.listimg[-1], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
                 self.labels.append(wx.StaticText(self.panel_1,-1, txt))
                 self.sizer_3.Add(self.labels[-1], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-                self.buts.append(wx.Button(self.panel_1, wx.ID_DELETE, name = `len(self.list_graph) - 1`))
+                self.buts.append(wx.Button(self.panel_1, wx.ID_DELETE, name = repr(len(self.list_graph) - 1)))
                 self.sizer_3.Add(self.buts[-1], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
                 self.sizer_3.Fit(self.panel_1)
                 self.Layout()
 
                 self.panel_1.Scroll(0,self.panel_1.GetScrollRange(wx.VERTICAL))
-#             elif self.param['typegraph'] == 2 :
-#                 parametres = {'gexffile' :  self.fileout,
-#                               'titre': 'Le titre',
-#                               'nodemin': self.param['txt_min'],
-#                               'nodemax': self.param['txt_max'],
-#                               'bargraphw' : 60*int(self.param['clnb']),
-#                 }
-#                 web = WebExport(self.ira, parametres)
-#                 afcout = web.exportafc()
-#                 dial = SimpleDialog(self.ira)
-#                 dial.link.SetLabel(afcout)
-#                 dial.link.SetURL(afcout)
-#                 dial.Layout()
-#                 dial.ShowModal()
+    #       elif self.param['typegraph'] == 2 :
+    #           parametres = {'gexffile' :  self.fileout,
+    #                           'titre': 'Le titre',
+    #                           'nodemin': self.param['txt_min'],
+    #                           'nodemax': self.param['txt_max'],
+    #                           'bargraphw' : 60*int(self.param['clnb']),
+    #           }
+    #           web = WebExport(self.ira, parametres)
+    #           afcout = web.exportafc()
+    #           dial = SimpleDialog(self.ira)
+    #           dial.link.SetLabel(afcout)
+    #           dial.link.SetURL(afcout)
+    #           dial.Layout()
+    #           dial.ShowModal()
 
 
 class GraphPanel(wx.ScrolledWindow):
+
     def __init__(self, parent, dico, list_graph, txt = '', style = wx.TAB_TRAVERSAL):
         wx.ScrolledWindow.__init__(self, parent, style = style)
         self.Dict = dico
         self.txt = txt
         self.parent = parent
-        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "Arial"))
+        self.SetFont(wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Arial"))
         self.labels = []
         self.listimg = []
         self.dirout = os.path.dirname(self.Dict['ira'])
@@ -334,7 +350,6 @@ class GraphPanel(wx.ScrolledWindow):
         self.SetScrollRate(20, 20)
         self.SetFocus()
 
-
     def __do_layout(self):
         self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
         self.sizer_2 = wx.BoxSizer(wx.VERTICAL)
@@ -350,8 +365,7 @@ class GraphPanel(wx.ScrolledWindow):
     def onMouseMove(self, event):
         self.SetFocus()
 
-
-def open_antiprofil(panel, AntiProfile, encoding, title = _(u"Antiprofiles").decode('utf8'), translation = False, lems=None) :
+def open_antiprofil(panel, AntiProfile, encoding, title = _("Antiprofiles"), translation = False, lems=None) :
     if not translation :
         DictAnti = ReadProfileAsDico(AntiProfile, True, encoding)
     else :
@@ -369,9 +383,10 @@ def getlemgram(corpus, lem) :
     else :
         return corpus.lems[lem[6]].gram
 
+
 class OpenCHDS():
+
     def __init__(self, parent, corpus, parametres, Alceste=False):
-        #sep = u'\n '
         sep=' '
         self.parent = parent
         self.corpus = corpus
@@ -382,10 +397,9 @@ class OpenCHDS():
         self.DictPathOut = DictPathOut
         self.dictpathout = DictPathOut
         self.Alceste = Alceste
-
         Profile = DictPathOut['PROFILE_OUT']
         AntiProfile = DictPathOut['ANTIPRO_OUT']
-        self.encoding = self.parametres['encoding']
+#        self.encoding = self.parametres['encoding']
         if isinstance(self.corpus, Corpus) :
             self.corpus.make_ucecl_from_R(self.pathout['uce'])
             corpname = self.corpus.parametres['corpus_name']
@@ -393,39 +407,36 @@ class OpenCHDS():
             corpname = self.corpus.parametres['matrix_name']
             if os.path.exists(self.pathout['analyse.db']) :
                 self.corpus.read_tableau(self.pathout['analyse.db'])
-
         clnb = parametres['clnb']
         dlg = progressbar(self, maxi = 4 + clnb)
         self.clnb = clnb
-        print 'lecture des profils'
-        dlg.Update(2, _(u"Reading profiles").decode('utf8'))
-
-        DictProfile = ReadProfileAsDico(Profile, Alceste, self.encoding)
+        print('lecture des profils')
+        dlg.Update(2, _("Reading profiles"))
+        DictProfile = ReadProfileAsDico(Profile, Alceste)
         self.DictProfile = DictProfile
         self.cluster_size = []
         clusternames = {}
         for i in range(0, clnb) :
-            clusternames[i] = ' '.join([u'%i' % (i + 1), _(u'Cluster').decode('utf8'),  u'%i' % (i + 1)])
+            clusternames[i] = ' '.join(['%i' % (i + 1), _('Cluster'),  '%i' % (i + 1)])
         if os.path.exists(self.pathout['classes_names.txt']) :
             with codecs.open(self.pathout['classes_names.txt'], 'r', self.parent.syscoding) as f :
                 clusternames_ = f.read()
-            clusternames_ =  dict([[i, ' '.join([`i + 1`, line])] for i, line in enumerate(clusternames_.splitlines())])
+            clusternames_ =  dict([[i, ' '.join([repr(i + 1), line])] for i, line in enumerate(clusternames_.splitlines())])
             clusternames.update(clusternames_)
-        #print 'lecture des antiprofils'
         #DictAnti = ReadProfileAsDico(self, AntiProfile, Alceste, self.encoding)
-
+        #
+        # preparation de l'affichage
+        #
         panel = wx.Panel(parent, -1)
         sizer1 = wx.BoxSizer(wx.VERTICAL)
-
         if os.path.exists(DictPathOut['pre_rapport']):
-            with codecs.open(DictPathOut['pre_rapport'], 'r', self.encoding) as f :
+            with codecs.open(DictPathOut['pre_rapport'], 'r') as f :
                 txt = f.read()
             self.debtext = txt
         else :
             self.debtext = ''
-#       panel.chd_toolbar = wx.ToolBar(panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.TB_FLAT | wx.TB_NODIVIDER)
-#       panel.chd_toolbar.SetToolBitmapSize(wx.Size(16, 16))
-
+    #   panel.chd_toolbar = wx.ToolBar(panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.TB_FLAT | wx.TB_NODIVIDER)
+    #   panel.chd_toolbar.SetToolBitmapSize(wx.Size(16, 16))
         if isinstance(self.corpus, Corpus) :
             panel.corpus = self.corpus
         else :
@@ -437,17 +448,14 @@ class OpenCHDS():
         panel.DictProfile = self.DictProfile
         panel.cluster_size = self.cluster_size
         panel.debtext = self.debtext
-
-#       self.ID_rapport = wx.NewId()
-#       #rap_img = wx.Image(os.path.join(self.parent.images_path,'icone_rap_16.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-#       #panel.chd_toolbar.AddLabelTool(self.ID_rapport, "rapport", rap_img, shortHelp=u"Produire le rapport", longHelp=u"Exporter un rapport en texte simple")
-#       butrap = wx.Button(panel.chd_toolbar, self.ID_rapport, u"Rapport ")
-#       panel.chd_toolbar.AddControl(butrap)
-#
-#       panel.chd_toolbar.Realize()
-#       sizer1.Add(panel.chd_toolbar,0, wx.EXPAND, 5)
-
-        #self.TabChdSim = wx.aui.AuiNotebook(self.parent.nb, -1, wx.DefaultPosition)
+    #   self.ID_rapport = wx.NewId()
+    #   #rap_img = wx.Image(os.path.join(self.parent.images_path,'icone_rap_16.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+    #   #panel.chd_toolbar.AddLabelTool(self.ID_rapport, "rapport", rap_img, shortHelp=u"Produire le rapport", longHelp=u"Exporter un rapport en texte simple")
+    #   butrap = wx.Button(panel.chd_toolbar, self.ID_rapport, u"Rapport ")
+    #   panel.chd_toolbar.AddControl(butrap)
+    #   panel.chd_toolbar.Realize()
+    #   sizer1.Add(panel.chd_toolbar,0, wx.EXPAND, 5)
+    #    self.TabChdSim = wx.aui.AuiNotebook(self.parent.nb, -1, wx.DefaultPosition)
         notebook_flags =  aui.AUI_NB_DEFAULT_STYLE | aui.AUI_NB_TAB_EXTERNAL_MOVE | aui.AUI_NB_TAB_MOVE | aui.AUI_NB_TAB_FLOAT| wx.NO_BORDER
         panel.TabChdSim = aui.AuiNotebook(panel, -1, wx.DefaultPosition)
         #panel.TabChdSim = LB.LabelBook(panel, -1, agwStyle = INB_TOP|INB_SHOW_ONLY_TEXT|INB_FIT_LABELTEXT)
@@ -456,8 +464,6 @@ class OpenCHDS():
         sizer1.Add(panel.TabChdSim,10, wx.EXPAND, 5)
         panel.SetSizer(sizer1)
         sizer1.Fit(panel)
-
-
         if isinstance(self.corpus, Corpus) :
             panel.TabChdSim.corpus = corpus
             panel.TabChdSim.corpus.dictpathout = self.DictPathOut
@@ -466,27 +472,20 @@ class OpenCHDS():
             panel.TabChdSim.tableau.dictpathout = self.DictPathOut
         panel.parametres = self.parametres
         self.panel = panel
-
         self.notenb = self.parent.nb.GetPageCount()
-
-
         if os.path.exists(self.DictPathOut['liste_graph_chd']) :
-            list_graph = read_list_file(self.DictPathOut['liste_graph_chd'], self.encoding)
+            list_graph = read_list_file(self.DictPathOut['liste_graph_chd'])
             CHD = GraphPanelDendro(panel.TabChdSim, DictPathOut, list_graph, txt = self.debtext)
             panel.TabChdSim.AddPage(CHD,'CHD')
-
-
-        #panel.ProfNB.SetArtProvider(aui.ChromeTabArt())
-        #panel.ProfNB = LB.LabelBook(panel, -1, agwStyle = INB_LEFT|INB_SHOW_ONLY_TEXT|INB_FIT_LABELTEXT)
-        #panel.ProfNB = wx.Listbook(self.parent, -1, style = wx.BK_DEFAULT)
-        #panel.ProfNB = wx.Treebook(self.parent, -1, style = wx.BK_DEFAULT)
-        #self.ProfNB.SetTabCtrlHeight(100)
-        #panel.AntiProfNB = aui.AuiNotebook(panel, -1, wx.DefaultPosition)
+    #    panel.ProfNB.SetArtProvider(aui.ChromeTabArt())
+    #    panel.ProfNB = LB.LabelBook(panel, -1, agwStyle = INB_LEFT|INB_SHOW_ONLY_TEXT|INB_FIT_LABELTEXT)
+    #    panel.ProfNB = wx.Listbook(self.parent, -1, style = wx.BK_DEFAULT)
+    #    panel.ProfNB = wx.Treebook(self.parent, -1, style = wx.BK_DEFAULT)
+    #    self.ProfNB.SetTabCtrlHeight(100)
+    #    panel.AntiProfNB = aui.AuiNotebook(panel, -1, wx.DefaultPosition)
         if os.path.exists(DictPathOut['prof_seg']) :
-            prof_seg = ReadProfileAsDico(DictPathOut['prof_seg'], False, self.encoding)
+            prof_seg = ReadProfileAsDico(DictPathOut['prof_seg'], False)
             self.prof_seg_nb = aui.AuiNotebook(panel, -1, wx.DefaultPosition)
-
-
         panel.ProfNB = aui.AuiNotebook(panel, -1, wx.DefaultPosition)
         notebook_flags |= aui.AUI_NB_WINDOWLIST_BUTTON
         panel.ProfNB.SetAGWWindowStyleFlag(notebook_flags)
@@ -502,30 +501,27 @@ class OpenCHDS():
             panel.ProfNB.AddPage(self.tabprofile, clusternames[i] + '\n%s%%' % indpour, True)
             panel.ProfNB.SetPageTextColour(i, '#890909')
             panel.ProfNB.SetRenamable(i, True)
-            #panel.AntiProfNB.AddPage(self.tabantiprofile, 'classe %s' % str(i + 1))
+    #       panel.AntiProfNB.AddPage(self.tabantiprofile, 'classe %s' % str(i + 1))
             if os.path.exists(DictPathOut['prof_seg']) :
                 self.tab_prof_seg = ProfListctrlPanel(self.parent, self, prof_seg[str(i + 1)], False, i + 1)
-                self.prof_seg_nb.AddPage(self.tab_prof_seg, _(u"Cluster").decode('utf8') + ' %i' % (i + 1))
+                self.prof_seg_nb.AddPage(self.tab_prof_seg, _("Cluster") + ' %i' % (i + 1))
         panel.ProfNB.SetSelection(0)
-
         if clnb > 2 :
             self.TabAFC = aui.AuiNotebook(panel.TabChdSim, -1, wx.DefaultPosition)
             log.info('read AFC')
-            list_graph=read_list_file(DictPathOut['liste_graph_afc'], self.encoding)
-            self.tabAFCGraph = GraphPanelAfc(self.TabAFC, DictPathOut, list_graph, self.clnb, coding=self.encoding)
-            self.TabAFC.AddPage(self.tabAFCGraph, _(u"CA").decode('utf8'))
-
+            list_graph=read_list_file(DictPathOut['liste_graph_afc'])
+            self.tabAFCGraph = GraphPanelAfc(self.TabAFC, DictPathOut, list_graph, self.clnb)
+            self.TabAFC.AddPage(self.tabAFCGraph, _("CA"))
             if os.path.exists(self.DictPathOut['afc_facteur']) :
-                dictrow, first = ReadList(self.DictPathOut['afc_facteur'], self.encoding)
+                dictrow, first = ReadList(self.DictPathOut['afc_facteur'])
                 self.TabAFC_facteur = ListForSpec(self.parent, parametres, dictrow, first[1:])
-                #dictrow, first = ReadList(self.DictPathOut['afc_row'], self.encoding)
-                #self.TabAFC_ligne = ListForSpec(self.parent, self.parametres, dictrow, first)
-                #dictrow, first = ReadList(self.DictPathOut['afc_col'], self.encoding)
-                #self.TabAFC_colonne = ListForSpec(parent, self.parametres, dictrow, first)
-                self.TabAFC.AddPage(self.TabAFC_facteur, _(u"Factor").decode('utf8'))
-                #self.TabAFC.AddPage(self.TabAFC_colonne, u'Colonnes')
-                #self.TabAFC.AddPage(self.TabAFC_ligne, u'Lignes')
-
+    #           dictrow, first = ReadList(self.DictPathOut['afc_row'], self.encoding)
+    #           self.TabAFC_ligne = ListForSpec(self.parent, self.parametres, dictrow, first)
+    #           dictrow, first = ReadList(self.DictPathOut['afc_col'], self.encoding)
+    #           self.TabAFC_colonne = ListForSpec(parent, self.parametres, dictrow, first)
+                self.TabAFC.AddPage(self.TabAFC_facteur, _("Factor"))
+    #           self.TabAFC.AddPage(self.TabAFC_colonne, 'Colonnes')
+    #           self.TabAFC.AddPage(self.TabAFC_ligne, 'Lignes')
             sizer_3 = wx.BoxSizer(wx.VERTICAL)
             self.parent.nb_panel_2 = wx.Panel(panel.TabChdSim, -1)
             self.parent.button_simi = wx.Button(self.parent.nb_panel_2, -1, "Voyager")
@@ -533,46 +529,40 @@ class OpenCHDS():
             sizer_3.Add(self.parent.simi3dpanel, 1, wx.EXPAND, 0)
             sizer_3.Add(self.parent.button_simi, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
             self.parent.nb_panel_2.SetSizer(sizer_3)
-            self.TabAFC.AddPage(self.parent.nb_panel_2, _(u"3D graph").decode('utf8'))
+            self.TabAFC.AddPage(self.parent.nb_panel_2, _("3D graph"))
             self.parent.Bind(wx.EVT_BUTTON, self.onsimi, self.parent.button_simi)
-
-        panel.TabChdSim.AddPage(panel.ProfNB, _(u"Profiles").decode('utf8'))
-        #panel.TabChdSim.AddPage(panel.AntiProfNB, 'Antiprofils')
+        panel.TabChdSim.AddPage(panel.ProfNB, _("Profiles"))
+    #   panel.TabChdSim.AddPage(panel.AntiProfNB, 'Antiprofils')
         dlg.Update(4 + self.clnb, 'Affichage...')
         if clnb > 2 :
-            panel.TabChdSim.AddPage(self.TabAFC, _(u"CA").decode('utf8'))
+            panel.TabChdSim.AddPage(self.TabAFC, _("CA"))
         if os.path.exists(DictPathOut['prof_seg']) :
-            panel.TabChdSim.AddPage(self.prof_seg_nb, _(u"Repeated segments profiles").decode('utf8'))
-
-#       panel.Bind(wx.EVT_BUTTON, self.ongetrapport, id = self.ID_rapport)
+            panel.TabChdSim.AddPage(self.prof_seg_nb, _("Repeated segments profiles"))
+    #   panel.Bind(wx.EVT_BUTTON, self.ongetrapport, id = self.ID_rapport)
         if os.path.exists(os.path.join(self.parametres['pathout'], 'tgenchi2.csv')) :
             self.parametres['tgenspec'] = os.path.join(self.parametres['pathout'], 'tgenchi2.csv')
             TgenLayout(panel)
-
         if os.path.exists(self.dictpathout['translations.txt']) :
             with codecs.open(self.dictpathout['translations.txt'], 'r', 'utf8') as f:
                 translist = f.read()
             translist = [line.split('\t') for line in translist.splitlines()]
             for line in translist :
                 self.opentrans(line)
-
         panel.TabChdSim.SetSelection(0)
-        self.parent.nb.AddPage(panel, _(u"Clustering").decode('utf8') + ' - %s' % corpname)
+        self.parent.nb.AddPage(panel, _("Clustering") + ' - %s' % corpname)
         self.parent.ShowTab(True)
         self.parent.nb.SetSelection(self.parent.nb.GetPageCount() - 1)
-        #for pane in self.parent._mgr.GetAllPanes() :
-        #     if isinstance(pane.window, aui.AuiNotebook):
-        #         nb = pane.window
-        #         nb.SetAGWWindowStyleFlag(notebook_flags)
-        #         nb.SetArtProvider(aui.ChromeTabArt())
+    #   for pane in self.parent._mgr.GetAllPanes() :
+    #       if isinstance(pane.window, aui.AuiNotebook):
+    #           nb = pane.window
+    #           nb.SetAGWWindowStyleFlag(notebook_flags)
+    #           nb.SetArtProvider(aui.ChromeTabArt())
         dlg.Destroy()
-
-
         self.parent._mgr.Update()
 
     def opentrans(self, trans) :
-        prof = ReadProfileAsDico(self.dictpathout[trans[0]], False, 'utf8')
-        with codecs.open(self.dictpathout[trans[1]], 'r', 'utf8') as f :
+        prof = ReadProfileAsDico(self.dictpathout[trans[0]], False)
+        with codecs.open(self.dictpathout[trans[1]], 'r') as f :
             lems = f.read()
         lems = [line.split('\t') for line in lems.splitlines()]
         lems = dict(lems)
@@ -593,15 +583,15 @@ class OpenCHDS():
             fileout = dial.fbb.GetValue()
             dial.Destroy()
             self.corpus.get_stat_by_cluster(fileout)
-            msg = u"Fini !"
-            dlg = wx.MessageDialog(self.parent, msg, _(u"Stat by cluster").decode('utf8'), wx.OK | wx.ICON_INFORMATION)
+            msg = "Fini !"
+            dlg = wx.MessageDialog(self.parent, msg, _("Stat by cluster"), wx.OK | wx.ICON_INFORMATION)
             dlg.CenterOnParent()
             if dlg.ShowModal() == wx.ID_OK :
                 dlg.Destroy()
 
     #def onsearchf(self, evt) :
     #    if 'FrameSearch' not in dir(self.panel) :
-    #        self.panel.FrameSearch = SearchFrame(self.parent, -1, u"Rechercher...", self.corpus)
+    #        self.panel.FrameSearch = SearchFrame(self.parent, -1, "Rechercher...", self.corpus)
     #    self.panel.FrameSearch.Show()
 
 def PrintRapport(self, corpus, parametres, istxt = True):
@@ -615,39 +605,40 @@ def PrintRapport(self, corpus, parametres, istxt = True):
 """ % datetime.datetime.now().ctime()
     if istxt :
         totocc = corpus.gettotocc()
-        txt += ': '.join([_(u'Number of texts').decode('utf8'),  u'%i%s' % (corpus.getucinb(), sep)])
-        txt += ': '.join([_(u'Number of text segments').decode('utf8'),  '%i%s' % (corpus.getucenb(), sep)])
-        txt += ': '.join([_(u'Number of forms').decode('utf8'), '%i%s' % (len(corpus.formes), sep)])
-        txt += ': '.join([_(u'Number of occurrences').decode('utf8'), '%i%s' % (totocc, sep)])
-        #txt += u'moyenne d\'occurrences par forme: %f%s' % (float(totocc) / float(len(self.corpus.formes)), sep)
-        txt += ': '.join([_(u'Number of lemmas').decode('utf8'), '%i%s' % (len(corpus.lems), sep)])
-        txt += ': '.join([_(u'Number of active forms').decode('utf8'), '%i%s' % (corpus.getactivesnb(1), sep)])
-        txt += ': '.join([_(u'Number of supplementary forms').decode('utf8'), '%i%s' % (corpus.getactivesnb(2), sep)])
-        txt += ' >= '.join([_(u'Number of active forms with a frequency').decode('utf8'), '%i: %i%s' % (parametres['eff_min_forme'], parametres['nbactives'], sep)])
-        txt += ': '.join([_(u'Mean of forms by segment').decode('utf8'), '%f%s' % (float(totocc) / float(corpus.getucenb()), sep)])
+        txt += ': '.join([_('Number of texts'),  '%i%s' % (corpus.getucinb(), sep)])
+        txt += ': '.join([_('Number of text segments'),  '%i%s' % (corpus.getucenb(), sep)])
+        txt += ': '.join([_('Number of forms'), '%i%s' % (len(corpus.formes), sep)])
+        txt += ': '.join([_('Number of occurrences'), '%i%s' % (totocc, sep)])
+        #txt += 'moyenne d\'occurrences par forme: %f%s' % (float(totocc) / float(len(self.corpus.formes)), sep)
+        txt += ': '.join([_('Number of lemmas'), '%i%s' % (len(corpus.lems), sep)])
+        txt += ': '.join([_('Number of active forms'), '%i%s' % (corpus.getactivesnb(1), sep)])
+        txt += ': '.join([_('Number of supplementary forms'), '%i%s' % (corpus.getactivesnb(2), sep)])
+        txt += ' >= '.join([_('Number of active forms with a frequency'), '%i: %i%s' % (parametres['eff_min_forme'], parametres['nbactives'], sep)])
+        txt += ': '.join([_('Mean of forms by segment'), '%f%s' % (float(totocc) / float(corpus.getucenb()), sep)])
         if 'tailleuc1' in parametres :
             if parametres['classif_mode'] == 0 :
-                txt += ': '.join([_(u'Size of rst1 / rst2').decode('utf8'), '%i / %i - %i / %i%s' % (parametres['tailleuc1'], parametres['tailleuc2'], parametres['lenuc1'], parametres['lenuc2'], sep)])
+                txt += ': '.join([_('Size of rst1 / rst2'), '%i / %i - %i / %i%s' % (parametres['tailleuc1'], parametres['tailleuc2'], parametres['lenuc1'], parametres['lenuc2'], sep)])
     else :
         self.Ucenb = self.nbind
-        txt += ': '.join([_(u'Number of lines').decode('utf8'), '%i%s' % (self.nbind, sep)])
-        txt += ': '.join([_(u'Number of clusters').decode('utf8'), '%i%s' % (self.clnb, sep)])
+        txt += ': '.join([_('Number of lines'), '%i%s' % (self.nbind, sep)])
+        txt += ': '.join([_('Number of clusters'), '%i%s' % (self.clnb, sep)])
     if istxt :
-        txt += ': '.join([_(u'Number of clusters').decode('utf8'), '%i%s' % (parametres['clnb'], sep)])
+        txt += ': '.join([_('Number of clusters'), '%i%s' % (parametres['clnb'], sep)])
         if parametres['classif_mode'] == 0 or parametres['classif_mode'] == 1 :
-            txt += ' '.join(['%i' % sum([len(cl) for cl in corpus.lc]), _(u'segments classified on').decode('utf8'), '%i (%.2f%%)%s' % (corpus.getucenb(), (float(sum([len(cl) for cl in corpus.lc])) / float(corpus.getucenb())) * 100, sep)])
+            txt += ' '.join(['%i' % sum([len(cl) for cl in corpus.lc]), _('segments classified on'), '%i (%.2f%%)%s' % (corpus.getucenb(), (float(sum([len(cl) for cl in corpus.lc])) / float(corpus.getucenb())) * 100, sep)])
         elif self.parametres['classif_mode'] == 2 :
-            txt += ' '.join([u'%i' % sum([len(cl) for cl in corpus.lc]), _(u'texts classified on').decode('utf8'), '%i (%.2f%%)%s' % (corpus.getucinb(), (float(sum([len(cl) for cl in corpus.lc]))) / float(corpus.getucinb()) * 100, sep)])
+            txt += ' '.join(['%i' % sum([len(cl) for cl in corpus.lc]), _('texts classified on'), '%i (%.2f%%)%s' % (corpus.getucinb(), (float(sum([len(cl) for cl in corpus.lc]))) / float(corpus.getucinb()) * 100, sep)])
     else :
-        txt += ' '.join(['%i' % self.ucecla, _(u'line classified on').decode('utf8'), '%i (%.2f%%)%s' % (self.Ucenb, (float(self.ucecla) / float(self.Ucenb)) * 100, sep)])
+        txt += ' '.join(['%i' % self.ucecla, _('line classified on'), '%i (%.2f%%)%s' % (self.Ucenb, (float(self.ucecla) / float(self.Ucenb)) * 100, sep)])
 
-    txt += ''.join([sep, u'###########################', sep, _(u'time').decode('utf8'), ' : %s' % parametres.get('time', ''), sep, u'###########################', sep])
-
+    txt += ''.join([sep, '###########################', sep, _('time'), ' : %s' % parametres.get('time', ''), sep, '###########################', sep])
+    # ecriture du resultat dans le fichier
     with open(self.pathout['pre_rapport'], 'w') as f :
         f.write(txt)
 
 
 class SashList(wx.Panel) :
+
     def __init__(self, parent) :
         wx.Panel.__init__(self, parent, -1)
         self.parent=parent
@@ -662,29 +653,23 @@ class SashList(wx.Panel) :
                 self, -1, wx.DefaultPosition, (200, 300),
                 wx.NO_BORDER|wx.SW_3D
                 )
-
         self.leftwin1.SetDefaultSize((120, 1000))
         self.leftwin1.SetOrientation(wx.LAYOUT_VERTICAL)
         self.leftwin1.SetAlignment(wx.LAYOUT_LEFT)
         self.leftwin1.SetBackgroundColour(wx.Colour(0, 255, 0))
         self.leftwin1.SetSashVisible(wx.SASH_RIGHT, True)
         self.leftwin1.SetExtraBorderSize(10)
-
         #textWindow = wx.TextCtrl(
         #                leftwin1, -1, "", wx.DefaultPosition, wx.DefaultSize,
         #                wx.TE_MULTILINE|wx.SUNKEN_BORDER
         #                )
-
         #textWindow.SetValue("A sub window")
-
         self.leftWindow1 = self.leftwin1
         winids.append(self.leftwin1.GetId())
-
         rightwin1 =  wx.SashLayoutWindow(
                 self, -1, wx.DefaultPosition, (200, 300),
                 wx.NO_BORDER|wx.SW_3D
                 )
-
         rightwin1.SetDefaultSize((120, 1000))
         rightwin1.SetOrientation(wx.LAYOUT_VERTICAL)
         rightwin1.SetAlignment(wx.LAYOUT_LEFT)
@@ -695,13 +680,13 @@ class SashList(wx.Panel) :
         #                leftwin1, -1, "", wx.DefaultPosition, wx.DefaultSize,
         #                wx.TE_MULTILINE|wx.SUNKEN_BORDER
         #                )
-
         #textWindow.SetValue("A sub window")
-
         self.rightwin1 = rightwin1
         winids.append(rightwin1.GetId())
 
+
 class TgenLayout :
+
     def __init__(self, page):
         self.page = page
         parametres = self.page.parametres
@@ -727,7 +712,6 @@ class TgenLayout :
                 if tab.tgen :
                     tgentab = tab
                     break
-
         if tgentab :
             self.page.tgentab.RefreshData(self.page.tgens)
             self.page.tgentab.tgens = tgen.tgen
@@ -739,10 +723,12 @@ class TgenLayout :
             self.page.tgentab.tgens = tgen.tgen
             if os.path.exists(tgenlempath) :
                 self.page.tgentab.tgenlem = self.page.tgenlem
-            page.AddPage(self.page.tgentab, _(u'Tgens Specificities').decode('utf8'))
+            page.AddPage(self.page.tgentab, _('Tgens Specificities'))
             page.SetSelection(page.GetPageCount() - 1)
 
+
 class dolexlayout :
+
     def __init__(self, ira, corpus, parametres):
         self.pathout = PathOut(dirout = parametres['pathout'])
         self.corpus = corpus
@@ -751,7 +737,6 @@ class dolexlayout :
         self.parent = ira
         self.encoding = self.corpus.parametres['syscoding']
         self.parametres = parametres
-
         self.DictSpec, first = ReadList(self.dictpathout['tablespecf'], self.corpus.parametres['syscoding'])
         if os.path.exists(self.pathout['banalites.csv']) :
             self.dictban, firstban = ReadList(self.pathout['banalites.csv'], self.corpus.parametres['syscoding'])
@@ -762,8 +747,6 @@ class dolexlayout :
         self.DictEffRelType, firsteffrelt = ReadList(self.dictpathout['eff_relatif_type'], self.corpus.parametres['syscoding'])
         self.etoiles = firsteff[1:]
         #sash = SashList(ira.nb)
-
-
         self.TabStat = aui.AuiNotebook(ira.nb, -1, wx.DefaultPosition)
         self.TabStat.parametres = parametres
         self.ListPan = ListForSpec(ira, self, self.DictSpec, self.etoiles)
@@ -775,28 +758,25 @@ class dolexlayout :
         self.ListPanEffType = ListForSpec(ira, self, self.DictEffType, self.etoiles)
         self.ListPanEffRelForme = ListForSpec(ira, self, self.DictEffRelForme, self.etoiles)
         self.ListPanEffRelType = ListForSpec(ira, self, self.DictEffRelType, self.etoiles)
-
-        self.TabStat.AddPage(self.ListPan, _(u'Forms').decode('utf8'))
+        self.TabStat.AddPage(self.ListPan, _('Forms'))
         if os.path.exists(self.pathout['banalites.csv']) :
-            self.TabStat.AddPage(self.listban, _(u'Banal forms').decode('utf8'))
-        self.TabStat.AddPage(self.ListPant, _(u'POS').decode('utf8'))
-        self.TabStat.AddPage(self.ListPanEff, _(u'Forms frequencies').decode('utf8'))
-        self.TabStat.AddPage(self.ListPanEffType, _(u'POS frequencies').decode('utf8'))
-        self.TabStat.AddPage(self.ListPanEffRelForme, _(u'Forms relative frequencies').decode('utf8'))
-        self.TabStat.AddPage(self.ListPanEffRelType, _(u'POS relative frequencies').decode('utf8'))
+            self.TabStat.AddPage(self.listban, _('Banal forms'))
+        self.TabStat.AddPage(self.ListPant, _('POS'))
+        self.TabStat.AddPage(self.ListPanEff, _('Forms frequencies'))
+        self.TabStat.AddPage(self.ListPanEffType, _('POS frequencies'))
+        self.TabStat.AddPage(self.ListPanEffRelForme, _('Forms relative frequencies'))
+        self.TabStat.AddPage(self.ListPanEffRelType, _('POS relative frequencies'))
         if self.parametres['clnb'] > 2 :
             self.TabAFC = aui.AuiNotebook(self.TabStat, -1, wx.DefaultPosition)
             list_graph=read_list_file(self.dictpathout['liste_graph_afcf'], encoding = self.encoding)
             self.tabAFCGraph = GraphPanelAfc(self.TabAFC, self.dictpathout, list_graph, self.parametres['clnb'], itempath ='liste_graph_afcf', coding = self.encoding)
-            self.TabAFC.AddPage(self.tabAFCGraph, _(u'CA forms').decode('utf8'))
+            self.TabAFC.AddPage(self.tabAFCGraph, _('CA forms'))
             list_graph=read_list_file(self.dictpathout['liste_graph_afct'], encoding = self.encoding)
             self.tabAFCTGraph = GraphPanelAfc(self.TabAFC, self.dictpathout, list_graph, self.parametres['clnb'], itempath ='liste_graph_afct', coding=self.encoding)
-            self.TabAFC.AddPage(self.tabAFCTGraph, _(u'CA POS').decode('utf8'))
-            self.TabStat.AddPage(self.TabAFC, _(u'CA').decode('utf8'))
-
-        ira.nb.AddPage(self.TabStat, ' - '.join([_(u'Specificities').decode('utf8'), self.parametres['name']]))
+            self.TabAFC.AddPage(self.tabAFCTGraph, _('CA POS'))
+            self.TabStat.AddPage(self.TabAFC, _('CA'))
+        ira.nb.AddPage(self.TabStat, ' - '.join([_('Specificities'), self.parametres['name']]))
         self.ira = ira
-
         self.TabStat.corpus = self.corpus
         self.TabStat.etoiles = self.etoiles
         if os.path.exists(os.path.join(self.parametres['pathout'], 'tgenspec.csv')) :
@@ -806,34 +786,33 @@ class dolexlayout :
         ira.nb.SetSelection(self.parent.nb.GetPageCount() - 1)
         ira.ShowAPane("Tab_content")
 
+
 class StatLayout:
+
     def __init__(self, ira, corpus, parametres):
         self.pathout = PathOut(dirout = parametres['pathout'])
         self.corpus = corpus
         self.ira = ira
-        self.read_result()
+        self.read_result() # qui va définir la propriété self.result
         self.parametres = parametres
         self.TabStat = aui.AuiNotebook(ira.nb, -1, wx.DefaultPosition)
         self.TabStat.parametres = parametres
         self.TabStat.corpus = corpus
         self.TabStat.pathout = self.pathout
 #        CHD = GraphPanel(panel.TabChdSim, DictPathOut, list_graph, txt = self.debtext)
-        #      panel.TabChdSim.AddPage(CHD,'CHD')
-
+#        panel.TabChdSim.AddPage(CHD,'CHD')
         #self.TabStatTot = wx.TextCtrl(self.TabStat, -1, style=wx.NO_BORDER | wx.TE_MULTILINE | wx.TE_RICH2)
         list_graph = [['zipf.png', 'zipf']]
         self.TabStatTot = GraphPanel(ira.nb, self.pathout, list_graph, self.result['glob'])
-        self.TabStat.AddPage(self.TabStatTot, _(u'Abstract').decode('utf8'))
-
-        dictlabel = {'total' : _(u'Total').decode('utf8'),
-                     u'formes_actives' : _(u'Actives forms').decode('utf8'),
-                     u'formes_supplémentaires': _(u'Supplementary forms').decode('utf8'),
-                     u'hapax' : _(u'Hapax').decode('utf8'),
+        self.TabStat.AddPage(self.TabStatTot, _('Abstract'))
+        dictlabel = {'total' : _('Total'),
+                     'formes_actives' : _('Actives forms'),
+                     'formes_supplémentaires': _('Supplementary forms'),
+                     'hapax' : _('Hapax'),
                      }
-
         for item in self.result:
             if item != 'glob':
-                datam = [['forme', 'nb']]
+                datam = [['forme', 'nb']] #???
                 self.ListPan = ListPanel(ira, self, self.result[item])
                 self.TabStat.AddPage(self.ListPan, dictlabel[item])
         ira.nb.AddPage(self.TabStat, '%s' % parametres['name'])
@@ -841,7 +820,7 @@ class StatLayout:
         ira.ShowAPane("Tab_content")
 
     def read_result(self) :
-        lcle = {'total' :u'total.csv', u'formes_actives':u'formes_actives.csv', u'formes_supplémentaires':u'formes_supplémentaires.csv', u'hapax': u'hapax.csv'}
+        lcle = {'total' :'total.csv', 'formes_actives':'formes_actives.csv', 'formes_supplémentaires':'formes_supplémentaires.csv', 'hapax': 'hapax.csv'}
         self.result = {}
         for key in lcle :
             with codecs.open(self.pathout[lcle[key]], 'r', sys.getdefaultencoding()) as f :
@@ -850,7 +829,9 @@ class StatLayout:
         with open(self.pathout['glob.txt'], 'r') as f :
             self.result['glob'] = f.read()
 
+
 class GraphPanelDendro(wx.Panel):
+
     def __init__(self,parent, dico, list_graph, txt=False):
         wx.Panel.__init__(self,parent)
         self.graphnb = 1
@@ -858,7 +839,7 @@ class GraphPanelDendro(wx.Panel):
         self.dirout = os.path.dirname(self.dictpathout['ira'])
         self.list_graph = list_graph
         self.parent = self.GetParent()#parent
-        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "Arial"))
+        self.SetFont(wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Arial")) #modifié
         self.labels = []
         self.listimg = []
         self.tabchd = self.parent.GetParent()
@@ -872,7 +853,6 @@ class GraphPanelDendro(wx.Panel):
         self.butdendro = wx.BitmapButton(self, -1, dendro_img)
         self.butdendrotexte = wx.BitmapButton(self, -1, dendro_liste_img)
         self.butdendrocloud = wx.BitmapButton(self, -1, dendro_cloud_img)
-
         for i in range(0,len(list_graph)):
             if os.path.exists(os.path.join(self.dirout,list_graph[i][0])) :
                 filename, ext = os.path.splitext(list_graph[i][0])
@@ -881,7 +861,6 @@ class GraphPanelDendro(wx.Panel):
                 else :
                     self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
                 self.labels.append(wx.StaticText(self.panel_1, -1, list_graph[i][1]))
-
         self.__set_properties()
         self.__do_layout()
 
@@ -901,7 +880,7 @@ class GraphPanelDendro(wx.Panel):
                        'type_tclasse' : 0,
                        'svg' : 0
                      }
-        self.type_dendro = [ u"phylogram", u"cladogram", u"fan", u"unrooted", u"radial" ]
+        self.type_dendro = [ "phylogram", "cladogram", "fan", "unrooted", "radial" ]
 
     def __do_layout(self):
         self.sizer_1 = wx.BoxSizer(wx.VERTICAL)
@@ -911,7 +890,6 @@ class GraphPanelDendro(wx.Panel):
         self.sizer_1.Add(self.butdendro, 0, 0, 0)
         self.sizer_1.Add(self.butdendrotexte, 0, 0, 0)
         self.sizer_1.Add(self.butdendrocloud, 0, 0, 0)
-
         for i in range(0, len(self.listimg)):
             self.sizer_3.Add(self.listimg[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
             self.sizer_3.Add(self.labels[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
@@ -1009,15 +987,16 @@ class GraphPanelDendro(wx.Panel):
             open_file_graph("%s", width=%i, height=%i, svg=%s)
             plot.dendro.cloud(tree.cut1$tree.cl, classes, chistable, nbbycl = 300, type.dendro="%s", bw=%s, lab=NULL)
             """ % (ffr(self.dictpathout['RData.RData']), ffr(self.ira.RscriptsPath['Rgraph']), ffr(fileout), width, height, svg, type_dendro, bw)
-
-
         tmpfile = tempfile.mktemp()
+        # ecriture du fichier de script à éxécuter
         with open(tmpfile, 'w') as f :
             f.write(txt)
-        busy = wx.BusyInfo(_("Please wait...").decode('utf8'), self.parent)
+        # dialogue d'attente
+        busy = wx.BusyInfo(_("Please wait..."), self.parent)
         wx.SafeYield()
         error = exec_rcode(self.ira.RPath, tmpfile, wait=True)
         del busy
+        # fin de l'attente
         check_Rresult(self.ira, error)
         self.list_graph.append([fileout, 'Dendrogramme CHD1 - %s' %  type_dendro])
         print_liste(self.dictpathout['liste_graph_chd'], self.list_graph)
@@ -1044,7 +1023,7 @@ class GraphPanelDendro(wx.Panel):
         if os.path.exists(self.dictpathout['translations.txt']) :
             with codecs.open(self.dictpathout['translations.txt'], 'r', 'utf8') as f :
                 content = f.read()
-            print content
+            print(content)
             trans = [line.split('\t')[1] for line in content.splitlines()]
             trans = [[val, self.dictpathout[val]] for val in trans]
             self.param['translation'] = trans
@@ -1062,7 +1041,9 @@ class GraphPanelDendro(wx.Panel):
             self.make_param(dial)
             self.make_dendro(dendro = 'cloud')
 
+
 class OpenCorpus :
+
     def __init__(self, ira, parametres) :
         #self.text = wx.TextCtrl(ira, -1, "", wx.Point(0, 0), wx.Size(200, 200), wx.NO_BORDER | wx.TE_MULTILINE | wx.TE_RICH2 | wx.TE_READONLY)
         self.panel = CopusPanel(ira, parametres)
@@ -1071,7 +1052,9 @@ class OpenCorpus :
         ira.nb.SetSelection(ira.nb.GetPageCount() - 1)
         ira.ShowAPane("Tab_content")
 
+
 class MatLayout :
+
     def __init__(self, ira, matrix):
         #self.parent.content = self.csvtable
         self.sheet = MySheet(ira.nb)
@@ -1081,7 +1064,9 @@ class MatLayout :
         ira.nb.SetSelection(ira.nb.GetPageCount() - 1)
         ira.ShowAPane("Tab_content")
 
+
 class CopusPanel(wx.Panel) :
+
     def __init__(self, parent, parametres) :
         wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL )
         self.parametres = parametres
@@ -1089,75 +1074,61 @@ class CopusPanel(wx.Panel) :
         fgSizer5.SetFlexibleDirection( wx.BOTH )
         fgSizer5.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         self.fgSizer5 = fgSizer5
-
-        self.m_staticText18 = wx.StaticText( self, wx.ID_ANY, _(u"Description of corpus").decode('utf8'), wx.DefaultPosition, wx.DefaultSize, 0 )
-
+        self.m_staticText18 = wx.StaticText( self, wx.ID_ANY, _("Description of corpus"), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText18.Wrap( -1 )
         fgSizer5.Add( self.m_staticText18, 0, wx.ALL, 5 )
-
-        self.m_staticText19 = wx.StaticText( self, wx.ID_ANY, u"", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText19 = wx.StaticText( self, wx.ID_ANY, "", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText19.Wrap( -1 )
         fgSizer5.Add( self.m_staticText19, 0, wx.ALL, 5 )
-
-        self.m_staticText20 = wx.StaticText( self, wx.ID_ANY, u"Nom", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText20 = wx.StaticText( self, wx.ID_ANY, "Nom", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText20.Wrap( -1 )
         fgSizer5.Add( self.m_staticText20, 0, wx.ALL, 5 )
-
         self.m_staticText21 = wx.StaticText( self, wx.ID_ANY, parametres['corpus_name'], wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText21.Wrap( -1 )
         fgSizer5.Add( self.m_staticText21, 0, wx.ALL, 5 )
-
-        description = {'lang' : _(u'Language').decode('utf8'),
-                       'encoding' : _(u'Characters set').decode('utf8'),
-                       'ucinb' : _(u'Number of texts').decode('utf8'),
-                       'ucenb' : _(u'Number of text segments').decode('utf8'),
-                       'formesnb' : _(u'Number of forms').decode('utf8'),
-                       'hapax' : _(u'Number of hapax').decode('utf8'),
+        description = {'lang' : _('Language'),
+                       'encoding' : _('Characters set'),
+                       'ucinb' : _('Number of texts'),
+                       'ucenb' : _('Number of text segments'),
+                       'formesnb' : _('Number of forms'),
+                       'hapax' : _('Number of hapax'),
                       }
-
         keys = ['lang', 'encoding', 'originalpath', 'pathout', 'date', 'time']
-
         self.addkeys(keys, description)
-
-        self.m_staticText18 = wx.StaticText( self, wx.ID_ANY, u"Paramètres", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText18 = wx.StaticText( self, wx.ID_ANY, "Paramètres", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText18.Wrap( -1 )
         fgSizer5.Add( self.m_staticText18, 0, wx.ALL, 5 )
-
-        self.m_staticText19 = wx.StaticText( self, wx.ID_ANY, u"", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText19 = wx.StaticText( self, wx.ID_ANY, "", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText19.Wrap( -1 )
         fgSizer5.Add( self.m_staticText19, 0, wx.ALL, 5 )
-
         keys = ['ucemethod', 'ucesize', 'keep_caract', 'expressions']
         self.addkeys(keys, description)
-
-        self.m_staticText18 = wx.StaticText( self, wx.ID_ANY, u"Statistiques", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText18 = wx.StaticText( self, wx.ID_ANY, "Statistiques", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText18.Wrap( -1 )
         fgSizer5.Add( self.m_staticText18, 0, wx.ALL, 5 )
-
-        self.m_staticText19 = wx.StaticText( self, wx.ID_ANY, u"", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText19 = wx.StaticText( self, wx.ID_ANY, "", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText19.Wrap( -1 )
         fgSizer5.Add( self.m_staticText19, 0, wx.ALL, 5 )
-
         keys = ['ucinb', 'ucenb', 'occurrences', 'formesnb', 'hapax']
         self.addkeys(keys, description)
-
         self.SetSizer( fgSizer5 )
         self.Layout()
 
     def addkeys(self, keys, description) :
         for key in keys :
-            option = self.parametres.get(key,u'non défini')
+            option = self.parametres.get(key,'non défini')
             if isinstance(option, int) :
-                option = `option`
+                option = repr(option)
             text = wx.StaticText( self, wx.ID_ANY, description.get(key, key), wx.DefaultPosition, wx.DefaultSize, 0 )
             text.Wrap( -1 )
             self.fgSizer5.Add( text, 0, wx.ALL, 5 )
-
             text = wx.StaticText( self, wx.ID_ANY, option, wx.DefaultPosition, wx.DefaultSize, 0 )
             text.Wrap( -1 )
             self.fgSizer5.Add( text, 0, wx.ALL, 5 )
 
+
 class DefaultTextLayout :
+
     def __init__(self, ira, corpus, parametres, cmd = False) :
         self.pathout = PathOut(dirout = parametres['pathout'])
         self.ira = ira
@@ -1170,7 +1141,9 @@ class DefaultTextLayout :
     def dolayout(self, cmd) :
         log.info('no layout yet')
 
+
 class WordCloudLayout(DefaultTextLayout):
+
     def dolayout(self):
         self.pathout.basefiles(simipath)
         self.Tab = aui.AuiNotebook(self.ira.nb, -1, wx.DefaultPosition)
@@ -1186,24 +1159,27 @@ class WordCloudLayout(DefaultTextLayout):
         self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
         self.ira.ShowAPane("Tab_content")
 
+
 class LabbeLayout(DefaultTextLayout):
+
     def dolayout(self):
         self.Tab = aui.AuiNotebook(self.ira.nb, -1, wx.DefaultPosition)
         #if self.parametres['svg'] :
         #    list_graph = [['nuage_1.svg', 'Nuage']]
         #else :
         #    list_graph = [['nuage_1.png', 'Nuage']]
-        list_graph = [['labbe-tree.png', _(u'Ward clustering (method ward2)').decode('utf8')],
-                     ['labbe-heatmap.png', _(u'Heatmap').decode('utf8')],
-                     ['labbe-matrix.png', _(u'Matrix').decode('utf8')]]
+        list_graph = [['labbe-tree.png', _('Ward clustering (method ward2)')],
+                     ['labbe-heatmap.png', _('Heatmap')],
+                     ['labbe-matrix.png', _('Matrix')]]
         for val in list_graph :
             #self.TabStatTot = GraphPanel(self.ira.nb, self.pathout, [val])
             self.Tab.AddPage(GraphPanel(self.Tab, self.pathout, [val]), val[1])
         self.Tab.corpus = self.corpus
         self.Tab.parametres = self.parametres
-        self.ira.nb.AddPage(self.Tab, u'%s' % self.parametres['name'])
+        self.ira.nb.AddPage(self.Tab, '%s' % self.parametres['name'])
         self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
         self.ira.ShowAPane("Tab_content")
+
 
 def blender(self):
     nodesfile = self.pathout['nodes.csv']
@@ -1226,15 +1202,19 @@ def blender(self):
     }
     graph.to.file(graph.simi, nodesfile = nodesf, edgesfile = edgesf, community = community)
     """
+    # ecriture du fichier de script à éxécuter
     filetmp = tempfile.mktemp()
     with open(filetmp, 'w') as f :
         f.write(txt)
     exec_rcode(self.ira.RPath, filetmp)
     GraphToJson(nodesfile, edgesfile, jsonout)
-    launchcommand(['/home/pierre/prog/blender-2.73-linux-glibc211-x86_64/blender', '-P', os.path.join(self.ira.AppliPath, 'network_to_blender.py'), jsonout])
+    # une fonction à ré-activer ???
+    # pour le moment, j'ai mis le module network_to_blender de coté
+    # launchcommand(['/home/pierre/prog/blender-2.73-linux-glibc211-x86_64/blender', '-P', os.path.join(self.ira.AppliPath, 'network_to_blender.py'), jsonout])
 
 
 class SimiLayout(DefaultTextLayout) :
+
     def dolayout(self) :
         self.pathout.basefiles(simipath)
         self.actives = None
@@ -1254,70 +1234,69 @@ class SimiLayout(DefaultTextLayout) :
             self.graphpan.Bind(wx.EVT_BUTTON, self.redosimi, self.graphpan.butafc)
             self.graphpan.Bind(wx.EVT_BUTTON, self.export, self.graphpan.butexport)
             self.graphpan.Bind(wx.EVT_BUTTON, self.blender, self.graphpan.butblender)
-            self.tabsimi.AddPage(self.graphpan, 'Graph')
-            self.ira.nb.AddPage(self.tabsimi, _(u'Graph analysis').decode('utf8'))
+            self.tabsimi.AddPage(self.graphpan, _('Graph'))
+            self.ira.nb.AddPage(self.tabsimi, _('Graph analysis'))
             self.ira.ShowTab(True)
             self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
 
     def redosimi(self, evt) :
         redosimi(self, evt)
-#         with open(self.pathout['selected.csv'],'r') as f :
-#             selected = f.read()
-#         selected = [int(val) for val in selected.splitlines()]
-#         if self.actives is None :
-#             with codecs.open(self.pathout['actives.csv'], 'r', self.parametres['encoding']) as f :
-#                 self.actives = f.read()
-#             self.actives = self.actives.splitlines()#[act for act in self.actives.splitlines()]
-#         if os.path.exists(self.pathout['actives_nb.csv']) :
-#             with open(self.pathout['actives_nb.csv'], 'r') as f :
-#                 act_nb = f.read()
-#                 act_nb = act_nb.splitlines()
-#             dictcol = dict([[i, [self.actives[i], int(act_nb[i])]] for i, val in enumerate(self.actives)])
-#         else :
-#             dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
-#         #res = SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], selected = selected, dlg = True)
-#         #if res.ok :
-#         prep = PrepSimi(self.ira, self, self.parametres,self.pathout['selected.csv'], self.actives, indices_simi, wordlist = dictcol, selected = selected)
-#         if prep.val == wx.ID_OK :
-#             self.parametres = prep.parametres
-#
-#             script = PrintSimiScript(self)
-#             script.make_script()
-#             pid = exec_rcode(self.ira.RPath, script.scriptout, wait = True)
-#             check_Rresult(self.ira, pid)
-#             if self.parametres['type_graph'] in [1,3] :
-#                 if self.parametres['svg'] :
-#                     filename, ext = os.path.splitext(script.filename)
-#                     fileout = filename + '.svg'
-#                 elif self.parametres['type_graph'] == 3 :
-#                     fileout = script.filename
-#                     parametres = {'gexffile' :  fileout,
-#                                   'dirout' : os.path.dirname(fileout),
-#                                   'titre': 'Le titre',
-#                                   #'nodemin': self.param['txt_min'],
-#                                   #'nodemax': self.param['txt_max'],
-#                                   #'bargraphw' : 60*int(self.param['clnb']),
-#                     }
-#                     web = WebExport(self.ira, parametres)
-#                     fileout = web.exportsimi()
-#                 else :
-#                     fileout = script.filename
-#                 if os.path.exists(self.pathout['liste_graph']):
-#                     graph_simi = read_list_file(self.pathout['liste_graph'])
-#                     graph_simi.append([os.path.basename(fileout), script.txtgraph])
-#                 else :
-#                     graph_simi = [[os.path.basename(fileout), script.txtgraph]]
-#                 print_liste(self.pathout['liste_graph'], graph_simi)
-#             DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
-#             if self.parametres['type_graph'] in [1,3] :
-#                 if self.parametres['svg'] or self.parametres['type_graph'] == 3 :
-#                     self.graphpan.sizer_3.Add(hl.HyperLinkCtrl(self.graphpan.panel_1, -1, fileout, URL = fileout), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-#                 else :
-#                     self.graphpan.sizer_3.Add(wx.StaticBitmap(self.graphpan.panel_1, -1, wx.Bitmap(fileout, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-#                 self.graphpan.sizer_3.Add(wx.StaticText(self.graphpan.panel_1,-1, script.txtgraph), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
-#                 self.graphpan.sizer_3.Fit(self.graphpan.panel_1)
-#                 self.graphpan.Layout()
-#                 self.graphpan.panel_1.Scroll(0,self.graphpan.panel_1.GetScrollRange(wx.VERTICAL))
+   #      with open(self.pathout['selected.csv'],'r') as f :
+   #          selected = f.read()
+   #      selected = [int(val) for val in selected.splitlines()]
+   #      if self.actives is None :
+   #          with codecs.open(self.pathout['actives.csv'], 'r', self.parametres['encoding']) as f :
+   #              self.actives = f.read()
+   #          self.actives = self.actives.splitlines()#[act for act in self.actives.splitlines()]
+   #      if os.path.exists(self.pathout['actives_nb.csv']) :
+   #          with open(self.pathout['actives_nb.csv'], 'r') as f :
+   #              act_nb = f.read()
+   #              act_nb = act_nb.splitlines()
+   #          dictcol = dict([[i, [self.actives[i], int(act_nb[i])]] for i, val in enumerate(self.actives)])
+   #      else :
+   #          dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
+   #      #res = SelectColumn(self.ira, dictcol, self.actives, self.pathout['selected.csv'], selected = selected, dlg = True)
+   #      #if res.ok :
+   #      prep = PrepSimi(self.ira, self, self.parametres,self.pathout['selected.csv'], self.actives, indices_simi, wordlist = dictcol, selected = selected)
+   #      if prep.val == wx.ID_OK :
+   #          self.parametres = prep.parametres
+   #          script = PrintSimiScript(self)
+   #          script.make_script()
+   #          pid = exec_rcode(self.ira.RPath, script.scriptout, wait = True)
+   #          check_Rresult(self.ira, pid)
+   #          if self.parametres['type_graph'] in [1,3] :
+   #              if self.parametres['svg'] :
+   #                  filename, ext = os.path.splitext(script.filename)
+   #                  fileout = filename + '.svg'
+   #              elif self.parametres['type_graph'] == 3 :
+   #                  fileout = script.filename
+   #                  parametres = {'gexffile' :  fileout,
+   #                                'dirout' : os.path.dirname(fileout),
+   #                                'titre': 'Le titre',
+   #                                #'nodemin': self.param['txt_min'],
+   #                                #'nodemax': self.param['txt_max'],
+   #                                #'bargraphw' : 60*int(self.param['clnb']),
+   #                  }
+   #                  web = WebExport(self.ira, parametres)
+   #                  fileout = web.exportsimi()
+   #              else :
+   #                  fileout = script.filename
+   #              if os.path.exists(self.pathout['liste_graph']):
+   #                  graph_simi = read_list_file(self.pathout['liste_graph'])
+   #                  graph_simi.append([os.path.basename(fileout), script.txtgraph])
+   #              else :
+   #                  graph_simi = [[os.path.basename(fileout), script.txtgraph]]
+   #              print_liste(self.pathout['liste_graph'], graph_simi)
+   #          DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])
+   #          if self.parametres['type_graph'] in [1,3] :
+   #              if self.parametres['svg'] or self.parametres['type_graph'] == 3 :
+   #                  self.graphpan.sizer_3.Add(hl.HyperLinkCtrl(self.graphpan.panel_1, -1, fileout, URL = fileout), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+   #              else :
+   #                  self.graphpan.sizer_3.Add(wx.StaticBitmap(self.graphpan.panel_1, -1, wx.Bitmap(fileout, wx.BITMAP_TYPE_ANY)), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+   #              self.graphpan.sizer_3.Add(wx.StaticText(self.graphpan.panel_1,-1, script.txtgraph), 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
+   #              self.graphpan.sizer_3.Fit(self.graphpan.panel_1)
+   #              self.graphpan.Layout()
+   #              self.graphpan.panel_1.Scroll(0,self.graphpan.panel_1.GetScrollRange(wx.VERTICAL))
 
     def export(self, evt) :
         nb = 1
@@ -1348,7 +1327,7 @@ class SimiLayout(DefaultTextLayout) :
         with open(filetmp, 'w') as f :
             f.write(txt)
         exec_rcode(self.ira.RPath, filetmp)
-        mss = wx.MessageDialog(self.ira, fileout, _(u'File exported').decode('utf8'), wx.OK)
+        mss = wx.MessageDialog(self.ira, fileout, _('File exported'), wx.OK)
         mss.CenterOnParent()
         mss.ShowModal()
         mss.Destroy()
@@ -1358,6 +1337,7 @@ class SimiLayout(DefaultTextLayout) :
 
 
 class DefaultMatLayout :
+
     def __init__(self, parent, tableau, parametres) :
         self.pathout = PathOut(dirout = parametres['pathout'])
         self.ira = parent
@@ -1373,7 +1353,9 @@ class DefaultMatLayout :
     def dolayout(self) :
         pass
 
+
 class FreqLayout(DefaultMatLayout) :
+
     def dolayout(self) :
         self.tab = wx.html.HtmlWindow(self.ira.nb, -1)
         #self.tab = wx.html2.WebView.New(self)
@@ -1381,10 +1363,11 @@ class FreqLayout(DefaultMatLayout) :
         self.tab.LoadPage(res)
         #self.tab.LoadURL(res)
         self.tab.parametres = self.parametres
-        self.ira.nb.AddPage(self.tab, ' - '.join([_(u"Frequency").decode('utf8'), self.parametres['name']]))
+        self.ira.nb.AddPage(self.tab, ' - '.join([_("Frequency"), self.parametres['name']]))
 
 
 class Chi2Layout(DefaultMatLayout) :
+
     def dolayout(self):
         self.tab = wx.html.HtmlWindow(self.ira.nb, -1)
         if "gtk2" in wx.PlatformInfo:
@@ -1392,14 +1375,15 @@ class Chi2Layout(DefaultMatLayout) :
         res = normpath_win32(self.pathout['resultats-chi2.html']).replace('\\','/')
         self.tab.LoadPage(res)
         self.tab.parametres = self.parametres
-        self.ira.nb.AddPage(self.tab, ' - '.join([u"Chi2", self.parametres['name']]))
+        self.ira.nb.AddPage(self.tab, ' - '.join(["Chi2", self.parametres['name']]))
         #self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
         #self.ira.ShowAPane("Tab_content")
 
 
 class ProtoLayout(DefaultMatLayout) :
+
     def dolayout(self) :
-        list_graph = [['proto.png', _(u'Prototypical analysis').decode('utf8')]]
+        list_graph = [['proto.png', _('Prototypical analysis')]]
         #self.Tab = aui.AuiNotebook(self.ira.nb, -1, wx.DefaultPosition)
         #if self.parametres['svg'] :
         #    list_graph = [['nuage_1.svg', 'Nuage']]
@@ -1409,12 +1393,13 @@ class ProtoLayout(DefaultMatLayout) :
         #self.Tab.AddPage(self.TabProto, 'Analyse Prototypique')
         #self.Tab.corpus = self.corpus
         self.TabProto.parametres = self.parametres
-        self.ira.nb.AddPage(self.TabProto, ' - '.join([_(u'Prototypical analysis').decode('utf8'), self.parametres['name']]))
+        self.ira.nb.AddPage(self.TabProto, ' - '.join([_('Prototypical analysis'), self.parametres['name']]))
         #self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
         #self.ira.ShowAPane("Tab_content")
 
 
 class SimiMatLayout(DefaultMatLayout) :
+
     def dolayout(self):
         self.pathout.basefiles(simipath)
         self.indices = indices_simi
@@ -1430,9 +1415,9 @@ class SimiMatLayout(DefaultMatLayout) :
         self.graphpan.Bind(wx.EVT_BUTTON, self.redosimi, self.graphpan.butafc)
         self.graphpan.Bind(wx.EVT_BUTTON, self.export, self.graphpan.butexport)
         self.graphpan.Bind(wx.EVT_BUTTON, self.blender, self.graphpan.butblender)
-        self.tabsimi.AddPage(self.graphpan, 'Graph')
+        self.tabsimi.AddPage(self.graphpan, _('Graph'))
         self.tabsimi.parametres = self.parametres
-        self.parent.nb.AddPage(self.tabsimi, ' - '.join([_(u'Graph analysis').decode('utf8'), self.parametres['name']]))
+        self.parent.nb.AddPage(self.tabsimi, ' - '.join([_('Graph analysis'), self.parametres['name']]))
         #self.parent.ShowTab(True)
         #self.parent.nb.SetSelection(self.parent.nb.GetPageCount() - 1)
 
@@ -1448,7 +1433,6 @@ class SimiMatLayout(DefaultMatLayout) :
             actives = [[val, self.tableau.actives[val][0]] for val in self.tableau.actives]
         except :
             actives = [[val, self.tableau.actives[val]] for val in self.tableau.actives]
-
         #self.tableau.make_listactives()
         actives = dict([[i, val] for i, val in enumerate(actives)])
         #dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
@@ -1466,7 +1450,7 @@ class SimiMatLayout(DefaultMatLayout) :
             self.column = [self.tableau.listactives.index(val) for val in indexes]
             self.column.sort()
             with open(self.pathout['selected.csv'], 'w') as f :
-                f.write('\n'.join([`val` for val in self.column]))
+                f.write('\n'.join([repr(val) for val in self.column]))
             self.make_param()
             self.dial.Destroy()
             self.script = PrintSimiScript(self)
@@ -1501,14 +1485,12 @@ class SimiMatLayout(DefaultMatLayout) :
         else :
             self.dial.Destroy()
 
-
     def make_param(self) :
         if self.parametres['first'] :
             keep_coord = False
         else :
             keep_coord = self.dial.check_coord.GetValue()
         #self.select = self.dial.check_colch.GetValue()
-
         paramsimi = {'coeff' : self.dial.choice1.GetSelection(),
                           'layout' : self.dial.choice2.GetSelection(),
                           'type_graph' : self.dial.choice3.GetSelection(),
@@ -1564,7 +1546,7 @@ class SimiMatLayout(DefaultMatLayout) :
         pid = exec_rcode(self.parent.RPath, self.tmpfile, wait = wait, graph = graph)
         if self.parametres['type_graph'] == 1 :
             while pid.poll() == None :
-                dlg.Pulse(u'R ...')
+                dlg.Pulse('R ...')
                 sleep(0.2)
             check_Rresult(self.parent, pid)
 
@@ -1598,7 +1580,7 @@ class SimiMatLayout(DefaultMatLayout) :
         with open(filetmp, 'w') as f :
             f.write(txt)
         exec_rcode(self.ira.RPath, filetmp)
-        mss = wx.MessageDialog(self.ira, fileout, _(u'File exported').decode('utf8'), wx.OK)
+        mss = wx.MessageDialog(self.ira, fileout, _('File exported'), wx.OK)
         mss.CenterOnParent()
         mss.ShowModal()
         mss.Destroy()
@@ -1608,13 +1590,14 @@ class SimiMatLayout(DefaultMatLayout) :
 
 
 class GraphPanelSimi(wx.Panel):
+
     def __init__(self,parent, dico, list_graph):
         wx.Panel.__init__(self,parent)
         self.afcnb = 1
         self.Dict = dico
         self.dirout = os.path.dirname(self.Dict['ira'])
-        self.parent = self.GetParent()#parent
-        self.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, 0, "courier"))
+        self.parent = self.GetParent()
+        self.SetFont(wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "courier")) #modifié
         self.labels = []
         self.listimg = []
         self.tabsimi = self.parent.GetParent()

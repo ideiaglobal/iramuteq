@@ -1,27 +1,39 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
-#from __future__ import division
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
-import wx
-from chemins import ffr, FFF
 import tempfile
 from time import sleep
+from operator import itemgetter
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+from chemins import ffr, FFF
 from analysematrix import AnalyseMatrix
 from functions import exec_rcode, check_Rresult
 from dialog import FreqDialog
 from PrintRScript import PrintRScript, FreqMultiScript
-from operator import itemgetter
+
 
 class Frequences(AnalyseMatrix) :
+
     def doparametres(self, dlg=None) :
         if dlg is None :
             return
         else :
-            dial = FreqDialog(self.parent, self.tableau.get_colnames(), u"Fréquences")
+            dial = FreqDialog(self.parent, self.tableau.get_colnames(), "Fréquences")
             dial.CenterOnParent()
             val = dial.ShowModal()
             if val == wx.ID_OK :
@@ -31,7 +43,7 @@ class Frequences(AnalyseMatrix) :
             else :
                 self.parametres = None
             dial.Destroy()
-                
+
     def doanalyse(self):
         self.pathout.createdir(self.parametres['pathout'])
         header = self.tableau.get_colnames()
@@ -56,7 +68,6 @@ class Frequences(AnalyseMatrix) :
         titles <- %s
         compteur <- 1
         """ % (sel, listfiles, titles)
-        
         if self.parametres['NA'] :
             txt += """
             countNA <- TRUE
@@ -65,7 +76,6 @@ class Frequences(AnalyseMatrix) :
             txt += """
             countNA <- FALSE
             """
-        
         txt += """
         for (i in select) {
             if (countNA) {
@@ -110,7 +120,7 @@ class Frequences(AnalyseMatrix) :
         self.Rscript.write()
         self.doR(self.Rscript.scriptout)
         self.dolayout()
-        
+
     def dolayout(self):
         listtab = []
         tab = []
@@ -120,20 +130,20 @@ class Frequences(AnalyseMatrix) :
         content.pop(0)
         content = ['\t'.join(line.split('\t')[1:]).replace('"','') for line in content]
         content = '\n'.join(content)
-        content = content.split(u'***\t****\t****')
+        content = content.split('***\t****\t****')
         content = [[line.split('\t') for line in tab.splitlines() if line.split('\t') != ['']] for tab in content]
         listtab = [tab for tab in content if tab != []]
         texte = ''
         #for ligne in content:
         #    ligne = ligne.replace('"', '')
         #    ligne = ligne.split('\t')
-        #    if ligne[1] == u'***' :
+        #    if ligne[1] == '***' :
         #        if tab != []:
         #            listtab.append(tab)
         #        tab = []
         #    else :
         #        tab.append(ligne)
-        pretexte = u'''<html>
+        pretexte = '''<html>
         <meta http-equiv="content-Type" content="text/html; charset=%s" />
         <body>\n<h1>Fréquences</h1>
         <a name="deb"></a><br>
@@ -161,15 +171,17 @@ class Frequences(AnalyseMatrix) :
             f.write(pretexte + texte)
         #return fileout
 
+
 class FreqMultiple(Frequences): 
+
     def doanalyse(self):
         select = self.parametres['colsel']
         freq = self.tableau.countmultiple(select)
         tot = sum([freq[forme][0] for forme in freq])
-        freq = [[forme, freq[forme][0], `round((float(freq[forme][0])/tot)*100, 2)`,`len(list(set(freq[forme][1])))`, `round((float(len(list(set(freq[forme][1]))))/self.tableau.rownb)*100,2)`] for forme in freq]
+        freq = [[forme, freq[forme][0], repr(round((float(freq[forme][0])/tot)*100, 2)),repr(len(list(set(freq[forme][1])))), repr(round((float(len(list(set(freq[forme][1]))))/self.tableau.rownb)*100,2))] for forme in freq]
         freq = sorted(freq, key=itemgetter(1), reverse=True)
-        freq = [[line[0], `line[1]`, line[2], line[3], line[4]] for line in freq]
-        freq.insert(0, [u'mod', 'freq', 'percent of total', 'row number', 'percent of rows'])
+        freq = [[line[0], repr(line[1]), line[2], line[3], line[4]] for line in freq]
+        freq.insert(0, ['mod', 'freq', 'percent of total', 'row number', 'percent of rows'])
         self.freq = freq
         with open(self.pathout['frequences.csv'], 'w') as f :
             f.write('\n'.join(['\t'.join(line) for line in freq]))
@@ -177,9 +189,9 @@ class FreqMultiple(Frequences):
         self.rscript.make_script()
         self.doR(self.rscript.scriptout)
         self.dolayout()
-    
+
     def dolayout(self):
-        pretexte = u'''<html>
+        pretexte = '''<html>
         <meta http-equiv="content-Type" content="text/html; charset=%s" />
         <body>\n<h1>Fréquences</h1>
         <a name="deb"></a><br>
@@ -193,11 +205,3 @@ class FreqMultiple(Frequences):
         txt += "</body>\n</html>"
         with open(self.pathout['resultats.html'], 'w') as f :
             f.write(pretexte + txt)
-        
-        
-        
-        
-        
-        
-        
-        

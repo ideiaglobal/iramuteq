@@ -1,13 +1,17 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
 import os
 import sys
 import tempfile
 import logging
+
 
 log = logging.getLogger('iramuteq.chemins')
 
@@ -39,10 +43,10 @@ class PathOut :
     def mkdirout(self) :
         dirout = os.path.join(self.dirout, self.filename + '_' + self.analyse + '_')
         nb = 1
-        tdirout = dirout + `nb`
+        tdirout = dirout + repr(nb)
         while os.path.exists(tdirout) :
             nb += 1
-            tdirout = dirout + `nb`
+            tdirout = dirout + repr(nb)
         self.name = os.path.splitext(tdirout)[1]
         return tdirout
 
@@ -77,10 +81,9 @@ class PathOut :
     def getF(self, key) :
         return self.__getitem__(key).replace('\\', '/')
 
-
 def ffr(filename):
     return filename.replace('\\', '\\\\')
-    
+
 def FFF(filename):
     return filename.replace('\\', '/')
 
@@ -238,7 +241,7 @@ ChdTxtPathOut = {'TableUc1': 'TableUc1.csv',
         'rapport':  'RAPPORT.txt',
         'pre_rapport' : 'info.txt',
         'uce':  'uce.csv',
-        'Rchdtxt': ffr(tempfile.mkstemp(prefix='iramuteq')[1]),
+        'Rchdtxt': tempfile.mkstemp(prefix='iramuteq')[1].replace('\\', '\\\\'),
         'arbre1':  'arbre_1.png',
         'arbre2':  'arbre_2.png',
         'dendro1':  'dendro1.png',
@@ -262,13 +265,13 @@ ChdTxtPathOut = {'TableUc1': 'TableUc1.csv',
         'AFC2DCoulSup':  'AFC2DCoulSup.png',
         'AFC2DCoulEt':  'AFC2DCoulEt.png',
         'AFC2DCoulCl':  'AFC2DCoulCl.png',
-        'Rafc3d': ffr(tempfile.mkstemp(prefix='iramuteq')[1]),
-        'R3DCoul': ffr(tempfile.mkstemp(prefix='iramuteq')[1]),
+        'Rafc3d': tempfile.mkstemp(prefix='iramuteq')[1].replace('\\', '\\\\'),
+        'R3DCoul': tempfile.mkstemp(prefix='iramuteq')[1].replace('\\', '\\\\'),
         'RESULT_CHD':  'resultats-chd.html',
         'RESULT_AFC':  'resultats-afc.html',
         'Et01':  'Et01.csv',
-        'Rchdquest':ffr(tempfile.mkstemp(prefix='iramuteq')[1]),
-        'RTxtProfGraph':ffr(tempfile.mkstemp(prefix='iramuteq')[1]),
+        'Rchdquest':tempfile.mkstemp(prefix='iramuteq')[1].replace('\\', '\\\\'),
+        'RTxtProfGraph':tempfile.mkstemp(prefix='iramuteq')[1].replace('\\', '\\\\'),
         'typelist': 'typelist.csv',
         'concord':'concordancier.csv',
         'bduceforme':'bduceforme.csv',
@@ -316,6 +319,7 @@ def StatTxtPathOut(pathout):
     }
     return d
 
+# ???
 #def construct_simipath(pathout):
 #    d = {'mat01' : 'mat01.csv',
 #          'matsimi' : 'matsimi.csv',

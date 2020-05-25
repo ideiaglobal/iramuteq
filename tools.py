@@ -1,29 +1,41 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2013, Pierre Ratinaud
-#License: GNU GPL
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
+#License: GNU/GPL
 
+#------------------------------------
+# import des modules python
+#------------------------------------
 import codecs
 import os
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+import wx
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from dialog import ExtractDialog
 from corpus import Corpus, copycorpus
-import wx
 
 
 parametres = {'filein' : 'corpus/lru2.txt',
               'encodein' : 'utf8',
               'encodeout' : 'utf8',
-              'mods' : [u'*annee_2010', u'*annee_2011']}
+              'mods' : ['*annee_2010', '*annee_2011']}
+
 
 def istext(line) :
-    if line.startswith(u'**** ') :
+    if line.startswith('**** ') :
         return True
     else :
         return False
 
 def isthem(line):
-    if line.startswith(u'-*') :
+    if line.startswith('-*') :
         return True
     else :
         return False
@@ -33,7 +45,7 @@ def testvar(line, variable) :
     varmod = [val.split('_') for val in line[1:]]
     vars = [var[0] for var in varmod]
     if variable in vars :
-        return '_'.join([variable, varmod[vars.index(variable)][1]]).replace(u'*','')
+        return '_'.join([variable, varmod[vars.index(variable)][1]]).replace('*','')
     else :
         return False
 
@@ -41,11 +53,12 @@ def testmod(line, mods) :
     line = line.split()
     for mod in mods :
         if mod in line[1:] :
-            return mod.replace(u'*','')
+            return mod.replace('*','')
     return False
 
 
 class Extract :
+
     def __init__(self, parent, option) :
         dial = ExtractDialog(parent, option)
         dial.CenterOnParent()
@@ -65,7 +78,9 @@ class Extract :
         else :
             dial.Destroy()
 
+
 class SplitFromVar :
+
     def __init__(self, parametres) :
         self.filein = parametres['filein']
         self.var = parametres['var']
@@ -90,22 +105,24 @@ class SplitFromVar :
                     else : 
                         keepline = False
                 if keepline :
-                    fileout.write(line.encode(self.encodeout))
+                    fileout.write(line)
         for f in filedict :
             filedict[f].close()
 
+
 class SplitFromThem :
+
     def __init__(self, parametres) :
         self.filein = parametres['filein']
         self.them = parametres['them']
         self.encodein = parametres['encodein']
         self.encodeout = parametres['encodeout']
         self.basepath = os.path.dirname(self.filein)
-        self.pathout = os.path.join(self.basepath, '_'.join([them.replace(u'-*','') for them in self.them]))
+        self.pathout = os.path.join(self.basepath, '_'.join([them.replace('-*','') for them in self.them]))
         self.fileout = open(self.pathout, 'w')
         self.doparse()
         self.fileout.close()
-    
+
     def doparse(self):
         text = ''
         keepline = False
@@ -125,13 +142,14 @@ class SplitFromThem :
                 if keepline :
                     text += line
             self.writetext(self.fileout, lastet, text)
-    
+
     def writetext(self, fileout, lastet, text):
         if text != '' :
-            self.fileout.write(lastet.encode(self.encodeout) + text.encode(self.encodeout))
-            
+            self.fileout.write(lastet + text)
+
 
 class ExtractMods :
+
     def __init__(self, parametres) :
         self.onefile = parametres.get('onefile', False)
         self.filein = parametres['filein']
@@ -140,7 +158,7 @@ class ExtractMods :
         self.encodeout = parametres['encodeout']
         self.basepath = os.path.dirname(self.filein)
         if self.onefile :
-            filename = os.path.join(self.basepath, '_'.join([mod.replace(u'*','') for mod in self.mods])+'.txt')
+            filename = os.path.join(self.basepath, '_'.join([mod.replace('*','') for mod in self.mods])+'.txt')
             self.fileout = open(filename, 'w')
         self.doparse()
 
@@ -163,7 +181,7 @@ class ExtractMods :
                     else : 
                         keepline = False
                 if keepline :
-                    fileout.write(line.encode(self.encodeout))
+                    fileout.write(line)
         if not self.onefile :
             for f in filedict :
                 filedict[f].close()
@@ -172,6 +190,7 @@ class ExtractMods :
 
 
 class SubCorpus(Corpus) :
+
     def __init__(self, parent, corpus, sgts) :
         Corpus.__init__(self, parent, corpus.parametres)
         self.sgts = sgts
@@ -189,7 +208,7 @@ class SubCorpus(Corpus) :
         self.formes = {}
         for forme in self.corpus.formes :
             sgtseff = self.corpus.getformeuceseff(forme)
-            sgts = set(self.sgts).intersection(sgtseff.keys())
+            sgts = set(self.sgts).intersection(list(sgtseff.keys()))
             if len(sgts) :
                 self.formes[forme] = self.corpus.formes[forme]
                 self.formes[forme].freq = sum([sgtseff[sgt] for sgt in sgts])
@@ -197,20 +216,19 @@ class SubCorpus(Corpus) :
     def getlemuces(self, lem) :
         return list(set(self.sgts).intersection(self.corpus.getlemuces(lem)))
 
+
 def converttabletocorpus(table, fileout, enc='UTF8') :
     var = table.pop(0)
     var = var[0:len(var)-1]
-    print var
-    et = [zip(var, line[0:len(line)-1]) for line in table]
+    print(var)
+    et = [list(zip(var, line[0:len(line)-1])) for line in table]
     et = ['**** ' + ' '.join(['*' + '_'.join(val) for val in line]) for line in et] 
     txt = ['\n'.join([et[i], line[-1]]) for i, line in enumerate(table)]
-    print '\n'.join(txt)
+    print('\n'.join(txt))
     #with open(fileout, 'w') as f :
-        
 
 
-
-
+# execution directe ???
 if __name__ == '__main__' :
     #SplitFromVar(parametres)
     ExtractMods(parametres, True)

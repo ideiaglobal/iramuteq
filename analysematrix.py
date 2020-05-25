@@ -1,17 +1,26 @@
-#!/bin/env python
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2013 Pierre Ratinaud
-#License: GNU GPL
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
+#License: GNU/GPL
 
-
-
+#------------------------------------
+# import des modules python
+#------------------------------------
 import logging
 import os
 from uuid import uuid4
+from time import time, sleep
+
+#------------------------------------
+# import des modules wx
+#------------------------------------
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
 from chemins import PathOut
 from functions import exec_rcode, check_Rresult, DoConf, progressbar
-from time import time, sleep
 from openanalyse import OpenAnalyse
 
 
@@ -72,10 +81,10 @@ class AnalyseMatrix :
  
     def doanalyse(self) :
         pass
-    
+
     def doparametres(self, dlg = None):
         pass
-    
+
     def doR(self, Rscript, wait = False, dlg = None, message = '') :
         #log.info('R code...')
         pid = exec_rcode(self.ira.RPath, Rscript, wait = wait)
@@ -86,4 +95,3 @@ class AnalyseMatrix :
             else :
                 sleep(0.2)
         return check_Rresult(self.ira, pid)
-    

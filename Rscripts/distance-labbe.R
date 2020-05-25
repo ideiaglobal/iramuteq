@@ -1,5 +1,5 @@
 #Author: Pierre Ratinaud
-#Copyright (c) 2015-2016 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
 #License: GNU/GPL
 
 #Distance de Labbe

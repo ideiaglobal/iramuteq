@@ -1,8 +1,19 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2010 Pierre Ratinaud
+#Copyright (c) 2008-2020 Pierre Ratinaud
+#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
 #License: GNU/GPL
 
+"""
+Removes HTML or XML character references and entities from a text string.
+
+@param text The HTML (or XML) source text.
+@return The plain text, as a Unicode string, if necessary.
+"""
+
+#------------------------------------
+# import des modules python
+#------------------------------------
 import codecs
 import sys
 import xlrd
@@ -10,38 +21,38 @@ import ooolib
 import os
 from copy import copy
 import re
-import htmlentitydefs
+import html.entities
 import shelve
-from functions import DoConf
 from uuid import uuid4
-from chemins import PathOut
 import logging
+
+#------------------------------------
+# import des fichiers du projet
+#------------------------------------
+from functions import DoConf
+from chemins import PathOut
+
 
 log = logging.getLogger('iramuteq.tableau')
 
-##
-# Removes HTML or XML character references and entities from a text string.
-#
-# @param text The HTML (or XML) source text.
-# @return The plain text, as a Unicode string, if necessary.
 
 def unescape(text):
     def fixup(m):
         #apos is not in the dictionnary
-        htmlentitydefs.name2codepoint['apos'] = ord("'")
+        html.entities.name2codepoint['apos'] = ord("'")
         text = m.group(0)
         if text[:2] == "&#":
             # character reference
             try:
                 if text[:3] == "&#x":
-                    return unichr(int(text[3:-1], 16))
+                    return chr(int(text[3:-1], 16))
                 else:
-                    return unichr(int(text[2:-1]))
+                    return chr(int(text[2:-1]))
             except ValueError:
                 pass
         else:
             try:
-                text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
+                text = chr(html.entities.name2codepoint[text[1:-1]])
             except KeyError:
                 pass
         return text # leave as is
@@ -67,7 +78,9 @@ def copymatrix(tableau):
         copymat.open()
     return copymat
 
+
 class Tableau() :
+
     def __init__(self, parent, filename = '', filetype = 'csv', encodage = 'utf-8', parametres = None) :
         self.parent = parent
         if parametres is None :
@@ -124,9 +137,9 @@ class Tableau() :
         if 'content' in d :
             self.content = d['content']
         d.close()
-    
+
     def open(self):
-        print 'open matrix'
+        print('open matrix')
         self.read_csvfile()
         self.colnames = self.csvtable[0][1:]
         self.rownb = len(self.linecontent)
@@ -160,10 +173,10 @@ class Tableau() :
             self.read_ods()
         self.parametres['csvfile'] = os.path.join(self.parametres['pathout'], 'csvfile.csv')
         self.make_tmpfile()
-        print self.parametres
+        print(self.parametres)
         DoConf().makeoptions(['matrix'],[self.parametres], self.parametres['ira'])
         self.parent.history.addMatrix(self.parametres)
-    
+
     def make_content_simple(self):
         self.parametres['csvfile'] = os.path.join(self.parametres['pathout'], 'csvfile.csv')
         self.make_tmpfile()
@@ -176,7 +189,7 @@ class Tableau() :
         #datafile = xlrd.open_workbook(self.parametre['filename'], encoding_override="azerazerazer")
         datafile = xlrd.open_workbook(self.parametres['originalpath'])
         datatable = datafile.sheet_by_index(self.parametres['sheetnb']-1)
-        self.linecontent = [[str(datatable.cell_value(rowx = i, colx = j)).replace(u'"','').replace(u';',' ').replace(u'\n',' ').replace('\r', ' ').replace('\t', ' ').strip() for j in range(datatable.ncols)] for i in range(datatable.nrows)]
+        self.linecontent = [[str(datatable.cell_value(rowx = i, colx = j)).replace('"','').replace(';',' ').replace('\n',' ').replace('\r', ' ').replace('\t', ' ').strip() for j in range(datatable.ncols)] for i in range(datatable.nrows)]
 
     def read_ods(self) :
         doc = ooolib.Calc(opendoc=self.parametres['originalpath'])
@@ -187,7 +200,7 @@ class Tableau() :
             for col in range(1, cols + 1):
                 data = doc.get_cell_value(col, row)
                 if data is not None :
-                    ligne.append(unescape(data[1].replace(u'"','').replace(u';',' ').replace(u'\n', ' ').replace('\t', ' ').strip()))
+                    ligne.append(unescape(data[1].replace('"','').replace(';',' ').replace('\n', ' ').replace('\t', ' ').strip()))
                 else :
                     ligne.append('')
             self.linecontent.append(ligne)
@@ -196,7 +209,7 @@ class Tableau() :
         with codecs.open(self.parametres['originalpath'], 'r', self.parametres['encodage']) as f :
             content = f.read() 
         self.linecontent = [line.split(self.parametres['colsep']) for line in content.splitlines()]
-        self.linecontent = [[val.replace(u'"','').replace(u';',' ').replace('\t', ' ').strip() for val in line] for line in self.linecontent]
+        self.linecontent = [[val.replace('"','').replace(';',' ').replace('\t', ' ').strip() for val in line] for line in self.linecontent]
 
     def write_csvfile(self) :
         with open(self.parametres['csvfile'], 'w') as f :
@@ -210,7 +223,7 @@ class Tableau() :
             self.linecontent.pop(0)
             self.rownb -= 1
         else :
-            self.colnames = ['_'.join([u'colonne', `i`]) for i in range(self.colnb)]
+            self.colnames = ['_'.join(['colonne', repr(i)]) for i in range(self.colnb)]
         if self.firstcolisrownames :
             self.rownames = [row[0] for row in self.linecontent]
             self.linecontent = [row[1:] for row in self.linecontent]
@@ -219,8 +232,8 @@ class Tableau() :
             self.colnames.pop(0)
             self.check_rownames()
         else :
-            self.rownames = [`i` for i in range(self.rownb)]
-            self.idname = u'identifiant'
+            self.rownames = [repr(i) for i in range(self.rownb)]
+            self.idname = 'identifiant'
         self.csvtable = [[self.idname] + self.colnames] + [[self.rownames[i]] + self.linecontent[i] for i in range(len(self.rownames))] 
         self.write_csvfile()
 
@@ -229,7 +242,7 @@ class Tableau() :
             self.csvtable = [line.split('\t') for line in f.read().splitlines()]
         self.linecontent = [line[1:] for line in self.csvtable]
         self.linecontent.pop(0)
-        
+
     def extractfrommod(self, col, val):
         return ([''] + self.colnames) + [line for line in self.csvtable[1:] if line[col + 1] == val]
 
@@ -247,10 +260,10 @@ class Tableau() :
 
     def check_rownames(self) :
         if len(self.rownames) == len(list(set(self.rownames))) :
-            print u'row names ok'
+            print('row names ok')
         else :
-            print u'les noms de lignes ne sont pas uniques, ils sont remplaces'
-            self.rownames = [`i` for i in range(self.rownb)]
+            print('les noms de lignes ne sont pas uniques, ils sont remplaces')
+            self.rownames = [repr(i) for i in range(self.rownb)]
 
     def make_unique_list(self) :
         return list(set([val for line in self.linecontent for val in line if val.strip() != '']))
@@ -262,12 +275,12 @@ class Tableau() :
                 if forme.strip() != '' :
                     UpdateDico(dico, forme, i)
         return dico
-    
+
     def select_col(self, listcol) :
-        dc = dict(zip(listcol, listcol))
+        dc = dict(list(zip(listcol, listcol)))
         selcol = [[val for i, val in enumerate(row) if i in dc] for row in self.linecontent]
         return selcol
-    
+
     def countmultiple(self, liscol):
         return self.make_dico(self.select_col(liscol))
 
@@ -278,7 +291,7 @@ class Tableau() :
 
     def make_listactives(self) :
         self.listactives = [val for val in self.actives if val != 'NA' and self.actives[val] >= self.parametres['mineff']]
-    
+
     def write01(self, fileout, dico, linecontent) :
         if self.listactives is None :
             self.listactives = [val for val in dico if val != 'NA' and dico[val] >= self.parametres['mineff']]
@@ -304,7 +317,7 @@ class Tableau() :
         for i, ligne in enumerate(self.linecontent) :
             for forme in ligne:
                 if len(forme) >= 1:
-                    if forme[0] == u'*':
+                    if forme[0] == '*':
                         UpdateDico(self.sups, forme, i)
                     else:
                         UpdateDico(self.actives, forme, i)        
@@ -323,9 +336,9 @@ class Tableau() :
     def printtable(self, filename, Table, sep = ';'):
         with open(filename, 'w') as f :
             f.write('\n'.join([sep.join(line) for line in Table]))
-    
+
     def buildprofil(self) :
-        with open(self.pathout['uce'], 'rU') as filein :
+        with open(self.pathout['uce'], 'r') as filein :
             content = filein.readlines()
         content.pop(0)
         lsucecl = []
@@ -341,7 +354,6 @@ class Tableau() :
             self.clnb = len(dicocl) - 1
         else:
             self.clnb = len(dicocl)
-
         tablecont = []
         for active in self.listactives :
             line = [active]
@@ -353,8 +365,7 @@ class Tableau() :
                         if active in self.linecontent[uce]:
                             line[i + 1] += 1
             if sum(line[1:]) > self.parametres['mineff']:
-                tablecont.append([line[0]] + [`don` for don in line if type(don) == type(1)])
-        
+                tablecont.append([line[0]] + [repr(don) for don in line if type(don) == type(1)])
         tablecontet = []
         for sup in self.sups :
             line = [sup]
@@ -365,7 +376,7 @@ class Tableau() :
                     if cl == i + 1 :
                         if sup in self.linecontent[uce]:
                             line[i + 1] += 1
-            tablecontet.append([line[0]] + [`don` for don in line if type(don) == type(1)])
+            tablecontet.append([line[0]] + [repr(don) for don in line if type(don) == type(1)])
             
         self.printtable(self.pathout['ContEtOut'], tablecontet)
         self.printtable(self.pathout['Contout'], tablecont)        
@@ -382,15 +393,3 @@ class Tableau() :
                     out[j][i] = '1'
         out.insert(0,[act for act in la])
         return out
-        
-        
-
-#filename = 'corpus/cent3.csv'
-#filename = 'corpus/agir2sortie.csv'
-#tab = Tableau('',filename, encodage='utf-8')
-#tab.parametre['csvfile'] = tab.parametre['filename']
-#tab.parametre['sep'] = '\t'
-#tab.firstrowiscolnames = True
-#tab.firstcolisrownames = False
-#tab.read_data()
-#tab.make_01('corpus/matrice01.csv')
