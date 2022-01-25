@@ -64,7 +64,7 @@ def UpdateDico(Dico, word, line):
         Dico[word][1].append(line)
     else:
         Dico[word] = [1, [line]]
-        
+
 def copymatrix(tableau):
     log.info('copy matrix')
     copymat = Tableau(tableau.parent, parametres = tableau.parametres)
@@ -290,11 +290,12 @@ class Tableau() :
         return [[val, self.actives[val][0]] for val in self.actives]       
 
     def make_listactives(self) :
-        self.listactives = [val for val in self.actives if val != 'NA' and self.actives[val] >= self.parametres['mineff']]
+        print(self.actives, self.parametres['mineff'])
+        self.listactives = [val for val in self.actives if val != 'NA' and self.actives[val][0] >= self.parametres['mineff']]
 
     def write01(self, fileout, dico, linecontent) :
         if self.listactives is None :
-            self.listactives = [val for val in dico if val != 'NA' and dico[val] >= self.parametres['mineff']]
+            self.listactives = [val for val in dico if val != 'NA' and dico[val][0] >= self.parametres['mineff']]
         out = [['0' for forme in self.listactives] for line in linecontent]
         for i, forme in enumerate(self.listactives) :
             for line in dico[forme][1] :
