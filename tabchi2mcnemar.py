@@ -143,13 +143,13 @@ class McNemar(AnalyseMatrix):
         cont<-1
         """%(ffr(self.tableau.parametres['csvfile']), self.tableau.parametres['syscoding'])
         if len(self.colsel1)==1:
-            strsel1=str(self.colsel1).replace(',','')
+            strsel1=str(tuple(self.colsel1)).replace(',','')
         else:
-            strsel1=str(self.colsel1)
+            strsel1=str(tuple(self.colsel1))
         if len(self.colsel2)==1:
-            strsel2=str(self.colsel2).replace(',','')
+            strsel2=str(tuple(self.colsel2)).replace(',','')
         else:
-            strsel2=str(self.colsel2)
+            strsel2=str(tuple(self.colsel2))
         txt+="""
         for (i in c%s) {""" % strsel1
         txt+="""
