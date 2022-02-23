@@ -120,7 +120,7 @@ def CheckRPath(PathPath):
         return False
     else :
         return True
-        
+
 def FindRPAthWin32():
     BestPath=False
     progpaths=[]
@@ -160,7 +160,7 @@ def RLibsAreInstalled(self) :
         return True
 
 def CheckRPackages(self):
-    listdep = ['ca', 'rgl', 'gee', 'ape', 'igraph','proxy', 'wordcloud', 'irlba', 'textometry']
+    listdep = ['ca', 'gee', 'ape', 'igraph','proxy', 'wordcloud', 'irlba', 'textometry', 'sna', 'network', 'intergraph', 'rgl']
     nolib = []
     i=0
     dlg = wx.ProgressDialog("Test des librairies de R", "test en cours...", maximum = len(listdep), parent=self, style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT)
@@ -186,12 +186,12 @@ def CheckRPackages(self):
 %s
 
 Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
-    
+
 - Vous pouvez installer ces bibliothèques manuellement :
         Cliquez sur Annuler
         Lancez R
         Tapez install.packages('nom de la bibiothèque')
-        
+
 - ou laisser IRamuteq les installer automatiquement en cliquant sur VALIDER .
         Les bibliothèques seront téléchargées depuis le site miroir de R %s.
         """ % (txt, self.pref.get('iramuteq','rmirror'))
@@ -206,7 +206,7 @@ Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
                                        style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT
                                        )
             dlg.Center()
-            dlg.Update(1, "installation...") 
+            dlg.Update(1, "installation...")
             compt = 0
 
             for bib in nolib :
@@ -215,7 +215,7 @@ Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
                 txt = """
                 userdir <- unlist(strsplit(Sys.getenv("R_LIBS_USER"), .Platform$path.sep))[1]
                 if (!file.exists(userdir)) {
-                    if (!dir.create(userdir, recursive = TRUE)) 
+                    if (!dir.create(userdir, recursive = TRUE))
                         print('pas possible')
                     lib <- userdir
                     .libPaths(c(userdir, .libPaths()))
@@ -236,7 +236,7 @@ Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
             dlg.Update(len(nolib) + 1, 'fin')
             dlg.Destroy()
         dial.Destroy()
-    if nolib == [] : 
+    if nolib == [] :
         self.pref.set('iramuteq', 'rlibs', True)
         with open(self.ConfigPath['preferences'], 'w') as f :
             self.pref.write(f)
