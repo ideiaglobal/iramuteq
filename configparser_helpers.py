@@ -5,7 +5,7 @@
 #------------------------------------
 # import des modules python
 #------------------------------------
-from collections import MutableMapping
+from collections.abc import MutableMapping
 
 
 try:

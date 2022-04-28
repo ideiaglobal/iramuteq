@@ -125,7 +125,7 @@ ConfigParser -- responsible for parsing a list of
 #------------------------------------
 # import des modules python
 #------------------------------------
-from collections import MutableMapping
+from collections.abc import MutableMapping
 import io
 import itertools
 import re
