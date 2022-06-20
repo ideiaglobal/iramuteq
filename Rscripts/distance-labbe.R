@@ -29,7 +29,7 @@ compute.labbe <- function(x, y, tab) {
         U <- N1/N2
         mini.tab[,2] <- mini.tab[,2] * U
 		col.plusgrand <- mini.tab[,2]
-		cs.plus.grand <- sum(col.plusgrand[col.plusgrand>1])
+		cs.plus.grand <- sum(col.plusgrand[col.plusgrand>=1])
     }
     commun <- which((mini.tab[,1] > 0) & (mini.tab[,2] > 0))
     deA <- which((mini.tab[,plus.petit] > 0) & (mini.tab[,plus.grand] == 0))
