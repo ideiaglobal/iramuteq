@@ -122,7 +122,7 @@ The items are displayed in the selection part of the widget'''
         self.bAdd.Bind(wx.EVT_BUTTON, self._OnAdd)
         self.bRemove = wx.Button(self, -1, label = '<- Remove')
         self.bRemove.Bind(wx.EVT_BUTTON, self._OnRemove)
-        sizer.Add(self.bAdd, 0, wx.EXPAND|wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5)
+        sizer.Add(self.bAdd, 0, wx.EXPAND, 5)
         sizer.Add(self.bRemove, 0, wx.EXPAND|wx.ALL, 5)
         return sizer
 
