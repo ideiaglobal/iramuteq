@@ -468,10 +468,10 @@ class PrefSimi ( wx.Dialog ):
         bSizer9 = wx.BoxSizer( wx.VERTICAL )
 
         self.check2 = wx.CheckBox( self.m_panel3, wx.ID_ANY, "eff.", wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer9.Add( self.check2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        bSizer9.Add( self.check2, 0, wx.ALL, 5 )
 
         self.checki = wx.CheckBox( self.m_panel3, wx.ID_ANY, "chi2", wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer9.Add( self.checki, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        bSizer9.Add( self.checki, 0, wx.ALL, 5 )
 
 
         bSizer7.Add( bSizer9, 0, wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -515,10 +515,10 @@ class PrefSimi ( wx.Dialog ):
         bSizer8 = wx.BoxSizer( wx.VERTICAL )
 
         self.check_vcex = wx.CheckBox( self.m_panel3, wx.ID_ANY, "eff.", wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer8.Add( self.check_vcex, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        bSizer8.Add( self.check_vcex, 0, wx.ALL, 5 )
 
         self.checkit = wx.CheckBox( self.m_panel3, wx.ID_ANY, "chi2", wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer8.Add( self.checkit, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        bSizer8.Add( self.checkit, 0, wx.ALL, 5 )
 
 
         bSizer71.Add( bSizer8, 0, wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -1144,13 +1144,13 @@ class TGenFrame ( wx.Frame ):
         self.tgens = wx.ListBox( self.panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, tgensChoices, 0 )
         self.tgens.SetMinSize( wx.Size( 250,350 ) )
 
-        fgSizer1.Add( self.tgens, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+        fgSizer1.Add( self.tgens, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
         tgencontentChoices = []
         self.tgencontent = wx.ListBox( self.panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, tgencontentChoices, 0|wx.VSCROLL )
         self.tgencontent.SetMinSize( wx.Size( 250,350 ) )
 
-        fgSizer1.Add( self.tgencontent, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+        fgSizer1.Add( self.tgencontent, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
         fgSizer2 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer2.SetFlexibleDirection( wx.BOTH )
@@ -1176,7 +1176,7 @@ class TGenFrame ( wx.Frame ):
 
         fgSizer1.Add( fgSizer3, 0, wx.EXPAND, 0 )
 
-        bSizer1.Add( fgSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
+        bSizer1.Add( fgSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
 
         m_sdbSizer2 = wx.StdDialogButtonSizer()
