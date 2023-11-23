@@ -44,7 +44,7 @@ def buildmenu(menu, parent_menu):
     for i in range(parent_menu.GetMenuItemCount()) :
         item = parent_menu.FindItemByPosition(i)
         itemid = item.GetId()
-        itemtext = item.GetText()
+        itemtext = item.GetItemLabelText()
         itemicon = item.GetBitmap()
         nitem = wx.MenuItem(menu, itemid, itemtext)
         nitem.SetBitmap(itemicon)
@@ -52,12 +52,12 @@ def buildmenu(menu, parent_menu):
             nmenu = wx.Menu()
             for val in item.GetSubMenu().GetMenuItems() :
                 itemid = val.GetId()
-                itemtext = val.GetText()
+                itemtext = val.GetItemLabelText()
                 itemicon = val.GetBitmap()
                 nitem = wx.MenuItem(menu, itemid, itemtext)
                 nitem.SetBitmap(itemicon)
                 nmenu.Append(nitem)
-            menu.Append(-1, item.GetText(), nmenu)
+            menu.Append(-1, item.GetItemLabelText(), nmenu)
         else :
             menu.Append(nitem)
 
@@ -124,10 +124,9 @@ class LeftTree(CT.CustomTreeCtrl):
                  agwStyle=CT.TR_HIDE_ROOT|CT.TR_HAS_BUTTONS|CT.TR_HAS_VARIABLE_ROW_HEIGHT):
         CT.CustomTreeCtrl.__init__(self, parent, id, pos, size, style, agwStyle)
         #FIXME : test for bigger font on HIDPI screen
-        font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD,
-               False, "", wx.FONTENCODING_DEFAULT)
-        #font = wx.Font(pointSize=12, family=wx.FONTFAMILY_DEFAULT, style=wx.FONTSTYLE_NORMAL, weight=wx.FONTWEIGHT_BOLD)
-        #    underline=False, face="", encoding=wx.FONTENCODING_DEFAULT)
+        #font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD,
+        #       False, "", wx.FONTENCODING_DEFAULT)
+        font = wx.Font(pointSize=10, family=wx.FONTFAMILY_DEFAULT, style=wx.FONTSTYLE_NORMAL, weight=wx.FONTWEIGHT_NORMAL)
         self.SetFont(font)
         ##################
         self.log = log
@@ -1053,7 +1052,7 @@ class LeftTree(CT.CustomTreeCtrl):
             else :
                 if os.path.exists(pydata['ira']) :
                     busy = wx.BusyInfo(_("Please wait..."), self.parent)
-                    wx.SafeYield()
+                    #wx.SafeYield()
                     try :
                         OpenAnalyse(self.parent, pydata)
                         del busy
