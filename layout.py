@@ -693,7 +693,7 @@ class TgenLayout :
         ira = wx.GetApp().GetTopWindow()
         tgenpath = os.path.join(parametres['pathout'], 'tgen.csv')
         self.page.tgens, etoiles =  ReadList(parametres['tgenspec'], ira.syscoding, sep="\t")
-        tgen = TGen(path = tgenpath, encoding = parametres['encoding'])
+        tgen = TGen(path = tgenpath, encoding = 'UTF-8')
         tgen.read()
         tgenlempath = os.path.join(parametres['pathout'], 'tgenlemchi2.csv')
         if os.path.exists(tgenlempath) :
