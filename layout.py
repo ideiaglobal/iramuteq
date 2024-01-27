@@ -823,10 +823,10 @@ class StatLayout:
         lcle = {'total' :'total.csv', 'formes_actives':'formes_actives.csv', 'formes_supplémentaires':'formes_supplémentaires.csv', 'hapax': 'hapax.csv'}
         self.result = {}
         for key in lcle :
-            with codecs.open(self.pathout[lcle[key]], 'r', sys.getdefaultencoding()) as f :
+            with open(self.pathout[lcle[key]], 'r', encoding='utf-8') as f :
                 self.result[key] = [line.split(';') for line in f.read().splitlines()]
                 self.result[key] = dict([[i,[line[0],int(line[1]), line[2]]] for i, line in enumerate(self.result[key])])
-        with open(self.pathout['glob.txt'], 'r') as f :
+        with open(self.pathout['glob.txt'], 'r', encoding='utf-8') as f :
             self.result['glob'] = f.read()
 
 
