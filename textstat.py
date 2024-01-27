@@ -88,9 +88,9 @@ class Stat(AnalyseText) :
         open_file_graph("%s", width = 400, height = 400)
         barplot(table(stsize[,1]))
         dev.off()
-        """ % (self.pathout['stsize.csv'], self.pathout['segments_size.png'])
+        """ % (ffr(self.pathout['stsize.csv']), ffr(self.pathout['segments_size.png']))
         tmpscript = tempfile.mktemp(dir=self.parent.TEMPDIR)
-        with open(tmpscript, 'w') as f :
+        with open(tmpscript, 'w', encoding='utf8') as f :
             f.write(txt)
         pid = exec_rcode(self.parent.RPath, tmpscript, wait = False)
         while pid.poll() == None :
@@ -104,8 +104,8 @@ class Stat(AnalyseText) :
             if key != 'glob' :
                 dico = self.result[key]
                 toprint = [[dico[val][0],repr(dico[val][1]), dico[val][2]] for val in dico]
-                with open(self.pathout['%s.csv' % key], 'w') as f :
+                with open(self.pathout['%s.csv' % key], 'w',  encoding='utf8') as f :
                     f.write('\n'.join([';'.join([val for val in ligne]) for ligne in toprint]))
             else :
-                with open(self.pathout['%s.txt' % 'glob'], 'w') as f :
+                with open(self.pathout['%s.txt' % 'glob'], 'w',  encoding='utf8') as f :
                     f.write(self.result['glob'])
