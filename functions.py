@@ -364,7 +364,7 @@ class DoConf :
         if outfile is None :
             outfile = self.configfile
         outfile = normpath_win32(outfile)
-        with open(outfile, 'w') as f :
+        with open(outfile, 'w', encoding="utf-8") as f :
             f.write(txt)
             #self.conf.write(f)
 
