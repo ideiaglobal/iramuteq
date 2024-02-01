@@ -230,7 +230,7 @@ CHD<-function(data.in, x=9, mode.patate = FALSE, svd.method, libsvdc.path=NULL){
     			print('longueur < 0')
     			malcl<-length(vdelta)
     			if ((it>1)&&(!is.logical(listsub[[it]]))&&(!is.logical(listsub[[it-1]]))){
-    				if (listsub[[it]]==listsub[[(it-1)]]){
+    				if (all(listsub[[it]]==listsub[[(it-1)]])){
     					malcl<-0
     				}
     			}
