@@ -182,8 +182,8 @@ class printer(object) :
     def flush(self):
         pass
 
-sys.stderr = writer()
-sys.stdout = printer()
+#sys.stderr = writer()
+#sys.stdout = printer()
 
 images_analyses = {
         'textroot' : 'textroot.png',
@@ -700,7 +700,10 @@ class IraFrame(wx.Frame):
         BestRPath = False
         if not CheckRPath(self.PathPath) :
             if sys.platform == 'win32':
-                BestRPath = FindRPAthWin32()
+                if os.path.exists(self.AppliPath + '\\R\\R') :
+                    BestRPath = self.AppliPath + '\\R\\R\\bin\\x64\\R.exe'
+                else :
+                    BestRPath = FindRPAthWin32()
             else:
                 BestRPath = FindRPathNix()
             if BestRPath:
@@ -756,7 +759,7 @@ class IraFrame(wx.Frame):
         if not menu_pos is None :
             self.mb.EnableTop(menu_pos, Show)
             self.mb.Refresh()
-        self._mgr.Update()
+        #self._mgr.Update()
 
     #--------------------------------------------------------------------
     # fin de __init__ du wx.Frame
@@ -910,13 +913,16 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         if isinstance(parent, IraFrame) :
             npage = self.nb.GetPage(new)
             if 'parametres' in dir(npage) :
-                self.tree.GiveFocus(uuid=npage.parametres['uuid'])
+                #self.tree.GiveFocus(uuid=npage.parametres['uuid'])
                 if npage.parametres.get('matrix', False) :
                     self.ShowMenu('text', False)
                     self.ShowMenu('matrix', True)
                 elif npage.parametres.get('corpus', False) :
                     self.ShowMenu('text')
                     self.ShowMenu('matrix', False)
+        #self._mgr.Update()
+        #wx.CallAfter(self.nb.SendSizeEvent)
+        #self.Refresh()
 
     # action ou évènement ?
     def OnCloseTab(self, evt):
@@ -958,6 +964,9 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
                 pane.Hide()
         self._mgr.GetPane(panel).Show()
         self._mgr.Update()
+        print('show a pane refresh')
+        wx.CallAfter(self.nb.SendSizeEvent)
+        self.Refresh()
 
     # action ou évènement ?
     def OnAcceuil(self, event):
@@ -1419,7 +1428,7 @@ class MySplashScreen(wx.adv.SplashScreen):
         displaySize = wx.DisplaySize()
         w = displaySize[0]/1.2
         h = displaySize[1]/1.2
-        frame = IraFrame(None, -1, "IRaMuTeQ " + ConfigGlob.get('DEFAULT', 'version'), size=(w, h))
+        frame = IraFrame(None, -1, "IRaMuTeQ " + ConfigGlob.get('DEFAULT', 'version'), size=(int(w), int(h)))
         frame.Show()
         frame.finish_init()
         frame.Upgrade()
