@@ -713,7 +713,7 @@ class RawConfigParser(MutableMapping):
         read_ok = []
         for filename in filenames:
             try:
-                with open(filename, encoding=encoding) as fp:
+                with open(filename, encoding='utf8') as fp:
                     self._read(fp, filename)
             except IOError:
                 continue
