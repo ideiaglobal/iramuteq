@@ -141,7 +141,7 @@ class Corpus :
 
     def read_corpus(self) :
         log.info('read corpus')
-        self.parametres['syscoding'] = sys.getdefaultencoding()
+        self.parametres['syscoding'] = 'utf8'
         if self.conncorpus is None :
             self.conn_all()
         res = self.ccorpus.execute('SELECT * FROM etoiles;')
@@ -563,7 +563,7 @@ class Corpus :
         self.make_iduces()
         actuci = ''
         actpara = False
-        with open(outf,'w') as f :
+        with open(outf,'w', encoding='utf8') as f :
             for uce in res :
                 if self.iduces[uce[0]].uci == actuci and self.iduces[uce[0]].para == actpara :
                     f.write(uce[1] + '\n')
@@ -586,7 +586,7 @@ class Corpus :
         longueur_max = max([len(val) for val in metas])
         first = ['column_%i' % i for i in range(longueur_max)]
         metas.insert(0, first)
-        with open(outf, 'w') as f :
+        with open(outf, 'w', encoding='utf8') as f :
             f.write('\n'.join(['\t'.join(line) for line in metas]))
 
     def export_corpus_classes(self, outf, alc = True, lem = False, uci = False) :
@@ -601,7 +601,7 @@ class Corpus :
             self.make_iduces()
         else :
             res = self.getallucis()
-        with open(outf, 'w') as f :
+        with open(outf, 'w', encoding='utf8') as f :
             for uce in res :
                 guce = uce[1]
                 if not uci :
@@ -624,7 +624,7 @@ class Corpus :
             self.make_iduces()
         else :
             res = self.getuciconcorde(sts)
-        with open(outf, 'w') as f :
+        with open(outf, 'w', encoding='utf8') as f :
             for uce in res :
                 guce = uce[1]
                 if not uci :
@@ -649,7 +649,7 @@ class Corpus :
             outf = os.path.join(rep, outf)
             if lem :
                 guce = ' '.join([self.formes[forme].lem for forme in guce.split()])
-            with open(outf, 'w') as f :
+            with open(outf, 'w', encoding='utf8') as f :
                 f.write(guce) #.encode('cp1252', errors = 'replace'))
 
     def export_tropes(self, fileout, classe, lem = False, uci = False) :
@@ -659,7 +659,7 @@ class Corpus :
             self.make_iduces()
         else :
             res = self.getuciconcorde(sts)
-        with open(fileout, 'w') as f :
+        with open(fileout, 'w', encoding='utf8') as f :
             for uce in res :
                 guce = uce[1]
                 if lem :
@@ -800,7 +800,7 @@ class Corpus :
         else :
             tab = [[lem] + [len(set(self.getlemuces(lem)).intersection(classe)) for classe in ucecl] for lem in actives]
         tab = [[line[0]] + [repr(val) for val in line[1:]] for line in tab if sum(line[1:]) >= 3]
-        with open(fileout, 'w') as f :
+        with open(fileout, 'w', encoding='utf8') as f :
             f.write('\n'.join([';'.join(line) for line in tab]))
 
     def make_etoiles(self) :
@@ -876,7 +876,7 @@ class Corpus :
         else :
             etoileuces = self.getetoileucis()
         etoileuces = dict([[et, etoileuces[et]] for et in etoileuces if len(etoileuces[et]) > 1])
-        with open(fileout, 'w') as f :
+        with open(fileout, 'w', encoding='utf8') as f :
             f.write('\n'.join([';'.join([et] + [repr(len(set(etoileuces[et]).intersection(classe))) for classe in ucecl]) for et in etoileuces])) #.encode(self.parametres['syscoding'])
         #etoiles = self.make_etoiles()
         #with open(fileout, 'w') as f :
@@ -891,9 +891,9 @@ class Corpus :
             ucecl[uce] = 0
         color = ['black'] + colors[len(self.lc) - 1]
         txt = '''<html>
-        <meta http-equiv="content-Type" content="text/html; charset=%s" />
+        <meta http-equiv="content-Type" content="text/html; charset=utf8" />
         <body>
-''' % sys.getdefaultencoding()
+'''
         if not uci :
             res = self.getalluces()
             self.make_iduces()
@@ -999,7 +999,7 @@ class Corpus :
                 for taille_segment in range(lenmin,lenmax) :
                     d =self.count_from_list_cl([' '.join(uce[i:i+taille_segment]) for i in range(len(uce)-(taille_segment - 1))], d, b, len(self.lc))
         result = [[seg] + [str(val) for val in d[seg]] for seg in d if sum(d[seg]) >= effmin]
-        with open(fileout, 'w') as f :
+        with open(fileout, 'w', encoding='utf8') as f :
             f.write('\n'.join([';'.join(line) for line in result]))
 
     def make_proftype(self, outf) :
@@ -1014,7 +1014,7 @@ class Corpus :
                 res[gram][i] += sum([lemuceeff[uce] for uce in concern])
         res = [[gram] + [repr(val) for val in res[gram]] for gram in res]
         res.sort()
-        with open(outf, 'w') as f :
+        with open(outf, 'w', encoding='utf8') as f :
             f.write('\n'.join([';'.join(line) for line in res]))
 
     def make_ucecl_from_R(self, filein) :
@@ -1054,7 +1054,7 @@ class Corpus :
         log.info('%f' % (time() - t1))
         if outf is not None :
             toprint = '\n'.join([';'.join([repr(i), repr(occurrences[i]), repr(formescl[i]), repr(hapaxcl[i]), repr(lenclasses[i]), repr(float(hapaxcl[i])/float(formescl[i]))]) for i in occurrences])
-            with open(outf, 'w') as f :
+            with open(outf, 'w', encoding='utf8') as f :
                 f.write(toprint)
         else :
             return [[repr(occurrences[i]), repr(formescl[i]), repr(hapaxcl[i]), repr(lenclasses[i]), repr(float(hapaxcl[i])/float(formescl[i]))] for i in occurrences]
@@ -1118,21 +1118,21 @@ class Corpus :
         txt += """
         </body></html>
         """
-        with open('/tmp/testhapxuce.html','w') as f :
+        with open('/tmp/testhapxuce.html','w', encoding='utf8') as f :
             f.write(txt)
 
     def export_dictionary(self, fileout, syscoding) :
         listformes = [[self.formes[forme].freq, forme, self.formes[forme].lem, self.formes[forme].gram] for forme in self.formes]
         listformes.sort(reverse = True)
         listformes = [forme[1:] + [repr(forme[0])] for forme in listformes]
-        with open(fileout, 'w') as f :
+        with open(fileout, 'w', encoding='utf8') as f :
             f.write('\n'.join(['\t'.join(forme) for forme in listformes]))
 
     def export_lems(self, fileout, syscoding) :
         self.make_idformes()
         listlem = [[lem, '\t'.join(['\t'.join([self.idformes[forme].forme, repr(self.lems[lem].formes[forme])]) for forme in self.lems[lem].formes])] for lem in self.lems]
         listlem.sort()
-        with open(fileout, 'w') as f :
+        with open(fileout, 'w', encoding='utf8') as f :
             f.write('\n'.join(['\t'.join(lem) for lem in listlem]))
 
 
