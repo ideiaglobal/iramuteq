@@ -559,11 +559,11 @@ memory for R""")
             parent.pref.set('iramuteq', 'libsvdc', 'false')
         parent.pref.set('iramuteq', 'libsvdc_path', self.fbb.GetValue())
         self.parent.pref.set('iramuteq', 'rmirror', self.mirror_value.GetValue())
-        file = open(parent.ConfigPath['preferences'], 'w')
+        file = open(parent.ConfigPath['preferences'], 'w', encoding='utf8')
         parent.pref.write(file)
         file.close()
         self.parent.PathPath.set('PATHS', 'rpath', self.Rpath_value.GetValue())
-        with open(self.parent.ConfigPath['path'], 'w') as f:
+        with open(self.parent.ConfigPath['path'], 'w', encoding='utf8') as f:
             self.parent.PathPath.write(f)
         self.Close()
 
@@ -1231,7 +1231,7 @@ class PrefSegProf(wx.Dialog) :
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
         txt = _("Be carefull : computation of repeated segments profiles can be very long on large corpus")
         self.label = wx.StaticText( self, wx.ID_ANY, txt, wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer1.Add( self.label, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
+        bSizer1.Add( self.label, 0, wx.ALL, 5 )
         fgSizer1 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer1.SetFlexibleDirection( wx.BOTH )
         fgSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -1269,7 +1269,7 @@ class PrefSegProf(wx.Dialog) :
         btn_ok.SetDefault()
         btnsizer.AddButton(btn_ok)
         btnsizer.Realize()
-        bSizer1.Add(btnsizer, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5)
+        bSizer1.Add(btnsizer, 0, wx.ALIGN_RIGHT, 5)
         self.SetSizer( bSizer1 )
         self.Layout()
         bSizer1.Fit( self )
@@ -2499,7 +2499,7 @@ class message(wx.Frame):
         self.html = '<br>'.join([self.items[i] for i in range(0,len(self.items))])
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
-            with open(path, 'w') as f :
+            with open(path, 'w', encoding='utf8') as f :
                 f.write(self.html)
 
     def OnLink(self, evt):
@@ -3024,7 +3024,7 @@ class BarFrame :
                 parametres['tree'] = tree
             txt = barplot(table, parametres)
             tmpscript = tempfile.mktemp(dir=ira.TEMPDIR)
-            with open(tmpscript,'w') as f :
+            with open(tmpscript,'w', encoding='utf8') as f :
                 f.write(txt)
             exec_rcode(ira.RPath, tmpscript, wait = True)
             win = ImageViewer(ira, parametres, _("Graphic"), size=(700, 500))
