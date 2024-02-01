@@ -83,13 +83,13 @@ class TGen :
     def write(self, path = None):
         if path is None :
             path = self.path
-        with open(path, 'w') as f :
+        with open(path, 'w', encoding='utf8') as f :
             f.write('\n'.join(['\t'.join([val] + self.tgen[val]) for val in self.tgen]))
 
     def writetable(self, pathout, tgens, totocc):
         etoiles = list(totocc.keys())
         etoiles.sort()
-        with open(pathout, 'w') as f :
+        with open(pathout, 'w', encoding='utf8') as f :
             line = '\t'.join(['tgens'] + etoiles) + '\n'
             f.write(line)
             for t in tgens :
@@ -384,7 +384,7 @@ class DoConf :
 
 
 def write_tab(tab, fileout) :
-        csvWriter = csv.writer(open(fileout, 'w'), delimiter=';', quoting = csv.QUOTE_NONNUMERIC)
+        csvWriter = csv.writer(open(fileout, 'w', newline='', encoding='utf8'), delimiter=';', quoting = csv.QUOTE_NONNUMERIC)
         csvWriter.writerows(tab)
 
 class BugDialog(wx.Dialog):
@@ -428,7 +428,7 @@ def CreateIraFile(DictPathOut, clusternb, corpname='corpus_name', section = 'ana
     AnalyseConf.set(section, 'clusternb', clusternb)
     AnalyseConf.set(section, 'corpus_name', corpname)
 
-    fileout = open(DictPathOut['ira'], 'w')
+    fileout = open(DictPathOut['ira'], 'w', encoding='utf8')
     AnalyseConf.write(fileout)
     fileout.close()
 
@@ -511,10 +511,10 @@ def treat_line_alceste(i, line) :
         line[5] = str(float(line[5].replace(',', '.')))[0:7]
     return [i, int(line[0]), int(line[1]), float(line[2]), float(line[3]), line[6], line[4], line[5]]
 
-def ReadProfileAsDico(File, Alceste=False, encoding = sys.getdefaultencoding()):
+def ReadProfileAsDico(File, Alceste=False, encoding = 'utf8'):
     dictlem = {}
     print('lecture des profiles')
-    FileReader = codecs.open(File, 'r', encoding)
+    FileReader = open(File, 'r', encoding='utf8')
     Filecontent = FileReader.readlines()
     FileReader.close()
     DictProfile = {}
@@ -674,7 +674,7 @@ def PlaySound(parent):
             print('pas de son')
 
 def ReadDicoAsDico(dicopath):
-    with codecs.open(dicopath, 'r', 'UTF8') as f:
+    with open(dicopath, 'r', encoding='UTF8') as f:
         content = f.readlines()
     lines = [line.rstrip('\n\r').replace('\n', '').replace('"', '').split('\t') for line in content if line != '']
     return dict([[line[0], line[1:]] for line in lines])
@@ -691,9 +691,9 @@ def ReadLexique(parent, lang = 'french', filein = None):
         else :
             parent.lexique = ReadDicoAsDico(filein)
 
-def ReadList(filein, encoding = sys.getdefaultencoding(), sep = ';'):
+def ReadList(filein, encoding = 'utf8', sep = ';'):
     #file = open(filein)
-    with codecs.open(filein, 'r', encoding) as f :
+    with open(filein, 'r', encoding='utf8') as f :
         content = f.read()
     content = [line.replace('\n', '').replace('\r','').replace('\"', '').replace(',', '.').split(sep) for line in content.splitlines()]
     #file = codecs.open(filein, 'r', encoding)
@@ -805,11 +805,12 @@ def launchcommand(mycommand):
     Popen(mycommand)
 
 def print_liste(filename,liste):
-    with open(filename,'w') as f :
+    with open(filename,'w', encoding='utf8') as f :
         for graph in liste :
             f.write(';'.join(graph) +'\n')
-def read_list_file(filename, encoding = sys.getdefaultencoding()):
-    with codecs.open(filename,'r', encoding) as f:
+
+def read_list_file(filename, encoding = 'utf8'):
+    with open(filename,'r', encoding='utf8') as f:
         content=f.readlines()
         ncontent=[line.replace('\n','').split(';') for line in content if line.strip() != '']
     return ncontent
@@ -880,7 +881,7 @@ def doconcorde(corpus, uces, mots, uci = False) :
 
 def getallstcarac(corpus, analyse) :
    pathout = PathOut(analyse['ira'])
-   profils =  ReadProfileAsDico(pathout['PROFILE_OUT'], Alceste, self.encoding)
+   profils =  ReadProfileAsDico(pathout['PROFILE_OUT'], Alceste, 'utf8')
    print(profils)
 
 def read_chd(filein, fileout):
@@ -1016,7 +1017,7 @@ def translateprofile(corpus, dictprofile, lf='it', lt='fr', maxword = 50) :
 
 def write_translation_profile(prof, lems, language, dictpathout) :
     if os.path.exists(dictpathout['translations.txt']) :
-        with codecs.open(dictpathout['translations.txt'], 'r', 'utf8') as f :
+        with open(dictpathout['translations.txt'], 'r', encoding='utf8') as f :
             translist = f.read()
         translist = [line.split('\t') for line in translist.splitlines()]
     else :
@@ -1034,13 +1035,13 @@ def write_translation_profile(prof, lems, language, dictpathout) :
             elif line[0] == '*****' :
                 rest[i] = ['*****','*','*', '*', '*', '*']
         toprint += rest
-    with open(dictpathout['translation_profile_%s.csv' % language], 'w') as f :
+    with open(dictpathout['translation_profile_%s.csv' % language], 'w', encoding='utf8') as f :
         f.write('\n'.join([';'.join(line) for line in toprint]))
-    with open(dictpathout['translation_words_%s.csv' % language], 'w') as f :
+    with open(dictpathout['translation_words_%s.csv' % language], 'w', encoding='utf8') as f :
         f.write('\n'.join(['\t'.join([val, lems[val]]) for val in lems]))
     if 'translation_profile_%s.csv' % language not in [val[0] for val in translist] :
         translist.append(['translation_profile_%s.csv' % language, 'translation_words_%s.csv' % language])
-        with open(dictpathout['translations.txt'], 'w') as f :
+        with open(dictpathout['translations.txt'], 'w', encoding='utf8') as f :
             f.write('\n'.join(['\t'.join(line) for line in translist]))
 
 def makesentidict(infile, language) :
