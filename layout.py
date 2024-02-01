@@ -419,7 +419,7 @@ class OpenCHDS():
         for i in range(0, clnb) :
             clusternames[i] = ' '.join(['%i' % (i + 1), _('Cluster'),  '%i' % (i + 1)])
         if os.path.exists(self.pathout['classes_names.txt']) :
-            with codecs.open(self.pathout['classes_names.txt'], 'r', self.parent.syscoding) as f :
+            with open(self.pathout['classes_names.txt'], 'r', encoding='utf8') as f :
                 clusternames_ = f.read()
             clusternames_ =  dict([[i, ' '.join([repr(i + 1), line])] for i, line in enumerate(clusternames_.splitlines())])
             clusternames.update(clusternames_)
@@ -430,7 +430,7 @@ class OpenCHDS():
         panel = wx.Panel(parent, -1)
         sizer1 = wx.BoxSizer(wx.VERTICAL)
         if os.path.exists(DictPathOut['pre_rapport']):
-            with codecs.open(DictPathOut['pre_rapport'], 'r') as f :
+            with open(DictPathOut['pre_rapport'], 'r', encoding='utf8') as f :
                 txt = f.read()
             self.debtext = txt
         else :
@@ -543,7 +543,7 @@ class OpenCHDS():
             self.parametres['tgenspec'] = os.path.join(self.parametres['pathout'], 'tgenchi2.csv')
             TgenLayout(panel)
         if os.path.exists(self.dictpathout['translations.txt']) :
-            with codecs.open(self.dictpathout['translations.txt'], 'r', 'utf8') as f:
+            with open(self.dictpathout['translations.txt'], 'r', encoding='utf8') as f:
                 translist = f.read()
             translist = [line.split('\t') for line in translist.splitlines()]
             for line in translist :
@@ -562,7 +562,7 @@ class OpenCHDS():
 
     def opentrans(self, trans) :
         prof = ReadProfileAsDico(self.dictpathout[trans[0]], False)
-        with codecs.open(self.dictpathout[trans[1]], 'r') as f :
+        with open(self.dictpathout[trans[1]], 'r', encoding='utf8') as f :
             lems = f.read()
         lems = [line.split('\t') for line in lems.splitlines()]
         lems = dict(lems)
@@ -633,7 +633,7 @@ def PrintRapport(self, corpus, parametres, istxt = True):
 
     txt += ''.join([sep, '###########################', sep, _('time'), ' : %s' % parametres.get('time', ''), sep, '###########################', sep])
     # ecriture du resultat dans le fichier
-    with open(self.pathout['pre_rapport'], 'w') as f :
+    with open(self.pathout['pre_rapport'], 'w', encoding='utf8') as f :
         f.write(txt)
 
 
@@ -735,6 +735,7 @@ class dolexlayout :
         self.dictpathout = StatTxtPathOut(parametres['pathout'])
         #self.corpus.read_corpus_from_shelves(self.corpus.dictpathout['db'])
         self.parent = ira
+        self.corpus.parametres['syscoding'] = 'UTF8'
         self.encoding = self.corpus.parametres['syscoding']
         self.parametres = parametres
         self.DictSpec, first = ReadList(self.dictpathout['tablespecf'], self.corpus.parametres['syscoding'])
@@ -1324,7 +1325,7 @@ class SimiLayout(DefaultTextLayout) :
         #saveAsGEXF(graph, filepath = fileout)
         """ % (ffr(self.pathout['RData.RData']), ffr(self.parent.RscriptsPath['simi']), fileout)
         filetmp = tempfile.mktemp()
-        with open(filetmp, 'w') as f :
+        with open(filetmp, 'w', encoding='utf8') as f :
             f.write(txt)
         exec_rcode(self.ira.RPath, filetmp)
         mss = wx.MessageDialog(self.ira, fileout, _('File exported'), wx.OK)
