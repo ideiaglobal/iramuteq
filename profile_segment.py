@@ -68,7 +68,7 @@ class ProfileSegment() :
         PrintProfile(n1,to[4],NULL,to[5],NULL,clnb,"%s","%s")
         """ % (ffr(self.corpus.dictpathout['segments_classes']), ffr(self.dictpathout['prof_seg']), ffr(self.dictpathout['antiprof_seg']))
         fo = tempfile.mktemp(dir=self.parent.TEMPDIR)
-        with open(fo, 'w') as f :
+        with open(fo, 'w', encoding='utf8') as f :
             f.write(txt)
         pid = exec_rcode(self.parent.RPath, fo, wait=False)
         while pid.poll() == None :
@@ -79,7 +79,7 @@ class ProfileSegment() :
     def do_layout(self) :
         SelectTab = self.parent.nb.GetSelection()
         page = self.parent.nb.GetPage(SelectTab).TabChdSim
-        prof_seg = ReadProfileAsDico(self.dictpathout['prof_seg'], True, self.parent.syscoding)
+        prof_seg = ReadProfileAsDico(self.dictpathout['prof_seg'], True, 'utf8')
         prof_seg_nb = aui.AuiNotebook(self.parent, -1, wx.DefaultPosition)
         for i in range(0, len(self.corpus.lc)) :
             ntab = ProfListctrlPanel(self.parent, self, prof_seg[str(i + 1)], False, i + 1)
@@ -142,7 +142,7 @@ class ProfilType() :
             # write.csv2(to[[3]], file = "%s")
             # % (self.outprof)
         fo = tempfile.mktemp(dir=self.parent.TEMPDIR)
-        with open(fo, 'w') as f :
+        with open(fo, 'w', encoding='utf8') as f :
             f.write(txt)
         pid = exec_rcode(self.parent.RPath, fo, wait=False)
         while pid.poll() == None :
