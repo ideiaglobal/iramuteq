@@ -568,7 +568,7 @@ class LeftTree(CT.CustomTreeCtrl):
                 ucis_txt, ucestxt = doconcorde(corpus, nuces, page.la, uci = uci)
                 items = ['<br>'.join([ucis_txt[j], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table><br>' % ntab2[j][0], ucestxt[j]]) for j, uce in enumerate(nuces)]
                 filename = self.page.pathout['st_caract_cl_%i.html' % (rcl+1)]
-                with open(filename, 'w') as f :
+                with open(filename, 'w', encoding='utf8') as f :
                     f.write('\n'.join(items))
             dlg.Destroy()
 
@@ -598,7 +598,7 @@ class LeftTree(CT.CustomTreeCtrl):
         uci = False
         fileout = os.path.join(os.path.dirname(self.page.pathout['ira']), 'segmented_corpus.txt')
         txt = self.page.corpus.make_cut_corpus(uci = uci)
-        with open(fileout, 'w') as f :
+        with open(fileout, 'w', encoding='utf8') as f :
             f.write(txt)
         msg = '\n'.join([_("Done !"), fileout])
         dlg = wx.MessageDialog(self.parent, msg, _("Segmented corpus"), wx.OK | wx.ICON_INFORMATION)
@@ -619,7 +619,7 @@ class LeftTree(CT.CustomTreeCtrl):
             else :
                 uci = True
             txt = self.page.corpus.make_colored_corpus(uci = uci)
-            with open(fileout, 'w') as f :
+            with open(fileout, 'w', encoding='utf8') as f :
                 f.write(txt)
             msg = ' !\n'.join([_("Done"), _("Open in a web browser ?")])
             dlg = wx.MessageDialog(self.parent, msg, "Corpus en couleur", wx.NO | wx.YES | wx.ICON_QUESTION)
@@ -657,7 +657,7 @@ class LeftTree(CT.CustomTreeCtrl):
                 find = True
                 break
         if not find :
-            open_antiprofil(self.page, self.page.dictpathout['ANTIPRO_OUT'], self.parent.syscoding)
+            open_antiprofil(self.page, self.page.dictpathout['ANTIPRO_OUT'], 'utf8')
             self.page.TabChdSim.SetSelection(self.page.TabChdSim.GetPageCount() - 1)
 
     def OnTranslate(self, evt) :
@@ -687,7 +687,7 @@ class LeftTree(CT.CustomTreeCtrl):
         if res == wx.ID_OK :
             fileout = dial.fbb.GetValue()
             dial.Destroy()
-            with open(fileout, 'w') as f :
+            with open(fileout, 'w', encoding='utf8') as f :
                 f.write(self.page.debtext + '\n' + GetTxtProfile(self.page.DictProfile, self.page.cluster_size))
             msg = "Fini !"
             dlg = wx.MessageDialog(self.parent, msg, _("Report"), wx.OK | wx.ICON_INFORMATION)
@@ -1099,6 +1099,7 @@ class LeftTree(CT.CustomTreeCtrl):
         if event is not None :
             item = event.GetItem()
             pydata = self.GetPyData(item)
+        print('selchange',pydata)
         if pydata is not None :
             if 'corpus_name' in pydata or 'corpus' in pydata :
                 self.ira.ShowMenu('matrix', False)
@@ -1118,8 +1119,11 @@ class LeftTree(CT.CustomTreeCtrl):
                         if self.page.parametres['uuid'] == pydata['uuid'] :
                             self.parent.nb.SetSelection(i)
                             break
-        if event is not None :
-            event.Skip()
+        #self.parent._mgr.Update()
+        #wx.CallAfter(self.parent.nb.SendSizeEvent)
+        self.parent.Refresh()
+        #if event is not None :
+        #    event.Skip()
 
     def OnSelChanging(self, event):
         item = event.GetItem()
