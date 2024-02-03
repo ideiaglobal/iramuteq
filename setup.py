@@ -7,13 +7,14 @@ Usage:
 
 from setuptools import setup
 import os
-DATA_FILES=['configuration','Rscripts','images','dictionnaires','locale','son_fin.wav', 'gpl-2.0.txt', 'gpl-2.0-fr.txt']
+DATA_FILES=['configuration','Rscripts','R','images','dictionnaires','locale','son_fin.wav', 'gpl-2.0.txt', 'gpl-2.0-fr.txt']
 #DATA_FILES=['configuration','Rscripts','images','dictionnaires','locale', 'Rlib','son_fin.wav', 'gpl-2.0.txt', 'gpl-2.0-fr.txt']
 APP = ['iramuteq.py']
-OPTIONS = {'argv_emulation': True,
+OPTIONS = {'argv_emulation': False,
          'emulate_shell_environment': True,
          'iconfile':('images/iraicone.icns'),
-         'optimize': 2}
+         'optimize': 2,
+        'arch': 'universal2'}
 
 setup(
     app=APP,
