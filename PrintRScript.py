@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2020 Pierre Ratinaud
-#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
+#Copyright (c) 2008-2011 Pierre Ratinaud
 #License: GNU/GPL
 
 #------------------------------------
@@ -1385,6 +1384,17 @@ class LabbeScript(PrintRScript):
         tab <- read.csv2("%s", header=TRUE, sep=';', row.names=1)
         """ % (ffr(self.pathout['tableafcm.csv']))
         txt += """
+        cs <- colSums(tab)
+        if (min(cs) == 0) {
+            print('empty columns !!')
+            vide <- which(cs==0)
+            print(vide)
+            tab <- tab[,-vide]
+        }
+        #print('#### RcppIramuteq for C++ Labbe ####')
+        #library(RcppIramuteq)
+        #dist.mat <- labbe(as.matrix(tab))
+        #rownames(dist.mat) <- colnames(tab)
         dist.mat <- dist.labbe(tab)
         dist.mat <- as.dist(dist.mat, upper=F, diag=F)
         write.table(as.matrix(dist.mat), "%s", sep='\t')

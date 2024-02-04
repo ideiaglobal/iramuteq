@@ -20,6 +20,9 @@ from operator import itemgetter
 from uuid import uuid4
 import datetime
 from copy import copy
+#------test spacy------------
+#import spacy
+#nlp = spacy.load("fr_core_news_lg")
 
 #------------------------------------
 # import des fichiers du projet
@@ -1546,6 +1549,7 @@ class BuildSubCorpus(BuildCorpus):
 class BuildFromAlceste(BuildCorpus) :
 
     def read_corpus(self, infile) :
+
         if self.dlg is not None :
             self.dlg.Pulse('textes : 0 - segments : 0')
         self.limitshow = 0
@@ -1565,6 +1569,8 @@ class BuildFromAlceste(BuildCorpus) :
                     if self.testuci(line) :
                         iduci += 1
                         if txt != [] :
+                            #doc = nlp(' '.join(txt))
+                            #print([[word, word.pos_, word.lemma_] for word in doc])
                             iduce, idpara = self.treattxt(txt, iduce, idpara, iduci - 1)
                             txt = []
                             self.corpus.ucis.append(Uci(iduci, line))
