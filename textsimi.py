@@ -59,7 +59,7 @@ class SimiTxt(AnalyseText):
         else :
             order_actives = [[i, act, self.corpus.getlemeff(act)] for i, act in enumerate(self.actives)]
             order_actives = sorted(order_actives, key=itemgetter(2), reverse = True)
-            with open(self.pathout['selected.csv'], 'w') as f :
+            with open(self.pathout['selected.csv'], 'w', encoding='utf8') as f :
                 f.write('\n'.join([repr(order_actives[val][0]) for val in self.parametres['selected']]))
             continu = True
         if continu :
@@ -129,7 +129,7 @@ class SimiTxt(AnalyseText):
         self.parametres['nbactives'] = len(self.actives)
         self.parametres['fromprof'] = False
         self.corpus.make_and_write_sparse_matrix_from_uces(self.actives, self.pathout['mat01.csv'], self.pathout['listeuce1.csv'])
-        with open(self.pathout['actives.csv'], 'w') as f :
+        with open(self.pathout['actives.csv'], 'w', encoding='utf8') as f :
             f.write('\n'.join(self.actives))
 
 
@@ -197,9 +197,9 @@ class SimiFromCluster(SimiTxt) :
         self.parametres['nbactives'] = len(self.actives)
         self.parametres['fromprof'] = True
         self.corpus.make_and_write_sparse_matrix_from_classe(self.actives, self.corpus.lc[self.numcluster], self.pathout['mat01.csv'])
-        with open(self.pathout['actives.csv'], 'w') as f :
+        with open(self.pathout['actives.csv'], 'w', encoding='utf8') as f :
             f.write('\n'.join(self.actives))
-        with open(self.pathout['actives_nb.csv'], 'w') as f :
+        with open(self.pathout['actives_nb.csv'], 'w', encoding='utf8') as f :
             f.write('\n'.join([repr(val) for val in self.lfreq]))
-        with open(self.pathout['actives_chi.csv'], 'w') as f :
+        with open(self.pathout['actives_chi.csv'], 'w', encoding='utf8') as f :
             f.write('\n'.join([repr(val) for val in self.lchi]))

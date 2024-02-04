@@ -135,7 +135,7 @@ def FindRPAthWin32():
         for progpath in progpaths :
             rpath = os.path.join(progpath, "R")
             if os.path.exists(rpath) :
-                for maj in range(2,4) :
+                for maj in range(3,5) :
                     for i in range(0,30):
                         for j in range(0,20):
                             for poss in ['', 'i386', 'x64'] :

@@ -73,10 +73,7 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         self.Bind(wx.EVT_COMMAND_RIGHT_CLICK, self.OnRightClick)
         # for wxGTK
         self.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
-        self.itemDataMap = dlist
-        self.itemIndexMap = list(dlist.keys())
-        self.SetItemCount(len(dlist))
-        listmix.ColumnSorterMixin.__init__(self, len(first)+2)
+
         #-----------------------------------------------------------
         first = ['id','formes']+first
         for i, name in enumerate(first) :
@@ -84,6 +81,10 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
         self.SetColumnWidth(0, wx.LIST_AUTOSIZE)
         for i in range(1,len(first)-1):
             self.SetColumnWidth(i, 130)
+        self.itemDataMap = dlist
+        self.itemIndexMap = list(dlist.keys())
+        self.SetItemCount(len(dlist))
+        listmix.ColumnSorterMixin.__init__(self, len(first)+2)
         self.SortListItems(0, True)
 
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
@@ -115,7 +116,10 @@ class SearchList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSort
     def OnGetItemText(self, item, col):
         index=self.itemIndexMap[item]
         s = self.itemDataMap[index][col]
-        return s
+        if isinstance(s, (int,float)):
+            return str(s)
+        else :
+            return s
 
     def OnGetItemData(self, item) :
         index = self.itemIndexMap[item]

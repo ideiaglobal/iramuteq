@@ -163,7 +163,7 @@ class SelectColumn :
                 dial.Destroy()
                 column = [actives.index(val) for val in indexes]
                 column.sort()
-                with open(pathout, 'w') as f :
+                with open(pathout, 'w' ,encoding='utf8') as f :
                     f.write('\n'.join([repr(val) for val in column]))
                 self.ok = True
             else :
@@ -172,7 +172,7 @@ class SelectColumn :
             self.ok = True
             if selected is None :
                 selected = [i for i in range(0, len(actives))]
-            with open(pathout, 'w') as f :
+            with open(pathout, 'w', encoding='utf8') as f :
                 f.write('\n'.join([repr(i) for i in selected]))
 
 
@@ -950,7 +950,7 @@ class PrepSimi :
                     indexes.append(self.dial.listcol.getColumnText(last,0))
                 column = [actives.index(val) for val in indexes]
                 column.sort()
-                with open(pathout, 'w') as f :
+                with open(pathout, 'w', encoding='utf8') as f :
                     f.write('\n'.join([repr(val) for val in column]))
                 self.make_param()
                 self.dial.Destroy()
@@ -1288,15 +1288,15 @@ class ExportMetaTable :
 
 
 def redosimi(self, evt) :
-    with open(self.pathout['selected.csv'],'r') as f :
+    with open(self.pathout['selected.csv'],'r', encoding='utf8') as f :
         selected = f.read()
     selected = [int(val) for val in selected.splitlines()]
     if self.actives is None :
-        with codecs.open(self.pathout['actives.csv'], 'r') as f :
+        with open(self.pathout['actives.csv'], 'r', encoding='utf8') as f :
             self.actives = f.read()
         self.actives = self.actives.splitlines()#[act for act in self.actives.splitlines()]
     if os.path.exists(self.pathout['actives_nb.csv']) :
-        with open(self.pathout['actives_nb.csv'], 'r') as f :
+        with open(self.pathout['actives_nb.csv'], 'r', encoding='utf8') as f :
             act_nb = f.read()
             act_nb = act_nb.splitlines()
         dictcol = dict([[i, [self.actives[i], int(act_nb[i])]] for i, val in enumerate(self.actives)])
@@ -1313,7 +1313,7 @@ def redosimi(self, evt) :
         prep.parametres = self.parametres
         order_actives = [[i, act, self.corpus.getlemeff(act)] for i, act in enumerate(self.actives)]
         order_actives = sorted(order_actives, key=itemgetter(2), reverse = True)
-        with open(self.pathout['selected.csv'], 'w') as f :
+        with open(self.pathout['selected.csv'], 'w', encoding='utf8') as f :
             f.write('\n'.join([repr(order_actives[val][0]) for val in self.parametres['selected']]))
     if prep.val == wx.ID_OK or evt is None:
         self.parametres = prep.parametres

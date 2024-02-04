@@ -1172,7 +1172,7 @@ class PrintSimiScript(PrintRScript):
         if (!is.null(graph.simi$com)) {
             com <- graph.simi$com
             colm <- rainbow(length(com))
-            if (vertex.size != 0 || graph.simi$halo) {
+            if (sum(vertex.size) != 0 || graph.simi$halo) {
                 vertex.label.color <- 'black'
                 vertex.col <- colm[membership(com)]
             } else {
