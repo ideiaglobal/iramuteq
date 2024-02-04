@@ -173,7 +173,6 @@ class Tableau() :
             self.read_ods()
         self.parametres['csvfile'] = os.path.join(self.parametres['pathout'], 'csvfile.csv')
         self.make_tmpfile()
-        print(self.parametres)
         DoConf().makeoptions(['matrix'],[self.parametres], self.parametres['ira'])
         self.parent.history.addMatrix(self.parametres)
 
@@ -181,7 +180,7 @@ class Tableau() :
         self.parametres['csvfile'] = os.path.join(self.parametres['pathout'], 'csvfile.csv')
         self.make_tmpfile()
         DoConf().makeoptions(['matrix'],[self.parametres], self.parametres['ira'])
-        self.parent.history.addMatrix(self.parametres)        
+        self.parent.history.addMatrix(self.parametres)
 
     def read_xls(self) :
         #FIXME : encodage
@@ -207,7 +206,7 @@ class Tableau() :
 
     def read_csv(self) :
         with codecs.open(self.parametres['originalpath'], 'r', self.parametres['encodage']) as f :
-            content = f.read() 
+            content = f.read()
         self.linecontent = [line.split(self.parametres['colsep']) for line in content.splitlines()]
         self.linecontent = [[val.replace('"','').replace(';',' ').replace('\t', ' ').strip() for val in line] for line in self.linecontent]
 
@@ -234,7 +233,7 @@ class Tableau() :
         else :
             self.rownames = [repr(i) for i in range(self.rownb)]
             self.idname = 'identifiant'
-        self.csvtable = [[self.idname] + self.colnames] + [[self.rownames[i]] + self.linecontent[i] for i in range(len(self.rownames))] 
+        self.csvtable = [[self.idname] + self.colnames] + [[self.rownames[i]] + self.linecontent[i] for i in range(len(self.rownames))]
         self.write_csvfile()
 
     def read_csvfile(self):
@@ -287,10 +286,9 @@ class Tableau() :
     def getactlistfromselection(self, listact) :
         selcol = self.select_col(listact)
         self.actives = self.make_dico(selcol)
-        return [[val, self.actives[val][0]] for val in self.actives]       
+        return [[val, self.actives[val][0]] for val in self.actives]
 
     def make_listactives(self) :
-        print(self.actives, self.parametres['mineff'])
         self.listactives = [val for val in self.actives if val != 'NA' and self.actives[val][0] >= self.parametres['mineff']]
 
     def write01(self, fileout, dico, linecontent) :
@@ -300,7 +298,7 @@ class Tableau() :
         for i, forme in enumerate(self.listactives) :
             for line in dico[forme][1] :
                 out[line][i] = '1'
-        #out = [[self.rownames[i]] + out[i] for i in range(len(linecontent))] 
+        #out = [[self.rownames[i]] + out[i] for i in range(len(linecontent))]
         #out.insert(0,[self.idname] + self.listactives)
         out.insert(0, self.listactives)
         with open(fileout, 'w') as f :
@@ -321,7 +319,7 @@ class Tableau() :
                     if forme[0] == '*':
                         UpdateDico(self.sups, forme, i)
                     else:
-                        UpdateDico(self.actives, forme, i)        
+                        UpdateDico(self.actives, forme, i)
         self.listactives = [val for val in self.actives if self.actives[val][0] >= self.parametres['mineff']]
         table = [['0' for i in range(len(self.listactives))] for j in range(self.rownb)]
         for i, val in enumerate(self.listactives) :
@@ -378,9 +376,9 @@ class Tableau() :
                         if sup in self.linecontent[uce]:
                             line[i + 1] += 1
             tablecontet.append([line[0]] + [repr(don) for don in line if type(don) == type(1)])
-            
+
         self.printtable(self.pathout['ContEtOut'], tablecontet)
-        self.printtable(self.pathout['Contout'], tablecont)        
+        self.printtable(self.pathout['Contout'], tablecont)
 
     def get_colnames(self) :
         return self.colnames[:]

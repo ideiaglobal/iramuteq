@@ -14,7 +14,7 @@ import logging
 # import des fichiers du projet
 #------------------------------------
 from chemins import ChdTxtPathOut, StatTxtPathOut, PathOut
-from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout, SimiMatLayout, ProtoLayout, MatLayout, FreqLayout, Chi2Layout, LabbeLayout
+from layout import OpenCHDS, dolexlayout, StatLayout, WordCloudLayout, OpenCorpus, SimiLayout, SimiMatLayout, ProtoLayout, MatLayout, FreqLayout, Chi2Layout, LabbeLayout, CateLayout
 from corpus import Corpus, copycorpus
 from tableau import Tableau
 from functions import DoConf, ReadDicoAsDico
@@ -181,3 +181,6 @@ class OpenAnalyse():
             FreqLayout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'chi2' or self.conf['type'] == 'chi2mcnemar':
             Chi2Layout(self.parent, corpus, self.conf)
+        elif self.conf['type'] == 'categorisation' :
+            CateLayout(self.parent, corpus, self.conf)
+            print(self.conf)

@@ -117,7 +117,9 @@ class History :
         self.read()
 
     def read(self) :
-        d = shelve.open(self.filein)
+        with open(self.filein, 'r') as fjson :
+            d = json.load(fjson)
+#        d = shelve.open(self.filein, protocol=1)
         self.history = d.get('history', [])
         self.matrix = d.get('matrix', [])
         self.ordercorpus = dict([[corpus['uuid'], i] for i, corpus in enumerate(self.history)])
@@ -125,13 +127,16 @@ class History :
         self.analyses = dict([[analyse['uuid'], analyse] for corpus in self.history for analyse in corpus.get('analyses', [])])
         self.matrixanalyse = dict([[mat['uuid'], mat] for mat in self.matrix])
         self.ordermatrix = dict([[matrix['uuid'], i] for i, matrix in enumerate(self.matrix)])
-        d.close()
+#        d.close()
 
     def write(self) :
-        d = shelve.open(self.filein)
+        d = {}
         d['history'] = self.history
         d['matrix'] = self.matrix
-        d.close()
+        with open(self.filein, 'w') as f :
+            f.write(json.dumps(d, indent=4, default=str))
+       #d = shelve.open(self.filein, protocol=1)
+       #d.close()
 
     def add(self, analyse) :
         log.info('add to history %s' % analyse.get('corpus_name', 'pas un corpus'))
