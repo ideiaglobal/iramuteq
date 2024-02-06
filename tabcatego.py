@@ -86,7 +86,7 @@ class Categorisation(AnalyseMatrix):
         cate = {'TOCATE':{}, 'CATE':{}}
         for val in self.tableau.actives :
             cate['TOCATE'][val] = self.tableau.actives[val][0]
-        with open(self.pathout['cate.json'], 'w') as f :
+        with open(self.pathout['cate.json'], 'w', encoding='utf8') as f :
             f.write(json.dumps(cate))
         self.tableau.save_tableau(self.pathout['analyse.db'])
         self.dlg.Destroy()
