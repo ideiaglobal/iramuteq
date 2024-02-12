@@ -308,7 +308,7 @@ class ChiSquare(AnalyseMatrix):
         """ % (ffr(self.parametres['pathout']),ffr(self.OutFrame))
         tmpfile=tempfile.mktemp(dir=self.TEMPDIR)
         print(tmpfile)
-        tmpscript=open(tmpfile,'w')
+        tmpscript=open(tmpfile,'w', encoding='utf8')
         tmpscript.write(txt)
         tmpscript.close()
         pid = exec_rcode(self.RPath, tmpfile, wait = False)
@@ -334,7 +334,7 @@ class ChiSquare(AnalyseMatrix):
 
     def dolayout(self, option):
         ListFile=[False]
-        file=open(self.OutFrame,'r')
+        file=open(self.OutFrame,'r', encoding='utf8')
         content=file.readlines()
         file.close()
         lcont = [line.replace('"','').replace('\n','').split(';') for line in content]
@@ -381,7 +381,7 @@ class ChiSquare(AnalyseMatrix):
             allhtml.append(html_graphs)
         header="""
         <html>\n
-        <meta http-equiv="content-Type" content="text/html; charset=%s" />\n
+        <meta http-equiv="content-Type" content="text/html; charset=utf8" />\n
         <body>\n
         <h1>Test du Chi2</h1>\n
         <br>
@@ -391,12 +391,12 @@ class ChiSquare(AnalyseMatrix):
         <font color=blue>p &lt;= 0.05 mais il y a des valeurs théoriques &lt; 5</font><br>
         <font color=red>p &gt; 0.05</font>
         </td></tr></table><br><br>
-        """%self.parent.SysEncoding
+        """
         pretxt = '<br>\n'.join(links)+'<br><hr><br>\n'
         txt = '<br><hr><br>\n'.join(['<br><br>'.join([tab[i] for tab in allhtml]) for i,val in enumerate(res)])
         txt = header + pretxt + txt + '\n</body></html>'
         fileout=os.path.join(self.parametres['pathout'],'resultats-chi2.html')
-        with open(fileout, 'w') as f :
+        with open(fileout, 'w',encoding='utf8') as f :
             f.write(txt)
         ListFile.append(fileout)         
         return ListFile
