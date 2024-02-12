@@ -229,6 +229,7 @@ CHD<-function(data.in, x=9, mode.patate = FALSE, svd.method, libsvdc.path=NULL){
     			print('###################################')
     			print('longueur < 0')
     			malcl<-length(vdelta)
+
     			if ((it>1)&&(!is.logical(listsub[[it]]))&&(!is.logical(listsub[[it-1]]))){
     				if (all(listsub[[it]]==listsub[[(it-1)]])){
     					malcl<-0
@@ -248,14 +249,14 @@ CHD<-function(data.in, x=9, mode.patate = FALSE, svd.method, libsvdc.path=NULL){
 			#t2<-dtable[dtable[,'cl']==clnb+1,][,-ncol(dtable)]
 		    t1<-dtable[which(cl[,1]==clnb),]#[,-ncol(dtable)]
 			t2<-dtable[which(cl[,1]==clnb+1),]#[,-ncol(dtable)]
-            if (class(t1)=='numeric') {
+            if (inherits(t1, "numeric")) {
                 sc1 <- as.vector(t1)
                 nrowt1 <- 1
             } else {
                 sc1 <- colSums(t1)
                 nrowt1 <- nrow(t1)
             }
-            if (class(t2)=='numeric') {
+            if  (inherits(t2, "numeric")) {
                 sc2 <- as.vector(t2)
                 nrowt2 <- 1
             } else {
