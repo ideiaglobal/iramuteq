@@ -190,9 +190,9 @@ class FileOptionDialog(wx.Dialog):
             grid_sizer.Add(label, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
             self.spin1 = wx.SpinCtrl(self, -1, '',size = wx.DefaultSize, min=1, max=500)
             grid_sizer.Add(self.spin1, 1, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL, 5)
-        sizer.Add(grid_sizer, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+        sizer.Add(grid_sizer, 0, wx.GROW | wx.ALL, 5)
         line = wx.StaticLine(self, -1, size=(20, -1), style=wx.LI_HORIZONTAL)
-        sizer.Add(line, 0, wx.GROW | wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.TOP, 5)
+        sizer.Add(line, 0, wx.GROW | wx.RIGHT | wx.TOP, 5)
         btnsizer = wx.StdDialogButtonSizer()
         if wx.Platform != "__WXMSW__":
             btn = wx.ContextHelpButton(self)
@@ -203,7 +203,7 @@ class FileOptionDialog(wx.Dialog):
         btn = wx.Button(self, wx.ID_CANCEL)
         btnsizer.AddButton(btn)
         btnsizer.Realize()
-        sizer.Add(btnsizer, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_CENTER_HORIZONTAL, 5)
+        sizer.Add(btnsizer, 0,  wx.ALIGN_CENTER_HORIZONTAL, 5)
         self.SetSizer(sizer)
         sizer.Fit(self)
 
