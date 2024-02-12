@@ -58,7 +58,7 @@ class PrintRScript:
             self.add('load("%s")' % ffr(val))
 
     def write(self):
-        with open(self.scriptout, 'w') as f:
+        with open(self.scriptout, 'w', encoding='utf8') as f:
             f.write(self.script)
 
 
@@ -262,7 +262,7 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     txt += """
     #save.image(file="%s")
     """ % (ffr(DicoPath['RData']))
-    fileout = open(DicoPath['Rchdtxt'], 'w')
+    fileout = open(DicoPath['Rchdtxt'], 'w', encoding='utf8')
     fileout.write(txt)
     fileout.close()
 
@@ -287,7 +287,7 @@ def RPamTxt(corpus, RscriptPath):
     txt += """
     save.image(file="%s")
     """ % DicoPath['RData']
-    fileout = open(DicoPath['Rchdtxt'], 'w')
+    fileout = open(DicoPath['Rchdtxt'], 'w', encoding='utf8')
     fileout.write(txt)
     fileout.close()
 
@@ -324,7 +324,7 @@ def RchdQuest(DicoPath, RscriptPath, nbcl = 10, mincl = 10):
     txt += """
     save.image(file="%s")
     """ % ffr(DicoPath['RData'])
-    fileout = open(DicoPath['Rchdquest'], 'w')
+    fileout = open(DicoPath['Rchdquest'], 'w', encoding='utf8')
     fileout.write(txt)
     fileout.close()
     
@@ -428,7 +428,7 @@ rm(tablesqrpsup)
 rm(tablesqrpet)
 save.image(file="%s")
 """ % ffr(DictChdTxtOut['RData'])
-    file = open(DictChdTxtOut['RTxtProfGraph'], 'w')
+    file = open(DictChdTxtOut['RTxtProfGraph'], 'w', encoding='utf8')
     file.write(txt)
     file.close()
 
@@ -467,7 +467,7 @@ def write_afc_graph(self):
     else:
         nodesfile = 'NULL'
         edgesfile = 'NULL'
-    with open(self.RscriptsPath['afc_graph'], 'r') as f:
+    with open(self.RscriptsPath['afc_graph'], 'r', encoding='utf8') as f:
         txt = f.read()
 #    self.DictPathOut['RData'], \
     scripts = txt % (ffr(self.RscriptsPath['Rgraph']),\
@@ -523,7 +523,7 @@ def print_simi3d(self):
     make.simi.afc(dm,chistabletot, lim=%i, alpha = %.2f, movie = %s)
     """ % (simi3d.spin_1.GetValue(), float(simi3d.slider_1.GetValue())/100, movie)
     tmpfile = tempfile.mktemp(dir=self.parent.TEMPDIR)
-    tmp = open(tmpfile,'w')
+    tmp = open(tmpfile,'w', encoding='utf8')
     tmp.write(txt)
     tmp.close()
     return tmpfile
