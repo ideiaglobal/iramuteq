@@ -38,6 +38,7 @@ from PrintRScript import write_afc_graph, print_simi3d, PrintSimiScript
 from profile_segment import ProfileSegment
 from listlex import *
 from Liste import *
+from elcategorizator import ElCategorizator
 from search_tools import SearchFrame
 from dialog import PrefGraph, PrefExport, PrefSimpleFile, PrefDendro, SimpleDialog, ImageViewer
 from guifunct import SelectColumn, PrepSimi, PrefSimi, redosimi
@@ -1398,6 +1399,11 @@ class ProtoLayout(DefaultMatLayout) :
         #self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
         #self.ira.ShowAPane("Tab_content")
 
+class CateLayout(DefaultMatLayout) :
+
+    def dolayout(self) :
+        TabCate = ElCategorizator(self.ira.nb, self.pathout, self.tableau)
+        self.ira.nb.AddPage(TabCate, ' - '.join([_('ElCaTeGoRiZaToR'), self.parametres['name']]))
 
 class SimiMatLayout(DefaultMatLayout) :
 
