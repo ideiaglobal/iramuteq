@@ -235,6 +235,7 @@ class IraFrame(wx.Frame):
                        wx.CLIP_CHILDREN):
         log.info('Starting Iramuteq... ' )
         log.info('version : %s' % ConfigGlob.get('DEFAULT', 'version'))
+        print(size)
         wx.Frame.__init__(self, parent, id, title, pos, size, style)
         # configuration
         self.AppliPath = AppliPath
@@ -426,7 +427,7 @@ class IraFrame(wx.Frame):
         # min size for the frame itself isn't completely done.
         # see the end up FrameManager::Update() for the test
         # code. For now, just hard code a frame minimum size
-        self.SetMinSize(wx.Size(400, 400))
+        self.SetMinSize(wx.Size(800, 600))
 
         #--------------------------------------------------------------------
         # barre d'outils : le menu de petits icones en haut de la fenetre
@@ -701,6 +702,8 @@ class IraFrame(wx.Frame):
         if not CheckRPath(self.PathPath) :
             if sys.platform == 'win32':
                 BestRPath = FindRPAthWin32()
+            elif os.path.exists(self.AppliPath + '/R/R') :
+                BestRPath = self.AppliPath + '/R/R'
             else:
                 BestRPath = FindRPathNix()
             if BestRPath:
@@ -1419,7 +1422,7 @@ class MySplashScreen(wx.adv.SplashScreen):
         displaySize = wx.DisplaySize()
         w = displaySize[0]/1.2
         h = displaySize[1]/1.2
-        frame = IraFrame(None, -1, "IRaMuTeQ " + ConfigGlob.get('DEFAULT', 'version'), size=(w, h))
+        frame = IraFrame(None, -1, "IRaMuTeQ " + ConfigGlob.get('DEFAULT', 'version'), size=(int(w), int(h)))
         frame.Show()
         frame.finish_init()
         frame.Upgrade()
