@@ -1402,6 +1402,7 @@ class ProtoLayout(DefaultMatLayout) :
 class CateLayout(DefaultMatLayout) :
 
     def dolayout(self) :
+        self.tableau.read_tableau(self.pathout['analyse.db'])
         TabCate = ElCategorizator(self.ira.nb, self.pathout, self.tableau)
         self.ira.nb.AddPage(TabCate, ' - '.join([_('ElCaTeGoRiZaToR'), self.parametres['name']]))
 
