@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #Author: Pierre Ratinaud
-#Copyright (c) 2008-2020 Pierre Ratinaud
-#modification pour python 3 : Laurent Mérat, 6x7 - mai 2020
+#Copyright (c) 2008-2011 Pierre Ratinaud
 #License: GNU/GPL
 
 #------------------------------------
@@ -59,7 +58,7 @@ class PrintRScript:
             self.add('load("%s")' % ffr(val))
 
     def write(self):
-        with open(self.scriptout, 'w') as f:
+        with open(self.scriptout, 'w', encoding='utf8') as f:
             f.write(self.script)
 
 
@@ -263,7 +262,7 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
     txt += """
     #save.image(file="%s")
     """ % (ffr(DicoPath['RData']))
-    fileout = open(DicoPath['Rchdtxt'], 'w')
+    fileout = open(DicoPath['Rchdtxt'], 'w', encoding='utf8')
     fileout.write(txt)
     fileout.close()
 
@@ -288,7 +287,7 @@ def RPamTxt(corpus, RscriptPath):
     txt += """
     save.image(file="%s")
     """ % DicoPath['RData']
-    fileout = open(DicoPath['Rchdtxt'], 'w')
+    fileout = open(DicoPath['Rchdtxt'], 'w', encoding='utf8')
     fileout.write(txt)
     fileout.close()
 
@@ -325,7 +324,7 @@ def RchdQuest(DicoPath, RscriptPath, nbcl = 10, mincl = 10):
     txt += """
     save.image(file="%s")
     """ % ffr(DicoPath['RData'])
-    fileout = open(DicoPath['Rchdquest'], 'w')
+    fileout = open(DicoPath['Rchdquest'], 'w', encoding='utf8')
     fileout.write(txt)
     fileout.close()
     
@@ -429,7 +428,7 @@ rm(tablesqrpsup)
 rm(tablesqrpet)
 save.image(file="%s")
 """ % ffr(DictChdTxtOut['RData'])
-    file = open(DictChdTxtOut['RTxtProfGraph'], 'w')
+    file = open(DictChdTxtOut['RTxtProfGraph'], 'w', encoding='utf8')
     file.write(txt)
     file.close()
 
@@ -468,7 +467,7 @@ def write_afc_graph(self):
     else:
         nodesfile = 'NULL'
         edgesfile = 'NULL'
-    with open(self.RscriptsPath['afc_graph'], 'r') as f:
+    with open(self.RscriptsPath['afc_graph'], 'r', encoding='utf8') as f:
         txt = f.read()
 #    self.DictPathOut['RData'], \
     scripts = txt % (ffr(self.RscriptsPath['Rgraph']),\
@@ -524,7 +523,7 @@ def print_simi3d(self):
     make.simi.afc(dm,chistabletot, lim=%i, alpha = %.2f, movie = %s)
     """ % (simi3d.spin_1.GetValue(), float(simi3d.slider_1.GetValue())/100, movie)
     tmpfile = tempfile.mktemp(dir=self.parent.TEMPDIR)
-    tmp = open(tmpfile,'w')
+    tmp = open(tmpfile,'w', encoding='utf8')
     tmp.write(txt)
     tmp.close()
     return tmpfile
@@ -1173,7 +1172,7 @@ class PrintSimiScript(PrintRScript):
         if (!is.null(graph.simi$com)) {
             com <- graph.simi$com
             colm <- rainbow(length(com))
-            if (vertex.size != 0 || graph.simi$halo) {
+            if (sum(vertex.size) != 0 || graph.simi$halo) {
                 vertex.label.color <- 'black'
                 vertex.col <- colm[membership(com)]
             } else {
@@ -1385,6 +1384,17 @@ class LabbeScript(PrintRScript):
         tab <- read.csv2("%s", header=TRUE, sep=';', row.names=1)
         """ % (ffr(self.pathout['tableafcm.csv']))
         txt += """
+        cs <- colSums(tab)
+        if (min(cs) == 0) {
+            print('empty columns !!')
+            vide <- which(cs==0)
+            print(vide)
+            tab <- tab[,-vide]
+        }
+        #print('#### RcppIramuteq for C++ Labbe ####')
+        #library(RcppIramuteq)
+        #dist.mat <- labbe(as.matrix(tab))
+        #rownames(dist.mat) <- colnames(tab)
         dist.mat <- dist.labbe(tab)
         dist.mat <- as.dist(dist.mat, upper=F, diag=F)
         write.table(as.matrix(dist.mat), "%s", sep='\t')

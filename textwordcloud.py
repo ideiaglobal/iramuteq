@@ -95,7 +95,7 @@ class WordCloud(AnalyseText):
 
     def make_wordcloud(self) :
         act = ['\t'.join([act, repr(self.corpus.getlemeff(act))]) for act in self.actives]
-        with open(self.pathout['actives_eff.csv'], 'w') as f :
+        with open(self.pathout['actives_eff.csv'], 'w', encoding='utf8') as f :
             f.write('\n'.join(act))
 
 
@@ -115,7 +115,7 @@ class ClusterCloud(WordCloud):
             else: 
                 tokeep = 2
             prof = [[val[0], int(round(val[tokeep]))] for val in prof]
-            with open(self.pathout['actives_eff.csv'], 'w') as f :
+            with open(self.pathout['actives_eff.csv'], 'w', encoding='utf8') as f :
                 f.write('\n'.join(['\t'.join([val[0], repr(val[1])]) for val in prof]))
             dictcol = dict([[i, val] for i, val in enumerate(prof)])
             self.actives = [val[0] for val in prof]

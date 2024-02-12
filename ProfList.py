@@ -116,12 +116,12 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         self.InsertColumn(6, "forme", wx.LIST_FORMAT_RIGHT)
         self.InsertColumn(7, "p", wx.LIST_FORMAT_RIGHT)
         self.SetColumnWidth(0, 60)
-        self.SetColumnWidth(1, 70)
-        self.SetColumnWidth(2, 80)
-        self.SetColumnWidth(3, 100)
-        self.SetColumnWidth(4, 70)
-        self.SetColumnWidth(5, 60)
-        self.SetColumnWidth(6, 140)
+        self.SetColumnWidth(1, 100)
+        self.SetColumnWidth(2, 100)
+        self.SetColumnWidth(3, 120)
+        self.SetColumnWidth(4, 150)
+        self.SetColumnWidth(5, 100)
+        self.SetColumnWidth(6, 300)
         self.SetColumnWidth(7, wx.LIST_AUTOSIZE)
         #These two should probably be passed to init more cleanly
         #setting the numbers of items = number of elements in the dictionary
@@ -131,8 +131,10 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         #mixins
         listmix.ListCtrlAutoWidthMixin.__init__(self)
         listmix.ColumnSorterMixin.__init__(self, len(classen[0]))
-        #sort by genre (column 2), A->Z ascending order (1)
         self.SortListItems(0, True)
+        #sort by genre (column 2), A->Z ascending order (1)
+
+
         #events
         #self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected)
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnPopupTwo, self)

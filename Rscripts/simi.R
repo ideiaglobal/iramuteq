@@ -376,7 +376,7 @@ plot.simi <- function(graph.simi, p.type = 'tkplot',filename=NULL, communities =
             require(tcltk)
             ReturnVal <- tkmessageBox(title="RGL 3 D",message="Cliquez pour commencer le film",icon="info",type="ok")
 
-            movie3d(spin3d(axis=c(0,1,0),rpm=6), movie = 'film_graph', frames = "tmpfilm", duration=10, clean=TRUE, top = TRUE, dir = movie)
+            movie3d(spin3d(axis=c(0,0,1),rpm=6), movie = 'film_graph', frames = "tmpfilm", duration=10, clean=TRUE, top = TRUE, dir = movie)
             ReturnVal <- tkmessageBox(title="RGL 3 D",message="Film fini !",icon="info",type="ok")
         }
         #play3d(spin3d(axis=c(0,1,0),rpm=6))

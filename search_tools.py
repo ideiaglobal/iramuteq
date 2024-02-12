@@ -38,7 +38,7 @@ class SearchFrame(wx.Frame):
         dlg = wx.ProgressDialog("Traitements", "lecture du tableau...", maximum = 4, parent=self, style = wx.PD_APP_MODAL|wx.PD_AUTO_HIDE|wx.PD_ELAPSED_TIME)
         dlg.Center()
         dlg.Update(1)
-        with codecs.open(corpus.dictpathout['chisqtable'], 'r', parent.SysEncoding) as f :
+        with open(corpus.dictpathout['chisqtable'], 'r', encoding='utf8') as f :
             chisqtable = [line.replace('\n','').replace('"','').replace(',','.').split(';') for line in f]
         first = chisqtable[0]
         first.pop(0)
@@ -49,9 +49,9 @@ class SearchFrame(wx.Frame):
         #self.text_ctrl_1 = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE)
         #nbactives = len(self.corpus.actives)
         dlg.Update(3)
-        with open(corpus.dictpathout['ContEtOut'], 'r') as f :
+        with open(corpus.dictpathout['ContEtOut'], 'r', encoding='utf8') as f :
             nbetoiles = len(f.readlines())
-        with open(corpus.dictpathout['Contout'], 'r') as f :
+        with open(corpus.dictpathout['Contout'], 'r', encoding='utf8') as f :
             nbactives = len(f.readlines())
         dlg.Update(4, "Ouverture...")
         self.liste = SearchList(self, parent, self.dchisqtable, first, nbactives, nbetoiles) 

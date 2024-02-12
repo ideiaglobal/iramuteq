@@ -56,6 +56,7 @@ from tabfrequence import Frequences, FreqMultiple
 from tableau import Tableau
 from tabrsimple import InputText
 from tabsimi import DoSimi
+from tabcatego import Categorisation
 from tabsplitvar import SplitMatrixFromVar
 from tabverges import Prototypical
 from textaslexico import Lexico
@@ -93,6 +94,7 @@ ID_CHECKCORPUS = wx.Window.NewControlId()
 ID_Tabcontent = wx.Window.NewControlId()
 ID_AFCM = wx.Window.NewControlId()
 ID_SIMI = wx.Window.NewControlId()
+ID_CATE = wx.Window.NewControlId()
 ID_CloseTab = wx.Window.NewControlId()
 ID_SaveTab = wx.Window.NewControlId()
 ID_CreateText = wx.Window.NewControlId()
@@ -182,8 +184,8 @@ class printer(object) :
     def flush(self):
         pass
 
-sys.stderr = writer()
-sys.stdout = printer()
+#sys.stderr = writer()
+#sys.stdout = printer()
 
 images_analyses = {
         'textroot' : 'textroot.png',
@@ -217,7 +219,8 @@ images_analyses = {
         'preferences' : 'preferences.png',
         'exportmetatable' : 'exportmetatable.png',
         'importdmi' : 'twitter.png',
-        'labbe' : 'spec.png'
+        'labbe' : 'spec.png',
+        'categorisation' : 'spec.png',
          }
 
 
@@ -237,6 +240,8 @@ class IraFrame(wx.Frame):
         log.info('version : %s' % ConfigGlob.get('DEFAULT', 'version'))
         print(size)
         wx.Frame.__init__(self, parent, id, title, pos, size, style)
+        #Font
+        self.SetFont(wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
         # configuration
         self.AppliPath = AppliPath
         self.images_path = os.path.join(AppliPath,'images')
@@ -352,6 +357,7 @@ class IraFrame(wx.Frame):
                        [ID_SIMI, _("Similarities Analysis"), 'simimatrix'],
                        [ID_proto, _("Prototypical Analysis"), 'proto'],
                        [ID_Splitfromvar, _("Split from variable"), 'subcorpusmeta'],
+                       [ID_CATE, _("ElCaTeGoRiZatoR"), 'categorisation'],
                       ]
         for analyse in matanalyses :
             if not isinstance(analyse, dict) :
@@ -489,10 +495,10 @@ class IraFrame(wx.Frame):
         #------------------------------------------------------------------------------------------------
         # fichier d'historique de Iramuteq
         #------------------------------------------------------------------------------------------------
-        #if not os.path.exists(os.path.join(UserConfigPath, 'history.db')) :
-        #    with open(os.path.join(UserConfigPath, 'history.db'), 'w') as f :
-        #        f.write('')
-        self.history = History(os.path.join(UserConfigPath, 'historyIramuteq'))
+        if not os.path.exists(os.path.join(UserConfigPath, 'history.db')) :
+            with open(os.path.join(UserConfigPath, 'history.db'), 'w') as f :
+                f.write('{}')
+        self.history = History(os.path.join(UserConfigPath, 'history.db'))
         # l'extension ".db" est ajoutée automatiquement par le module
 
         #------------------------------------------------------------------------------------------------
@@ -505,7 +511,7 @@ class IraFrame(wx.Frame):
             Name("lefttree").
             Caption(_("Historic")).
             Left().
-            MinSize(wx.Size(200,500)).
+            MinSize(wx.Size(300,400)).
             Layer(1).
             Position(1).
             CloseButton(False).
@@ -603,6 +609,7 @@ class IraFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnAFCM, id=ID_AFCM)
         self.Bind(wx.EVT_MENU, self.OnProto, id=ID_proto)
         self.Bind(wx.EVT_MENU, self.OnSplitVar, id = ID_Splitfromvar)
+        self.Bind(wx.EVT_MENU, self.OnCategorisation, id = ID_CATE)
         #self.Bind(wx.EVT_MENU, self.OnRCode, id=ID_RCODE) #???
         #self.Bind(wx.EVT_MENU, self.OnSplitVar, id=ID_SPLITVAR) #???
         #self.Bind(wx.EVT_MENU, self.OnCheckcorpus, id = ID_CHECKCORPUS) #???
@@ -701,7 +708,12 @@ class IraFrame(wx.Frame):
         BestRPath = False
         if not CheckRPath(self.PathPath) :
             if sys.platform == 'win32':
-                BestRPath = FindRPAthWin32()
+                if os.path.exists(self.AppliPath + '\\R\\R\\x64\\R.exe') :
+                    BestRPath = self.AppliPath + '\\R\\R\\bin\\x64\\R.exe'
+                elif os.path.exists(self.AppliPath + '\\R\\R\\i386\\R.exe') :
+                    BestRPath = self.AppliPath + '\\R\\R\\bin\\i386\\R.exe'
+                else :
+                    BestRPath = FindRPAthWin32()
             elif os.path.exists(self.AppliPath + '/R/R') :
                 BestRPath = self.AppliPath + '/R/R'
             else:
@@ -759,7 +771,7 @@ class IraFrame(wx.Frame):
         if not menu_pos is None :
             self.mb.EnableTop(menu_pos, Show)
             self.mb.Refresh()
-        self._mgr.Update()
+        #self._mgr.Update()
 
     #--------------------------------------------------------------------
     # fin de __init__ du wx.Frame
@@ -913,13 +925,16 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
         if isinstance(parent, IraFrame) :
             npage = self.nb.GetPage(new)
             if 'parametres' in dir(npage) :
-                self.tree.GiveFocus(uuid=npage.parametres['uuid'])
+                #self.tree.GiveFocus(uuid=npage.parametres['uuid'])
                 if npage.parametres.get('matrix', False) :
                     self.ShowMenu('text', False)
                     self.ShowMenu('matrix', True)
                 elif npage.parametres.get('corpus', False) :
                     self.ShowMenu('text')
                     self.ShowMenu('matrix', False)
+        #self._mgr.Update()
+        #wx.CallAfter(self.nb.SendSizeEvent)
+        #self.Refresh()
 
     # action ou évènement ?
     def OnCloseTab(self, evt):
@@ -961,6 +976,9 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
                 pane.Hide()
         self._mgr.GetPane(panel).Show()
         self._mgr.Update()
+        print('show a pane refresh')
+        wx.CallAfter(self.nb.SendSizeEvent)
+        self.Refresh()
 
     # action ou évènement ?
     def OnAcceuil(self, event):
@@ -1009,6 +1027,10 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 
     def OnSimiTab(self, event, matrix = None):
         self.analyse_matrix(DoSimi, matrix = matrix, analyse_type = 'simimatrix', dlgnb = 5)
+
+    def OnCategorisation(self, event, matrix = None) :
+        self.analyse_matrix(Categorisation, matrix = matrix, analyse_type = 'categorisation', dlgnb = 1)
+
 
     def OnCHDReinert(self, event, matrix = None):
         #if matrix is None :

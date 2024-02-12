@@ -148,7 +148,7 @@ class Lexico(AnalyseText) :
         save.image("%s")
         """ % ffr(self.dictpathout['RData'])
         tmpfile = tempfile.mktemp(dir=self.parent.TEMPDIR)
-        tmpscript = open(tmpfile, 'w')
+        tmpscript = open(tmpfile, 'w' ,encoding='utf8')
         tmpscript.write(txt)
         tmpscript.close()
         self.doR(tmpfile, dlg = self.dlg, message = 'R...')
