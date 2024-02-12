@@ -740,16 +740,23 @@ class IraFrame(wx.Frame):
     # vu comme elle est écrite, impossible de gérer
     # l'affichage/masquage des toolbars en fonction du contexte
     def ShowMenu(self, menu, Show=True):
+        print("showmenu")
         if menu == 'text' :
             menu_pos = 4
             if Show :
                 self._mgr.GetPane('tb_text').Show()
+                self._mgr.GetPane('tb_mat').Hide()
+                self.mb.EnableTop(menu_pos, Show)
+                self.mb.EnableTop(3, False)
             else :
                 self._mgr.GetPane('tb_text').Hide()
         elif menu == 'matrix' :
             menu_pos = 3
             if Show :
                 self._mgr.GetPane('tb_mat').Show()
+                self._mgr.GetPane('tb_text').Hide()
+                self.mb.EnableTop(menu_pos, Show)
+                self.mb.EnableTop(4, False)
             else :
                 self._mgr.GetPane('tb_mat').Hide()
         elif menu == 'view' :
@@ -757,9 +764,9 @@ class IraFrame(wx.Frame):
         else :
             menu_pos = None
         if not menu_pos is None :
-            self.mb.EnableTop(menu_pos, Show)
+            #self.mb.EnableTop(menu_pos, Show)
             self.mb.Refresh()
-        #self._mgr.Update()
+        self._mgr.Update()
 
     #--------------------------------------------------------------------
     # fin de __init__ du wx.Frame
@@ -907,6 +914,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 
     # action ou évènement ?
     def OnPageChanged(self, event) :
+        print("OnPageChange")
         new = event.GetSelection()
         nobject = event.GetEventObject()
         parent = nobject.GetParent()
@@ -915,14 +923,13 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
             if 'parametres' in dir(npage) :
                 #self.tree.GiveFocus(uuid=npage.parametres['uuid'])
                 if npage.parametres.get('matrix', False) :
-                    self.ShowMenu('text', False)
+                    #self.ShowMenu('text', False)
                     self.ShowMenu('matrix', True)
                 elif npage.parametres.get('corpus', False) :
                     self.ShowMenu('text')
-                    self.ShowMenu('matrix', False)
-        #self._mgr.Update()
-        #wx.CallAfter(self.nb.SendSizeEvent)
-        #self.Refresh()
+                    #self.ShowMenu('matrix', False)
+        wx.CallAfter(self.nb.SendSizeEvent)
+        self.Refresh()
 
     # action ou évènement ?
     def OnCloseTab(self, evt):
@@ -964,7 +971,6 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
                 pane.Hide()
         self._mgr.GetPane(panel).Show()
         self._mgr.Update()
-        print('show a pane refresh')
         wx.CallAfter(self.nb.SendSizeEvent)
         self.Refresh()
 
