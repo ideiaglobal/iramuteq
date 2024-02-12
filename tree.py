@@ -1096,16 +1096,16 @@ class LeftTree(CT.CustomTreeCtrl):
         event.Skip()
 
     def OnSelChanged(self, event = None, pydata = None):
+        print("OnSelChange")
         if event is not None :
             item = event.GetItem()
             pydata = self.GetPyData(item)
-        print('selchange',pydata)
         if pydata is not None :
             if 'corpus_name' in pydata or 'corpus' in pydata :
-                self.ira.ShowMenu('matrix', False)
+                #self.ira.ShowMenu('matrix', False)
                 self.ira.ShowMenu('text', True)
             if 'matrix_name' in pydata or 'matrix' in pydata:
-                self.ira.ShowMenu('text', False)
+                #self.ira.ShowMenu('text', False)
                 self.ira.ShowMenu('matrix', True)
             if 'uuid' in pydata :
                 if pydata['uuid'] in ['textroot', 'matroot'] :
@@ -1120,7 +1120,7 @@ class LeftTree(CT.CustomTreeCtrl):
                             self.parent.nb.SetSelection(i)
                             break
         #self.parent._mgr.Update()
-        #wx.CallAfter(self.parent.nb.SendSizeEvent)
+        wx.CallAfter(self.parent.nb.SendSizeEvent)
         self.parent.Refresh()
         #if event is not None :
         #    event.Skip()
@@ -1134,7 +1134,7 @@ class LeftTree(CT.CustomTreeCtrl):
             else:
                 olditemtext = self.GetItemText(olditem)
             #self.log.info("OnSelChanging: From %s" % olditemtext + " To %s" % self.GetItemText(item) + "\n")
-        event.Skip()
+        #event.Skip()
 
     def OnBeginDrag(self, event):
         self.item = event.GetItem()
