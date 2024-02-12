@@ -157,7 +157,7 @@ Rchdquest<-function(tableuc1,listeuce1,uceout ,nbt = 9, mincl = 2, mode.patate =
 			chitable[2,1]<-poids2[j]-chitable[1,1]
 			chitable[2,2]<-nrow(classeuce1)-poids2[j]-chitable[1,2]
 			chitest<-chisq.test(chitable,correct=FALSE)
-			if ((chitable[1,1]-chitest$expected)<0) {
+			if ((chitable[1,1]-chitest$expected[1,1])<0) {
 			    chicroise[i,j]<--round(chitest$statistic,digits=7)
 			} else {
 			    chicroise[i,j]<-round(chitest$statistic,digits=7)
