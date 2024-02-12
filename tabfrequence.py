@@ -124,7 +124,7 @@ class Frequences(AnalyseMatrix) :
     def dolayout(self):
         listtab = []
         tab = []
-        with open(self.outframe) as f :
+        with open(self.outframe, 'r', encoding='utf8') as f :
             content = f.read().splitlines()
         content.pop(0)
         content.pop(0)
@@ -144,10 +144,10 @@ class Frequences(AnalyseMatrix) :
         #    else :
         #        tab.append(ligne)
         pretexte = '''<html>
-        <meta http-equiv="content-Type" content="text/html; charset=%s" />
+        <meta http-equiv="content-Type" content="text/html; charset=utf8" />
         <body>\n<h1>Fréquences</h1>
         <a name="deb"></a><br>
-        ''' % self.parent.SysEncoding
+        ''' 
         for i in range(0, len(listtab)):
             pretexte += '<p><a href="#%s">%s</a></p>' % (str(i), self.listtitre[i])
             texte += '<hr size="5" align="center" width="50%" color="green">\n'
@@ -167,7 +167,7 @@ class Frequences(AnalyseMatrix) :
             """ % os.path.basename(self.fileforR[i])
             texte += '</body>\n</html>'
         fileout = os.path.join(self.pathout.dirout, 'resultats.html')
-        with open(fileout, 'w') as f :
+        with open(fileout, 'w', encoding='utf8') as f :
             f.write(pretexte + texte)
         #return fileout
 
@@ -183,7 +183,7 @@ class FreqMultiple(Frequences):
         freq = [[line[0], repr(line[1]), line[2], line[3], line[4]] for line in freq]
         freq.insert(0, ['mod', 'freq', 'percent of total', 'row number', 'percent of rows'])
         self.freq = freq
-        with open(self.pathout['frequences.csv'], 'w') as f :
+        with open(self.pathout['frequences.csv'], 'w', encoding='utf8') as f :
             f.write('\n'.join(['\t'.join(line) for line in freq]))
         self.rscript = FreqMultiScript(self)
         self.rscript.make_script()
@@ -192,10 +192,10 @@ class FreqMultiple(Frequences):
 
     def dolayout(self):
         pretexte = '''<html>
-        <meta http-equiv="content-Type" content="text/html; charset=%s" />
+        <meta http-equiv="content-Type" content="text/html; charset=utf8" />
         <body>\n<h1>Fréquences</h1>
         <a name="deb"></a><br>
-        ''' % self.parent.SysEncoding       
+        '''       
         txt = """
         <table>\n<tr><td>\n
         <table border=1><tr><td>
@@ -203,5 +203,5 @@ class FreqMultiple(Frequences):
         txt += '</td></tr><tr><td>'.join(['</td><td>'.join(line) for line in self.freq]) + '</td></tr></table></td></tr>'
         txt += '<tr><td><img src="%s" alt="graph"/></td><td><img src="%s" alt="graph"/></td></tr></table>' % (os.path.basename(self.pathout['barplotfreq.png']), os.path.basename(self.pathout['barplotrow.png']))
         txt += "</body>\n</html>"
-        with open(self.pathout['resultats.html'], 'w') as f :
+        with open(self.pathout['resultats.html'], 'w', encoding='utf8') as f :
             f.write(pretexte + txt)
