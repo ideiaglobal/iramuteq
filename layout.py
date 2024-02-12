@@ -250,7 +250,7 @@ class GraphPanelAfc(wx.Panel):
                 """
             txt += write_afc_graph(self)
             filetmp = tempfile.mktemp()
-            with open(filetmp, 'w') as f :
+            with open(filetmp, 'w', encoding='utf8') as f :
                 f.write(txt)
             pid = exec_rcode(self.ira.RPath, filetmp)
             check_Rresult(self.ira, pid)
@@ -990,7 +990,7 @@ class GraphPanelDendro(wx.Panel):
             """ % (ffr(self.dictpathout['RData.RData']), ffr(self.ira.RscriptsPath['Rgraph']), ffr(fileout), width, height, svg, type_dendro, bw)
         tmpfile = tempfile.mktemp()
         # ecriture du fichier de script à éxécuter
-        with open(tmpfile, 'w') as f :
+        with open(tmpfile, 'w', encoding='utf8') as f :
             f.write(txt)
         # dialogue d'attente
         busy = wx.BusyInfo(_("Please wait..."), self.parent)
@@ -1205,7 +1205,7 @@ def blender(self):
     """
     # ecriture du fichier de script à éxécuter
     filetmp = tempfile.mktemp()
-    with open(filetmp, 'w') as f :
+    with open(filetmp, 'w', encoding='utf8') as f :
         f.write(txt)
     exec_rcode(self.ira.RPath, filetmp)
     GraphToJson(nodesfile, edgesfile, jsonout)
@@ -1423,7 +1423,7 @@ class SimiMatLayout(DefaultMatLayout) :
         #self.parent.nb.SetSelection(self.parent.nb.GetPageCount() - 1)
 
     def redosimi(self,evt) :
-        with open(self.pathout['selected.csv'],'r') as f :
+        with open(self.pathout['selected.csv'],'r', encoding='utf8') as f :
             selected = f.read()
         selected = [int(val) for val in selected.splitlines()]
         #if self.actives is None :
@@ -1436,6 +1436,7 @@ class SimiMatLayout(DefaultMatLayout) :
             actives = [[val, self.tableau.actives[val]] for val in self.tableau.actives]
         #self.tableau.make_listactives()
         actives = dict([[i, val] for i, val in enumerate(actives)])
+        print(actives)
         #dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
         self.dial = PrefSimi(self.parent, -1, self.parametres, self.indices, wordlist = actives, selected = selected, actives = self.tableau.listactives)
         self.dial.CenterOnParent()
@@ -1450,7 +1451,7 @@ class SimiMatLayout(DefaultMatLayout) :
                 indexes.append(self.dial.listcol.getColumnText(last,0))
             self.column = [self.tableau.listactives.index(val) for val in indexes]
             self.column.sort()
-            with open(self.pathout['selected.csv'], 'w') as f :
+            with open(self.pathout['selected.csv'], 'w', encoding='utf8') as f :
                 f.write('\n'.join([repr(val) for val in self.column]))
             self.make_param()
             self.dial.Destroy()
@@ -1578,7 +1579,7 @@ class SimiMatLayout(DefaultMatLayout) :
         #saveAsGEXF(graph, filepath = fileout)
         """ % (ffr(self.pathout['RData.RData']), ffr(self.parent.RscriptsPath['simi']), fileout)
         filetmp = tempfile.mktemp()
-        with open(filetmp, 'w') as f :
+        with open(filetmp, 'w', encoding='utf8') as f :
             f.write(txt)
         exec_rcode(self.ira.RPath, filetmp)
         mss = wx.MessageDialog(self.ira, fileout, _('File exported'), wx.OK)
