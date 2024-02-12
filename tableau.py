@@ -212,7 +212,7 @@ class Tableau() :
         self.linecontent = [[val.replace('"','').replace(';',' ').replace('\t', ' ').strip() for val in line] for line in self.linecontent]
 
     def write_csvfile(self) :
-        with open(self.parametres['csvfile'], 'w') as f :
+        with open(self.parametres['csvfile'], 'w', encoding='utf8') as f :
             f.write('\n'.join(['\t'.join(line) for line in self.csvtable]))
 
     def make_tmpfile(self) :
@@ -238,7 +238,7 @@ class Tableau() :
         self.write_csvfile()
 
     def read_csvfile(self):
-        with codecs.open(self.parametres['csvfile'], 'r', self.parametres['syscoding']) as f:
+        with open(self.parametres['csvfile'], 'r', encoding='utf8') as f:
             self.csvtable = [line.split('\t') for line in f.read().splitlines()]
         self.linecontent = [line[1:] for line in self.csvtable]
         self.linecontent.pop(0)
@@ -303,7 +303,7 @@ class Tableau() :
         #out = [[self.rownames[i]] + out[i] for i in range(len(linecontent))] 
         #out.insert(0,[self.idname] + self.listactives)
         out.insert(0, self.listactives)
-        with open(fileout, 'w') as f :
+        with open(fileout, 'w', encoding='utf8') as f :
             f.write('\n'.join([';'.join(line) for line in out]))
 
     def make_01_from_selection(self, listact, listsup = None, dowrite = True) :
@@ -331,15 +331,15 @@ class Tableau() :
         #table = [[self.rownames[i]] + table[i] for i in range(len(self.rownames))]
         #table.insert(0, [self.idname] + self.listactives)
         table.insert(0, self.listactives)
-        with open(fileout, 'w') as f:
+        with open(fileout, 'w', encoding='utf8') as f:
             f.write('\n'.join([';'.join(line) for line in table]))
 
     def printtable(self, filename, Table, sep = ';'):
-        with open(filename, 'w') as f :
+        with open(filename, 'w', encoding='utf8') as f :
             f.write('\n'.join([sep.join(line) for line in Table]))
 
     def buildprofil(self) :
-        with open(self.pathout['uce'], 'r') as filein :
+        with open(self.pathout['uce'], 'r', encoding='utf8') as filein :
             content = filein.readlines()
         content.pop(0)
         lsucecl = []
