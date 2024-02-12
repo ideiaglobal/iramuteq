@@ -140,7 +140,7 @@ class DoSimi(AnalyseMatrix):
 
     def doanalyse(self) :
         self.pathout.basefiles(simipath)
-        with open(normpath_win32(self.pathout['selected.csv']), 'w') as f :
+        with open(normpath_win32(self.pathout['selected.csv']), 'w', encoding='utf8') as f :
             f.write('\n'.join([repr(val) for val in self.column]))
         count = 1
         keepGoing = self.dlg.Update(count)
