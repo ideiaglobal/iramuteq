@@ -21,7 +21,7 @@ class CategoDict :
 
     def readjson(self):
         if self.pathout is not None :
-            with open(self.pathout['cate.json'], 'r') as f :
+            with open(self.pathout['cate.json'], 'r', encoding='utf8') as f :
                 cate = json.load(f)
         else :
             cate = {'TOCATE' : {'word1': 3, 'word2' : 2, 'word3' : 5}, 'CATE': {'cat1' : [34,{'word6':30, 'word7':4}], 'cat2' : [20,{'word20':20}]}}
@@ -106,6 +106,13 @@ class CategoDict :
             del(self.cate['TOCATE'][word])
             return True
 
+    def addcatefromscratch(self) :
+        i = 0
+        while "NewCategory_%i" %i in self.cate['CATE'] :
+            i += 1
+        newcate = "NewCategory_%i" %i
+        self.cate['CATE'][newcate] = [0, {}]
+
     def addcatefromwordcate(self, word, eff) :
         if word in self.cate['CATE'] :
             return False
@@ -127,7 +134,7 @@ class CategoDict :
         if self.cate['CATE'] != {} :
             print("Categories should be empty")
             return False
-        with open(infile, 'r') as f :
+        with open(infile, 'r', encoding='utf8') as f :
             newcate = json.load(f)
         for categorie in newcate['CATE'] :
             self.cate['CATE'][categorie] = [0,{}]
@@ -185,6 +192,10 @@ class ElCategorizator ( wx.Panel ):
         self.butload = wx.Button( self, wx.ID_ANY, u"Load a categorization", wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer2.Add( self.butload, 0, wx.ALL, 5 )
 
+        self.butaddcate = wx.Button( self, wx.ID_ANY, u"Add a category", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer2.Add( self.butaddcate, 0, wx.ALL, 5 )
+
+
         bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
 
         self.nbword = """Words : {:d} ({:d}) | """
@@ -211,6 +222,7 @@ class ElCategorizator ( wx.Panel ):
         self.butdict.Bind(wx.EVT_BUTTON, self.OnDict)
         self.butsave.SetBackgroundColour((14, 242, 14, 255))
         self.butload.Bind(wx.EVT_BUTTON, self.OnLoad)
+        self.butaddcate.Bind(wx.EVT_BUTTON, self.OnAddCate)
         self.OnStat()
         self.SetSizer( gsizer )
         self.Layout()
@@ -221,8 +233,9 @@ class ElCategorizator ( wx.Panel ):
 
     def OnLoad(self, event) :
         if len(self.cate.cate['CATE']) != 0 :
-            print("Categories should be empty")
-            event.Skip()
+            message = wx.MessageDialog(self, _("Categories must be empty to load a categorization."), _("Information"), wx.OK|wx.ICON_WARNING)
+            message.ShowModal()
+            message.Destroy()
             return
         wildcard = "json|*.json|" \
                    "All file|*.*"
@@ -256,19 +269,23 @@ class ElCategorizator ( wx.Panel ):
             for word in line :
                 newline.append(wordscate.get(word,word))
             newtab.append(newline)
-        with open(self.pathout['tableout.csv'], 'w') as f :
+        with open(self.pathout['tableout.csv'], 'w', encoding='utf8') as f :
             f.write('\n'.join(['\t'.join(line) for line in newtab]))
-        print("csv exported !")
+        message = wx.MessageDialog(self, _("Export successful\n%s" % self.pathout['tableout.csv']), _("Information"), wx.OK|wx.ICON_INFORMATION)
+        message.ShowModal()
+        message.Destroy()
 
     def OnDict(self, event):
-        with open(self.pathout['dictionnary.txt'], 'w') as f :
+        with open(self.pathout['dictionnary.txt'], 'w', encoding='utf8') as f :
             for categorie in self.cate.cate['CATE'] :
                 f.write(categorie + ': \t' + repr(self.cate.cate['CATE'][categorie][0]) + '\n')
                 for word in self.cate.cate['CATE'][categorie][1] :
                     f.write('\t' + word + ': \t' + repr(self.cate.cate['CATE'][categorie][1][word]) + '\n')
             for word in self.cate.cate['TOCATE'] :
                 f.write(word + ':\t' + repr(self.cate.cate['TOCATE'][word]) + '\n')
-        print("dictionnary exported !")
+        message = wx.MessageDialog(self, _("Export successful\n%s" % self.pathout['dictionnary.txt']), _("Information"), wx.OK|wx.ICON_INFORMATION)
+        message.ShowModal()
+        message.Destroy()
 
     def OnStat(self) :
         nbtocat, totocat, nbcate, totcate, lenwordincate = self.cate.makestat()
@@ -287,6 +304,14 @@ class ElCategorizator ( wx.Panel ):
             for word in line :
                 newline.append(wordscate.get(word,word))
             newtab.append(newline)
+
+    def OnAddCate(self, evt) :
+        print('add a category')
+        print(self.m_listCate.GetItemCount())
+        self.cate.addcatefromscratch()
+        self.m_listCate.dlist = self.cate.getcate()
+        self.m_listCate.RefreshData(self.m_listCate.dlist)
+        self.m_listCate.SetSelection(self.m_listCate.GetItemCount() - 1)
 
 
 
@@ -625,6 +650,7 @@ class ListForCate(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
                     pass
                 else :
                     dial = wx.MessageDialog(self, "This category name is already used", style=wx.OK|wx.CENTRE).ShowModal()
+                    dial.Destroy()
             self.dlist = self.cate.getcate()
             self.RefreshData(self.dlist)
             self.parent.m_listToCate.RefreshData(self.cate.getwordstocate())
