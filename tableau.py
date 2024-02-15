@@ -95,7 +95,7 @@ class Tableau() :
             self.parametres['type'] = 'matrix'
             self.parametres['matrix_name'] = os.path.basename(filename)
             self.parametres['uuid'] = str(uuid4())
-            self.parametres['shelves'] = os.path.join(self.parametres['pathout'], 'shelve.db')
+            self.parametres['shelves'] = os.path.join(self.parametres['pathout'], 'shelve')
             self.parametres['ira'] = os.path.join(self.parametres['pathout'], 'Matrix.ira')
         else :
             self.parametres = parametres

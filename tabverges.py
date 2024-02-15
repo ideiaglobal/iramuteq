@@ -72,7 +72,7 @@ class Prototypical(AnalyseMatrix) :
                         self.parametres['typegraph'] = 'plan'
                 self.dial.Destroy()
         else :
-            self.dial.Destroy()               
+            self.dial.Destroy()
             self.parametres = None
 
     def doanalyse(self) :

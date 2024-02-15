@@ -50,7 +50,7 @@ class SplitMatrixFromVar(AnalyseMatrix):
             tab = Tableau(self.ira, os.path.join(self.tableau.pathout['%s.csv' % mod]).replace('*',''))
             if not os.path.exists(tab.pathout.dirout) :
                 os.mkdir(tab.pathout.dirout)
-            tab.linecontent = newtabs[mod] 
+            tab.linecontent = newtabs[mod]
             tab.make_content_simple()
             tab.parametres['matrix'] = tab.parametres['uuid']
             self.ira.tree.OnItemAppend(tab.parametres, select = False)

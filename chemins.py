@@ -77,7 +77,7 @@ class PathOut :
             f = os.path.join(self.dirout, self.d[key]).replace('\\', '\\\\')
             return normpath_win32(f)
             #return os.path.join(self.dirout, self.d[key]).replace('\\', '\\\\')
-    
+
     def getF(self, key) :
         return self.__getitem__(key).replace('\\', '/')
 
@@ -290,7 +290,7 @@ ChdTxtPathOut = {'TableUc1': 'TableUc1.csv',
         'prof_type' :  'profil_type.csv',
         'antiprof_type' :  'antiprof_type.csv',
         'type_cl' :  'type_cl.csv',
-        'db' : 'analyse.db',
+        'db' : 'analyse'#.db,
     }
 
 def StatTxtPathOut(pathout):
@@ -314,7 +314,7 @@ def StatTxtPathOut(pathout):
           'afct_col_csv': ffr(os.path.join(pathout, 'afct_col.csv')),
           'afct_facteur_csv': ffr(os.path.join(pathout, 'afct_facteur.csv')),
           'ira' : ffr(os.path.join(pathout, 'Analyse.ira')),
-          'db' : os.path.join(pathout, 'analyse.db'),
+          'db' : os.path.join(pathout, 'analyse'),
           'zipf' : ffr(os.path.join(pathout, 'zipf.png')),
     }
     return d
@@ -338,7 +338,7 @@ simipath = {'mat01' :  'mat01.csv',
           'liste_graph' :'liste_graph.txt',
           'ira' : 'Analyse.ira',
           'film' : '',
-          'db' : 'analyse.db',
+          'db' : 'analyse',
           'corpus' : 'corpus.db',
         }
 

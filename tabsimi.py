@@ -90,7 +90,7 @@ class DoSimi(AnalyseMatrix):
             self.tableau.parametres['mineff'] = 0
             if not self.fromprof :
                 dialcol = FreqDialog(self.parent, self.tableau.get_colnames(), _("Select columns"), size=(600, 250), showNA = False)
-                dialcol.CenterOnParent()            
+                dialcol.CenterOnParent()
                 res = dialcol.ShowModal()
             else :
                 res = wx.ID_OK
@@ -121,14 +121,14 @@ class DoSimi(AnalyseMatrix):
                     self.paramsimi = self.make_param()
                     self.parametres.update(self.paramsimi)
                     #self.parametres['type'] = 'simimatrix'
-                    if not self.pathout : 
+                    if not self.pathout :
                         self.parametres['pathout'] = ConstructPathOut(self.parametres['pathout'], 'SimiMatrix')
                     else :
                         self.parametres['pathout'] = self.dirout
                     self.pathout.createdir(self.parametres['pathout'])
                     self.pathout.dirout = self.parametres['pathout']
                     self.dial.Destroy()
-                    #self.doanalyse2()  
+                    #self.doanalyse2()
                 else :
                     self.dial.Destroy()
                     self.parametres = None

@@ -60,7 +60,7 @@ class AnalyseMatrix :
             if self.parametres.get('tohistory', True) :
                 self.time = time() - self.t1
                 minutes, seconds = divmod(self.time, 60)
-                hours, minutes = divmod(minutes, 60)            
+                hours, minutes = divmod(minutes, 60)
                 self.parametres['time'] = '%.0fh %.0fm %.0fs' % (hours, minutes, seconds)
                 self.parametres['ira'] = self.pathout['Analyse.ira']
                 DoConf().makeoptions([self.parametres['type']], [self.parametres], self.pathout['Analyse.ira'])

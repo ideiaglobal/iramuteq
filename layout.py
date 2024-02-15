@@ -407,7 +407,7 @@ class OpenCHDS():
         else :
             corpname = self.corpus.parametres['matrix_name']
             if os.path.exists(self.pathout['analyse.db']) :
-                self.corpus.read_tableau(self.pathout['analyse.db'])
+                self.corpus.read_tableau(self.pathout['analyse'])
         clnb = parametres['clnb']
         dlg = progressbar(self, maxi = 4 + clnb)
         self.clnb = clnb
@@ -1347,7 +1347,7 @@ class DefaultMatLayout :
         self.tableau = tableau
         self.parametres = parametres
         if os.path.exists(self.pathout['analyse.db']) :
-            self.tableau.read_tableau(self.pathout['analyse.db'])
+            self.tableau.read_tableau(self.pathout['analyse'])
         self.dolayout()
         self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
         self.ira.ShowAPane("Tab_content")
@@ -1402,7 +1402,7 @@ class ProtoLayout(DefaultMatLayout) :
 class CateLayout(DefaultMatLayout) :
 
     def dolayout(self) :
-        self.tableau.read_tableau(self.pathout['analyse.db'])
+        self.tableau.read_tableau(self.pathout['analyse'])
         TabCate = ElCategorizator(self.ira.nb, self.pathout, self.tableau)
         self.ira.nb.AddPage(TabCate, ' - '.join([_('ElCaTeGoRiZaToR'), self.parametres['name']]))
 
