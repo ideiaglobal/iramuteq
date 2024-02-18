@@ -585,7 +585,7 @@ class IraFrame(wx.Frame):
         self._mgr.GetPane("lefttree").Show()
         self._mgr.GetPane("classif_tb").Hide() # utilisé nulle part ailleurs que sur cette ligne ???
         # "commit" all changes made to FrameManager
-        self._mgr.Update()
+        #self._mgr.Update()
 
         # Attache les événements aux éléments d'interface
         self.Bind(wx.EVT_MENU, self.OnAcceuil, id=ID_ACCEUIL)
@@ -645,7 +645,7 @@ class IraFrame(wx.Frame):
         self._mgr.SetAGWFlags(self._mgr.GetAGWFlags() ^ (aui.AUI_MGR_RECTANGLE_HINT | aui.AUI_MGR_ALLOW_FLOATING))
         self._mgr.GetArtProvider().SetMetric(aui.AUI_DOCKART_GRADIENT_TYPE, aui.AUI_GRADIENT_HORIZONTAL)
         self.GetDockArt().SetColor(aui.AUI_DOCKART_ACTIVE_CAPTION_GRADIENT_COLOUR, "#00FFF9")
-        self.DoUpdate()
+        #self.DoUpdate()
         self._icon = wx.Icon(os.path.join(ImagePath, "iraicone.ico"), wx.BITMAP_TYPE_ICO)
         self.SetIcon(self._icon)
 
@@ -752,10 +752,11 @@ class IraFrame(wx.Frame):
     # vu comme elle est écrite, impossible de gérer
     # l'affichage/masquage des toolbars en fonction du contexte
     def ShowMenu(self, menu, Show=True):
-        print("showmenu")
         if menu == 'text' :
             menu_pos = 4
             if Show :
+                if self._mgr.GetPane('tb_text').IsShown()  :
+                    return
                 self._mgr.GetPane('tb_text').Show()
                 self._mgr.GetPane('tb_mat').Hide()
                 self.mb.EnableTop(menu_pos, Show)
@@ -765,6 +766,8 @@ class IraFrame(wx.Frame):
         elif menu == 'matrix' :
             menu_pos = 3
             if Show :
+                if self._mgr.GetPane('tb_mat').IsShown():
+                    return
                 self._mgr.GetPane('tb_mat').Show()
                 self._mgr.GetPane('tb_text').Hide()
                 self.mb.EnableTop(menu_pos, Show)
@@ -779,6 +782,7 @@ class IraFrame(wx.Frame):
             #self.mb.EnableTop(menu_pos, Show)
             self.mb.Refresh()
         self._mgr.Update()
+        self.Refresh()
 
     #--------------------------------------------------------------------
     # fin de __init__ du wx.Frame
@@ -926,22 +930,13 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 
     # action ou évènement ?
     def OnPageChanged(self, event) :
-        print("OnPageChange")
         new = event.GetSelection()
         nobject = event.GetEventObject()
         parent = nobject.GetParent()
         if isinstance(parent, IraFrame) :
             npage = self.nb.GetPage(new)
             if 'parametres' in dir(npage) :
-                #self.tree.GiveFocus(uuid=npage.parametres['uuid'])
-                if npage.parametres.get('matrix', False) :
-                    #self.ShowMenu('text', False)
-                    self.ShowMenu('matrix', True)
-                elif npage.parametres.get('corpus', False) :
-                    self.ShowMenu('text')
-                    #self.ShowMenu('matrix', False)
-        wx.CallAfter(self.nb.SendSizeEvent)
-        self.Refresh()
+                self.tree.GiveFocus(uuid=npage.parametres['uuid'])
 
     # action ou évènement ?
     def OnCloseTab(self, evt):
@@ -978,6 +973,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 
     # action ou évènement ?
     def ShowAPane(self, panel):
+        print('ShowAPane')
         for pane in self._mgr.GetAllPanes() :
             if not pane.IsToolbar() and pane.name != 'lefttree':
                 pane.Hide()

@@ -120,7 +120,7 @@ class AnalyseQuest(AnalyseMatrix):
         self.BuildProfile()
         temps = time.time() - self.t1
         PrintRapport(self, self, {}, istxt = False)
-        self.tableau.save_tableau(self.pathout['db'])
+        self.tableau.save_tableau(self.pathout['analyse.db'])
         #CreateIraFile(self.dictpathout, self.clnb, corpname = os.path.basename(self.parent.filename), section = 'questionnaire')
         afc_graph_list = [[os.path.basename(self.pathout['AFC2DL_OUT']), 'Variables actives - coordonnées - facteurs 1 / 2'],
                          [os.path.basename(self.pathout['AFC2DSL_OUT']), 'variables illustratives - coordonnées - facteurs 1 / 2'],

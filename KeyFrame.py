@@ -108,7 +108,7 @@ class AlcOptFrame(wx.Dialog):
             grid_sizer_1.Add(self.listlabel[i], 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 0)
             grid_sizer_1.Add(self.listspin[i], 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 0)
             grid_sizer_1.Add(self.listbutton[i], 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 0)
-        for i in range(13,len(self.listlabel)):
+        for i in range(14,len(self.listlabel)):
             grid_sizer_2.Add(self.listlabel[i], 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 0)
             grid_sizer_2.Add(self.listspin[i], 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 0)
             grid_sizer_2.Add(self.listbutton[i], 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 0)

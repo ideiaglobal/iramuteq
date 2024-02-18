@@ -173,7 +173,7 @@ class DoSimi(AnalyseMatrix):
         self.tmpfile = self.script.scriptout
         self.DoR(self.dlg)
         self.addgraph()
-        self.tableau.save_tableau(self.pathout['db'])
+        self.tableau.save_tableau(self.pathout['analyse.db'])
         #self.make_ira()
         #count += 1
         #self.dlg.Update(count, u"") 

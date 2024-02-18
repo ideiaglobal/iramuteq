@@ -22,7 +22,8 @@ import os
 from copy import copy
 import re
 import html.entities
-import shelve
+#import shelve
+import json
 from uuid import uuid4
 import logging
 
@@ -118,10 +119,8 @@ class Tableau() :
         #self.parametres = self.parametre
 
     def read_tableau(self, fileout) :
-        d=shelve.open(fileout)
-        #self.parametres = d['parametres']
-        #if 'syscoding' not in self.parametres :
-        #    self.parametres['syscoding'] = sys.getdefaultencoding()
+        with open(fileout, 'r', encoding='utf8') as f :
+            d = json.load(f)
         self.actives = d['actives']
         self.sups = d['sups']
         self.classes = d['classes']
@@ -136,7 +135,6 @@ class Tableau() :
             self.lchi = d['lchi']
         if 'content' in d :
             self.content = d['content']
-        d.close()
 
     def open(self):
         print('open matrix')
@@ -146,7 +144,7 @@ class Tableau() :
         self.colnb = len(self.linecontent[0])
 
     def save_tableau(self, fileout) :
-        d=shelve.open(fileout)
+        d = {}
         d['parametres'] = self.parametres
         d['actives'] = self.actives
         d['sups'] = self.sups
@@ -161,7 +159,8 @@ class Tableau() :
         if 'lchi' in dir(self) :
             d['lchi'] = self.lchi
         d['content'] = self.content
-        d.close()
+        with open(fileout, 'w', encoding='utf8') as f :
+            json.dump(d, f)
 
     def make_content(self) :
         self.pathout.createdir(self.parametres['pathout'])

@@ -1096,7 +1096,6 @@ class LeftTree(CT.CustomTreeCtrl):
         event.Skip()
 
     def OnSelChanged(self, event = None, pydata = None):
-        print("OnSelChange")
         if event is not None :
             item = event.GetItem()
             pydata = self.GetPyData(item)
@@ -1113,15 +1112,16 @@ class LeftTree(CT.CustomTreeCtrl):
                     self.ira.ShowMenu('matrix', False)             
             self.pydata = pydata
             if pydata['uuid'] in self.parent.history.opened :
+                actual = self.parent.nb.GetSelection()
                 for i in range(self.parent.nb.GetPageCount()) :
                     self.page = self.parent.nb.GetPage(i)
                     if 'parametres' in dir(self.page) :
                         if self.page.parametres['uuid'] == pydata['uuid'] :
                             self.parent.nb.SetSelection(i)
+                            wx.CallAfter(self.parent.nb.SendSizeEvent)
+                            #self.parent.Refresh()
                             break
         #self.parent._mgr.Update()
-        wx.CallAfter(self.parent.nb.SendSizeEvent)
-        self.parent.Refresh()
         #if event is not None :
         #    event.Skip()
 
