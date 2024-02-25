@@ -6,7 +6,7 @@
 import os
 import wx
 import wx.xrc
-#from wx.lib.splitter import MultiSplitterWindow
+from wx.lib.splitter import MultiSplitterWindow
 from listlex import *
 import pickle
 import json
@@ -156,6 +156,181 @@ class CategoDict :
 #cate = CategoDict()
 
 
+#class ElCategorizator ( wx.Panel ):
+#
+#    def __init__( self, parent, pathout, tableau, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL, name = wx.EmptyString ):
+#        wx.Panel.__init__ ( self, parent, id = id, pos = pos, size = size, style = style, name = name )
+#        self.pathout = pathout
+#        self.parent = parent
+#        self.tableau = tableau
+#
+#        self.cate = CategoDict(self.pathout)
+#        gsizer =  wx.BoxSizer( wx.VERTICAL )
+#
+#        bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
+#
+#        self.m_listToCate = ListForWords(self, dlist = self.cate, first = ['eff'])
+#        bSizer1.Add( self.m_listToCate, 2, wx.ALL|wx.EXPAND, 5 )
+#
+#        self.m_listCate = ListForCate(self, dlist = self.cate, first = ['eff'])
+#        bSizer1.Add( self.m_listCate, 1, wx.ALL|wx.EXPAND, 5 )
+#
+#        self.m_listCateWords = ListForCateWords(self, dlist = self.cate, first = ['eff'])
+#        bSizer1.Add( self.m_listCateWords, 1, wx.ALL|wx.EXPAND, 5 )
+#
+#        bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
+#
+#        self.butsave = wx.Button( self, wx.ID_SAVE, u"Save", wx.DefaultPosition, wx.DefaultSize, 0 )
+#        bSizer2.Add( self.butsave, 0, wx.ALL, 5 )
+#
+#        self.butcsv = wx.Button( self, wx.ID_ANY, u"Export Columns", wx.DefaultPosition, wx.DefaultSize, 0 )
+#        bSizer2.Add( self.butcsv, 0, wx.ALL, 5 )
+#
+#        self.butdict = wx.Button( self, wx.ID_ANY, u"Export dictonary", wx.DefaultPosition, wx.DefaultSize, 0 )
+#        bSizer2.Add( self.butdict, 0, wx.ALL, 5 )
+#
+#        self.butload = wx.Button( self, wx.ID_ANY, u"Load a categorization", wx.DefaultPosition, wx.DefaultSize, 0 )
+#        bSizer2.Add( self.butload, 0, wx.ALL, 5 )
+#
+#        self.butaddcate = wx.Button( self, wx.ID_ANY, u"Add a category", wx.DefaultPosition, wx.DefaultSize, 0 )
+#        bSizer2.Add( self.butaddcate, 0, wx.ALL, 5 )
+#
+#
+#        bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
+#
+#        self.nbword = """Words : {:d} ({:d}) | """
+#
+#        self.stat = """ Words to categorize : {:d} ({}%) - {:d} ({}%) -- Categories : {:d} - {:d} ({}%) - {:d} ({}%)"""
+##        nbtocat, totocat, nbcate, totcate = self.cate.makestat()
+##        lenwords = self.cate.lenwords
+##        totwords = totocat + totcate
+##        prtocat = repr(nbtocat/lenwords)
+##        prtotocat = repr(totocat/totwords)
+##        prcate = repr(totcate/totwords)
+#        self.wordtxt = wx.StaticText(self, -1, "")
+#        bSizer3.Add( self.wordtxt, 0, wx.ALL, 5 )
+#        self.stattxt = wx.StaticText(self, -1, "")
+#        bSizer3.Add( self.stattxt, 0, wx.ALL, 5 )
+#
+#
+#        gsizer.Add( bSizer2, 0, wx.EXPAND, 5 )
+#        gsizer.Add( bSizer1, 2, wx.EXPAND, 5 )
+#        gsizer.Add( bSizer3, 0, wx.EXPAND, 5 )
+#
+#        self.butsave.Bind(wx.EVT_BUTTON, self.OnSave)
+#        self.butcsv.Bind(wx.EVT_BUTTON, self.OnCSV)
+#        self.butdict.Bind(wx.EVT_BUTTON, self.OnDict)
+#        self.butsave.SetBackgroundColour((14, 242, 14, 255))
+#        self.butload.Bind(wx.EVT_BUTTON, self.OnLoad)
+#        self.butaddcate.Bind(wx.EVT_BUTTON, self.OnAddCate)
+#        self.OnStat()
+#        self.SetSizer( gsizer )
+#        self.Layout()
+#
+#    def __del__( self ):
+#        pass
+#
+#
+#    def OnLoad(self, event) :
+#        if len(self.cate.cate['CATE']) != 0 :
+#            message = wx.MessageDialog(self, _("Categories must be empty to load a categorization."), _("Information"), wx.OK|wx.ICON_WARNING)
+#            message.ShowModal()
+#            message.Destroy()
+#            return
+#        wildcard = "json|*.json|" \
+#                   "All file|*.*"
+#        dlg = wx.FileDialog(
+#             self, message="Choose a file",
+#             defaultDir=self.pathout.dirout,
+#             defaultFile="",
+#             wildcard=wildcard,
+#             style=wx.FD_OPEN |
+#                   wx.FD_CHANGE_DIR | wx.FD_FILE_MUST_EXIST |
+#                   wx.FD_PREVIEW
+#             )
+#
+#        if dlg.ShowModal() == wx.ID_OK:
+#            paths = dlg.GetPaths()
+#            path = paths[0]
+#            self.cate.loadcate(path)
+#            self.m_listCate.RefreshData(self.cate.getcate())
+#            self.m_listToCate.RefreshData(self.cate.getwordstocate())
+#        dlg.Destroy()
+#
+#    def OnSave(self, event) :
+#        self.cate.save()
+#        self.butsave.SetBackgroundColour((14, 242, 14, 255))
+#
+#    def OnCSV(self, event) :
+#        wordscate = self.cate.getwordscate()
+#        newtab = [['category%i' % i for i in range(1, len(self.tableau.selected_col)+1)]]
+#        for line in self.tableau.select_col(self.tableau.selected_col):
+#            newline = []
+#            for word in line :
+#                newline.append(wordscate.get(word,word))
+#            newtab.append(newline)
+#        with open(self.pathout['tableout.csv'], 'w', encoding='utf8') as f :
+#            f.write('\n'.join(['\t'.join(line) for line in newtab]))
+#        message = wx.MessageDialog(self, _("Export successful\n%s" % self.pathout['tableout.csv']), _("Information"), wx.OK|wx.ICON_INFORMATION)
+#        message.ShowModal()
+#        message.Destroy()
+#
+#    def OnDict(self, event):
+#        with open(self.pathout['dictionnary.txt'], 'w', encoding='utf8') as f :
+#            for categorie in self.cate.cate['CATE'] :
+#                f.write(categorie + ': \t' + repr(self.cate.cate['CATE'][categorie][0]) + '\n')
+#                for word in self.cate.cate['CATE'][categorie][1] :
+#                    f.write('\t' + word + ': \t' + repr(self.cate.cate['CATE'][categorie][1][word]) + '\n')
+#            for word in self.cate.cate['TOCATE'] :
+#                f.write(word + ':\t' + repr(self.cate.cate['TOCATE'][word]) + '\n')
+#        message = wx.MessageDialog(self, _("Export successful\n%s" % self.pathout['dictionnary.txt']), _("Information"), wx.OK|wx.ICON_INFORMATION)
+#        message.ShowModal()
+#        message.Destroy()
+#
+#    def OnStat(self) :
+#        nbtocat, totocat, nbcate, totcate, lenwordincate = self.cate.makestat()
+#        totwords = totocat + totcate
+#        prtocat = repr(round((nbtocat/self.cate.lenwords) * 100 ,2))
+#        prtotocat = repr(round((totocat/totwords) * 100, 2))
+#        prcate = repr(round((totcate/totwords)*100, 2))
+#        prwordincate = repr(round((lenwordincate/self.cate.lenwords)*100, 2))
+#        self.stattxt.SetLabel(self.stat.format(nbtocat, prtocat, totocat, prtotocat, nbcate, lenwordincate, prwordincate, totcate, prcate))
+#
+#    def OnAddToTable(self) :
+#        wordscate = self.cate.getwordscate()
+#        newtab = [['category%i' % i for i in range(1, len(self.tableau.selected_col)+1)]]
+#        for line in self.tableau.select_col(self.tableau.selected_col):
+#            newline = []
+#            for word in line :
+#                newline.append(wordscate.get(word,word))
+#            newtab.append(newline)
+#
+#    def OnAddCate(self, evt) :
+#        print('add a category')
+#        print(self.m_listCate.GetItemCount())
+#        self.cate.addcatefromscratch()
+#        self.m_listCate.dlist = self.cate.getcate()
+#        self.m_listCate.RefreshData(self.m_listCate.dlist)
+#        self.m_listCate.SetSelection(self.m_listCate.GetItemCount() - 1)
+
+
+
+class ListPanel(wx.Panel) :
+     def __init__(self, parent, gparent, List):
+        wx.Panel.__init__(self, parent, style=wx.BORDER_SUNKEN)
+        self.parent = parent
+        self.gparent = gparent
+        self.cate = gparent.cate
+        gsizer =  wx.BoxSizer( wx.HORIZONTAL )
+        self.list = List(self, dlist = gparent.cate, first = ['eff'])
+        gsizer.Add(self.list, 5, wx.EXPAND, 5 )
+        self.SetSizer( gsizer )
+        self.Layout()
+
+
+     def OnStat(self) :
+        self.gparent.OnStat()
+
 class ElCategorizator ( wx.Panel ):
 
     def __init__( self, parent, pathout, tableau, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL, name = wx.EmptyString ):
@@ -168,15 +343,31 @@ class ElCategorizator ( wx.Panel ):
         gsizer =  wx.BoxSizer( wx.VERTICAL )
 
         bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
+        splitter = MultiSplitterWindow(self, style=wx.SP_LIVE_UPDATE)
+        self.splitter = splitter
+        #sizer = wx.BoxSizer(wx.HORIZONTAL)
+        #sizer.Add(splitter, 1, wx.EXPAND)
+        #self.SetSizer(sizer)
+        W,H = wx.GetTopLevelParent(self).GetSize()
+        print(W)
+        W = W - 200
+        if W < 300 :
+            W = 300
+        splitsize = int(W/3)
+        print(W)
+        print(H)
+        print(splitsize)
 
-        self.m_listToCate = ListForWords(self, dlist = self.cate, first = ['eff'])
-        bSizer1.Add( self.m_listToCate, 2, wx.ALL|wx.EXPAND, 5 )
+        panelwords = ListPanel(splitter, self, ListForWords)
+        splitter.AppendWindow(panelwords, splitsize)
+        panelcate = ListPanel(splitter, self, ListForCate)
+        splitter.AppendWindow(panelcate, splitsize)
+        panelwordscate = ListPanel(splitter, self, ListForCateWords)
+        splitter.AppendWindow(panelwordscate, splitsize)
+        self.m_listToCate = panelwords.list
+        self.m_listCate = panelcate.list
+        self.m_listCateWords = panelwordscate.list
 
-        self.m_listCate = ListForCate(self, dlist = self.cate, first = ['eff'])
-        bSizer1.Add( self.m_listCate, 1, wx.ALL|wx.EXPAND, 5 )
-
-        self.m_listCateWords = ListForCateWords(self, dlist = self.cate, first = ['eff'])
-        bSizer1.Add( self.m_listCateWords, 1, wx.ALL|wx.EXPAND, 5 )
 
         bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
 
@@ -201,6 +392,12 @@ class ElCategorizator ( wx.Panel ):
         self.nbword = """Words : {:d} ({:d}) | """
 
         self.stat = """ Words to categorize : {:d} ({}%) - {:d} ({}%) -- Categories : {:d} - {:d} ({}%) - {:d} ({}%)"""
+        for panel in [panelwords, panelcate, panelwordscate] :
+            panel.m_listToCate = self.m_listToCate
+            panel.m_listCate = self.m_listCate
+            panel.m_listCateWords = self.m_listCateWords
+            panel.butsave = self.butsave
+
 #        nbtocat, totocat, nbcate, totcate = self.cate.makestat()
 #        lenwords = self.cate.lenwords
 #        totwords = totocat + totcate
@@ -214,7 +411,7 @@ class ElCategorizator ( wx.Panel ):
 
 
         gsizer.Add( bSizer2, 0, wx.EXPAND, 5 )
-        gsizer.Add( bSizer1, 2, wx.EXPAND, 5 )
+        gsizer.Add( splitter, 2, wx.EXPAND, 5 )
         gsizer.Add( bSizer3, 0, wx.EXPAND, 5 )
 
         self.butsave.Bind(wx.EVT_BUTTON, self.OnSave)
@@ -227,9 +424,10 @@ class ElCategorizator ( wx.Panel ):
         self.SetSizer( gsizer )
         self.Layout()
 
+
+
     def __del__( self ):
         pass
-
 
     def OnLoad(self, event) :
         if len(self.cate.cate['CATE']) != 0 :
@@ -296,6 +494,7 @@ class ElCategorizator ( wx.Panel ):
         prwordincate = repr(round((lenwordincate/self.cate.lenwords)*100, 2))
         self.stattxt.SetLabel(self.stat.format(nbtocat, prtocat, totocat, prtotocat, nbcate, lenwordincate, prwordincate, totcate, prcate))
 
+
     def OnAddToTable(self) :
         wordscate = self.cate.getwordscate()
         newtab = [['category%i' % i for i in range(1, len(self.tableau.selected_col)+1)]]
@@ -312,71 +511,6 @@ class ElCategorizator ( wx.Panel ):
         self.m_listCate.dlist = self.cate.getcate()
         self.m_listCate.RefreshData(self.m_listCate.dlist)
         self.m_listCate.SetSelection(self.m_listCate.GetItemCount() - 1)
-
-
-
-#class ListPanel(wx.Panel) :
-#     def __init__(self, parent, gparent, List):
-#        wx.Panel.__init__(self, parent, style=wx.BORDER_SUNKEN)
-#        self.parent = parent
-#        self.cate = gparent.cate
-#        self.list = List(self, dlist = gparent.cate, first = ['eff'])
-
-
-#class ElCategorizator ( wx.Panel ):
-#
-#    def __init__( self, parent, pathout, tableau, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.TAB_TRAVERSAL, name = wx.EmptyString ):
-#        wx.Panel.__init__ ( self, parent, id = id, pos = pos, size = size, style = style, name = name )
-#        self.pathout = pathout
-#        self.parent = parent
-#        self.tableau = tableau
-#
-#        self.cate = CategoDict(self.pathout)
-#
-#        splitter = MultiSplitterWindow(self, style=wx.SP_LIVE_UPDATE)
-#        self.splitter = splitter
-#        sizer = wx.BoxSizer(wx.HORIZONTAL)
-#        sizer.Add(splitter, 1, wx.EXPAND)
-#        self.SetSizer(sizer)
-#
-#        panelwords = ListPanel(splitter, self, ListForWords)
-#        splitter.AppendWindow(panelwords, 150)
-#        panelcate = ListPanel(splitter, self, ListForCate)
-#        splitter.AppendWindow(panelcate, 150)
-#        panelwordscate = ListPanel(splitter, self, ListForCateWords)
-#        splitter.AppendWindow(panelwordscate, 150)
-#        self.m_listToCate = panelwords.list
-#        self.m_listCate = panelcate.list
-#        self.m_listCateWords = panelwordscate.list
-#
-#    def __del__( self ):
-#        pass
-#
-#    def OnSave(self, event) :
-#        self.cate.save()
-#        self.butsave.SetBackgroundColour((14, 242, 14, 255))
-#
-#    def OnCSV(self, event) :
-#        wordscate = self.cate.getwordscate()
-#        newtab = [['category%i' % i for i in range(1, len(self.tableau.selected_col)+1)]]
-#        for line in self.tableau.select_col(self.tableau.selected_col):
-#            newline = []
-#            for word in line :
-#                newline.append(wordscate.get(word,word))
-#            newtab.append(newline)
-#        with open(self.pathout['tableout.csv'], 'w') as f :
-#            f.write('\n'.join(['\t'.join(line) for line in newtab]))
-#        print("csv exported !")
-#
-#    def OnDict(self, event):
-#        with open(self.pathout['dictionnary.txt'], 'w') as f :
-#            for categorie in self.cate.cate['CATE'] :
-#                f.write(categorie + ': \t' + repr(self.cate.cate['CATE'][categorie][0]) + '\n')
-#                for word in self.cate.cate['CATE'][categorie][1] :
-#                    f.write('\t' + word + ': \t' + repr(self.cate.cate['CATE'][categorie][1][word]) + '\n')
-#            for word in self.cate.cate['TOCATE'] :
-#                f.write(word + ':\t' + repr(self.cate.cate['TOCATE'][word]) + '\n')
-#        print("dictionnary exported !")
 
 
 class ListForCate(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
