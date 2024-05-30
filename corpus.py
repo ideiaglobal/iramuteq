@@ -258,14 +258,14 @@ class Corpus :
 
     def getucisize(self) :
         ucesize = self.getucesize()
-        return [sum(ucesize[uci.uces[0].ident:(uci.uces[-1].ident + 1)]) for uci in self.ucis]
+        return [sum(ucesize[uci.uces[0].ident:(uci.uces[-1].ident + 1)]) for uci in self.ucis if len(uci.uces) != 0]
 
     def getucesize(self) :
         res = self.getalluces()
         return [len(uce[1].split()) for uce in res]
 
     def getconcorde(self, uces) :
-        return self.cuces.execute('select * from uces where id IN (%s) ORDER BY id;' % ', '.join([repr(i) for i in uces])) 
+        return self.cuces.execute('select * from uces where id IN (%s) ORDER BY id;' % ', '.join([repr(i) for i in uces]))
 
     def getuciconcorde(self, ucis) :
         uces = [[val,[uce.ident for uce in self.ucis[val].uces]] for val in ucis]
@@ -292,6 +292,11 @@ class Corpus :
 
     def getucesfrometoile(self, etoile) :
         return [uce.ident for uci in self.ucis for uce in uci.uces if etoile in uci.etoiles]
+
+    def getucisfrometoile(self, etoile):
+        uces = [uce.ident for uci in self.ucis for uce in uci.uces if etoile in uci.etoiles]
+        return list(set([self.getucefromid(val).uci for val in uces]))
+
 
     def getetoileuces(self) :
         log.info('get uces etoiles')
@@ -878,7 +883,7 @@ class Corpus :
             etoileuces = self.getetoileuces()
         else :
             etoileuces = self.getetoileucis()
-        etoileuces = dict([[et, etoileuces[et]] for et in etoileuces if len(etoileuces[et]) > 1])
+        etoileuces = dict([[et, etoileuces[et]] for et in etoileuces if len(etoileuces[et]) > 0])
         with open(fileout, 'w', encoding='utf8') as f :
             f.write('\n'.join([';'.join([et] + [repr(len(set(etoileuces[et]).intersection(classe))) for classe in ucecl]) for et in etoileuces])) #.encode(self.parametres['syscoding'])
         #etoiles = self.make_etoiles()
@@ -1505,7 +1510,7 @@ class BuildSubCorpus(BuildCorpus):
                 newuces = []
                 newpara = []
                 for et in uci.paras :
-                    keepuces = [CopyUce(uce) for uce in uci.uces if uce.ident in dictucekeep]
+                    keepuces = [CopyUce(uce) for uce in uci.uces if uce.ident in dictucekeepand and uce.para == idpara]
                     idpara += 1
                     if keepuces != [] :
                         newuces += keepuces
