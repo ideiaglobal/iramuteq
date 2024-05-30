@@ -50,7 +50,7 @@ def open_folder(folder):
     else:
         opener ="open" if sys.platform == "darwin" else "xdg-open"
         #call([opener, folder])
-        call(["%s %s &" % (opener, folder)], shell=True)
+        call(["%s '%s' &" % (opener, folder)], shell=True)
 
 def normpath_win32(path) :
     if not sys.platform == 'win32' :
