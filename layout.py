@@ -46,6 +46,7 @@ from webexport import WebExport
 from corpus import Corpus
 from sheet import MySheet
 from graph_to_json import GraphToJson
+from listlex2 import LexPanel
 
 
 import langue
@@ -751,15 +752,22 @@ class dolexlayout :
         #sash = SashList(ira.nb)
         self.TabStat = aui.AuiNotebook(ira.nb, -1, wx.DefaultPosition)
         self.TabStat.parametres = parametres
+        #self.ListPan = LexPanel(self, ira, self.DictSpec, self.etoiles)
         self.ListPan = ListForSpec(ira, self, self.DictSpec, self.etoiles)
+        self.ListPan.pathout = self.pathout
         if os.path.exists(self.pathout['banalites.csv']) :
             self.listban = ListForSpec(ira, self, self.dictban, ['eff'] + self.etoiles, usefirst = True)
         #self.ListPan2 = ListForSpec(sash.rightwin1, self, self.DictSpec, first)
         self.ListPant = ListForSpec(ira, self, self.DictType, self.etoiles)
+        self.ListPant.pathout = self.pathout
         self.ListPanEff = ListForSpec(ira, self, self.DictEff, self.etoiles)
+        self.ListPanEff.pathout = self.pathout
         self.ListPanEffType = ListForSpec(ira, self, self.DictEffType, self.etoiles)
+        self.ListPanEffType.pathout = self.pathout
         self.ListPanEffRelForme = ListForSpec(ira, self, self.DictEffRelForme, self.etoiles)
+        self.ListPanEffRelForme.pathout = self.pathout
         self.ListPanEffRelType = ListForSpec(ira, self, self.DictEffRelType, self.etoiles)
+        self.ListPanEffRelType.pathout = self.pathout
         self.TabStat.AddPage(self.ListPan, _('Forms'))
         if os.path.exists(self.pathout['banalites.csv']) :
             self.TabStat.AddPage(self.listban, _('Banal forms'))
@@ -781,6 +789,7 @@ class dolexlayout :
         self.ira = ira
         self.TabStat.corpus = self.corpus
         self.TabStat.etoiles = self.etoiles
+        self.TabStat.pathout = self.pathout
         if os.path.exists(os.path.join(self.parametres['pathout'], 'tgenspec.csv')) :
             self.parametres['tgenspec'] = os.path.join(self.parametres['pathout'], 'tgenspec.csv')
             TgenLayout(self.TabStat)
@@ -1361,7 +1370,8 @@ class FreqLayout(DefaultMatLayout) :
         self.tab = wx.html.HtmlWindow(self.ira.nb, -1)
         #self.tab = wx.html2.WebView.New(self)
         res = normpath_win32(self.pathout['resultats.html']).replace('\\','/')
-        self.tab.LoadPage(res)
+        #self.tab.LoadPage(res)
+        self.tab.LoadFile(res)
         #self.tab.LoadURL(res)
         self.tab.parametres = self.parametres
         self.ira.nb.AddPage(self.tab, ' - '.join([_("Frequency"), self.parametres['name']]))
@@ -1374,7 +1384,7 @@ class Chi2Layout(DefaultMatLayout) :
         if "gtk2" in wx.PlatformInfo:
             self.tab.SetStandardFonts()
         res = normpath_win32(self.pathout['resultats-chi2.html']).replace('\\','/')
-        self.tab.LoadPage(res)
+        self.tab.LoadFile(res)
         self.tab.parametres = self.parametres
         self.ira.nb.AddPage(self.tab, ' - '.join(["Chi2", self.parametres['name']]))
         #self.ira.nb.SetSelection(self.ira.nb.GetPageCount() - 1)
