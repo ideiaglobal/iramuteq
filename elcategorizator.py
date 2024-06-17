@@ -354,9 +354,6 @@ class ElCategorizator ( wx.Panel ):
         if W < 300 :
             W = 300
         splitsize = int(W/3)
-        print(W)
-        print(H)
-        print(splitsize)
 
         panelwords = ListPanel(splitter, self, ListForWords)
         splitter.AppendWindow(panelwords, splitsize)
