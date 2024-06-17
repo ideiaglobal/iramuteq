@@ -123,11 +123,7 @@ class LeftTree(CT.CustomTreeCtrl):
                  style=wx.SUNKEN_BORDER|wx.WANTS_CHARS,
                  agwStyle=CT.TR_HIDE_ROOT|CT.TR_HAS_BUTTONS|CT.TR_HAS_VARIABLE_ROW_HEIGHT):
         CT.CustomTreeCtrl.__init__(self, parent, id, pos, size, style, agwStyle)
-        #FIXME : test for bigger font on HIDPI screen
-        #font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD,
-        #       False, "", wx.FONTENCODING_DEFAULT)
-        font = wx.Font(pointSize=10, family=wx.FONTFAMILY_DEFAULT, style=wx.FONTSTYLE_NORMAL, weight=wx.FONTWEIGHT_NORMAL)
-        self.SetFont(font)
+
         ##################
         self.log = log
         alldata = dir(CT)
@@ -140,6 +136,8 @@ class LeftTree(CT.CustomTreeCtrl):
                 events.append(data)
         self.parent = parent
         self.ira = parent
+        font = wx.Font(pointSize=self.ira.fontsize + 2, family=wx.FONTFAMILY_DEFAULT, style=wx.FONTSTYLE_NORMAL, weight=wx.FONTWEIGHT_NORMAL)
+        self.SetFont(font)
         self.events = events
         self.styles = treestyles
         self.item = None
@@ -1109,10 +1107,9 @@ class LeftTree(CT.CustomTreeCtrl):
             if 'uuid' in pydata :
                 if pydata['uuid'] in ['textroot', 'matroot'] :
                     self.ira.ShowMenu('text', False)
-                    self.ira.ShowMenu('matrix', False)             
+                    self.ira.ShowMenu('matrix', False)
             self.pydata = pydata
             if pydata['uuid'] in self.parent.history.opened :
-                actual = self.parent.nb.GetSelection()
                 for i in range(self.parent.nb.GetPageCount()) :
                     self.page = self.parent.nb.GetPage(i)
                     if 'parametres' in dir(self.page) :
