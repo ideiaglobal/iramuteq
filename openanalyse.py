@@ -183,4 +183,4 @@ class OpenAnalyse():
             Chi2Layout(self.parent, corpus, self.conf)
         elif self.conf['type'] == 'categorisation' :
             CateLayout(self.parent, corpus, self.conf)
-            print(self.conf)
+            #print(self.conf)
