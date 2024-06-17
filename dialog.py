@@ -2434,6 +2434,7 @@ class ConcordList(wx.html.HtmlListBox):
         self.concord = concord
         #self.script_status = dict()
         wx.html.HtmlListBox.__init__(self, parent, -1, size = (900, 600))
+        #self.SetFont(wx.Font(30,wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
         self.SetItemCount(len(concord))
         #self.Bind(wx.EVT_LISTBOX, self.RefreshMe)
         #self.Bind(wx.EVT_LISTBOX_DCLICK, self.Download)
@@ -2455,6 +2456,7 @@ class message(wx.Frame):
         #self.HtmlPage=wx.html.HtmlWindow(self, -1)
         self.panel = wx.Panel(self, wx.ID_ANY)
         self.HtmlPage = ConcordList(self.panel, items)
+        #self.HtmlPage.SetFonts("","",self.ira.fontsize)
         #self.HtmlPage.SetMinSize( size )
         #if "gtk2" in wx.PlatformInfo:
         #    self.HtmlPage.SetStandardFonts()
@@ -3311,12 +3313,12 @@ class MergeClusterFrame ( wx.Dialog ):
                 for analyse in corpus['analyses'] :
                     if analyse['type'] == 'alceste' :
                         if corpus['uuid'] not in self.intree :
-                            child = self.tree.Append(self.tree.root, corpus['corpus_name'])
+                            child = self.tree.AppendItem(self.tree.root, corpus['corpus_name'])
                             self.tree.SetItemImage(child, self.ild['corpus'], wx.TreeItemIcon_Normal)
                             self.tree.SetItemImage(child, self.ild['corpus'], wx.TreeItemIcon_Expanded)
                             self.tree.SetPyData(child, corpus)
                             self.intree[corpus['uuid']] = corpus
-                        last = self.tree.Append(child, analyse['name'])
+                        last = self.tree.AppendItem(child, analyse['name'])
                         self.tree.SetItemImage(last, self.ild['reinert'], wx.TreeItemIcon_Normal)
                         self.tree.SetItemImage(last, self.ild['reinert'], wx.TreeItemIcon_Expanded)
 
@@ -3325,7 +3327,7 @@ class MergeClusterFrame ( wx.Dialog ):
                             parametres = DoConf(analyse['ira']).getoptions()
                             clnb = int(parametres['clnb'])
                             for i in range(clnb) :
-                                cl = self.tree.Append(last, 'classe %i' % (i+1))
+                                cl = self.tree.AppendItem(last, 'classe %i' % (i+1))
                                 self.tree.SetItemImage(cl, self.ild['wordcloud'], wx.TreeItemIcon_Normal)
                                 self.tree.SetItemImage(cl, self.ild['wordcloud'], wx.TreeItemIcon_Expanded)
                                 self.tree.SetPyData(cl, {'type' : 'cluster', 'analyse': analyse['uuid'], 'number': i+1, 'corpus': analyse['corpus'], 'ira':analyse['ira']})
