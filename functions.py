@@ -860,7 +860,7 @@ def treat_var_mod(variables) :
 #                     var_mod[var].append(variable)
     return var_mod
 
-def doconcorde(corpus, uces, mots, uci = False) :
+def doconcorde(corpus, uces, mots, uci = False, fontsize=16) :
     if not uci :
         ucestxt1 = [row for row in corpus.getconcorde(uces)]
     else :
@@ -872,15 +872,17 @@ def doconcorde(corpus, uces, mots, uci = False) :
     listmot = [corpus.getforme(fid).forme for lem in listmot for fid in lem]
     mothtml = ['<font color=red><b>%s</b></font>' % mot for mot in listmot]
     dmots = dict(list(zip(listmot, mothtml)))
+    presfont = '<p><b><font size="%i">' % fontsize
+    font = '<font size="%i">' % fontsize
     for uce in uces :
         ucetxt = ucestxt1[uce].split()
         ucetxt = ' '.join([dmots.get(mot, mot) for mot in ucetxt])
         if not uci :
             uciid = corpus.getucefromid(uce).uci
-            ucis_txt.append('<p><b>' + ' '.join(corpus.ucis[corpus.getucefromid(uce).uci].etoiles) + '<a href="%i_%i"> *%i_%i</a></b></p>' % (uciid, uce, uciid, uce))
+            ucis_txt.append(presfont + ' '.join(corpus.ucis[corpus.getucefromid(uce).uci].etoiles) + '<a href="%i_%i"> *%i_%i</a></font></b></p>' % (uciid, uce, uciid, uce))
         else :
-            ucis_txt.append('<p><b>' + ' '.join(corpus.ucis[uce].etoiles) + '</b></p>')
-        ucestxt.append(ucetxt)
+            ucis_txt.append(presfont + ' '.join(corpus.ucis[uce].etoiles) + '</font></b></p>')
+        ucestxt.append(font + ucetxt + '</font>')
     return ucis_txt, ucestxt
 
 
