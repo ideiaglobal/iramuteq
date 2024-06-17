@@ -240,8 +240,7 @@ class IraFrame(wx.Frame):
         log.info('version : %s' % ConfigGlob.get('DEFAULT', 'version'))
         print(size)
         wx.Frame.__init__(self, parent, id, title, pos, size, style)
-        #Font
-        self.SetFont(wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
+
         # configuration
         self.AppliPath = AppliPath
         self.images_path = os.path.join(AppliPath,'images')
@@ -260,6 +259,15 @@ class IraFrame(wx.Frame):
         self._mgr = aui.AuiManager()
         self._mgr.SetManagedWindow(self)
         self.x = 0
+        #Font
+        try :
+            self.pref.read(self.ConfigPath['preferences'])
+            self.fontsize = self.pref.getint('iramuteq','fontsize')
+        except :
+            print('no pref : setting fontsize to 12')
+            self.fontsize = 12
+        self.SetFont(wx.Font(self.fontsize, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
+
         #--------------------------------------------------------------------------------
         # creation menu
         #--------------------------------------------------------------------------------
@@ -511,7 +519,8 @@ class IraFrame(wx.Frame):
             Name("lefttree").
             Caption(_("Historic")).
             Left().
-            MinSize(wx.Size(300,400)).
+            MinSize(wx.Size(200,400)).
+            BestSize(wx.Size(300,-1)).
             Layer(1).
             Position(1).
             CloseButton(False).
@@ -528,6 +537,7 @@ class IraFrame(wx.Frame):
         # | aui.AUI_NB_TAB_EXTERNAL_MOVE | aui.AUI_NB_TAB_MOVE | aui.AUI_NB_TAB_FLOAT| wx.NO_BORDER
         self.nb.SetAGWWindowStyleFlag(notebook_flags)
         self.nb.SetArtProvider(aui.ChromeTabArt())
+        self.nb.SetFont(wx.Font(self.fontsize, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
         #self.nb.SetArtProvider(aui.VC8TabArt())
         #self.nb.parent = self
         #self._notebook_style = aui.AUI_NB_DEFAULT_STYLE | aui.AUI_NB_TAB_EXTERNAL_MOVE | wx.NO_BORDER
@@ -539,6 +549,7 @@ class IraFrame(wx.Frame):
             aui.AuiPaneInfo().
             Name("Tab_content").
             CenterPane())
+
         #self._mgr.AddPane(self.Sheet, wx.aui.AuiPaneInfo().Name("Data").CenterPane())
         #self._mgr.AddPane(self.Sheet, aui.AuiPaneInfo().Name("Data").CenterPane())
         self.nb.Bind(aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self.OnCloseTab)
@@ -684,6 +695,7 @@ class IraFrame(wx.Frame):
         self.Text = ''
         self.lexique = None
         self.corpus = None
+        
 
     def finish_init(self) :
         try :

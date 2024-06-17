@@ -46,7 +46,7 @@ from webexport import WebExport
 from corpus import Corpus
 from sheet import MySheet
 from graph_to_json import GraphToJson
-from listlex2 import LexPanel
+#from listlex2 import LexPanel
 
 
 import langue
@@ -460,9 +460,12 @@ class OpenCHDS():
     #    self.TabChdSim = wx.aui.AuiNotebook(self.parent.nb, -1, wx.DefaultPosition)
         notebook_flags =  aui.AUI_NB_DEFAULT_STYLE | aui.AUI_NB_TAB_EXTERNAL_MOVE | aui.AUI_NB_TAB_MOVE | aui.AUI_NB_TAB_FLOAT| wx.NO_BORDER
         panel.TabChdSim = aui.AuiNotebook(panel, -1, wx.DefaultPosition)
-        #panel.TabChdSim = LB.LabelBook(panel, -1, agwStyle = INB_TOP|INB_SHOW_ONLY_TEXT|INB_FIT_LABELTEXT)
+
+       #panel.TabChdSim = LB.LabelBook(panel, -1, agwStyle = INB_TOP|INB_SHOW_ONLY_TEXT|INB_FIT_LABELTEXT)
         panel.TabChdSim.SetAGWWindowStyleFlag(notebook_flags)
         panel.TabChdSim.SetArtProvider(aui.ChromeTabArt())
+        font = wx.Font(self.parent.fontsize, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        panel.TabChdSim.SetFont(font)
         sizer1.Add(panel.TabChdSim,10, wx.EXPAND, 5)
         panel.SetSizer(sizer1)
         sizer1.Fit(panel)
@@ -508,6 +511,7 @@ class OpenCHDS():
                 self.tab_prof_seg = ProfListctrlPanel(self.parent, self, prof_seg[str(i + 1)], False, i + 1)
                 self.prof_seg_nb.AddPage(self.tab_prof_seg, _("Cluster") + ' %i' % (i + 1))
         panel.ProfNB.SetSelection(0)
+        panel.ProfNB.SetFont(font)
         if clnb > 2 :
             self.TabAFC = aui.AuiNotebook(panel.TabChdSim, -1, wx.DefaultPosition)
             log.info('read AFC')
@@ -1413,6 +1417,7 @@ class CateLayout(DefaultMatLayout) :
     def dolayout(self) :
         self.tableau.read_tableau(self.pathout['analyse.db'])
         TabCate = ElCategorizator(self.ira.nb, self.pathout, self.tableau)
+        TabCate.parametres = self.parametres
         self.ira.nb.AddPage(TabCate, ' - '.join([_('ElCaTeGoRiZaToR'), self.parametres['name']]))
 
 class SimiMatLayout(DefaultMatLayout) :
