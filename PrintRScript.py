@@ -125,7 +125,7 @@ class Alceste2(PrintRScript):
 #
 
 
-def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'svdR', libsvdc = False, libsvdc_path = None, R_max_mem = False, mode_patate = False, nbproc=1):
+def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'svdR', libsvdc = False, libsvdc_path = None, R_max_mem = False, mode_patate = False, nbproc=10):
     txt = """
     source("%s")
     source("%s")
@@ -176,7 +176,7 @@ def RchdTxt(DicoPath, RscriptPath, mincl, classif_mode, nbt = 9, svdmethod = 'sv
         row.names(data2) <- 1:nrow(data2)
         """ % ffr(DicoPath['TableUc2'])
     txt += """
-    log1 <- "%s"
+    #log1 <- "%s"
     #print('FIXME : source newCHD')
     #source('/home/pierre/workspace/iramuteq/Rscripts/newCHD.R')
     #nbproc <- %s
@@ -741,7 +741,7 @@ class PrintSimiScript(PrintRScript):
                 """
             txt += """
             dm <-readMM(dm.path)
-            cn <- read.table(cn.path, sep="\t", quote='"')
+            cn <- read.table(cn.path, sep="\t", quote='"', comment.char="")
             colnames(dm) <- cn[,1]
             if (file.exists(selected.col)) {
                 sel.col <- read.csv2(selected.col, header = FALSE)
