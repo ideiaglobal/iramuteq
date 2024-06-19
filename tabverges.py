@@ -100,7 +100,7 @@ class Prototypical(AnalyseMatrix) :
                         else :
                             words[word] = [1, []]
         res = [[word, words[word][0], float(sum(words[word][1])) / len(words[word][1])] for word in words if len(words[word][1]) != 0 and words[word][0] >= self.parametres['freqmin']]
-        with open(self.pathout['table.csv'], 'w') as f :
+        with open(self.pathout['table.csv'], 'w', encoding='utf8') as f :
             f.write('\n'.join(['\t'.join(['"' + val[0] +'"', repr(val[1]), repr(val[2])]) for val in res]))
         #self.parent.tableau.parametres = self.parent.tableau.parametre
         #self.parent.tableau.save_tableau(self.pathout['analyse.db'])
