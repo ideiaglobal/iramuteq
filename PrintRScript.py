@@ -1243,7 +1243,7 @@ class ProtoScript(PrintRScript):
         }
         mat <- read.csv2("%s", header = FALSE, row.names=1, sep='\t', quote='"', dec='.')
         open_file_graph("%s",height=800, width=1000)
-        prototypical(mat, mfreq = %s, mrank = %s, cloud = FALSE, cexrange=c(1,2.4), cexalpha= c(0.4, 1), type = '%s', mat.col.path='/tmp/matcol.csv')
+        prototypical(mat, mfreq = %s, mrank = %s, cloud = FALSE, cexrange=c(1,2.4), cexalpha= c(0.4, 1), type = '%s')#, mat.col.path='/tmp/matcol.csv')
         dev.off()
         """ % (ffr(self.analyse.pathout['table.csv']), ffr(self.analyse.pathout['proto.png']), self.parametres['limfreq'], self.parametres['limrang'], self.parametres['typegraph'])
         self.add(txt)
