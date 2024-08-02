@@ -196,6 +196,8 @@ def ConstructDicoPath(AppliPath):
         'spanish_exp' :  os.path.join(BasePath, 'expression_sp.txt'),
         'galician' : os.path.join(BasePath, 'lexique_gl.txt'),
         'galician_exp' : os.path.join(BasePath, 'expression_gl.txt'),
+        'dutch' : os.path.join(BasePath, 'lexique_nl.txt'),
+        'norwegian' :  os.path.join(BasePath, 'lexique_nn.txt'),
     }
     return DictPath
 

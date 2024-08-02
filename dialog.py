@@ -127,8 +127,8 @@ encodages = [['cp1252','Western Europe'],
     ['utf_7', 'all languages'],
     ['utf_8_sig', 'all languages']]
 
-langues_n = ['français', 'english', 'german (expérimentale)', 'italian', 'swedish (expérimentale)', 'portuguese', 'spanish', 'greek (expériementale)', 'galician (expérimentale)', 'autre...']
-langues = ['french', 'english', 'german', 'italian', 'swedish', 'portuguese', 'spanish', 'greek', 'galician', 'other']
+langues_n = ['french', 'english', 'german', 'italian', 'swedish', 'portuguese', 'spanish', 'greek', 'galician', 'dutch', 'norwegian', 'autre...']
+langues = ['french', 'english', 'german', 'italian', 'swedish', 'portuguese', 'spanish', 'greek', 'galician', 'dutch', 'norwegian', 'other']
 
 class FileOptionDialog(wx.Dialog):
 
