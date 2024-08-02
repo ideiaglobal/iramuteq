@@ -127,6 +127,8 @@ encodages = [['cp1252','Western Europe'],
     ['utf_7', 'all languages'],
     ['utf_8_sig', 'all languages']]
 
+langues_n = ['français', 'english', 'german (expérimentale)', 'italian', 'swedish (expérimentale)', 'portuguese', 'spanish', 'greek (expériementale)', 'galician (expérimentale)', 'autre...']
+langues = ['french', 'english', 'german', 'italian', 'swedish', 'portuguese', 'spanish', 'greek', 'galician', 'other']
 
 class FileOptionDialog(wx.Dialog):
 
@@ -430,6 +432,18 @@ releases at startup""")
         self.langues = wx.Choice( self, wx.ID_ANY, (200, -1), choices = self.listlangues)
         #self.langues.SetSelection( 0 )
         fgSizer1.Add( self.langues, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
+
+        msg = _("Default language for text")
+        self.m_staticText55 = wx.StaticText( self, wx.ID_ANY, msg, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText55.Wrap( -1 )
+        fgSizer1.Add( self.m_staticText55, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        self.m_staticText56 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText56.Wrap( -1 )
+        fgSizer1.Add( self.m_staticText56, 0, wx.ALL, 5 )
+        self.txtlangues = wx.Choice( self, wx.ID_ANY, (200, -1), choices = langues_n)
+        #self.langues.SetSelection( 0 )
+        fgSizer1.Add( self.txtlangues, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
+
         msg = _("""Check installation
 of R packages""")
         self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, msg, wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -441,46 +455,47 @@ of R packages""")
         self.m_button1 = wx.Button( self, wx.ID_ANY, _("Check"), wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizer1.Add( self.m_button1, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
         bSizer1.Add( fgSizer1, 1, wx.EXPAND, 5 )
-        if sys.platform == 'win32' :
-            bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
-            msg = _("""Maximum
-memory for R""")
-            self.m_staticText7 = wx.StaticText( self, wx.ID_ANY, msg, wx.DefaultPosition, wx.DefaultSize, 0 )
-            self.m_staticText7.Wrap( -1 )
-            bSizer2.Add( self.m_staticText7, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-            self.m_checkBox1 = wx.CheckBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-            bSizer2.Add( self.m_checkBox1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-            self.m_spinCtrl1 = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 32, 16000, 1535 )
-            bSizer2.Add( self.m_spinCtrl1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-            self.m_staticline7 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-            bSizer2.Add( self.m_staticline7, 0, wx.EXPAND |wx.ALL, 5 )
-            bSizer1.Add( bSizer2, 0, wx.EXPAND, 5 )
-            self.m_checkBox1.Bind( wx.EVT_CHECKBOX, self.oncheckmem )
+        #if sys.platform == 'win32' :
+        #    bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
+        #    msg = _("""Maximum
+#memory for R""")
+        #    self.m_staticText7 = wx.StaticText( self, wx.ID_ANY, msg, wx.DefaultPosition, wx.DefaultSize, 0 )
+        #    self.m_staticText7.Wrap( -1 )
+        #    bSizer2.Add( self.m_staticText7, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        #    self.m_checkBox1 = wx.CheckBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        #    bSizer2.Add( self.m_checkBox1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        #    self.m_spinCtrl1 = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 32, 16000, 1535 )
+        #    bSizer2.Add( self.m_spinCtrl1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        #    self.m_staticline7 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+        #    bSizer2.Add( self.m_staticline7, 0, wx.EXPAND |wx.ALL, 5 )
+        #    bSizer1.Add( bSizer2, 0, wx.EXPAND, 5 )
+        #    self.m_checkBox1.Bind( wx.EVT_CHECKBOX, self.oncheckmem )
         bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
         bSizer4 = wx.BoxSizer( wx.HORIZONTAL )
-        self.text8 = wx.StaticText( self, wx.ID_ANY, _("Use svdlibc"), wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.text8.Wrap( -1 )
-        fgSizer1.Add( self.text8, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        self.check_svdc = wx.CheckBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer4.Add( self.check_svdc, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        bSizer3.Add( bSizer4, 0, wx.EXPAND, 5 )
-        self.fbb = filebrowse.FileBrowseButton(self, -1, size=(250, -1), fileMode = 2, fileMask = '*')
-        bSizer3.Add( self.fbb, 0, wx.EXPAND, 5 )
-        self.fbb.SetLabel(_("Path : "))
-        fgSizer1.Add( wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 ),  wx.ID_ANY, wx.ALL, 5)
-        fgSizer1.Add( bSizer3, 0,  wx.ALIGN_RIGHT|wx.ALL, 5 )
+        #self.text8 = wx.StaticText( self, wx.ID_ANY, _("Use svdlibc"), wx.DefaultPosition, wx.DefaultSize, 0 )
+        #self.text8.Wrap( -1 )
+        #fgSizer1.Add( self.text8, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        #self.check_svdc = wx.CheckBox( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        #bSizer4.Add( self.check_svdc, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        #bSizer3.Add( bSizer4, 0, wx.EXPAND, 5 )
+        #self.fbb = filebrowse.FileBrowseButton(self, -1, size=(250, -1), fileMode = 2, fileMask = '*')
+        #bSizer3.Add( self.fbb, 0, wx.EXPAND, 5 )
+        #self.fbb.SetLabel(_("Path : "))
+        #fgSizer1.Add( wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 ),  wx.ID_ANY, wx.ALL, 5)
+        #fgSizer1.Add( bSizer3, 0,  wx.ALIGN_RIGHT|wx.ALL, 5 )
         Rpath_text =  wx.StaticText( self, wx.ID_ANY, _("R path"), wx.DefaultPosition, wx.DefaultSize, 0 )
         Rpath_text.Wrap( -1 )
         fgSizer1.Add( Rpath_text, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         fgSizer1.Add( wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 ),  wx.ID_ANY, wx.ALL, 5)
-        self.Rpath_value = filebrowse.FileBrowseButton(self, -1, size=(350, -1), fileMode = 2, fileMask = '*')
+        self.Rpath_value = filebrowse.FileBrowseButton(self, -1, size=(350, 50), fileMode = 2, fileMask = '*')
+        self.Rpath_value.SetSize(wx.Size(400,50))
         self.Rpath_value.SetLabel(_("Path : "))
         fgSizer1.Add( self.Rpath_value, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
         mirror_text =  wx.StaticText( self, wx.ID_ANY, _("Default R mirror"), wx.DefaultPosition, wx.DefaultSize, 0 )
         mirror_text.Wrap( -1 )
         fgSizer1.Add( mirror_text, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         fgSizer1.Add( wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 ),  wx.ID_ANY, wx.ALL, 5)
-        self.mirror_value = wx.TextCtrl( self, wx.ID_ANY, 'http://cran.univ-lyon1.fr', wx.DefaultPosition, wx.Size( 300,30 ), 0 )
+        self.mirror_value = wx.TextCtrl( self, wx.ID_ANY, 'http://cran.univ-lyon1.fr', wx.DefaultPosition, wx.Size( 300,50 ), 0 )
         fgSizer1.Add( self.mirror_value, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
         m_sdbSizer1 = wx.StdDialogButtonSizer()
         self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
@@ -496,7 +511,7 @@ memory for R""")
         # Connect Events
         self.m_sdbSizer1OK.Bind( wx.EVT_BUTTON, self.OnValid )
         self.m_button1.Bind( wx.EVT_BUTTON, parent.OnVerif )
-        self.check_svdc.Bind( wx.EVT_CHECKBOX, self.OnSVDC )
+        #self.check_svdc.Bind( wx.EVT_CHECKBOX, self.OnSVDC )
         self.__set_properties()
 
     def __set_properties(self):
@@ -508,21 +523,22 @@ memory for R""")
         else : val2 = 1
         self.m_radioBox2.SetSelection(val2)
         self.langues.SetSelection(self.listlangues.index(self.parent.pref.get('iramuteq', 'guilanguage')))
-        if sys.platform == 'win32' :
-            if self.parent.pref.getboolean('iramuteq', 'R_mem') :
-                self.m_checkBox1.SetValue(True)
-                self.m_spinCtrl1.Enable(True)
-                self.m_spinCtrl1.SetValue(self.parent.pref.getint('iramuteq', 'R_max_mem'))
-            else :
-                self.m_checkBox1.SetValue(False)
-                self.m_spinCtrl1.Enable(False)
-        if self.parent.pref.getboolean('iramuteq', 'libsvdc') :
-            self.check_svdc.SetValue(True)
-            self.fbb.SetValue(self.parent.pref.get('iramuteq', 'libsvdc_path'))
-        else :
-            self.check_svdc.SetValue(False)
-            self.fbb.SetValue(self.parent.pref.get('iramuteq', 'libsvdc_path'))
-            self.fbb.Enable(False)
+        self.txtlangues.SetSelection(langues.index(self.parent.pref.get('iramuteq','language')))
+        #if sys.platform == 'win32' :
+        #    if self.parent.pref.getboolean('iramuteq', 'R_mem') :
+        #        self.m_checkBox1.SetValue(True)
+        #        self.m_spinCtrl1.Enable(True)
+        #        self.m_spinCtrl1.SetValue(self.parent.pref.getint('iramuteq', 'R_max_mem'))
+        #    else :
+        #        self.m_checkBox1.SetValue(False)
+        #        self.m_spinCtrl1.Enable(False)
+       # if self.parent.pref.getboolean('iramuteq', 'libsvdc') :
+       #     self.check_svdc.SetValue(True)
+       #     self.fbb.SetValue(self.parent.pref.get('iramuteq', 'libsvdc_path'))
+       # else :
+       #     self.check_svdc.SetValue(False)
+       #     self.fbb.SetValue(self.parent.pref.get('iramuteq', 'libsvdc_path'))
+       #     self.fbb.Enable(False)
         self.Rpath_value.SetValue(self.parent.PathPath.get('PATHS', 'rpath'))
         self.mirror_value.SetValue(self.parent.pref.get('iramuteq', 'rmirror'))
 
@@ -532,11 +548,11 @@ memory for R""")
         else :
             self.m_spinCtrl1.Enable(False)
 
-    def OnSVDC(self, evt):
-        if self.check_svdc.GetValue() :
-            self.fbb.Enable(True)
-        else :
-            self.fbb.Enable(False)
+   # def OnSVDC(self, evt):
+   #     if self.check_svdc.GetValue() :
+   #         self.fbb.Enable(True)
+   #     else :
+   #         self.fbb.Enable(False)
 
     def OnValid(self, event):
         parent = self.parent
@@ -547,17 +563,18 @@ memory for R""")
         else :  valcheck = 'false'
         parent.pref.set('iramuteq', 'checkupdate', valcheck)
         parent.pref.set('iramuteq', 'guilanguage', self.listlangues[self.langues.GetSelection()])
-        if sys.platform == 'win32' :
-            if self.m_checkBox1.GetValue() :
-                parent.pref.set('iramuteq', 'R_mem', 'true')
-                parent.pref.set('iramuteq', 'R_max_mem', str(self.m_spinCtrl1.GetValue()))
-            else :
-                parent.pref.set('iramuteq', 'R_mem', 'false')
-        if self.check_svdc.GetValue() :
-            parent.pref.set('iramuteq', 'libsvdc', 'true')
-        else :
-            parent.pref.set('iramuteq', 'libsvdc', 'false')
-        parent.pref.set('iramuteq', 'libsvdc_path', self.fbb.GetValue())
+        parent.pref.set('iramuteq', 'language', langues[self.txtlangues.GetSelection()])
+        #if sys.platform == 'win32' :
+        #    if self.m_checkBox1.GetValue() :
+        #        parent.pref.set('iramuteq', 'R_mem', 'true')
+        #        parent.pref.set('iramuteq', 'R_max_mem', str(self.m_spinCtrl1.GetValue()))
+        #    else :
+        #        parent.pref.set('iramuteq', 'R_mem', 'false')
+        #if self.check_svdc.GetValue() :
+        #    parent.pref.set('iramuteq', 'libsvdc', 'true')
+        #else :
+        #    parent.pref.set('iramuteq', 'libsvdc', 'false')
+        #parent.pref.set('iramuteq', 'libsvdc_path', self.fbb.GetValue())
         self.parent.pref.set('iramuteq', 'rmirror', self.mirror_value.GetValue())
         file = open(parent.ConfigPath['preferences'], 'w', encoding='utf8')
         parent.pref.write(file)
@@ -577,9 +594,9 @@ class PrefGraph(wx.Dialog):
         self.paramgraph=paramgraph
         self.labeltype = wx.StaticText(self, -1, _("Graphic type"))
         if self.paramgraph['clnb'] <= 3 :
-            choix = ['2D', 'web 2D']
+            choix = ['2D']#, 'web 2D']
         else :
-            choix=['2D' ,'3D', 'web 2D', 'web 3D', 'Blender']
+            choix=['2D' ,'3D']#, 'web 2D', 'web 3D', 'Blender']
         self.choicetype = wx.Choice(self, -1, (100,50), choices=choix)
         self.label_format = wx.StaticText(self, -1, _("Picture format"))
         self.choix_format =  wx.Choice(self, -1, (100,50), choices = ['png', 'svg'])
@@ -2175,8 +2192,7 @@ class CorpusPref ( wx.Dialog ):
     def __init__( self, parent, parametres ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _("Settings"), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE | wx.STAY_ON_TOP )
         self.parent = parent
-        langues_n = ['français', 'english', 'german (expérimentale)', 'italian', 'swedish (expérimentale)', 'portuguese', 'spanish', 'greek (expériementale)', 'galician (expérimentale)', 'autre...']
-        self.langues = ['french', 'english', 'german', 'italian', 'swedish', 'portuguese', 'spanish', 'greek', 'galician', 'other']
+        self.langues = langues
         self.encodages = [enc[0].lower() for enc in encodages]
         ucimark = ['****', '0000']
         ucemethod = [_("characters"), _("occurrences"), _("paragraphs")]
@@ -2366,7 +2382,7 @@ class CorpusPref ( wx.Dialog ):
             except ValueError :
                 enc = self.encodages.index('utf-8')
         self.encodage_choices.SetSelection(enc)
-        self.lang_choices.SetSelection(0)
+        self.lang_choices.SetSelection(self.langues.index(parametres['lang']))
         self.repout_choices.SetValue(parametres['pathout'])
         self.corpusname.SetValue(parametres['corpus_name'])
         self.ucimark_choices.SetSelection(parametres['ucimark'])
@@ -3237,11 +3253,11 @@ class MergeClusterFrame ( wx.Dialog ):
         bSizer1.Add( self.m_panel1, 4, wx.EXPAND |wx.ALL, 5 )
         self.m_panel4 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
         bSizer5 = wx.BoxSizer( wx.HORIZONTAL )
-        self.m_staticText13 = wx.StaticText( self.m_panel4, wx.ID_ANY, "MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText13 = wx.StaticText( self.m_panel4, wx.ID_ANY, "Metadata", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText13.Wrap( -1 )
         bSizer5.Add( self.m_staticText13, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         self.m_textCtrl5 = wx.TextCtrl( self.m_panel4, wx.ID_ANY, "cl_", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_textCtrl5.SetMinSize( wx.Size( 400,-1 ) )
+        self.m_textCtrl5.SetMinSize( wx.Size( 400, 50 ) )
         bSizer5.Add( self.m_textCtrl5, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         self.m_staticText15 = wx.StaticText( self.m_panel4, wx.ID_ANY, "+cluster number", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText15.Wrap( -1 )
@@ -3255,8 +3271,8 @@ class MergeClusterFrame ( wx.Dialog ):
         self.m_staticText12 = wx.StaticText( self.m_panel3, wx.ID_ANY, "Corpus name", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText12.Wrap( -1 )
         bSizer4.Add( self.m_staticText12, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        self.m_textCtrl4 = wx.TextCtrl( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_textCtrl4.SetMinSize( wx.Size( 400,-1 ) )
+        self.m_textCtrl4 = wx.TextCtrl( self.m_panel3, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 5 )
+        self.m_textCtrl4.SetMinSize( wx.Size( 400, 50 ) )
         bSizer4.Add( self.m_textCtrl4, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         self.m_panel3.SetSizer( bSizer4 )
         self.m_panel3.Layout()
@@ -3387,7 +3403,7 @@ class MergeClusterFrame ( wx.Dialog ):
 class FullText ( wx.Frame ):
 
     def __init__( self, parent ):
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 500,600 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = _("Full Text"), pos = wx.DefaultPosition, size = wx.Size( 500,600 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         self.SetSizeHints( -1, -1 )
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
         self.m_panel1 = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
@@ -3398,9 +3414,10 @@ class FullText ( wx.Frame ):
         #bSizer2.Add( self.m_richText1, 9, wx.EXPAND |wx.ALL, 5 )
         m_sdbSizer1 = wx.StdDialogButtonSizer()
         self.m_sdbSizer1OK = wx.Button( self.m_panel1, wx.ID_OK )
+        self.m_sdbSizer1OK.Bind( wx.EVT_BUTTON, self.OnOk )
         m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
-        self.m_sdbSizer1Cancel = wx.Button( self.m_panel1, wx.ID_CANCEL )
-        m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
+        #self.m_sdbSizer1Cancel = wx.Button( self.m_panel1, wx.ID_CANCEL )
+        #m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
         m_sdbSizer1.Realize();
         bSizer2.Add( m_sdbSizer1, 0, wx.EXPAND, 5 )
         self.m_panel1.SetSizer( bSizer2 )
@@ -3413,4 +3430,7 @@ class FullText ( wx.Frame ):
 
     def __del__( self ):
         pass
+
+    def OnOk( self, evt ):
+        self.Destroy()
 

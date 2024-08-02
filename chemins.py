@@ -155,6 +155,7 @@ def ConstructConfigPath(AppliPath, user=True):
         ConfigPath = AppliPath
     DictConfigPath = {
         'reinert': os.path.join(ConfigPath, 'reinert.cfg'),
+        #'key': os.path.join(ConfigPath, 'spacykeyfr.cfg'),
         'key': os.path.join(ConfigPath, 'key.cfg'),
         'path': os.path.join(ConfigPath, 'path.cfg'),
         'preferences' : os.path.join(ConfigPath, 'iramuteq.cfg'),

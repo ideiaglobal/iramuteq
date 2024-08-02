@@ -39,6 +39,8 @@ from PrintRScript import barplot
 from dialog import SearchDial, message, BarGraphDialog, BarFrame
 
 
+
+
 class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
 
     def __init__(self, parent,gparent, dlist = {}, first = [], usefirst = False, menu = True):
@@ -70,11 +72,11 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             exec(s)
         self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
         tID = wx.NewId()
-        self.attr1 = wx.ListItemAttr()
+        self.attr1 = wx.ItemAttr()
         self.attr1.SetBackgroundColour((230, 230, 230))
-        self.attr2 = wx.ListItemAttr()
+        self.attr2 = wx.ItemAttr()
         self.attr2.SetBackgroundColour("light blue")
-        self.attrselected = wx.ListItemAttr()
+        self.attrselected = wx.ItemAttr()
         self.attrselected.SetBackgroundColour("red")
         self.selected = {}
         i=0
@@ -89,14 +91,14 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         self.SetItemCount(len(self.dlist))
         listmix.ColumnSorterMixin.__init__(self, len(self.first) + 1)
         self.SortListItems(1, False)
-        #-----------------------------------------------------------------------------------------    
+        #-----------------------------------------------------------------------------------------
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self)
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED , self.OnPopupTwo, self)
         # for wxMSW
         self.Bind(wx.EVT_COMMAND_RIGHT_CLICK, self.OnRightClick)
         # for wxGTK
         self.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
-#-----------------------------------------------------------------------------------------    
+#-----------------------------------------------------------------------------------------
 
     def OnGetItemColumnImage(self, item, col):
         return -1
@@ -144,7 +146,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
     # Used by the ColumnSorterMixin, see wx/lib/mixins/listctrl.py
     def GetSortImages(self):
         return (self.sm_dn, self.sm_up)
-    
+
     def OnRightDown(self, event):
         x = event.GetX()
         y = event.GetY()
@@ -167,7 +169,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         index=self.itemIndexMap[item]
         s = self.itemDataMap[index]
         return s
-    
+
 #    def SortItems(self,sorter=cmp): # modification pour python 3
     def SortItems(self, sorter=None):
         listTemp = sorted(self.itemDataMap.items(),
@@ -186,7 +188,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         self.dial.CenterOnParent()
         self.dial.Show()
         #self.dial.Destroy()
-    
+
     def OnRightClick(self, event):
         if self.menu :
             # only do this part the first time so the events are only bound once
@@ -289,7 +291,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         items = dict([[i, '<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table><br>' % ntab2[i][0], ucestxt[i]])] for i in range(0,len(ucestxt))])
         win = message(self, items, ' - '.join([_("Typical text segments"), "%s" % self.first[ind]]), (900, 600))
         win.Show(True)
-        
+
     def OnPopupTwo(self, event):
         if 'nb' in dir(self.parent) :
             activenotebook = self.parent.nb.GetSelection()
@@ -353,7 +355,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         spec.Tgen.glob <- spec.Tgen.glob[[1]][((nrow(Tgen.table)-ncol(Tgen.table))+1):nrow(Tgen.table),]
         di <- spec.Tgen.glob
         """
-        txt = barplot('', '', '', self.parent.RscriptsPath['Rgraph'], tmpgraph, intxt = intxt) 
+        txt = barplot('', '', '', self.parent.RscriptsPath['Rgraph'], tmpgraph, intxt = intxt)
         # ecriture du script dans un fichier
         tmpscript = tempfile.mktemp(dir=self.parent.TEMPDIR)
         with open(tmpscript, 'w') as f :
@@ -365,7 +367,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         txt = "<img src='%s'>" % tmpgraph
         win.HtmlPage.SetPage(txt)
         win.Show(True)
-    
+
     def OnTgenDetails(self, evt):
         if 'nb' in dir(self.parent) :
             activenotebook = self.parent.nb.GetSelection()

@@ -406,6 +406,7 @@ class Corpus :
         else :
             grams = {gram :''}
         tokeep = [lem for lem in self.lems if self.lems[lem].freq >= mineff and self.lems[lem].act in grams]
+        print(tokeep)
         etuces = [[] for et in etoiles]
         for uci in self.ucis :
             get = list(set(uci.etoiles).intersection(etoiles))
@@ -1677,6 +1678,7 @@ class Builder :
         parametres = DoConf(os.path.join(self.parent.UserConfigPath,'corpus.cfg')).getoptions('corpus')
         parametres['pathout'] = PathOut(parent.filename, 'corpus').mkdirout()
         parametres['corpus_name'] = os.path.split(parametres['pathout'])[1]
+        parametres['lang'] = self.parent.pref.get('iramuteq','language')
         dial = CorpusPref(parent, parametres)
         dial.CenterOnParent()
         dial.txtpath.SetLabel(parent.filename)

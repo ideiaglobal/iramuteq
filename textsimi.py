@@ -25,23 +25,23 @@ from chemins import ffr, simipath
 from analysetxt import AnalyseText
 from guifunct import PrepSimi
 from functions import indices_simi, progressbar, treat_var_mod, read_list_file, print_liste, DoConf, exec_rcode, check_Rresult
-from PrintRScript import PrintSimiScript 
+from PrintRScript import PrintSimiScript
 
 
 log = logging.getLogger('iramuteq.textsimi')
 
 
-class SimiTxt(AnalyseText): 
+class SimiTxt(AnalyseText):
 
     def doanalyse(self) :
         self.parametres['type'] = 'simitxt'
         self.pathout.basefiles(simipath)
         self.indices = indices_simi
-        if self.dlg : # quel est le lien ???
+        if self.dlg :
             self.makesimiparam()
         #FIXME
         self.actives = self.corpus.make_actives_limit(3)
-        dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)]) 
+        dictcol = dict([[i, [act, self.corpus.getlemeff(act)]] for i, act in enumerate(self.actives)])
         continu = False
         if self.dlg :
             self.listet = self.corpus.make_etoiles()
@@ -72,7 +72,7 @@ class SimiTxt(AnalyseText):
             if self.parametres['type_graph'] == 1:
                 if self.parametres['svg'] :
                     filename, ext = os.path.splitext(script.filename)
-                    fileout = filename + '.svg'                    
+                    fileout = filename + '.svg'
                 else :
                     fileout = script.filename
                 if os.path.exists(self.pathout['liste_graph']):
@@ -155,7 +155,7 @@ class SimiFromCluster(SimiTxt) :
             self.makesimiparam()
         if 'bystar' in self.parametres :
             del self.parametres['bystar']
-        dictcol = dict([[i, [act, self.corpus.getlemclustereff(act, self.numcluster)]] for i, act in enumerate(self.actives)]) 
+        dictcol = dict([[i, [act, self.corpus.getlemclustereff(act, self.numcluster)]] for i, act in enumerate(self.actives)])
         continu = True
         if self.dlg :
 #            self.dlg.Destroy()
@@ -179,7 +179,7 @@ class SimiFromCluster(SimiTxt) :
             if self.parametres['type_graph'] == 1:
                 if self.parametres['svg'] :
                     filename, ext = os.path.splitext(script.filename)
-                    fileout = filename + '.svg'                    
+                    fileout = filename + '.svg'
                 else :
                     fileout = script.filename
                 if os.path.exists(self.pathout['liste_graph']):
@@ -189,7 +189,7 @@ class SimiFromCluster(SimiTxt) :
                     graph_simi = [[os.path.basename(fileout), script.txtgraph]]
                 print_liste(self.pathout['liste_graph'], graph_simi)
             self.dlg.Destroy()
-        else : 
+        else :
             return False
 
     def makefiles(self) :

@@ -299,7 +299,7 @@ class IraFrame(wx.Frame):
         item.SetBitmap(self.images_analyses['importdmi'])
         file_menu.Append(item)
         item = wx.MenuItem(file_menu, ID_merge, _('Merge graphs'), _('Merge graphs'))
-        file_menu.Append(item)
+        #file_menu.Append(item)
         item = wx.MenuItem(file_menu, ID_merge_clusters, _('Corpus from merge clusters'), _('Corpus from merge clusters'))
         file_menu.Append(item)
 
@@ -985,7 +985,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
 
     # action ou évènement ?
     def ShowAPane(self, panel):
-        print('ShowAPane')
+        #print('ShowAPane')
         for pane in self._mgr.GetAllPanes() :
             if not pane.IsToolbar() and pane.name != 'lefttree':
                 pane.Hide()
@@ -1361,13 +1361,13 @@ class IntroPanel(wx.Panel):
         label2 = wx.StaticText(PanelPres, -1 , '\nVersion ' + ConfigGlob.get('DEFAULT', 'version') + '\n')
         label2.SetForegroundColour(txtcolour)
         label2.SetBackgroundColour(bckgrdcolor)
-        self.hyper2 = hl.HyperLinkCtrl(PanelPres, wx.ID_ANY, "REPERE", URL="http://repere.no-ip.org/")
-        self.hyper2.SetColours(linkcolor, linkcolor, "RED")
-        self.hyper2.SetBackgroundColour(bckgrdcolor)
-        self.hyper2.EnableRollover(True)
-        self.hyper2.SetUnderlines(False, False, True)
-        self.hyper2.SetBold(True)
-        self.hyper2.UpdateLink()
+        #self.hyper2 = hl.HyperLinkCtrl(PanelPres, wx.ID_ANY, "REPERE", URL="http://repere.no-ip.org/")
+        #self.hyper2.SetColours(linkcolor, linkcolor, "RED")
+        #self.hyper2.SetBackgroundColour(bckgrdcolor)
+        #self.hyper2.EnableRollover(True)
+        #self.hyper2.SetUnderlines(False, False, True)
+        #self.hyper2.SetBold(True)
+        #self.hyper2.UpdateLink()
         label_lerass = wx.StaticText(PanelPres, -1, 'Laboratoire ')
         label_lerass.SetForegroundColour(txtcolour)
         label_lerass.SetBackgroundColour(bckgrdcolor)
@@ -1389,13 +1389,16 @@ class IntroPanel(wx.Panel):
         python_img = wx.Image(os.path.join(ImagePath,'python-logo.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         r_img = wx.Image(os.path.join(ImagePath,'Rlogo.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         lexique_img = wx.Image(os.path.join(ImagePath,'LexTexte4.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        sms_img = wx.Image(os.path.join(ImagePath,'logo_sms.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         but_python = wx.BitmapButton(self, -1, python_img)
         but_lexique = wx.BitmapButton(self, -1, lexique_img)
         but_r = wx.BitmapButton(self, -1, r_img)
+        but_sms = wx.BitmapButton(self, -1, sms_img)
         self.Bind(wx.EVT_BUTTON, self.OnPython, but_python)
         self.Bind(wx.EVT_BUTTON, self.OnLexique, but_lexique)
         self.Bind(wx.EVT_BUTTON, self.OnR, but_r)
-        grid_sizer_1.Add(self.hyper2, 0, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 0)
+        self.Bind(wx.EVT_BUTTON, self.OnSMS, but_sms)
+        #grid_sizer_1.Add(self.hyper2, 0, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 0)
         grid_sizer_3.Add(label_lerass, 0, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 0)
         grid_sizer_3.Add(self.hyper_lerass, 0, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL, 0)
         sizer4.Add(label_1, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 5)
@@ -1415,6 +1418,7 @@ class IntroPanel(wx.Panel):
         grid_sizer_2.Add(but_python, 1, wx.ALIGN_BOTTOM)
         grid_sizer_2.Add(but_lexique, 1, wx.ALIGN_BOTTOM)
         grid_sizer_2.Add(but_r, 1,  wx.ALIGN_BOTTOM)
+        grid_sizer_2.Add(but_sms, 1,  wx.ALIGN_BOTTOM)
         sizer1.Add(PanelPres, 0, wx.EXPAND |wx.ALL, 10)
         sizer1.Add(grid_sizer_2, 2, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 1)
         self.SetSizer(sizer1)
@@ -1428,6 +1432,9 @@ class IntroPanel(wx.Panel):
 
     def OnR(self,evt):
         webbrowser.open('http://www.r-project.org')
+
+    def OnSMS(self, evt):
+        webbrowser.open('https://sms.univ-tlse2.fr')
 
 
 #--------------------------------------------------------------------

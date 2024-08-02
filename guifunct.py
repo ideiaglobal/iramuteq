@@ -194,7 +194,7 @@ class PrefSimi ( wx.Dialog ):
             listsizer = wx.BoxSizer( wx.VERTICAL )
             countsizer = wx.BoxSizer( wx.HORIZONTAL )
             self.butcount = wx.Button(self, -1, _("count"))
-            self.textcount = wx.TextCtrl(self, -1, "", wx.DefaultPosition, wx.Size( 100,-1 ), wx.TE_READONLY )
+            self.textcount = wx.TextCtrl(self, -1, "", wx.DefaultPosition, wx.Size( 100, 50 ), wx.TE_READONLY )
             countsizer.Add(self.butcount, 0, wx.ALL, 5)
             countsizer.Add(self.textcount, 0, wx.ALL, 5 )
             listsizer.Add(countsizer, 0, wx.ALL, 5)
@@ -273,7 +273,7 @@ class PrefSimi ( wx.Dialog ):
         self.m_staticText5.Wrap( -1 )
         fgSizer3.Add( self.m_staticText5, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 
-        choice3Choices = [ "dynamique", "statique", "3D", 'web2D', "web3D" ]
+        choice3Choices = [ "dynamique", "statique", "3D"]#, 'web2D', "web3D" ]
         self.choice3 = wx.Choice( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, choice3Choices, 0 )
         self.choice3.SetSelection( 0 )
 
@@ -813,7 +813,7 @@ class PrefSimi ( wx.Dialog ):
         self.comcheck.SetValue(self.paramsimi['com'])
         self.choix_com.SetSelection(self.paramsimi['communities'])
         self.halo.SetValue(self.paramsimi['halo'])
-        self.check_curved.SetValue(self.paramsimi.get('edgecurved', True))
+        self.check_curved.SetValue(self.paramsimi.get('edgecurved', False))
         if self.paramsimi.get('word', False) and self.paramsimi['first'] :
             self.choice2.SetSelection(5)
 

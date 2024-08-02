@@ -59,9 +59,7 @@ class Reinert(AnalyseText) :
         self.print_graph_files()
 
     def preferences(self) :
-        print('parametres en entree config alceste', self.parametres)
         parametres = DoConf(self.parent.ConfigPath['reinert']).getoptions('ALCESTE')
-        print('parametres apres doconf', parametres)
         parametres['corpus'] = self.corpus
         parametres['pathout'] = self.pathout
         parametres['lem'] = self.parametres['lem']
@@ -82,7 +80,6 @@ class Reinert(AnalyseText) :
             parametres['mode.patate'] = self.dial.check_patate.GetValue()
             DoConf(self.parent.ConfigPath['reinert']).makeoptions(['ALCESTE'], [parametres])
             self.dial.Destroy()
-            print(parametres)
             self.parametres.update(parametres)
             return self.parametres
         else :
@@ -108,7 +105,7 @@ class Reinert(AnalyseText) :
             chd_graph_list.append([os.path.basename(self.pathout['dendro2']), 'dendrogramme à partir de chd2'])
         chd_graph_list.append([os.path.basename(self.pathout['arbre1']), 'chd1'])
         if self.parametres['classif_mode'] == 0 :
-            chd_graph_list.append([os.path.basename(self.pathout['arbre2']), 'chd2'])       
+            chd_graph_list.append([os.path.basename(self.pathout['arbre2']), 'chd2'])
         print_liste(self.pathout['liste_graph_afc'], afc_graph_list)
         print_liste(self.pathout['liste_graph_chd'], chd_graph_list)
         PrintRapport(self, self.corpus, self.parametres)
@@ -155,4 +152,4 @@ class ReDoProfile(AnalyseText):
         self.doanalyse()
 
     def Rscript(self) :
-       script = ReDoProfScript(self) 
+       script = ReDoProfScript(self)

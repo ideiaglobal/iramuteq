@@ -1247,7 +1247,7 @@ class SimiLayout(DefaultTextLayout) :
             self.graphpan = GraphPanelSimi(self.tabsimi, self.pathout, list_graph)
             self.graphpan.Bind(wx.EVT_BUTTON, self.redosimi, self.graphpan.butafc)
             self.graphpan.Bind(wx.EVT_BUTTON, self.export, self.graphpan.butexport)
-            self.graphpan.Bind(wx.EVT_BUTTON, self.blender, self.graphpan.butblender)
+            #self.graphpan.Bind(wx.EVT_BUTTON, self.blender, self.graphpan.butblender)
             self.tabsimi.AddPage(self.graphpan, _('Graph'))
             self.ira.nb.AddPage(self.tabsimi, _('Graph analysis'))
             self.ira.ShowTab(True)
@@ -1436,7 +1436,7 @@ class SimiMatLayout(DefaultMatLayout) :
         self.graphpan = GraphPanelSimi(self.tabsimi, self.pathout, list_graph)
         self.graphpan.Bind(wx.EVT_BUTTON, self.redosimi, self.graphpan.butafc)
         self.graphpan.Bind(wx.EVT_BUTTON, self.export, self.graphpan.butexport)
-        self.graphpan.Bind(wx.EVT_BUTTON, self.blender, self.graphpan.butblender)
+        #self.graphpan.Bind(wx.EVT_BUTTON, self.blender, self.graphpan.butblender)
         self.tabsimi.AddPage(self.graphpan, _('Graph'))
         self.tabsimi.parametres = self.parametres
         self.parent.nb.AddPage(self.tabsimi, ' - '.join([_('Graph analysis'), self.parametres['name']]))
@@ -1630,10 +1630,10 @@ class GraphPanelSimi(wx.Panel):
         self.butafc = wx.BitmapButton(self, -1, afc_img)
         export_img = wx.Image(os.path.join(self.ira.images_path,'button_export.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.butexport = wx.BitmapButton(self, -1, export_img)
-        blender_img = wx.Image(os.path.join(self.ira.images_path,'button_blender.png'), wx.BITMAP_TYPE_ANY)
-        blender_img.Rescale(32,32)
-        blender_img = blender_img.ConvertToBitmap()
-        self.butblender = wx.BitmapButton(self, -1, blender_img)
+        #blender_img = wx.Image(os.path.join(self.ira.images_path,'button_blender.png'), wx.BITMAP_TYPE_ANY)
+        #blender_img.Rescale(32,32)
+        #blender_img = blender_img.ConvertToBitmap()
+        #self.butblender = wx.BitmapButton(self, -1, blender_img)
         for i in range(0,len(list_graph)):
             if os.path.exists(os.path.join(self.dirout,list_graph[i][0])) :
                 filename, ext = os.path.splitext(list_graph[i][0])
@@ -1641,7 +1641,7 @@ class GraphPanelSimi(wx.Panel):
                     self.listimg.append(hl.HyperLinkCtrl(self.panel_1, -1, os.path.join(self.dirout,list_graph[i][0]), URL=os.path.join(self.dirout,list_graph[i][0])))
                 else :
                     self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)))
-                self.labels.append(wx.StaticText(self.panel_1, -1, list_graph[i][1]))
+                self.labels.append(wx.StaticText(self.panel_1, -1, list_graph[i][1] + ''))
         self.panel_1.Bind(wx.EVT_MOTION, self.onMouseMove)
         self.__set_properties()
         self.__do_layout()
@@ -1658,7 +1658,7 @@ class GraphPanelSimi(wx.Panel):
         self.sizer_3 = wx.BoxSizer(wx.VERTICAL)
         self.sizer_2.Add(self.butafc, 0, 0, 0)
         self.sizer_2.Add(self.butexport, 0, 0, 0)
-        self.sizer_2.Add(self.butblender, 0, 0, 0)
+        #self.sizer_2.Add(self.butblender, 0, 0, 0)
         for i in range(0, len(self.listimg)):
             self.sizer_3.Add(self.listimg[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
             self.sizer_3.Add(self.labels[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)

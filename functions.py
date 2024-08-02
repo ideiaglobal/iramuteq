@@ -860,7 +860,7 @@ def treat_var_mod(variables) :
 #                     var_mod[var].append(variable)
     return var_mod
 
-def doconcorde(corpus, uces, mots, uci = False, fontsize=16) :
+def doconcorde(corpus, uces, mots, uci = False, fontsize=4) :
     if not uci :
         ucestxt1 = [row for row in corpus.getconcorde(uces)]
     else :

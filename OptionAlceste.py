@@ -50,7 +50,7 @@ class OptionAlc(wx.Dialog):
         self.spin_nbcl = wx.SpinCtrl(self, -1, "",size = (100,30), min=2, max=1000000)
         txt = _("Minimum frequency of text segments by clusters (0=automatic)")
         self.label_7 = wx.StaticText(self, -1, txt)
-        self.spin_ctrl_4 = wx.SpinCtrl(self, -1, "",size = (100,30), min=0, max=1000000)       
+        self.spin_ctrl_4 = wx.SpinCtrl(self, -1, "",size = (100,30), min=0, max=1000000)
         txt = _("Minimum frequency of an analyzed form (2=automatic)")
         self.label_8 = wx.StaticText(self, -1, txt)
         self.spin_ctrl_5 = wx.SpinCtrl(self, -1, "",size = (100,30), min=2, max=1000000)
