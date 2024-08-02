@@ -50,7 +50,7 @@ prototypical <- function(x, mfreq = NULL, mrank = NULL, cexrange=c(0.8, 3), cexa
         labcol <- colors[ord.ori]
     }
 	mat.col <- cbind(r.names, labcol)
-	write.table(mat.col,file=mat.col.path)
+	#write.table(mat.col,file=mat.col.path)
     ti <- c("Zone du noyau", "Première périphérie", "Seconde périphérie", "Elements contrastés")
 	if (type == 'classical') {
 	    par(oma=c(1,3,3,1))
