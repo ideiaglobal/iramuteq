@@ -48,7 +48,6 @@ class AnalyseText :
             self.parametres = self.make_config(parametres)
         if self.parametres is not None:
             self.keys = DoConf(self.ira.ConfigPath['key']).getoptions()
-            print(self.keys)
             gramact = [k for k in self.keys if self.keys[k] == 1]
             gramsup = [k for k in self.keys if self.keys[k] == 2]
             self.parametres['pathout'] = self.pathout.mkdirout()

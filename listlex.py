@@ -85,10 +85,16 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             i+=1
         self.SetColumnWidth(0, 250)
         for i in range(0,len(self.etoiles)):
-            size = self.checkcolumnwidth(len(self.etoiles[i]) * 20)
-            if size < 200 :
-                size = 200
-            self.SetColumnWidth(i + 1, size)
+            #size = self.checkcolumnwidth(len(self.etoiles[i]) * 20)
+            #if size < 200 :
+            #    size = 200
+            #self.SetColumnWidth(i + 1, size)
+            self.SetColumnWidth(i+1, wx.LIST_AUTOSIZE_USEHEADER)
+            size = self.GetColumnWidth(i+1)
+            if size < 80 :
+                self.SetColumnWidth(i+1, 80)
+            if size > 300 :
+                self.SetColumnWidth(i+1, 300)
         self.itemDataMap = self.dlist
         self.itemIndexMap = list(self.dlist.keys())
         self.SetItemCount(len(self.dlist))

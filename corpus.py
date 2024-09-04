@@ -406,7 +406,6 @@ class Corpus :
         else :
             grams = {gram :''}
         tokeep = [lem for lem in self.lems if self.lems[lem].freq >= mineff and self.lems[lem].act in grams]
-        print(tokeep)
         etuces = [[] for et in etoiles]
         for uci in self.ucis :
             get = list(set(uci.etoiles).intersection(etoiles))
