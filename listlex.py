@@ -83,9 +83,12 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         for name in ['formes'] + self.etoiles :
             self.InsertColumn(i,name,wx.LIST_FORMAT_LEFT)
             i+=1
-        self.SetColumnWidth(0, 180)
+        self.SetColumnWidth(0, 250)
         for i in range(0,len(self.etoiles)):
-            self.SetColumnWidth(i + 1, self.checkcolumnwidth(len(self.etoiles[i]) * 10))
+            size = self.checkcolumnwidth(len(self.etoiles[i]) * 20)
+            if size < 200 :
+                size = 200
+            self.SetColumnWidth(i + 1, size)
         self.itemDataMap = self.dlist
         self.itemIndexMap = list(self.dlist.keys())
         self.SetItemCount(len(self.dlist))

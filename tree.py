@@ -136,7 +136,7 @@ class LeftTree(CT.CustomTreeCtrl):
                 events.append(data)
         self.parent = parent
         self.ira = parent
-        font = wx.Font(pointSize=self.ira.fontsize + 2, family=wx.FONTFAMILY_DEFAULT, style=wx.FONTSTYLE_NORMAL, weight=wx.FONTWEIGHT_NORMAL)
+        font = wx.Font(pointSize=self.ira.fontsize, family=wx.FONTFAMILY_DEFAULT, style=wx.FONTSTYLE_NORMAL, weight=wx.FONTWEIGHT_NORMAL)
         self.SetFont(font)
         self.events = events
         self.styles = treestyles
