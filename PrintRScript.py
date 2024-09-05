@@ -1343,7 +1343,7 @@ class TgenProfScript(PrintRScript):
         reslem <- build.prof.tgen(tgenlem)
         write.table(reslem$chi2, file = "%s", sep='\\t', col.names = NA)
         write.table(reslem$pchi2, file = "%s", sep='\\t', col.names = NA)
-        """ % (ffr(self.pathout['tgenlemchi2.csv']), ffr(self.pathout['tgenlempchi2.csv']))        
+        """ % (ffr(self.pathout['tgenlemchi2.csv']), ffr(self.pathout['tgenlempchi2.csv']))
         self.add(txt)
 
 

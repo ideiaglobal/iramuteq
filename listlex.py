@@ -234,7 +234,8 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
                 menu.Append(-1, _("Typical text segments"), menu_stcaract) #modifié
                 menu.Append(self.onmaketgen, _("Make Tgen"))
             else :
-                menu.Append(self.id_tgendetails, _('Tgen details'))
+                if self.tgenlem :
+                    menu.Append(self.id_tgendetails, _('Tgen details'))
             self.PopupMenu(menu)
             menu.Destroy()
 
@@ -387,7 +388,10 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         ira = wx.GetApp().GetTopWindow()
         item=self.getColumnText(self.GetFirstSelected(), 0)
         wordlist = [val for val in self.tgens[item] if val in corpus.lems]
+        print(wordlist)
         wordlist = dict(list(zip(wordlist,wordlist)))
+        print(wordlist)
+        print(self.tgenlem)
         res = dict([[val, self.tgenlem[val]] for val in self.tgenlem if self.tgenlem[val][0] in wordlist])
         win = ListLexFrame(self, ira, corpus, res, self.etoiles)
         win.Show()

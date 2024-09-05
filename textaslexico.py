@@ -23,7 +23,7 @@ import wx
 from chemins import ConstructPathOut, StatTxtPathOut, PathOut, ffr
 from analysetxt import AnalyseText
 from functions import exec_rcode, progressbar, check_Rresult, CreateIraFile, print_liste, treat_var_mod, write_tab, DoConf, TGen
-from dialog import OptLexi #, StatDialog 
+from dialog import OptLexi #, StatDialog
 from PrintRScript import TgenSpecScript
 
 
@@ -227,7 +227,7 @@ class TgenSpec(AnalyseText):
         self.doanalyse()
 
     def doanalyse(self):
-        self.tgen = TGen(path = self.parametres['tgenpath'], encoding = self.ira.syscoding)
+        self.tgen = TGen(path = self.parametres['tgenpath'], encoding = 'utf8')
         self.tgen.read(self.tgen.path)
         self.parametres['etoiles'].sort()
         tgenocc, totocc = self.corpus.make_tgen_table(self.tgen, self.parametres['etoiles'])

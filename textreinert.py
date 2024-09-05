@@ -120,7 +120,7 @@ class TgenProf(AnalyseText):
         self.doanalyse()
 
     def doanalyse(self):
-        self.tgen = TGen(path = self.parametres['tgenpath'], encoding = self.ira.syscoding)
+        self.tgen = TGen(path = self.parametres['tgenpath'], encoding = 'utf8')
         self.tgen.read(self.tgen.path)
         #self.parametres['etoiles'].sort()
         self.parametres['tgeneff'] = os.path.join(self.parametres['pathout'], 'tgeneff.csv')

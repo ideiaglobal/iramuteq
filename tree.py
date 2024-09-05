@@ -386,7 +386,7 @@ class LeftTree(CT.CustomTreeCtrl):
                 stcaract = menu.Append(wx.ID_ANY, _("Typical text segments"))
                 tgen = menu.Append(wx.ID_ANY, _("Tgen Editor"))
                 computetgen = menu.Append(wx.ID_ANY, _("Compute Tgen"))
-                mergeclustergraph = menu.Append(wx.ID_ANY, _("Merge Cluster Graph"))
+                #mergeclustergraph = menu.Append(wx.ID_ANY, _("Merge Cluster Graph"))
                 export_corpus = menu.Append(wx.ID_ANY, _("Export corpus"))
                 colored = menu.Append(wx.ID_ANY, _("Colored corpus"))
                 navig = menu.Append(wx.ID_ANY, _("Navigator"))
@@ -402,7 +402,7 @@ class LeftTree(CT.CustomTreeCtrl):
                 self.Bind(wx.EVT_MENU, self.OnStCaract, stcaract)
                 self.Bind(wx.EVT_MENU, self.OnTgenEditor, tgen)
                 self.Bind(wx.EVT_MENU, self.OnTgenCompute, computetgen)
-                self.Bind(wx.EVT_MENU, self.OnMergeClusterGraph, mergeclustergraph)
+                #self.Bind(wx.EVT_MENU, self.OnMergeClusterGraph, mergeclustergraph)
                 self.Bind(wx.EVT_MENU, self.OnExportCorpus, export_corpus)
                 self.Bind(wx.EVT_MENU, self.OnColored, colored)
                 self.Bind(wx.EVT_MENU, self.OnNavig, navig)
@@ -730,14 +730,14 @@ class LeftTree(CT.CustomTreeCtrl):
 
     def OnTgenCompute(self, evt):
         corpus = self.page.corpus
-        tgenpath = os.path.join(self.page.parametres['pathout'], 'tgen.csv')        
+        tgenpath = os.path.join(self.page.parametres['pathout'], 'tgen.csv')
         if not os.path.exists(tgenpath) :
-            message = wx.MessageDialog(self.parent, _("No TGen yet !"), style = wx.ICON_EXCLAMATION | wx.OK) 
+            message = wx.MessageDialog(self.parent, _("No TGen yet !"), style = wx.ICON_EXCLAMATION | wx.OK)
             message.ShowModal()
             message.Destroy()
         else :
             self.page.parametres['tgenpath'] = tgenpath
-            tgen = TGen(path = tgenpath, encoding = self.parent.syscoding)
+            tgen = TGen(path = tgenpath, encoding = 'utf8')
             if self.page.parametres['type'] == 'spec' :
                 self.page.parametres['etoiles'] = self.page.etoiles
                 TgenSpec(self.parent, corpus, self.page.parametres)
