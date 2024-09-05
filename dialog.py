@@ -497,6 +497,14 @@ of R packages""")
         fgSizer1.Add( wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 ),  wx.ID_ANY, wx.ALL, 5)
         self.mirror_value = wx.TextCtrl( self, wx.ID_ANY, 'http://cran.univ-lyon1.fr', wx.DefaultPosition, wx.Size( 300,50 ), 0 )
         fgSizer1.Add( self.mirror_value, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
+
+        font_text =  wx.StaticText( self, wx.ID_ANY, _("Font size"), wx.DefaultPosition, wx.DefaultSize, 0 )
+        font_text.Wrap( -1 )
+        fgSizer1.Add( font_text, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        fgSizer1.Add( wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 ),  wx.ID_ANY, wx.ALL, 5)
+        self.font_value = wx.TextCtrl( self, wx.ID_ANY, '', wx.DefaultPosition, wx.Size( 80,50 ), 0 )
+        fgSizer1.Add( self.font_value, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
+
         m_sdbSizer1 = wx.StdDialogButtonSizer()
         self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
         m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
@@ -541,6 +549,7 @@ of R packages""")
        #     self.fbb.Enable(False)
         self.Rpath_value.SetValue(self.parent.PathPath.get('PATHS', 'rpath'))
         self.mirror_value.SetValue(self.parent.pref.get('iramuteq', 'rmirror'))
+        self.font_value.SetValue(self.parent.pref.get('iramuteq', 'fontsize'))
 
     def oncheckmem(self, evt):
         if self.m_checkBox1.GetValue() :
@@ -555,6 +564,11 @@ of R packages""")
    #         self.fbb.Enable(False)
 
     def OnValid(self, event):
+        try :
+            int(self.font_value.GetValue())
+        except :
+            wx.MessageBox(_("Font size should be an integer!"), _("Warning"), wx.OK | wx.ICON_WARNING)
+            return
         parent = self.parent
         if self.m_radioBox1.GetSelection() == 0 : valsound = 'true'
         else :  valsound = 'false'
@@ -576,6 +590,7 @@ of R packages""")
         #    parent.pref.set('iramuteq', 'libsvdc', 'false')
         #parent.pref.set('iramuteq', 'libsvdc_path', self.fbb.GetValue())
         self.parent.pref.set('iramuteq', 'rmirror', self.mirror_value.GetValue())
+        self.parent.pref.set('iramuteq', 'fontsize', self.font_value.GetValue())
         file = open(parent.ConfigPath['preferences'], 'w', encoding='utf8')
         parent.pref.write(file)
         file.close()
