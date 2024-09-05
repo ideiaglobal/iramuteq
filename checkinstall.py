@@ -223,9 +223,15 @@ Sans ces bibliothèques, IRamuteq ne fonctionnera pas.
                 print(userdir)
                 .libPaths
                 """
-                txt += """
-                install.packages("%s", repos = "%s")
-                """ % (bib, self.pref.get('iramuteq','rmirror'))
+                if sys.platform in ['win32','darwin'] :
+                    txt += """
+                    install.packages("%s", repos = "%s", type='binary')
+                    """ % (bib, self.pref.get('iramuteq','rmirror'))
+                else :
+                    txt += """
+                    install.packages("%s", repos = "%s")
+                    """ % (bib, self.pref.get('iramuteq','rmirror'))
+
                 tmpscript = tempfile.mktemp(dir=self.TEMPDIR)
                 with open(tmpscript, 'w') as f :
                     f.write(txt)
