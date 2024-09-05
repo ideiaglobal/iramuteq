@@ -238,7 +238,6 @@ class IraFrame(wx.Frame):
                        wx.CLIP_CHILDREN):
         log.info('Starting Iramuteq... ' )
         log.info('version : %s' % ConfigGlob.get('DEFAULT', 'version'))
-        print(size)
         wx.Frame.__init__(self, parent, id, title, pos, size, style)
 
         # configuration
