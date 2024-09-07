@@ -368,7 +368,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         txt = barplot('', '', '', self.parent.RscriptsPath['Rgraph'], tmpgraph, intxt = intxt)
         # ecriture du script dans un fichier
         tmpscript = tempfile.mktemp(dir=self.parent.TEMPDIR)
-        with open(tmpscript, 'w') as f :
+        with open(tmpscript, 'w', encoding='utf8') as f :
             f.write(txt)
         # excution du script
         exec_rcode(self.parent.RPath, tmpscript, wait = True)
@@ -388,10 +388,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         ira = wx.GetApp().GetTopWindow()
         item=self.getColumnText(self.GetFirstSelected(), 0)
         wordlist = [val for val in self.tgens[item] if val in corpus.lems]
-        print(wordlist)
         wordlist = dict(list(zip(wordlist,wordlist)))
-        print(wordlist)
-        print(self.tgenlem)
         res = dict([[val, self.tgenlem[val]] for val in self.tgenlem if self.tgenlem[val][0] in wordlist])
         win = ListLexFrame(self, ira, corpus, res, self.etoiles)
         win.Show()

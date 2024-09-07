@@ -26,7 +26,7 @@ class GraphToJson :
             edges = [line.split('\t') for line in content]
         except :
             edges = None
-            
+
         with codecs.open(nodesfile, 'r', 'utf8') as f :
             content = f.read()
         content = content.replace('"','')
@@ -53,17 +53,15 @@ class GraphToJson :
         nodes = [line.split('\t') for line in content]
 
         graph = {'edges': [], 'nodes' : {}}
-        
+
         we = titles_edges.index('weight')
         if edges is not None :
             for edge in edges :
                 graph['edges'].append({'source' : edge[0], 'target' : edge[1], 'weight' : edge[we]})
-        
-        
+
         coefcoord = parametres.get('coefcoord', 1)
         coefweight = parametres.get('coefweight', 1)
-        
-        
+
         for node in nodes :
             if zr is not None :
                 graph['nodes'][node[ni]] = {"location" : [float(node[xr])*coefcoord, float(node[yr])*coefcoord, float(node[zr])*coefcoord], 'weight' : float(node[wr])/coefweight, 'color': (int(node[r]),int(node[g]),int(node[b]))}
@@ -73,5 +71,5 @@ class GraphToJson :
                     x = randint(-150,150)
                 graph['nodes'][node[ni]] = {"location" : [ x, float(node[xr]), float(node[yr])], 'weight' : float(node[wr]), 'color': (int(node[r]),int(node[g]),int(node[b]))}
 
-        with open(jsonout, 'w') as f :
+        with open(jsonout, 'w', encoding='utf8') as f :
             json.dump(graph, f)

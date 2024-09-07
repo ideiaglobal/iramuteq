@@ -100,11 +100,11 @@ class ParseFactivaPaste :
             nf.sort()
             files += nf
         tot = 0
-        with open(fileout,'w') as outf : 
+        with open(fileout,'w', encoding='utf8') as outf : 
             for f in files : 
                 print(f)
-                with codecs.open(f, 'r', encodage_in) as infile : 
-                    content = infile.read() 
+                with codecs.open(f, 'r', encodage_in) as infile :
+                    content = infile.read()
                 ucis = parsetxtpaste(content)
                 print_ucis(ucis, outf, encodage_out)
                 tot += len(ucis)

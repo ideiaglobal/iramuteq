@@ -313,7 +313,7 @@ class McNemar(AnalyseMatrix):
         """ % (ffr(self.parametres['pathout']),ffr(self.OutFrame))
         tmpfile=tempfile.mktemp(dir=self.TEMPDIR)
         print(tmpfile)
-        tmpscript=open(tmpfile,'w')
+        tmpscript=open(tmpfile,'w', encoding='utf8')
         tmpscript.write(txt)
         tmpscript.close()
         pid = exec_rcode(self.RPath, tmpfile, wait = False)
@@ -340,7 +340,7 @@ class McNemar(AnalyseMatrix):
 
     def dolayout(self, option):
         ListFile=[False]
-        file=open(self.OutFrame,'r')
+        file=open(self.OutFrame,'r', encoging='utf8')
         content=file.readlines()
         file.close()
         lcont = [line.replace('"','').replace('\n','').split(';') for line in content]
@@ -363,7 +363,7 @@ class McNemar(AnalyseMatrix):
         if option['contrib'] :
             allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*contrib*'])
             names.append('Contributions a posteriori')
-        if option['pourcent'] : 
+        if option['pourcent'] :
             allcoord.append([i for i,chi in enumerate(lcont) if chi[1]=='*pr*'])
             names.append('Pourcentages')
         if option['pourcentl'] :
@@ -402,7 +402,7 @@ class McNemar(AnalyseMatrix):
         txt = '<br><hr><br>\n'.join(['<br><br>'.join([tab[i] for tab in allhtml]) for i,val in enumerate(res)])
         txt = header + pretxt + txt + '\n</body></html>'
         fileout=os.path.join(self.parametres['pathout'],'resultats-chi2.html')
-        with open(fileout, 'w') as f :
+        with open(fileout, 'w', encoding='utf8') as f :
             f.write(txt)
-        ListFile.append(fileout)         
+        ListFile.append(fileout)
         return ListFile

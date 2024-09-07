@@ -117,7 +117,7 @@ class History :
         self.read()
 
     def read(self) :
-        with open(self.filein, 'r') as fjson :
+        with open(self.filein, 'r', encoding='utf8') as fjson :
             d = json.load(fjson)
 #        d = shelve.open(self.filein, protocol=1)
         self.history = d.get('history', [])
@@ -133,7 +133,7 @@ class History :
         d = {}
         d['history'] = self.history
         d['matrix'] = self.matrix
-        with open(self.filein, 'w') as f :
+        with open(self.filein, 'w', encoding='utf8') as f :
             f.write(json.dumps(d, indent=4, default=str))
        #d = shelve.open(self.filein, protocol=1)
        #d.close()
@@ -892,7 +892,7 @@ def getallstcarac(corpus, analyse) :
    print(profils)
 
 def read_chd(filein, fileout):
-    with open(filein, 'r') as f :
+    with open(filein, 'r', encoding='utf8') as f :
         content = f.read()
     #content = [line[3:].replace('"',"").replace(' ','') for line in content.splitlines()]
     content = [line.split('\t') for line in content.splitlines()]
@@ -913,7 +913,7 @@ def read_chd(filein, fileout):
                 mere[line[0]]['children'] = [{'name': line[1],'size' : content[i+1][0]}, {'name':line[2], 'size': content[i+1][1]}]
                 mere[line[1]] = mere[line[0]]['children'][-2]
                 mere[line[2]] = mere[line[0]]['children'][-1]
-    with open(fileout, 'w') as f :
+    with open(fileout, 'w', encoding='utf8') as f :
         f.write(json.dumps(chd))
 
 

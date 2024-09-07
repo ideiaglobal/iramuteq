@@ -432,7 +432,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             if self.var_mod == {} :
                 self.var_mod = treat_var_mod([val for val in corpus.actives] + [val for val in corpus.sups])
             var_mod = self.var_mod
-        with codecs.open(self.Source.pathout['chisqtable'], 'r', corpus.parametres['syscoding']) as f :
+        with open(self.Source.pathout['chisqtable'], 'r', encoding='utf8') as f :
             chistable = [line.replace('\n','').replace('\r','').replace('"','').replace(',','.').split(';') for line in f]
         title = chistable[0]
         title.pop(0)
@@ -540,7 +540,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         pathout = ConstructPathOut(self.Source.pathout.dirout, 'simi_classe_%i' %self.cl)
         if self.tmpchi is None :
             self.tmpchi = os.path.join(pathout,'chi.csv')
-            with open(self.tmpchi, 'w') as f:
+            with open(self.tmpchi, 'w', encoding='utf8') as f:
                 f.write('\n'.join([str(val) for val in self.lchi]))
         self.filename = os.path.join(pathout,'mat01.csv')
         tableau.printtable(self.filename, tab)
@@ -599,7 +599,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
         word = self.getColumnText(self.GetFirstSelected(), 6)
         if self.tmpchi is None :
             self.tmpchi = os.path.join(self.Source.parametres['pathout'],'chi_%i.csv' % self.cl)
-            with open(self.tmpchi, 'w') as f:
+            with open(self.tmpchi, 'w', encoding='utf8') as f:
                 f.write('\n'.join([str(val) for val in self.lchi]))
         index = self.la.index(word)
         parametres = {'type' : 'clustersimitxt',
@@ -615,7 +615,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
     def on_graph(self, evt):
         if self.tmpchi is None :
             self.tmpchi = os.path.join(self.Source.parametres['pathout'],'chi_%i.csv' % self.cl)
-            with open(self.tmpchi, 'w') as f:
+            with open(self.tmpchi, 'w', encoding='utf8') as f:
                 f.write('\n'.join([str(val) for val in self.lchi]))
         parametres = {'type' : 'clustersimitxt',
                         'pathout' : self.Source.parametres['pathout'],
@@ -690,7 +690,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             corpus = self.Source.corpus
         else :
             corpus = self.Source.tableau
-        with codecs.open(self.Source.pathout['chisqtable'], 'r', corpus.parametres['syscoding']) as f :
+        with open(self.Source.pathout['chisqtable'], 'r', encoging='utf8') as f :
             chistable = [line.replace('\n','').replace('\r','').replace('"','').replace(',','.').split(';') for line in f]
         title = chistable[0]
         title.pop(0)
@@ -709,7 +709,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             corpus = self.Source.corpus
         else :
             corpus = self.Source.tableau
-        with codecs.open(self.Source.pathout['chisqtable'], 'r', corpus.parametres['syscoding']) as f :
+        with open(self.Source.pathout['chisqtable'], 'r', encoding='utf8') as f :
             chistable = [line.replace('\n','').replace('\r','').replace('"','').replace(',','.').split(';') for line in f]
         title = chistable[0]
         title.pop(0)

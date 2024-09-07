@@ -217,7 +217,7 @@ class AnalyseQuest(AnalyseMatrix):
         save.image(file="%s")
         """ % ffr(self.pathout['RData'])
         tmpfile = tempfile.mktemp(dir=self.parent.TEMPDIR)
-        tmpscript = open(tmpfile, 'w')
+        tmpscript = open(tmpfile, 'w', encoding='utf8')
         tmpscript.write(txt)
         tmpscript.close()
         pid = exec_rcode(self.parent.RPath, tmpfile, wait = False)
@@ -226,4 +226,4 @@ class AnalyseQuest(AnalyseMatrix):
         check_Rresult(self.parent, pid)
         temps = time.time() - self.t1
         self.minutes, self.seconds = divmod(temps, 60)
-        self.hours, self.minutes = divmod(self.minutes, 60)        
+        self.hours, self.minutes = divmod(self.minutes, 60)

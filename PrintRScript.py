@@ -619,7 +619,7 @@ def barplot(table, parametres, intxt = False):
                 coordinf <- coord[toinf]
                 valinf <- di[toinf]
                 text(x=coordinf, y=valinf - 0.1, 'i')
-            }            
+            }
             c <- colMeans(coord)
             c1 <- c[-1]
             c2 <- c[-length(c)]
@@ -639,15 +639,15 @@ def barplot(table, parametres, intxt = False):
             mn <- round(min(di))
             mx <- round(max(di))
             for (i in mn:mx) {
-                if ((i/d) == (i%%/%%d)) { 
+                if ((i/d) == (i%%/%%d)) {
                     abline(h=i,lty=3)
                 }
             }
             par(mar=c(0,0,0,0))
             plot(0, axes = FALSE, pch = '')
-            legend(x = 'center' , rownames(di), fill = color)
+            legend(x = 'center' , rownames(di)            , fill = color)
             dev.off()
-            """ % (ffr(parametres['rgraph']), parametres['width'], parametres['height'], ffr(parametres['tmpgraph']), parametres['svg'])    
+            """ % (ffr(parametres['rgraph']), parametres['width'], parametres['height'], ffr(parametres['tmpgraph']), parametres['svg'])
     else:
         txt += """
         load("%s")

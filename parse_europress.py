@@ -163,7 +163,7 @@ def ParseEuropress(txtdir, fileout, encodage_in, encodage_out) :
         files.append(txtdir)
     tot = 0
     parser = MyHTMLParser()
-    with open(fileout,'w') as outf :
+    with open(fileout,'w', encoding='utf8') as outf :
         for f in files :
             print(f)
             parser.doinit(outf)

@@ -503,7 +503,7 @@ class IraFrame(wx.Frame):
         # fichier d'historique de Iramuteq
         #------------------------------------------------------------------------------------------------
         if not os.path.exists(os.path.join(UserConfigPath, 'history.db')) :
-            with open(os.path.join(UserConfigPath, 'history.db'), 'w') as f :
+            with open(os.path.join(UserConfigPath, 'history.db'), 'w', encoding='utf8') as f :
                 f.write('{}')
         self.history = History(os.path.join(UserConfigPath, 'history.db'))
         # l'extension ".db" est ajoutée automatiquement par le module

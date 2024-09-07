@@ -51,7 +51,7 @@ class Stat(AnalyseText) :
         supp = sortedby(supp, 2, 1)
         supp = [[i, val] for i, val in enumerate(supp)]
         ucesize = self.corpus.getucesize()
-        with open(self.pathout['stsize.csv'], 'w') as f :
+        with open(self.pathout['stsize.csv'], 'w', encoding='utf8') as f :
             f.write('\n'.join([repr(val) for val in ucesize]))
         self.result = {'total' : dict(tot), 'formes_actives' : dict(act), 'formes_supplémentaires' : dict(supp), 'hapax' : dict(hapax), 'glob' : ''}
         occurrences = sum([val[1][1] for val in tot]) + len(hapax)

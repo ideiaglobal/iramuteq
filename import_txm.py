@@ -36,7 +36,7 @@ class TXMParser(xml.sax.ContentHandler) :
         if name == 'p' :
             self.printsent()
             self.fileout.write('\n')
-          
+
     def characters(self, content) :
         if self.name == 'txm:form' :
             if content not in ['', ' ', '\n', '\r'] :
@@ -64,9 +64,9 @@ def TXM2IRA(pathin, fileout, encodage_in, encodage_out) :
         files = glob.glob(os.path.join(pathin,'*.xml'))
         if len(files) == 0 :
             return 'nofile'
-        with open(fileout, 'w') as fout :
+        with open(fileout, 'w', encoding='utf8') as fout :
             parser.setContentHandler(TXMParser(fout, encodage_out))
             for f in files :
-                parser.parse(open(f, 'r'))
+                parser.parse(open(f, 'r', encoding='utf8'))
                 fout.write('\n\n')
         return None
