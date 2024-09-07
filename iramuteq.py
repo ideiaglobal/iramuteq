@@ -731,7 +731,7 @@ class IraFrame(wx.Frame):
                 BestRPath = FindRPathNix()
             if BestRPath:
                 self.PathPath.set('PATHS', 'rpath', BestRPath)
-                with open(ConfigPath['path'], 'w') as f :
+                with open(ConfigPath['path'], 'w', encoding='utf8') as f :
                     self.PathPath.write(f)
         else:
             BestRPath = True
@@ -802,7 +802,7 @@ class IraFrame(wx.Frame):
     # evenement attaché au bouton de fermeture des fenetres ou onglets ?
     def OnClose(self, event):
         print('onclose Iramuteq')
-        with open(self.ConfigPath['path'], 'w') as f :
+        with open(self.ConfigPath['path'], 'w', encoding='utf8') as f :
             self.PathPath.write(f)
         self._mgr.UnInit()
         del self._mgr
