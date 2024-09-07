@@ -854,11 +854,11 @@ class GraphPanelDendro(wx.Panel):
         self.dirout = os.path.dirname(self.dictpathout['ira'])
         self.list_graph = list_graph
         self.parent = self.GetParent()#parent
-        self.SetFont(wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Arial")) #modifié
-        self.labels = []
-        self.listimg = []
         self.tabchd = self.parent.GetParent()
         self.ira = self.tabchd.GetParent()
+        self.SetFont(wx.Font(self.ira.fontsize, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Arial")) #modifié
+        self.labels = []
+        self.listimg = []
         self.panel_1 = wx.ScrolledWindow(self, -1, style=wx.TAB_TRAVERSAL)
         self.panel_1.SetBackgroundColour('white')
         self.deb = wx.StaticText(self.panel_1, -1, txt)
