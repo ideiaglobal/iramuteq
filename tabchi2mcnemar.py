@@ -319,10 +319,10 @@ class McNemar(AnalyseMatrix):
         pid = exec_rcode(self.RPath, tmpfile, wait = False)
         while pid.poll() == None :
             sleep(0.2)
-        check_Rresult(self.parent, pid)            
+        check_Rresult(self.parent, pid)
         self.count += 1
         keepGoing = self.dlg.Update(self.count,"Ecriture des résultats")
-         
+
         listfileout = self.dolayout(self.chioption)
             #listfileout=dlg.ShowChi2(ColSel1,ColSel2)
             #parent.FreqNum += 1
@@ -340,7 +340,7 @@ class McNemar(AnalyseMatrix):
 
     def dolayout(self, option):
         ListFile=[False]
-        file=open(self.OutFrame,'r', encoging='utf8')
+        file=open(self.OutFrame,'r', encoding='utf8')
         content=file.readlines()
         file.close()
         lcont = [line.replace('"','').replace('\n','').split(';') for line in content]

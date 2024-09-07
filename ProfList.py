@@ -690,7 +690,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             corpus = self.Source.corpus
         else :
             corpus = self.Source.tableau
-        with open(self.Source.pathout['chisqtable'], 'r', encoging='utf8') as f :
+        with open(self.Source.pathout['chisqtable'], 'r', encoding='utf8') as f :
             chistable = [line.replace('\n','').replace('\r','').replace('"','').replace(',','.').split(';') for line in f]
         title = chistable[0]
         title.pop(0)
