@@ -3027,6 +3027,8 @@ class BarFrame :
             height = len(rownames) * 15
             if height < 400 :
                 height = 400
+            if width < 500 :
+                width = 500
         else :
             width = 500
             height = (35 * len(colnames)) + (15 * len(rownames))
