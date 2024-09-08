@@ -219,7 +219,7 @@ images_analyses = {
         'preferences' : 'preferences.png',
         'exportmetatable' : 'exportmetatable.png',
         'importdmi' : 'twitter.png',
-        'labbe' : 'spec.png',
+        'labbe' : 'labbe.png',
         'categorisation' : 'spec.png',
          }
 
