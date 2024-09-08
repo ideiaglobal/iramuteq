@@ -42,6 +42,7 @@ class OptionAlc(wx.Dialog):
         #self.radio_1 = wx.RadioBox(self, -1, "", choices=['oui', 'non'], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
         self.label_12 = wx.StaticText(self, -1, _("Clustering"))
         self.radio_box_2 = wx.RadioBox(self, -1, "", choices=[_("double on RST"), _("simple on text segments"), _("simple on texts")], majorDimension=0, style=wx.RA_SPECIFY_ROWS) #, u"simple sur UCE (non implemente)"
+        self.radio_box_2.EnableItem(0, False)
         self.label_2 = wx.StaticText(self, -1, _("Size of rst1"))
         self.spin_ctrl_1 = wx.SpinCtrl(self, -1, _("actives forms"),size = (100,30), min=0, max=1000000)
         self.label_3 = wx.StaticText(self, -1, _("Size of rst2"))
