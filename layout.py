@@ -60,7 +60,7 @@ log = logging.getLogger('iramuteq.layout')
 
 class GraphPanelAfc(wx.Panel):
 
-    def __init__(self, parent, dico, list_graph, clnb, itempath = 'liste_graph_afc', coding = sys.getdefaultencoding()):
+    def __init__(self, parent, dico, list_graph, clnb, itempath = 'liste_graph_afc', coding = sys.getdefaultencoding(), islex = False):
         wx.Panel.__init__(self,parent)
         self.afcnb = 1
         self.clnb = clnb
@@ -73,6 +73,7 @@ class GraphPanelAfc(wx.Panel):
         self.listimg = []
         self.buts = []
         self.list_graph = list_graph
+        self.islex = islex
         self.TabCHD = self.parent.GetParent()
         self.nb = self.TabCHD.GetParent()
         self.ira = self.nb.GetParent()
@@ -125,6 +126,10 @@ class GraphPanelAfc(wx.Panel):
               'clnb' : clnb,
               'svg' : 0,
                }
+        if self.islex :
+            self.param['islex'] = 1
+        else :
+            self.param['islex'] = 0
         self.__set_properties()
         self.__do_layout()
 
@@ -232,6 +237,12 @@ class GraphPanelAfc(wx.Panel):
                           'alpha' : dial.slider_sphere.GetValue(),
                           'svg' : svg
                         }
+            if self.islex :
+                self.param['islex'] = 1
+                if self.param['qui'] == 1 :
+                    self.param['qui'] = 3
+            else :
+                self.param['islex'] = 0
             self.nb.parent = self.ira
             self.DictPathOut = self.Dict
             self.RscriptsPath = self.ira.RscriptsPath
@@ -256,6 +267,8 @@ class GraphPanelAfc(wx.Panel):
                 f.write(txt)
             pid = exec_rcode(self.ira.RPath, filetmp)
             check_Rresult(self.ira, pid)
+            if self.param['islex'] and self.param['qui'] == 3 :
+                self.param['qui']=1
             if self.param['typegraph'] != 1 :
                 txt = 'Variables '
                 if self.param['qui'] == 0 : value = 'actives'
@@ -783,10 +796,10 @@ class dolexlayout :
         if self.parametres['clnb'] > 2 :
             self.TabAFC = aui.AuiNotebook(self.TabStat, -1, wx.DefaultPosition)
             list_graph=read_list_file(self.dictpathout['liste_graph_afcf'], encoding = self.encoding)
-            self.tabAFCGraph = GraphPanelAfc(self.TabAFC, self.dictpathout, list_graph, self.parametres['clnb'], itempath ='liste_graph_afcf', coding = self.encoding)
+            self.tabAFCGraph = GraphPanelAfc(self.TabAFC, self.dictpathout, list_graph, self.parametres['clnb'], itempath ='liste_graph_afcf', coding = self.encoding, islex=True)
             self.TabAFC.AddPage(self.tabAFCGraph, _('CA forms'))
             list_graph=read_list_file(self.dictpathout['liste_graph_afct'], encoding = self.encoding)
-            self.tabAFCTGraph = GraphPanelAfc(self.TabAFC, self.dictpathout, list_graph, self.parametres['clnb'], itempath ='liste_graph_afct', coding=self.encoding)
+            self.tabAFCTGraph = GraphPanelAfc(self.TabAFC, self.dictpathout, list_graph, self.parametres['clnb'], itempath ='liste_graph_afct', coding=self.encoding, islex=True)
             self.TabAFC.AddPage(self.tabAFCTGraph, _('CA POS'))
             self.TabStat.AddPage(self.TabAFC, _('CA'))
         ira.nb.AddPage(self.TabStat, ' - '.join([_('Specificities'), self.parametres['name']]))
@@ -1620,7 +1633,7 @@ class GraphPanelSimi(wx.Panel):
         self.Dict = dico
         self.dirout = os.path.dirname(self.Dict['ira'])
         self.parent = self.GetParent()
-        self.SetFont(wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "courier")) #modifié
+        #self.SetFont(wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "courier")) #modifié
         self.labels = []
         self.listimg = []
         self.tabsimi = self.parent.GetParent()
