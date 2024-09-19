@@ -622,7 +622,11 @@ class PrefGraph(wx.Dialog):
         self.label_what = wx.StaticText(self, -1, _("Representation"))
         self.choice1 = wx.Choice(self, -1, (100,50), choices=[_("coordinates"),_("correlations")])
         self.label_qui = wx.StaticText(self, -1, 'Variables')
-        self.choice2 = wx.Choice(self, -1, (100,50), choices=[_("actives") ,_("supplementaries"), _("stars"), _("clusters")])
+        if self.paramgraph.get('islex', False) :
+            choix = [_("Rows"), _("Columns")]
+        else :
+            choix = [_("actives") ,_("supplementaries"), _("stars"), _("clusters")]
+        self.choice2 = wx.Choice(self, -1, (100,50), choices=choix)
         self.label_3 = wx.StaticText(self, -1, _("Text size"))
         self.spin3 = wx.SpinCtrl(self, -1, '', size = wx.DefaultSize, min=1, max=20)
         txt = _("Take the x first points")
