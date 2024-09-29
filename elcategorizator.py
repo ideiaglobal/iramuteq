@@ -11,6 +11,8 @@ from listlex import *
 import pickle
 import json
 
+import langue
+langue.run()
 
 
 class CategoDict :
@@ -368,19 +370,19 @@ class ElCategorizator ( wx.Panel ):
 
         bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
 
-        self.butsave = wx.Button( self, wx.ID_SAVE, u"Save", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.butsave = wx.Button( self, wx.ID_SAVE, _("Save"), wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer2.Add( self.butsave, 0, wx.ALL, 5 )
 
-        self.butcsv = wx.Button( self, wx.ID_ANY, u"Export Columns", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.butcsv = wx.Button( self, wx.ID_ANY, _("Export Columns"), wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer2.Add( self.butcsv, 0, wx.ALL, 5 )
 
-        self.butdict = wx.Button( self, wx.ID_ANY, u"Export dictonary", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.butdict = wx.Button( self, wx.ID_ANY, _("Export dictonary"), wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer2.Add( self.butdict, 0, wx.ALL, 5 )
 
-        self.butload = wx.Button( self, wx.ID_ANY, u"Load a categorization", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.butload = wx.Button( self, wx.ID_ANY, _("Load a categorization"), wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer2.Add( self.butload, 0, wx.ALL, 5 )
 
-        self.butaddcate = wx.Button( self, wx.ID_ANY, u"Add a category", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.butaddcate = wx.Button( self, wx.ID_ANY, _("Add a category"), wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer2.Add( self.butaddcate, 0, wx.ALL, 5 )
 
 
