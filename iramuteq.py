@@ -263,7 +263,6 @@ class IraFrame(wx.Frame):
             self.pref.read(self.ConfigPath['preferences'])
             self.fontsize = self.pref.getint('iramuteq','fontsize')
         except :
-            print('no pref : setting fontsize to 12')
             self.fontsize = 12
         self.SetFont(wx.Font(self.fontsize, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
 
@@ -694,7 +693,7 @@ class IraFrame(wx.Frame):
         self.Text = ''
         self.lexique = None
         self.corpus = None
-        
+
 
     def finish_init(self) :
         try :
@@ -911,7 +910,6 @@ construit avec des logiciels libres.
 
 Laboratoire LERASS
 
-REPERE
 """
         info.WebSite = ("http://www.iramuteq.org", "Site web IRaMuTeQ")
         dev = ConfigGlob.get('DEFAULT', 'dev').split(';')
@@ -1320,13 +1318,21 @@ class IntroPanel(wx.Panel):
         #col = randint(0, 255)
         #col1 = randint(0,255)
         #col2 = randint(0,255)
+        #width, height = parent.GetSize()
+        #print(width, height)
+        #image_file = "/home/pierre/graph_emojiGJ.png"
+        #bmp1 = wx.Image(image_file, wx.BITMAP_TYPE_ANY)
+        #bmp1.Rescale(width, height)
+        # image's upper left corner anchors at panel coordinates (0, 0)
+        #self.bitmap1 = wx.StaticBitmap(self, -1, bmp1.ConvertToBitmap(), (0, 0))
         #col = 57
-        col = 161
-        col1 = 198
-        col2 = 224
+        col = 242
+        col1 = 228
+        col2 = 179
         bckgrdcolor = wx.Colour(col, col1, col2)
+        #bckgrdcolor = wx.Colour(randint(0, 255), randint(0, 255), randint(0, 255))
         self.SetBackgroundColour(bckgrdcolor)
-        txtcolour = wx.Colour(250, 250, 250)
+        txtcolour = wx.Colour(0, 0, 0)
         linkcolor = wx.Colour(255, 0, 0)
         sizer1 = wx.BoxSizer(wx.VERTICAL)
         sizer2 = wx.BoxSizer(wx.VERTICAL)
@@ -1339,13 +1345,17 @@ class IntroPanel(wx.Panel):
             "http://www.iramuteq.org",
             URL="http://www.iramuteq.org")
         iralink.SetColours(linkcolor, linkcolor, "RED")
-        iralink.SetBackgroundColour(bckgrdcolor)
+        #iralink.SetBackgroundColour(bckgrdcolor)
         iralink.EnableRollover(True)
         iralink.SetUnderlines(False, False, True)
         iralink.SetBold(True)
         iralink.UpdateLink()
         PanelPres = wx.Panel(self)
-        bckgrdcolor = wx.Colour(randint(0, 255), randint(0, 255), randint(0, 255))
+        col = 70
+        col1 = 176
+        col2 = 70
+        bckgrdcolor = wx.Colour(col, col1, col2)
+        #bckgrdcolor = wx.Colour(randint(0, 255), randint(0, 255), randint(0, 255))
         PanelPres.SetBackgroundColour(bckgrdcolor)
         label_1 = wx.StaticText(self, -1, "IRaMuTeQ", size=(-1, -1))
         label_1.SetFont(wx.Font(46,
@@ -1355,7 +1365,7 @@ class IntroPanel(wx.Panel):
             0,
             "Purisa"))
         label_1.SetForegroundColour(wx.RED)
-        iraicone = wx.Image(os.path.join(ImagePath,'iraicone100x100.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        iraicone = wx.Image(os.path.join(ImagePath,'iraicone255x255.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         but_ira = wx.StaticBitmap(self, -1, bitmap = iraicone)
         label2 = wx.StaticText(PanelPres, -1 , '\nVersion ' + ConfigGlob.get('DEFAULT', 'version') + '\n')
         label2.SetForegroundColour(txtcolour)
@@ -1381,10 +1391,10 @@ class IntroPanel(wx.Panel):
         blank1 = wx.StaticText(PanelPres, -1, '\n')
         labellicence = wx.StaticText(PanelPres, -1, _("License GNU GPL"))
         labellicence.SetForegroundColour(txtcolour)
-        labellicence.SetBackgroundColour(bckgrdcolor)
+        #labellicence.SetBackgroundColour(bckgrdcolor)
         labelcopy = wx.StaticText(PanelPres, -1, ConfigGlob.get('DEFAULT', 'copyright'))
         labelcopy.SetForegroundColour(txtcolour)
-        labelcopy.SetBackgroundColour(bckgrdcolor)
+        #labelcopy.SetBackgroundColour(bckgrdcolor)
         python_img = wx.Image(os.path.join(ImagePath,'python-logo.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         r_img = wx.Image(os.path.join(ImagePath,'Rlogo.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         lexique_img = wx.Image(os.path.join(ImagePath,'LexTexte4.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
@@ -1414,10 +1424,10 @@ class IntroPanel(wx.Panel):
         sizer1.Add(iralink, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_TOP, 5)
         sizer2.Add(wx.StaticText(PanelPres, -1, ''), 0, wx.ALIGN_CENTER, 10)
         PanelPres.SetSizer(sizer2)
-        grid_sizer_2.Add(but_python, 1, wx.ALIGN_BOTTOM)
-        grid_sizer_2.Add(but_lexique, 1, wx.ALIGN_BOTTOM)
-        grid_sizer_2.Add(but_r, 1,  wx.ALIGN_BOTTOM)
-        grid_sizer_2.Add(but_sms, 1,  wx.ALIGN_BOTTOM)
+        grid_sizer_2.Add(but_python, 1, wx.ALIGN_CENTER_VERTICAL)
+        grid_sizer_2.Add(but_lexique, 1, wx.ALIGN_CENTER_VERTICAL)
+        grid_sizer_2.Add(but_r, 1,  wx.ALIGN_CENTER_VERTICAL)
+        grid_sizer_2.Add(but_sms, 1,  wx.ALIGN_CENTER_VERTICAL)
         sizer1.Add(PanelPres, 0, wx.EXPAND |wx.ALL, 10)
         sizer1.Add(grid_sizer_2, 2, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 1)
         self.SetSizer(sizer1)
@@ -1447,7 +1457,7 @@ class MySplashScreen(wx.adv.SplashScreen):
         wx.adv.SplashScreen.__init__(self, bmp,
             wx.adv.SPLASH_CENTRE_ON_SCREEN |
             wx.adv.SPLASH_TIMEOUT,
-            1000,
+            2000,
             None,
             -1)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
