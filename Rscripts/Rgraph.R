@@ -1270,3 +1270,14 @@ graph.to.file2 <- function(graph, layout, nodesfile = NULL, edgesfile = NULL, co
 	}
 }
 
+
+dist2list <- function(mat, outfile = NULL) {
+	m <- as.matrix(mat)
+	xy <- t(combn(colnames(m), 2))
+	m <- data.frame(xy, dist=m[xy])
+	if (!is.null(outfile)) {
+		write.csv2(m, file=outfile)
+	} else {
+		m
+	}
+}
