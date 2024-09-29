@@ -1397,7 +1397,8 @@ class LabbeScript(PrintRScript):
         #rownames(dist.mat) <- colnames(tab)
         dist.mat <- dist.labbe(tab)
         dist.mat <- as.dist(dist.mat, upper=F, diag=F)
-        write.table(as.matrix(dist.mat), "%s", sep='\t')
+        dist2list(dist.mat, "%s")
+        write.csv2(as.matrix(dist.mat), "%s")
         library(cluster)
         library(ape)
         chd <- hclust(dist.mat, method="ward.D2")
@@ -1405,7 +1406,7 @@ class LabbeScript(PrintRScript):
         par(cex=1.2)
         plot.phylo(as.phylo(chd), type='unrooted', lab4ut="axial")
         dev.off()
-        """ % (ffr(self.pathout['distmat.csv']), ffr(self.pathout['labbe-tree.png']))
+        """ % (ffr(self.pathout['listdist.csv']), ffr(self.pathout['distmat.csv']), ffr(self.pathout['labbe-tree.png']))
         txt +="""
         open_file_graph("%s", width=1000, height=1000, svg=F)
         par(mar=c(10,1,1,10))
