@@ -79,7 +79,7 @@ class McNemar(AnalyseMatrix):
                      )
         dial.CenterOnParent()
         val = dial.ShowModal()
-        if val==wx.ID_OK :     
+        if val==wx.ID_OK :
             self.colsel1 = dial.list_box_1.GetSelections()
             self.colsel2 = dial.list_box_2.GetSelections()
             if dial.chiopt :
@@ -141,7 +141,7 @@ class McNemar(AnalyseMatrix):
         listres<-list()
         listcol<-list()
         cont<-1
-        """%(ffr(self.tableau.parametres['csvfile']), self.tableau.parametres['syscoding'])
+        """%(ffr(self.tableau.parametres['csvfile']), 'utf8')
         if len(self.colsel1)==1:
             strsel1=str(tuple(self.colsel1)).replace(',','')
         else:
@@ -239,7 +239,7 @@ class McNemar(AnalyseMatrix):
             chi$residuals<-round(chi$residuals,digits=2)
             chi$contrib<-round(chi$contrib, digits=2)
             nom_col<-colnames(chi$observed)
-           
+
             if (ncol(chi$observed)<maxcol) {
                 for (i in 1:(maxcol-ncol(chi$observed))) {
                     chi$observed<-cbind(chi$observed,'**')
