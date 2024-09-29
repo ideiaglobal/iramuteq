@@ -43,7 +43,7 @@ from functions import doconcorde
 
 
 class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorterMixin):
-    def __init__(self, parent, gparent, dlist):
+    def __init__(self, parent, gparent, dlist, context='stat'):
         wx.ListCtrl.__init__(self, parent, -1, style=wx.LC_REPORT | wx.LC_VIRTUAL | wx.LC_HRULES | wx.LC_VRULES)
         self.parent = parent
         self.gparent = gparent
@@ -61,32 +61,43 @@ class ListPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSorte
         self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
         tID = wx.NewId()
         # -----------------------------------------------------------------------------------------
-        self.attr1 = wx.ListItemAttr()
+        self.attr1 = wx.ItemAttr()
         self.attr1.SetBackgroundColour((230, 230, 230))
-        self.attr2 = wx.ListItemAttr()
+        self.attr2 = wx.ItemAttr()
         self.attr2.SetBackgroundColour("light blue")
-        self.InsertColumn(0, _('Form'), wx.LIST_FORMAT_RIGHT)
-        self.InsertColumn(1, _('Freq.'), wx.LIST_FORMAT_RIGHT)
-        self.InsertColumn(2, _('POS'), wx.LIST_FORMAT_RIGHT)
+        if context == 'stat' :
+            first = [ _('Form'),  _('Freq.'),  _('POS')]
+            sortcol = 1
+            sens = False
+            sizes = [300, 150, 150]
+        elif context == 'labbe' :
+            first = ['X1','X2', _('Distance')]
+            sortcol = 2
+            sens = True
+            sizes = [300,300,350]
+        self.InsertColumn(0, first[0], wx.LIST_FORMAT_RIGHT)
+        self.InsertColumn(1, first[1], wx.LIST_FORMAT_RIGHT)
+        self.InsertColumn(2, first[2], wx.LIST_FORMAT_RIGHT)
         # self.InsertColumn(3, '', wx.LIST_FORMAT_RIGHT)
-        self.SetColumnWidth(0, 150)
-        self.SetColumnWidth(1, 100)
-        self.SetColumnWidth(2, 100)
+        self.SetColumnWidth(0, sizes[0])
+        self.SetColumnWidth(1, sizes[1])
+        self.SetColumnWidth(2, sizes[2])
         # self.SetColumnWidth(3, wx.LIST_AUTOSIZE)
         self.itemDataMap = dlist
         self.itemIndexMap = list(dlist.keys())
         self.SetItemCount(len(dlist))
         # self.Bind(wx.EVT_SIZE, self.OnSize)
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick, self)
-        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnPopupTwo, self)
-        # for wxMSW
-        self.Bind(wx.EVT_COMMAND_RIGHT_CLICK, self.OnRightClick)
-        # for wxGTK
-        self.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
+        if context == 'stat' :
+            self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self)
+            self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnPopupTwo, self)
+            # for wxMSW
+            self.Bind(wx.EVT_COMMAND_RIGHT_CLICK, self.OnRightClick)
+            # for wxGTK
+            self.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
         # listmix.ListCtrlAutoWidthMixin.__init__(self)
         listmix.ColumnSorterMixin.__init__(self, 3)
-        self.SortListItems(1, False) #indice de la colonne pour le tri + sens du tri
+        self.SortListItems(sortcol, sens) #indice de la colonne pour le tri + sens du tri
         # self.do_greyline()
         # self.currentItem = 0
 
