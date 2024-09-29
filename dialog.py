@@ -13,6 +13,7 @@ from shutil import copyfile
 import tempfile
 import sys
 from KeyFrame import AlcOptFrame
+import subprocess
 
 #------------------------------------
 # import des modules wx
@@ -1285,7 +1286,7 @@ class PrefSegProf(wx.Dialog) :
         self.spin_min = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 2, 30, 2 )
         self.spin_min.SetValue(2)
         fgSizer1.Add( self.spin_min, 0, wx.ALL, 5 )
-        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, _("Maxmum size of segments"), wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, _("Maximum size of segments"), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText4.Wrap( -1 )
         fgSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         self.spin_max = wx.SpinCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 2, 30, 10 )
@@ -2952,8 +2953,21 @@ class BarGraphDialog ( wx.Dialog ):
             self.heightsp.Enable(True)
         event.Skip()
 
+class ImageViewer :
+    def __init__( self, parent, parametres, title, size) :
+        ira = wx.GetTopLevelParent(parent)
+        try :
+            if ira.pref.get('iramuteq', 'imageviewer').strip() != '' :
+                subprocess.Popen([ira.pref.get('iramuteq', 'imageviewer').strip(), parametres['tmpgraph']])
+            else :
+                viewer = ImageViewerFrame(parent, parametres, title, size)
+                viewer.Show()
+        except :
+            viewer = ImageViewerFrame(parent, parametres, title, size)
+            viewer.Show()
 
-class ImageViewer ( wx.Frame ):
+
+class ImageViewerFrame ( wx.Frame ):
 
     def __init__( self, parent, parametres, title, size ):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = title, pos = wx.DefaultPosition, size = size, style = wx.DEFAULT_FRAME_STYLE|wx.MAXIMIZE_BOX|wx.MINIMIZE_BOX|wx.STAY_ON_TOP|wx.TAB_TRAVERSAL )
@@ -3067,7 +3081,7 @@ class BarFrame :
                 f.write(txt)
             exec_rcode(ira.RPath, tmpscript, wait = True)
             win = ImageViewer(ira, parametres, _("Graphic"), size=(700, 500))
-            win.Show(True)
+            #win.Show(True)
         dial.Destroy()
 
 
@@ -3104,7 +3118,7 @@ class ChronoFrame :
             script.make_script()
             exec_rcode(ira.RPath, script.scriptout, wait = True)
             win = ImageViewer(ira, self.parametres, _("Graphic"), size=(700, 500))
-            win.Show(True)
+            #win.Show(True)
         dial.Destroy()
 
 

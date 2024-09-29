@@ -31,7 +31,7 @@ from wx.lib.agw.fmresources import *
 from chemins import ConstructPathOut, ChdTxtPathOut, FFF, ffr, PathOut, StatTxtPathOut, simipath
 from configparser import ConfigParser
 from functions import ReadProfileAsDico, GetTxtProfile, read_list_file, ReadList, exec_rcode, print_liste, BugReport, DoConf,\
- indices_simi, check_Rresult, progressbar, normpath_win32, TGen, ReadList, launchcommand
+ indices_simi, check_Rresult, progressbar, normpath_win32, TGen, ReadList, launchcommand, read_dist_list
 from ProfList import ProfListctrlPanel
 from guiparam3d import param3d, simi3d
 from PrintRScript import write_afc_graph, print_simi3d, PrintSimiScript
@@ -183,7 +183,7 @@ class GraphPanelAfc(wx.Panel):
         image_id = int(event.GetEventObject().GetName())
         image_path = self.list_graph[image_id][0]
         viewer = ImageViewer(self, {'tmpgraph' : os.path.join(self.dirout,image_path), 'svg': 'FALSE', 'wildcard': '*.*'}, self.labels[image_id].GetLabelText(), self.listimg[image_id].GetSize())
-        viewer.Show()
+        #viewer.Show()
         #print image_path
         #print self.labels[image_id].GetLabelText()
 
@@ -343,7 +343,7 @@ class GraphPanel(wx.ScrolledWindow):
         self.Dict = dico
         self.txt = txt
         self.parent = parent
-        self.SetFont(wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Arial"))
+        #self.SetFont(wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, "Arial"))
         self.labels = []
         self.listimg = []
         self.dirout = os.path.dirname(self.Dict['ira'])
@@ -477,8 +477,8 @@ class OpenCHDS():
        #panel.TabChdSim = LB.LabelBook(panel, -1, agwStyle = INB_TOP|INB_SHOW_ONLY_TEXT|INB_FIT_LABELTEXT)
         panel.TabChdSim.SetAGWWindowStyleFlag(notebook_flags)
         panel.TabChdSim.SetArtProvider(aui.ChromeTabArt())
-        font = wx.Font(self.parent.fontsize, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
-        panel.TabChdSim.SetFont(font)
+        #font = wx.Font(self.parent.fontsize, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        #panel.TabChdSim.SetFont(font)
         sizer1.Add(panel.TabChdSim,10, wx.EXPAND, 5)
         panel.SetSizer(sizer1)
         sizer1.Fit(panel)
@@ -524,7 +524,7 @@ class OpenCHDS():
                 self.tab_prof_seg = ProfListctrlPanel(self.parent, self, prof_seg[str(i + 1)], False, i + 1)
                 self.prof_seg_nb.AddPage(self.tab_prof_seg, _("Cluster") + ' %i' % (i + 1))
         panel.ProfNB.SetSelection(0)
-        panel.ProfNB.SetFont(font)
+        #panel.ProfNB.SetFont(font)
         if clnb > 2 :
             self.TabAFC = aui.AuiNotebook(panel.TabChdSim, -1, wx.DefaultPosition)
             log.info('read AFC')
@@ -1201,6 +1201,9 @@ class LabbeLayout(DefaultTextLayout):
         for val in list_graph :
             #self.TabStatTot = GraphPanel(self.ira.nb, self.pathout, [val])
             self.Tab.AddPage(GraphPanel(self.Tab, self.pathout, [val]), val[1])
+        self.dictlist, first = read_dist_list(self.pathout['listdist.csv'])
+        self.listpan = ListPanel(self.ira, self, self.dictlist, context='labbe')
+        self.Tab.AddPage(self.listpan, _("List"))
         self.Tab.corpus = self.corpus
         self.Tab.parametres = self.parametres
         self.ira.nb.AddPage(self.Tab, '%s' % self.parametres['name'])
