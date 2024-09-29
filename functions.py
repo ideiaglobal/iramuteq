@@ -697,20 +697,13 @@ def ReadLexique(parent, lang = 'french', filein = None):
             parent.lexique = ReadDicoAsDico(filein)
 
 def ReadList(filein, encoding = 'utf8', sep = ';'):
-    #file = open(filein)
     with open(filein, 'r', encoding='utf8') as f :
         content = f.read()
     content = [line.replace('\n', '').replace('\r','').replace('\"', '').replace(',', '.').split(sep) for line in content.splitlines()]
-    #file = codecs.open(filein, 'r', encoding)
-    #content = file.readlines()
-    #file.close()
     first = content.pop(0)
-    #first = first.replace('\n', '').replace('\r','').replace('\"', '').split(sep)
     dict = {}
     i = 0
     for line in content:
-        #line = line.replace('\n', '').replace('\r','').replace('\"', '').replace(',', '.')
-        #line = line.split(';')
         nline = [line[0]]
         for val in line[1:]:
             if val == 'NA' :
@@ -724,6 +717,19 @@ def ReadList(filein, encoding = 'utf8', sep = ';'):
         dict[i] = nline
         i += 1
     return dict, first
+
+def read_dist_list(filein, sep=';') :
+    ldict = {}
+    with open(filein, 'r', newline='', encoding='utf8') as csvfile :
+        csvreader = csv.reader(csvfile, delimiter=sep, quotechar='"')
+        i = 0
+        for row in csvreader :
+            if i == 0 :
+                first = row
+            else :
+                ldict[i-1] = row[1:]
+            i+=1
+    return ldict, first
 
 def exec_RCMD(rpath, command) :
     log.info('R CMD INSTALL %s' % command)
@@ -860,7 +866,7 @@ def treat_var_mod(variables) :
 #                     var_mod[var].append(variable)
     return var_mod
 
-def doconcorde(corpus, uces, mots, uci = False, fontsize=4) :
+def doconcorde(corpus, uces, mots, uci = False, et = False, fontsize = 4) :
     if not uci :
         ucestxt1 = [row for row in corpus.getconcorde(uces)]
     else :
@@ -868,8 +874,11 @@ def doconcorde(corpus, uces, mots, uci = False, fontsize=4) :
     ucestxt1 = dict(ucestxt1)
     ucestxt = []
     ucis_txt = []
-    listmot = [corpus.getlems()[lem].formes for lem in mots]
-    listmot = [corpus.getforme(fid).forme for lem in listmot for fid in lem]
+    if not et :
+        listmot = [corpus.getlems()[lem].formes for lem in mots]
+        listmot = [corpus.getforme(fid).forme for lem in listmot for fid in lem]
+    else :
+        listmot = mots
     mothtml = ['<font color=red><b>%s</b></font>' % mot for mot in listmot]
     dmots = dict(list(zip(listmot, mothtml)))
     presfont = '<p><b><font size="%i">' % fontsize
