@@ -18,6 +18,8 @@ import wx
 #------------------------------------
 # import des fichiers du projet
 #------------------------------------
+import langue
+langue.run()
 
 
 # utilisé seulement depuis iramuteq.py
@@ -33,11 +35,11 @@ def NewVersion(parent):
         versionsub = False
     erreur = False
     new = False
-    req = urllib.request.Request("http://www.iramuteq.org/current_version")
+    lien = "http://www.iramuteq.org/current_version"
     try:
-        LastVersion = urllib.request.urlopen(req,'',3)
+        LastVersion = urllib.request.urlopen(lien,data=None,timeout=3)
         lastversion = LastVersion.readlines()
-        lastversion = lastversion[0].replace('\n', '').split('-')
+        lastversion = lastversion[0].decode('utf8').replace('\n', '').split('-')
         if len(lastversion) == 2 :
             if (float(lastversion[0]) > versionnb) :
                 new = True
@@ -51,12 +53,16 @@ def NewVersion(parent):
                 new = True
     except :
         erreur = "la page n'est pas accessible"
+        print(erreur)
     if not erreur and new :
-        msg = """
-Une nouvelle version d'IRaMuTeQ (%s) est disponible.
-Vous pouvez la télécharger à partir du site web iramuteq :
-http://www.iramuteq.org""" % '-'.join(lastversion)
-        dlg = wx.MessageDialog(parent, msg, "Nouvelle version disponible", wx.OK | wx.ICON_WARNING)
+        msg = _("""A new release of IRaMuTeQ is out (%s) !
+                You can dowload it from iramuteq website :
+                http://www.iramuteq.org""") % '-'.join(lastversion)
+#        msg = """
+#Une nouvelle version d'IRaMuTeQ (%s) est disponible.
+#Vous pouvez la télécharger à partir du site web iramuteq :
+#http://www.iramuteq.org""" % '-'.join(lastversion)
+        dlg = wx.MessageDialog(parent, msg, _("New release is out !"), wx.OK | wx.ICON_WARNING)
         dlg.CenterOnParent()
         if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
              evt.Veto()
