@@ -56,7 +56,11 @@ langue.run()
 
 log = logging.getLogger('iramuteq.layout')
 
-
+def scale_bitmap(bitmap, width, height):
+    image = bitmap.ConvertToImage()
+    image = image.Scale(width, height, wx.IMAGE_QUALITY_HIGH)
+    result = wx.Bitmap(image)
+    return result
 
 class GraphPanelAfc(wx.Panel):
 
@@ -90,7 +94,11 @@ class GraphPanelAfc(wx.Panel):
                 if ext == '.svg' or ext == '.html':
                     self.listimg.append(hl.HyperLinkCtrl(self.panel_1, -1, os.path.join(self.dirout,list_graph[i][0]), URL=os.path.join(self.dirout,list_graph[i][0])))
                 else :
-                    self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY), name=repr(i-b)))
+                    path = os.path.join(self.dirout,list_graph[i][0])
+                    bitmap = wx.Bitmap(path, wx.BITMAP_TYPE_ANY)
+                    #bitmap = scale_bitmap(bitmap, 2000, 2000)
+                    #self.listimg.append(wx.StaticBitmap(self.panel_1, -1, wx.Bitmap(os.path.join(self.dirout,list_graph[i][0]), wx.BITMAP_TYPE_ANY)), name=repr(i-b)))
+                    self.listimg.append(wx.StaticBitmap(self.panel_1, -1, bitmap, name=repr(i-b)))
                     self.listimg[-1].Bind(wx.EVT_RIGHT_DOWN, self.onrightclick)
                 if os.path.exists(os.path.join(self.dirout,list_graph[i][0] + '_notplotted.csv')) :
                     txt = _("List of not plotted points : ") + '%s' % os.path.join(self.dirout,list_graph[i][0] + '_notplotted.csv')
@@ -1201,9 +1209,10 @@ class LabbeLayout(DefaultTextLayout):
         for val in list_graph :
             #self.TabStatTot = GraphPanel(self.ira.nb, self.pathout, [val])
             self.Tab.AddPage(GraphPanel(self.Tab, self.pathout, [val]), val[1])
-        self.dictlist, first = read_dist_list(self.pathout['listdist.csv'])
-        self.listpan = ListPanel(self.ira, self, self.dictlist, context='labbe')
-        self.Tab.AddPage(self.listpan, _("List"))
+        if os.path.exists(self.pathout['listdist.csv']) :
+            self.dictlist, first = read_dist_list(self.pathout['listdist.csv'])
+            self.listpan = ListPanel(self.ira, self, self.dictlist, context='labbe')
+            self.Tab.AddPage(self.listpan, _("List"))
         self.Tab.corpus = self.corpus
         self.Tab.parametres = self.parametres
         self.ira.nb.AddPage(self.Tab, '%s' % self.parametres['name'])
@@ -1263,6 +1272,7 @@ class SimiLayout(DefaultTextLayout) :
             self.graphpan = GraphPanelSimi(self.tabsimi, self.pathout, list_graph)
             self.graphpan.Bind(wx.EVT_BUTTON, self.redosimi, self.graphpan.butafc)
             self.graphpan.Bind(wx.EVT_BUTTON, self.export, self.graphpan.butexport)
+            self.graphpan.Bind(wx.EVT_BUTTON, self.exportmat, self.graphpan.butexportmat)
             #self.graphpan.Bind(wx.EVT_BUTTON, self.blender, self.graphpan.butblender)
             self.tabsimi.AddPage(self.graphpan, _('Graph'))
             self.ira.nb.AddPage(self.tabsimi, _('Graph analysis'))
@@ -1364,6 +1374,22 @@ class SimiLayout(DefaultTextLayout) :
 
     def blender(self, evt):
         blender(self)
+
+    def exportmat(self, evt) :
+        fileout = self.pathout['simimat.csv']
+        txt = """
+        load("%s")
+        write.csv2(x$mat, "%s")
+        """ % (ffr(self.pathout['RData.RData']), ffr(fileout))
+        filetmp = tempfile.mktemp()
+        with open(filetmp, 'w', encoding='utf8') as f :
+            f.write(txt)
+        exec_rcode(self.ira.RPath, filetmp)
+        mss = wx.MessageDialog(self.ira, fileout, _('File exported'), wx.OK)
+        mss.CenterOnParent()
+        mss.ShowModal()
+        mss.Destroy()
+
 
 
 class DefaultMatLayout :
@@ -1642,10 +1668,12 @@ class GraphPanelSimi(wx.Panel):
         self.tabsimi = self.parent.GetParent()
         self.ira = self.tabsimi.GetParent()
         self.panel_1 = wx.ScrolledWindow(self, -1, style=wx.TAB_TRAVERSAL)
-        afc_img = wx.Image(os.path.join(self.ira.images_path,'button_simi.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        afc_img = wx.Image(os.path.join(self.ira.images_path,'button_simi.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.butafc = wx.BitmapButton(self, -1, afc_img)
-        export_img = wx.Image(os.path.join(self.ira.images_path,'button_export.jpg'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        export_img = wx.Image(os.path.join(self.ira.images_path,'button_export.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.butexport = wx.BitmapButton(self, -1, export_img)
+        export_img = wx.Image(os.path.join(self.ira.images_path,'button_exportmat.png'), wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.butexportmat = wx.BitmapButton(self, -1, export_img)
         #blender_img = wx.Image(os.path.join(self.ira.images_path,'button_blender.png'), wx.BITMAP_TYPE_ANY)
         #blender_img.Rescale(32,32)
         #blender_img = blender_img.ConvertToBitmap()
@@ -1674,6 +1702,7 @@ class GraphPanelSimi(wx.Panel):
         self.sizer_3 = wx.BoxSizer(wx.VERTICAL)
         self.sizer_2.Add(self.butafc, 0, 0, 0)
         self.sizer_2.Add(self.butexport, 0, 0, 0)
+        self.sizer_2.Add(self.butexportmat, 0, 0, 0)
         #self.sizer_2.Add(self.butblender, 0, 0, 0)
         for i in range(0, len(self.listimg)):
             self.sizer_3.Add(self.listimg[i], 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
