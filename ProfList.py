@@ -676,7 +676,7 @@ class ProfListctrlPanel(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.Col
             ntab2 = ntab2[:limite]
             nuces = [val[1] for val in ntab2]
             dlg.Update(3, 'concordancier...')
-            ucis_txt, ucestxt = doconcorde(corpus, nuces, self.la, uci = uci, fontsize = self.ira.fontsize)
+            ucis_txt, ucestxt = doconcorde(corpus, nuces, self.la, uci = uci)
             items = dict([[i, '<br>'.join([ucis_txt[i], '<table bgcolor = #1BF0F7 border=0><tr><td><b>score : %.2f</b></td></tr></table><br>' % ntab2[i][0], ucestxt[i]])] for i, uce in enumerate(nuces)])
             dlg.Destroy()
             win = message(self, items, ' - '.join([_("Typical text segments"), "Classe %i" % self.cl]), (750, 600), uceids = nuces)
