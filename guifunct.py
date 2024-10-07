@@ -200,9 +200,12 @@ class PrefSimi ( wx.Dialog ):
             listsizer.Add(countsizer, 0, wx.ALL, 5)
             listsizer.Add(self.listcol, 2, wx.ALL|wx.EXPAND, 5 )
             #bSizer16.Add( self.listcol, 0, wx.ALL|wx.EXPAND, 5 )
-            bSizer16.Add( listsizer, 0, wx.ALL|wx.EXPAND, 5)
+            bSizer16.Add( listsizer, 1, wx.ALL|wx.EXPAND, 5)
             if selected is None :
-                for row in range(self.listcol.GetItemCount()):
+                maxsel = self.listcol.GetItemCount()
+                if maxsel > 200 : 
+                    maxsel = 200
+                for row in range(maxsel):
                     self.listcol.Select(row)
             else :
                 self.orderlex = dict([[self.listcol.getColumnText(i,0),i] for i in range(0,self.listcol.GetItemCount())])
@@ -740,7 +743,7 @@ class PrefSimi ( wx.Dialog ):
         fgSizer10.Add( m_sdbSizer2, 1, wx.EXPAND, 5 )
 
 
-        bSizer16.Add( fgSizer10, 1, wx.EXPAND, 5 )
+        bSizer16.Add( fgSizer10, 3, wx.EXPAND, 5 )
 
 
         self.SetSizer( bSizer16 )
