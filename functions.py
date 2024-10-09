@@ -701,7 +701,7 @@ def ReadList(filein, encoding = 'utf8', sep = ';'):
         content = f.read()
     content = [line.replace('\n', '').replace('\r','').replace('\"', '').replace(',', '.').split(sep) for line in content.splitlines()]
     first = content.pop(0)
-    dict = {}
+    dico = {}
     i = 0
     for line in content:
         nline = [line[0]]
@@ -714,9 +714,34 @@ def ReadList(filein, encoding = 'utf8', sep = ';'):
                 except:
                     don = float('%.5f' % float(val))
             nline.append(don)
-        dict[i] = nline
+        dico[i] = nline
         i += 1
-    return dict, first
+    return dico, first
+
+def readliststat(filein, sep='\t') :
+    with open(filein, 'r', encoding='utf8') as f :
+        content = f.read()
+    content = [line.replace('\n', '').replace('\r','').replace('\"', '').replace(',', '.').split(sep) for line in content.splitlines()]
+    dico = {}
+    content = list(map(list, zip(*content)))
+    first = content.pop(0)
+    i=0
+    for line in content:
+        nline = [line[0]]
+        for val in line[1:]:
+            if val == 'NA' :
+                don = ''
+            else:
+                try:
+                    don = int(val)
+                except:
+                    don = float('%.5f' % float(val))
+            nline.append(don)
+        dico[i] = nline
+        i += 1
+    return dico, first
+
+
 
 def read_dist_list(filein, sep=';') :
     ldict = {}

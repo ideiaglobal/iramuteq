@@ -1071,6 +1071,14 @@ class Corpus :
         lclasses = [self.getucesfrometoile(etoile) for etoile in etoiles]
         stats = self.get_stat_by_cluster(None, lclasses)
         stats = [[etoiles[i]] + val for i, val in enumerate(stats)]
+        first = [_('variable'), _('occurences'), _('formes'), _('hapax'), _('segments'), _('hapax/formes')]
+        if outf is not None :
+            toprint = '\t'.join(first) + "\n"
+            toprint += '\n'.join(['\t'.join(line) for line in stats])
+            with open(outf, 'w', encoding='utf8') as f :
+                f.write(toprint)
+        else :
+            return stats
 
     def gethapaxbyet(self, etoiles) :
         hapaxuces = [self.getlemuces(forme)[0] for forme in self.lems if self.lems[forme].freq == 1]

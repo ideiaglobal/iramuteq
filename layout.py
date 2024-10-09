@@ -31,7 +31,7 @@ from wx.lib.agw.fmresources import *
 from chemins import ConstructPathOut, ChdTxtPathOut, FFF, ffr, PathOut, StatTxtPathOut, simipath
 from configparser import ConfigParser
 from functions import ReadProfileAsDico, GetTxtProfile, read_list_file, ReadList, exec_rcode, print_liste, BugReport, DoConf,\
- indices_simi, check_Rresult, progressbar, normpath_win32, TGen, ReadList, launchcommand, read_dist_list
+ indices_simi, check_Rresult, progressbar, normpath_win32, TGen, ReadList, launchcommand, read_dist_list, readliststat
 from ProfList import ProfListctrlPanel
 from guiparam3d import param3d, simi3d
 from PrintRScript import write_afc_graph, print_simi3d, PrintSimiScript
@@ -768,6 +768,9 @@ class dolexlayout :
         self.DictSpec, first = ReadList(self.dictpathout['tablespecf'], self.corpus.parametres['syscoding'])
         if os.path.exists(self.pathout['banalites.csv']) :
             self.dictban, firstban = ReadList(self.pathout['banalites.csv'], self.corpus.parametres['syscoding'])
+        if os.path.exists(self.pathout['statbyet.csv']) :
+            self.dictstat, first = readliststat(self.pathout['statbyet.csv'])
+
         self.DictType, firstt = ReadList(self.dictpathout['tablespect'], self.corpus.parametres['syscoding'])
         self.DictEff, firsteff = ReadList(self.dictpathout['tableafcm'], self.corpus.parametres['syscoding'])
         self.DictEffType, firstefft = ReadList(self.dictpathout['tabletypem'], self.corpus.parametres['syscoding'])
@@ -782,6 +785,9 @@ class dolexlayout :
         self.ListPan.pathout = self.pathout
         if os.path.exists(self.pathout['banalites.csv']) :
             self.listban = ListForSpec(ira, self, self.dictban, ['eff'] + self.etoiles, usefirst = True)
+        if os.path.exists(self.pathout['statbyet.csv']) :
+            self.liststat =  ListForSpec(ira, self,self.dictstat, self.etoiles)
+            self.liststat.pathout = self.pathout
         #self.ListPan2 = ListForSpec(sash.rightwin1, self, self.DictSpec, first)
         self.ListPant = ListForSpec(ira, self, self.DictType, self.etoiles)
         self.ListPant.pathout = self.pathout
@@ -793,6 +799,8 @@ class dolexlayout :
         self.ListPanEffRelForme.pathout = self.pathout
         self.ListPanEffRelType = ListForSpec(ira, self, self.DictEffRelType, self.etoiles)
         self.ListPanEffRelType.pathout = self.pathout
+        if os.path.exists(self.pathout['statbyet.csv']) :
+            self.TabStat.AddPage(self.liststat, _('Statistics'))
         self.TabStat.AddPage(self.ListPan, _('Forms'))
         if os.path.exists(self.pathout['banalites.csv']) :
             self.TabStat.AddPage(self.listban, _('Banal forms'))

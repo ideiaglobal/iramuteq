@@ -189,6 +189,7 @@ class Lexico(AnalyseText) :
         mineff = self.parametres['mineff']
         #dlg = progressbar(self, maxi = 3)
         tabout = self.corpus.make_lexitable(mineff, self.listet, gram = self.parametres['typeformes'])
+        self.corpus.get_stat_by_et(self.pathout['statbyet.csv'], self.listet)
         #log.warning('Fmax a 200')
         #Fmax = [line for line in tabout[1:] if sum(line[1:]) > 199]
         #formesmax = [line[0] for line in Fmax
