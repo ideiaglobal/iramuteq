@@ -1329,9 +1329,9 @@ class IntroPanel(wx.Panel):
         col = 242
         col1 = 228
         col2 = 179
-        bckgrdcolor = wx.Colour(col, col1, col2)
+        bckgrdcolorhaut = wx.Colour(col, col1, col2)
         #bckgrdcolor = wx.Colour(randint(0, 255), randint(0, 255), randint(0, 255))
-        self.SetBackgroundColour(bckgrdcolor)
+        self.SetBackgroundColour(bckgrdcolorhaut)
         txtcolour = wx.Colour(0, 0, 0)
         linkcolor = wx.Colour(255, 0, 0)
         sizer1 = wx.BoxSizer(wx.VERTICAL)
@@ -1345,7 +1345,7 @@ class IntroPanel(wx.Panel):
             "http://www.iramuteq.org",
             URL="http://www.iramuteq.org")
         iralink.SetColours(linkcolor, linkcolor, "RED")
-        #iralink.SetBackgroundColour(bckgrdcolor)
+        iralink.SetBackgroundColour(bckgrdcolorhaut)
         iralink.EnableRollover(True)
         iralink.SetUnderlines(False, False, True)
         iralink.SetBold(True)
