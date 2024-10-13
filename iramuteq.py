@@ -534,7 +534,7 @@ class IraFrame(wx.Frame):
         notebook_flags = aui.AUI_NB_DEFAULT_STYLE
         # | aui.AUI_NB_TAB_EXTERNAL_MOVE | aui.AUI_NB_TAB_MOVE | aui.AUI_NB_TAB_FLOAT| wx.NO_BORDER
         self.nb.SetAGWWindowStyleFlag(notebook_flags)
-        self.nb.SetArtProvider(aui.ChromeTabArt())
+        self.nb.SetArtProvider(aui.VC8TabArt())
         self.nb.SetFont(wx.Font(self.fontsize, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
         #self.nb.SetArtProvider(aui.VC8TabArt())
         #self.nb.parent = self
