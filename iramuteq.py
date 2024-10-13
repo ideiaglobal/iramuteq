@@ -679,13 +679,10 @@ class IraFrame(wx.Frame):
         if self.SysEncoding == 'mac-roman' : self.SysEncoding = 'MacRoman'
         self.type = ''
         #------------------------------------------------------------------------------------------------
-        # P3
         # 'view', 'matrix' et 'text' sont des valeurs attendues par la fonction ShowMenu
-        #self.ShowMenu('view', True)
-        #self.ShowMenu('matrix', False)
-        #self.ShowMenu('text', False)
-        # je commente ces trois lignes car je ne comprends pas
-        # mais je les garde pour le moment, au cas où il y a un mécanisme que je n'ai pas encore compris
+        self.ShowMenu('view', True)
+        self.ShowMenu('matrix', False)
+        self.ShowMenu('text', False)
         #------------------------------------------------------------------------------------------------
         self._mgr.Update()
         self.DataPop = False
@@ -773,6 +770,7 @@ class IraFrame(wx.Frame):
                 self.mb.EnableTop(3, False)
             else :
                 self._mgr.GetPane('tb_text').Hide()
+                self.mb.EnableTop(menu_pos, Show)
         elif menu == 'matrix' :
             menu_pos = 3
             if Show :
@@ -784,6 +782,7 @@ class IraFrame(wx.Frame):
                 self.mb.EnableTop(4, False)
             else :
                 self._mgr.GetPane('tb_mat').Hide()
+                self.mb.EnableTop(menu_pos, Show)
         elif menu == 'view' :
             menu_pos = 2
         else :
