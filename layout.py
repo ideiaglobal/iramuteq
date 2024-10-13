@@ -484,7 +484,7 @@ class OpenCHDS():
 
        #panel.TabChdSim = LB.LabelBook(panel, -1, agwStyle = INB_TOP|INB_SHOW_ONLY_TEXT|INB_FIT_LABELTEXT)
         panel.TabChdSim.SetAGWWindowStyleFlag(notebook_flags)
-        panel.TabChdSim.SetArtProvider(aui.ChromeTabArt())
+        #panel.TabChdSim.SetArtProvider(aui.ChromeTabArt())
         #font = wx.Font(self.parent.fontsize, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         #panel.TabChdSim.SetFont(font)
         sizer1.Add(panel.TabChdSim,10, wx.EXPAND, 5)
