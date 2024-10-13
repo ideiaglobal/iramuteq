@@ -192,6 +192,15 @@
        x2="482.60556"
        y2="1035.4242"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5278-3"
+       id="linearGradient902"
+       x1="39.018452"
+       y1="55.200813"
+       x2="444.59412"
+       y2="55.200813"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -201,8 +210,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.894"
-     inkscape:cx="83.43176"
-     inkscape:cy="265.27472"
+     inkscape:cx="50.777994"
+     inkscape:cy="264.58363"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -267,20 +276,21 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot2985"
-       style="font-style:normal;font-weight:normal;line-height:0.01%;font-family:'Bitstream Vera Sans';letter-spacing:0px;word-spacing:0px;fill:#e91616;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-weight:normal;line-height:0.01%;font-family:'Bitstream Vera Sans';letter-spacing:0px;word-spacing:0px;fill:url(#linearGradient902);fill-opacity:1.0;stroke:none"
        transform="matrix(1.0448226,0,0,1.1117284,-2.6868848,685.09285)"
        inkscape:export-filename="/home/pierre/workspace/iramuteq/images/splash.png"
        inkscape:export-xdpi="100"
        inkscape:export-ydpi="100"><flowRegion
-         id="flowRegion2987"><rect
+         id="flowRegion2987"
+         style="fill-opacity:1.0;fill:url(#linearGradient902)"><rect
            id="rect2989"
            width="422.24377"
            height="81.822365"
            x="31.31473"
            y="15.13188"
-           style="fill:#e91616;fill-opacity:1" /></flowRegion><flowPara
+           style="fill:url(#linearGradient902);fill-opacity:1.0" /></flowRegion><flowPara
          id="flowPara2991"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:72px;line-height:125%;font-family:Purisa;-inkscape-font-specification:'Purisa Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#e91616;fill-opacity:1">IRaMuTeQ</flowPara></flowRoot>    <flowRoot
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:72px;line-height:125%;font-family:Purisa;-inkscape-font-specification:'Purisa Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient902);fill-opacity:1.0">IRaMuTeQ</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3005"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0.01%;font-family:FreeSans;-inkscape-font-specification:FreeSans;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#240c0c;fill-opacity:1;stroke:none"
@@ -360,7 +370,7 @@
            y="146.45171"
            style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:14px;line-height:125%;font-family:gargi;-inkscape-font-specification:'gargi Medium';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#1c1010;fill-opacity:1" /></flowRegion><flowPara
          id="flowPara3866"
-         style="font-size:14px;line-height:1.25">Version 0.8 alpha 6</flowPara></flowRoot>    <flowRoot
+         style="font-size:14px;line-height:1.25">Version 0.8 alpha 7</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3868"
        style="font-style:normal;font-weight:normal;line-height:0.01%;font-family:'Bitstream Vera Sans';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
