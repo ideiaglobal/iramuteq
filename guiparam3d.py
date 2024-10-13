@@ -55,7 +55,7 @@ class param3d(wx.Panel):
         sizer_5 = wx.BoxSizer(wx.VERTICAL)
         sizer_3.Add(self.label_2, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
         sizer_3.Add(wx.StaticLine(self,-1), 0, wx.EXPAND,0)
-        sizer_5.Add(self.label_3, 0, wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL, 0)
+        sizer_5.Add(self.label_3, 0, wx.ALIGN_LEFT, 0)
         sizer_5.Add(self.Check1, 0, wx.ALIGN_LEFT, 0)
         sizer_5.Add(self.Check2, 0, wx.ALIGN_LEFT, 0)
         sizer_5.Add(self.Check3, 0, wx.ALIGN_LEFT, 0)

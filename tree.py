@@ -1069,7 +1069,7 @@ class LeftTree(CT.CustomTreeCtrl):
         #        pydata = self.GetPyData(item)
         #        print pydata
         #        self.log.info("OnLeftDClick: Cannot Start Manual Editing, Missing Style TR_EDIT_LABELS\n")
-        event.Skip()                
+        event.Skip()
 
     def OnItemExpanded(self, event):
         item = event.GetItem()
