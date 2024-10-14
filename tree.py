@@ -865,7 +865,7 @@ class LeftTree(CT.CustomTreeCtrl):
     def OnItemIcons(self, event):
         bitmaps = [self.itemdict["normal"], self.itemdict["selected"],
                    self.itemdict["expanded"], self.itemdict["selexp"]]
-        wx.BeginBusyCursor()        
+        wx.BeginBusyCursor()
         dlg = TreeIcons(self, -1, bitmaps=bitmaps)
         wx.EndBusyCursor()
         dlg.ShowModal()
