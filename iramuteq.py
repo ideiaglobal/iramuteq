@@ -897,6 +897,7 @@ class IraFrame(wx.Frame):
         print('on about')
         info = wx.adv.AboutDialogInfo()
         info.Name = ConfigGlob.get('DEFAULT', 'name')
+        info.SetIcon(self._icon)
         info.Version = ConfigGlob.get('DEFAULT', 'version')
         info.Copyright = ConfigGlob.get('DEFAULT', 'copyright')
         info.Translators = ConfigGlob.get('DEFAULT', 'translators').split(';')
@@ -914,13 +915,13 @@ Laboratoire LERASS
         dev = ConfigGlob.get('DEFAULT', 'dev').split(';')
         info.Developers = dev
         info.License = """Iramuteq est un logiciel libre ; vous pouvez le diffuser et/ou le modifier
-suivant les termes de la Licence Publique Générale GNU telle que publiée 
-par la Free Software Foundation ; soit la version 2 de cette licence, 
+suivant les termes de la Licence Publique Générale GNU telle que publiée
+par la Free Software Foundation ; soit la version 2 de cette licence,
 soit (à votre convenance) une version ultérieure.
 
-Iramuteq est diffusé dans l'espoir qu'il sera utile, 
-mais SANS AUCUNE GARANTIE ; sans même une garantie implicite 
-de COMMERCIALISATION ou d'ADÉQUATION À UN USAGE PARTICULIER. 
+Iramuteq est diffusé dans l'espoir qu'il sera utile,
+mais SANS AUCUNE GARANTIE ; sans même une garantie implicite
+de COMMERCIALISATION ou d'ADÉQUATION À UN USAGE PARTICULIER.
 Voyez la Licence Publique Générale GNU pour plus de détails.
 
 Vous devriez avoir reçu une copie de la Licence Publique Générale GNU
