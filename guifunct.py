@@ -203,7 +203,7 @@ class PrefSimi ( wx.Dialog ):
             bSizer16.Add( listsizer, 1, wx.ALL|wx.EXPAND, 5)
             if selected is None :
                 maxsel = self.listcol.GetItemCount()
-                if maxsel > 200 : 
+                if maxsel > 200 :
                     maxsel = 200
                 for row in range(maxsel):
                     self.listcol.Select(row)
