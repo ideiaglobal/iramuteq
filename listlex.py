@@ -113,7 +113,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         return -1
 
     def OnGetItemImage(self, item):
-        pass
+        return -1
 
     def RefreshData(self, data):
         self.itemDataMap = data
@@ -135,15 +135,30 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         else:
             return s #modification pour python 3
 
+    def ItemInSelected(self, item) :
+        word = self.GetItemText(item, 0)
+        if word in self.selected :
+            return True
+        else :
+            return False
+
     def OnGetItemAttr(self, item):
-        index=self.itemIndexMap[item]
-        if self.IsSelected(index) == False :
+        #print('get attr', item)
+        #print(item)
+        #word = self.itemDataMap[item][0]
+        #index=self.itemIndexMap[item]
+        ##word = self.GetItemText(item)
+        #if word not in self.selected :
+        ##if self.IsSelected(item) == False :
+        ##if not self.ItemInSelected(item) :
             if item % 2 :
                 return self.attr1
             else :
                 return self.attr2
-        else :
-            return self.attrselected
+        #else :
+        #    print(self.itemDataMap[item])
+        #    print(item,self.dlist[item])
+        #    return self.attrselected
 
     def GetItemByWord(self, word):
         return [ val for val in self.dlist if self.dlist[val][0] == word ][0]
@@ -190,6 +205,7 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
 
     def OnItemSelected(self, event):
         self.currentItem = event.GetIndex() #event.m_itemIndex
+        index=self.itemIndexMap[self.currentItem]
         event.Skip()
 
     def onsearch(self, evt) :
@@ -238,6 +254,14 @@ class ListForSpec(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
                     menu.Append(self.id_tgendetails, _('Tgen details'))
             self.PopupMenu(menu)
             menu.Destroy()
+
+    def GetSelectionIndex(self) :
+        index = [self.GetFirstSelected()]
+        last = self.GetFirstSelected()
+        while self.GetNextSelected(last) != -1:
+            last = self.GetNextSelected(last)
+            index.append(last)
+        return index
 
     def getselectedwords(self) :
         words = [self.getColumnText(self.GetFirstSelected(), 0)]
