@@ -534,7 +534,9 @@ class IraFrame(wx.Frame):
         notebook_flags = aui.AUI_NB_DEFAULT_STYLE
         # | aui.AUI_NB_TAB_EXTERNAL_MOVE | aui.AUI_NB_TAB_MOVE | aui.AUI_NB_TAB_FLOAT| wx.NO_BORDER
         self.nb.SetAGWWindowStyleFlag(notebook_flags)
-        self.nb.SetArtProvider(aui.VC8TabArt())
+        #self.nb.SetArtProvider(aui.VC8TabArt())
+        nbart = self.nb.GetArtProvider()
+        nbart.SetBaseColour('blue')
         self.nb.SetFont(wx.Font(self.fontsize, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
         #self.nb.SetArtProvider(aui.VC8TabArt())
         #self.nb.parent = self
@@ -550,7 +552,7 @@ class IraFrame(wx.Frame):
 
         #self._mgr.AddPane(self.Sheet, wx.aui.AuiPaneInfo().Name("Data").CenterPane())
         #self._mgr.AddPane(self.Sheet, aui.AuiPaneInfo().Name("Data").CenterPane())
-        self.nb.Bind(aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self.OnCloseTab)
+        self.nb.Bind(aui.EVT_AUINOTEBOOK_PAGE_CLOSED, self.OnCloseTab)
         self.nb.Bind(aui.EVT_AUINOTEBOOK_PAGE_CHANGED, self.OnPageChanged)
 
         #------------------------------------------------------------------------------------------------
@@ -951,11 +953,12 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, États-Unis."""
     def OnCloseTab(self, evt):
         #log.info('Closing tab %s' % str(evt.GetEventObject()))
         ctrl = evt.GetEventObject()
+        print('page lcose', ctrl)
         if isinstance(ctrl.GetParent(), aui.AuiNotebook) or isinstance(ctrl.GetParent(), wx.Panel):
             notebook = True
         else :
             notebook = False
-        page = self.nb.GetPage(self.nb.GetSelection())
+        page = self.nb.GetPage(ctrl.GetSelection())
         if 'parametres' in dir(page) and isinstance(ctrl.GetParent(), IraFrame) :
             self.history.rmtab(page.parametres)
             self.tree.CloseItem(uuid = page.parametres['uuid'])
