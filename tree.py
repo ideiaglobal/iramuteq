@@ -1149,7 +1149,7 @@ class LeftTree(CT.CustomTreeCtrl):
         self.item = event.GetItem()
         if self.item:
             self.log.info("Ending Drag!" + "\n")
-        event.Skip()            
+        event.Skip()
 
     def OnDeleteItem(self, event):
         item = event.GetItem()
