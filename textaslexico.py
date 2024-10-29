@@ -106,7 +106,7 @@ class Lexico(AnalyseText) :
             if (min(slf) == 0) {
                 dmfp<-dmf[-which(slf==0),]
                 specfp <- specf[-which(slf==0),]
-            } else { 
+            } else {
                 dmfp <- dmf
                 specfp <- specf
                 }
@@ -115,7 +115,7 @@ class Lexico(AnalyseText) :
             if (min(slt) == 0) {
                 dmtp<-dmt[-which(slt==0),]
                 spectp <- spect[-which(slt==0),]
-            } else { 
+            } else {
                 dmtp <- dmt
                 spectp <- spect
                 }
