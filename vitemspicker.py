@@ -166,8 +166,7 @@ The items are displayed in the selection part of the widget'''
                 self._destData[len(self._destData)] = [newItem, '']
                 self._SetDestItems()
                 self._source.selected[newItem] = 1
-                self._source.Refresh()
-        #self.SetSelections(items)
+        self._source.Refresh()
         self._FireIpSelectionChanged()
 
     def _FireIpSelectionChanged(self):
