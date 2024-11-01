@@ -32,7 +32,6 @@ class CategoDict :
     def save(self) :
         with open(self.pathout['cate.json'], 'w', encoding='utf8') as f :
             f.write(json.dumps(self.cate, indent=4))
-        print("json saved!")
 
     def exportdict(self):
         pass
@@ -78,7 +77,6 @@ class CategoDict :
         del(self.cate['TOCATE'][word])
 
     def addwordinwords(self, categorie, word, eff) :
-        print(categorie, word, eff)
         self.cate['TOCATE'][word] = eff
         self.cate['CATE'][categorie][0] -= eff
         del(self.cate['CATE'][categorie][1][word])
@@ -134,7 +132,6 @@ class CategoDict :
 
     def loadcate(self, infile) :
         if self.cate['CATE'] != {} :
-            print("Categories should be empty")
             return False
         with open(infile, 'r', encoding='utf8') as f :
             newcate = json.load(f)
@@ -352,7 +349,6 @@ class ElCategorizator ( wx.Panel ):
         #sizer.Add(splitter, 1, wx.EXPAND)
         #self.SetSizer(sizer)
         W,H = wx.GetTopLevelParent(self).GetSize()
-        print(W)
         W = W - 200
         if W < 300 :
             W = 300
@@ -507,8 +503,6 @@ class ElCategorizator ( wx.Panel ):
             newtab.append(newline)
 
     def OnAddCate(self, evt) :
-        print('add a category')
-        print(self.m_listCate.GetItemCount())
         self.cate.addcatefromscratch()
         self.m_listCate.dlist = self.cate.getcate()
         self.m_listCate.RefreshData(self.m_listCate.dlist)
@@ -529,9 +523,9 @@ class ListForCate(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             s="self.%s= self.il.Add(wx.ArtProvider.GetBitmap(wx.ART_%s,wx.ART_TOOLBAR,(20,20)))" % (k,v)
             exec(s)
         self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-        self.attr1 = wx.ListItemAttr()
+        self.attr1 = wx.ItemAttr()
         self.attr1.SetBackgroundColour((230, 230, 230))
-        self.attr2 = wx.ListItemAttr()
+        self.attr2 = wx.ItemAttr()
         self.attr2.SetBackgroundColour("light blue")
         #self.attrselected = wx.ListItemAttr()
         #self.attrselected.SetBackgroundColour("red")
@@ -566,7 +560,7 @@ class ListForCate(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         self.SetDropTarget(dt)
 
     def OnSortColumn(self, evt) :
-        print(self.currentItem)
+        #print(self.currentItem)
         evt.Skip()
 
     def SetListFont(self) :
@@ -629,7 +623,9 @@ class ListForCate(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         try :
             select = self.currentItem
             word = self.GetItemData(select)[0]
-        except Exception as e: print('word',e)
+        except:
+            print("no item selected")
+        #Exception as e: print('execption SortItems ListForCate :',e)
 
         listTemp = sorted(self.itemDataMap.items(),
             key=lambda x:x[1][self._col], reverse= (self._colSortFlag[self._col]!=True))
@@ -642,7 +638,7 @@ class ListForCate(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             idx = [i for i, val in enumerate(formes) if val == word][0]
             self.SetSelection(idx)
             self.Focus(idx)
-        except Exception as e: print(e)
+        except Exception as e: print('execption SortItems2 : ',e)
 
     def OnGetItemText(self, item, col):
         index=self.itemIndexMap[item]
@@ -676,8 +672,13 @@ class ListForCate(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         return self.getselectedwords()
 
     def getColumnText(self, index, col):
-        item = self.GetItem(index, col)
-        return item.GetText()
+        try:
+            item = self.GetItem(index, col)
+            return item.GetText()
+        except:
+            message = wx.MessageDialog(self, _("You have to select a category first"), _("Information"), wx.OK|wx.ICON_INFORMATION)
+            message.ShowModal()
+            message.Destroy()
 
     def GetItemData(self, item) :
         index=self.itemIndexMap[item]
@@ -802,7 +803,7 @@ class ListForCate(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
                     word, eff = val[1]
                     if word not in self.cate.cate['CATE'][self.GetItemData(index)[0]][1] :
                         self.cate.changewordcate(self.GetItemData(index)[0], word, eff)
-                        self.parent.butsave.SetbackgroundColour((255,0,0,255))
+                        self.parent.butsave.SetBackgroundColour((255,0,0,255))
                         self.parent.Refresh()
             else :
                 index = self.GetItemCount()
@@ -844,9 +845,9 @@ class ListForWords(ListForCate) :
             s="self.%s= self.il.Add(wx.ArtProvider.GetBitmap(wx.ART_%s,wx.ART_TOOLBAR,(16,16)))" % (k,v)
             exec(s)
         self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-        self.attr1 = wx.ListItemAttr()
+        self.attr1 = wx.ItemAttr()
         self.attr1.SetBackgroundColour((230, 230, 230))
-        self.attr2 = wx.ListItemAttr()
+        self.attr2 = wx.ItemAttr()
         self.attr2.SetBackgroundColour("light blue")
         #self.attrselected = wx.ListItemAttr()
         #self.attrselected.SetBackgroundColour("red")
@@ -937,7 +938,7 @@ class ListForWords(ListForCate) :
             l.reverse() # Delete all the items, starting with the last item.
             for i in l:
                 pos = self.FindItem(i[0], i[2])
-                print('detruit : ',pos)
+                #print('detruit : ',pos)
                 self.DeleteItem(pos)
 
 
@@ -1002,9 +1003,9 @@ class ListForCateWords(ListForCate) :
             s="self.%s= self.il.Add(wx.ArtProvider.GetBitmap(wx.ART_%s,wx.ART_TOOLBAR,(16,16)))" % (k,v)
             exec(s)
         self.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-        self.attr1 = wx.ListItemAttr()
+        self.attr1 = wx.ItemAttr()
         self.attr1.SetBackgroundColour((230, 230, 230))
-        self.attr2 = wx.ListItemAttr()
+        self.attr2 = wx.ItemAttr()
         self.attr2.SetBackgroundColour("light blue")
         #self.attrselected = wx.ListItemAttr()
         #self.attrselected.SetBackgroundColour("red")
@@ -1077,8 +1078,8 @@ class ListForCateWords(ListForCate) :
         dropSource = wx.DropSource(self)
         dropSource.SetData(data)
         res = dropSource.DoDragDrop(flags=wx.Drag_DefaultMove)
-        print('current')
-        print(self.parent.m_listCate.currentItem)
+        #print('current')
+        #print(self.parent.m_listCate.currentItem)
 
         # If move, we want to remove the item from this list.
         #if res == wx.DragMove:
@@ -1117,18 +1118,20 @@ class ListForCateWords(ListForCate) :
 #            # Correct for the fact that there may be a heading involved.
 #            if y > rect.y - self.GetItemRect(0).y + rect.height/2:
 #                index += 1
-        print('Insert de ListForCateWords', index,flags)
-        if seq[0][-1] == 'words' :
-            for val in seq :
-                word, eff = val[1]
-                categorie = self.parent.m_listCate.getColumnText(self.parent.m_listCate.GetFirstSelected(),0)
-                self.cate.addwordincate(categorie, word, eff)
-            self.dlist = self.cate.getwordstocate()
-            self.RefreshData(self.cate.getcatewords(categorie))
-            self.parent.m_listCate.RefreshData(self.cate.getcate())
-            self.parent.m_listToCate.RefreshData(self.dlist)
-            self.parent.butsave.SetBackgroundColour((255,0,0,255))
-            self.parent.Refresh()
+        #print('Insert de ListForCateWords', index,flags)
+
+        categorie = self.parent.m_listCate.getColumnText(self.parent.m_listCate.GetFirstSelected(),0)
+        if categorie is not None :
+            if seq[0][-1] == 'words' :
+                for val in seq :
+                    word, eff = val[1]
+                    self.cate.addwordincate(categorie, word, eff)
+                self.dlist = self.cate.getwordstocate()
+                self.RefreshData(self.cate.getcatewords(categorie))
+                self.parent.m_listCate.RefreshData(self.cate.getcate())
+                self.parent.m_listToCate.RefreshData(self.dlist)
+                self.parent.butsave.SetBackgroundColour((255,0,0,255))
+                self.parent.Refresh()
 
 
 
