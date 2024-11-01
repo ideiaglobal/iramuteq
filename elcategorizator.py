@@ -1119,9 +1119,9 @@ class ListForCateWords(ListForCate) :
 #            if y > rect.y - self.GetItemRect(0).y + rect.height/2:
 #                index += 1
         #print('Insert de ListForCateWords', index,flags)
-
-        categorie = self.parent.m_listCate.getColumnText(self.parent.m_listCate.GetFirstSelected(),0)
-        if categorie is not None :
+        if self.parent.m_listCate.GetFirstSelected() != -1 :
+            categorie = self.parent.m_listCate.getColumnText(self.parent.m_listCate.GetFirstSelected(),0)
+        #if categorie is not None :
             if seq[0][-1] == 'words' :
                 for val in seq :
                     word, eff = val[1]
@@ -1132,8 +1132,10 @@ class ListForCateWords(ListForCate) :
                 self.parent.m_listToCate.RefreshData(self.dlist)
                 self.parent.butsave.SetBackgroundColour((255,0,0,255))
                 self.parent.Refresh()
-
-
+        else : 
+            message = wx.MessageDialog(self, _("You have to select a category first"), _("Information"), wx.OK|wx.ICON_INFORMATION)
+            message.ShowModal()
+            message.Destroy()
 
 class MyListDropCate(wx.DropTarget):
     """
