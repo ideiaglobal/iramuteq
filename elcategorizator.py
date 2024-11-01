@@ -340,6 +340,7 @@ class ElCategorizator ( wx.Panel ):
         self.pathout = pathout
         self.parent = parent
         self.tableau = tableau
+        self.ira = wx.GetApp().GetTopWindow()
 
         self.cate = CategoDict(self.pathout)
         gsizer =  wx.BoxSizer( wx.VERTICAL )
@@ -370,7 +371,7 @@ class ElCategorizator ( wx.Panel ):
 
         bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
 
-        self.butsave = wx.Button( self, wx.ID_SAVE, _("Save"), wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.butsave = wx.Button( self, wx.ID_SAVE, _("Save"), wx.DefaultPosition, wx.DefaultSize, 0)
         bSizer2.Add( self.butsave, 0, wx.ALL, 5 )
 
         self.butcsv = wx.Button( self, wx.ID_ANY, _("Export Columns"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -457,6 +458,8 @@ class ElCategorizator ( wx.Panel ):
     def OnSave(self, event) :
         self.cate.save()
         self.butsave.SetBackgroundColour((14, 242, 14, 255))
+        self.parent.Refresh()
+
 
     def OnCSV(self, event) :
         wordscate = self.cate.getwordscate()
@@ -770,7 +773,7 @@ class ListForCate(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
             # Correct for the fact that there may be a heading involved.
             #if y > rect.y - self.GetItemRect(0).y + rect.height/2:
             #    index += 1
-        print('Insert de ListForCate', index, flags)
+        #print('Insert de ListForCate', index, flags)
         word, eff = seq[0][1]
         if seq[0][-1] == 'words' :
             if index < self.GetItemCount() and index != -1 :
@@ -792,17 +795,20 @@ class ListForCate(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
                 self.Select(i, on=0)
             self.Select(index, on=1)
             self.parent.butsave.SetBackgroundColour((255,0,0,255))
+            self.parent.Refresh() 
         if seq[0][-1] == 'catewords' :
             if index < self.GetItemCount() and index != -1 :
                 for val in seq :
                     word, eff = val[1]
                     if word not in self.cate.cate['CATE'][self.GetItemData(index)[0]][1] :
                         self.cate.changewordcate(self.GetItemData(index)[0], word, eff)
-                        self.parent.butsave.SetBackgroundColour((255,0,0,255))
+                        self.parent.butsave.SetbackgroundColour((255,0,0,255))
+                        self.parent.Refresh()
             else :
                 index = self.GetItemCount()
                 if self.cate.addcatefromwordcate(word, eff) :
                     self.parent.butsave.SetBackgroundColour((255,0,0,255))
+                    self.parent.Refresh()
                 else :
                     dial = wx.MessageDialog(self, "This category name is already used", style=wx.OK|wx.CENTRE).ShowModal()
                 #self.cate.addwordincate(self.GetItemData(index)[0], word, eff)
@@ -970,6 +976,7 @@ class ListForWords(ListForCate) :
             self.parent.m_listCate.RefreshData(self.cate.getcate())
             self.parent.m_listCateWords.RefreshData(self.cate.getcatewords(categorie))
             self.parent.butsave.SetBackgroundColour((255,0,0,255))
+            self.parent.Refresh()
         elif seq[0][-1] == 'cate' :
             categorie = seq[0][1][0]
             self.cate.delcate(categorie)
@@ -978,6 +985,8 @@ class ListForWords(ListForCate) :
             self.parent.m_listCate.SetSelection(0)
             self.parent.m_listCateWords.RefreshData(self.cate.getcatewords(self.parent.m_listCate.GetItemText(0)))
             self.parent.butsave.SetBackgroundColour((255,0,0,255))
+            self.parent.Refresh()
+
 
 
 class ListForCateWords(ListForCate) :
@@ -1119,6 +1128,8 @@ class ListForCateWords(ListForCate) :
             self.parent.m_listCate.RefreshData(self.cate.getcate())
             self.parent.m_listToCate.RefreshData(self.dlist)
             self.parent.butsave.SetBackgroundColour((255,0,0,255))
+            self.parent.Refresh()
+
 
 
 class MyListDropCate(wx.DropTarget):

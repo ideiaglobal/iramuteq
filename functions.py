@@ -26,6 +26,8 @@ import json
 #from dialog import BugDialog
 import logging
 from operator import itemgetter
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 #------------------------------------
 # import des modules wx
