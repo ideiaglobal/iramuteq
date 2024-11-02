@@ -601,7 +601,8 @@ class ListForCate(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         self.itemIndexMap = list(data.keys())
         self.SetItemCount(len(data))
         order = self._colSortFlag[self._col]
-        self.SortListItems(self._col, order)
+        if len(data) :
+            self.SortListItems(self._col, order)
         #self.SetColumnWidth(0, wx.LIST_AUTOSIZE)
         #self.SetColumnWidth(1, wx.LIST_AUTOSIZE)
         #self.SetColumnWidth(0,300)
@@ -620,15 +621,15 @@ class ListForCate(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
         return (self.sm_dn, self.sm_up)
 
     def SortItems(self, sorter=None):
+        #print(self.currentItem)
         try :
             select = self.currentItem
             word = self.GetItemData(select)[0]
         except:
             print("no item selected")
         #Exception as e: print('execption SortItems ListForCate :',e)
-
         listTemp = sorted(self.itemDataMap.items(),
-            key=lambda x:x[1][self._col], reverse= (self._colSortFlag[self._col]!=True))
+           key=lambda x:x[1][self._col], reverse= (self._colSortFlag[self._col]!=True))
         dlist = dict([[line[0],line[1]] for line in listTemp])
         self.itemDataMap = dlist
         self.itemIndexMap = list(dlist.keys())
@@ -687,6 +688,8 @@ class ListForCate(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
 
     def OnItemSelected(self, event):
         self.currentItem = event.GetIndex() #event.m_itemIndex
+        categorie = self.GetItemData(self.currentItem)[0]
+        self.parent.m_listCateWords.RefreshData(self.cate.getcatewords(categorie))
         event.Skip()
 
     def SetSelection(self, index) :
@@ -786,38 +789,46 @@ class ListForCate(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin, listmix.ColumnSor
                 if self.cate.addcatefromwordtocate(word, eff) :
                     pass
                 else :
-                    dial = wx.MessageDialog(self, "This category name is already used", style=wx.OK|wx.CENTRE).ShowModal()
+                    dial = wx.MessageDialog(self, "This category name is already used", style=wx.OK|wx.CENTRE)
+                    dial.ShowModal()
                     dial.Destroy()
+                    return
             self.dlist = self.cate.getcate()
             self.RefreshData(self.dlist)
             self.parent.m_listToCate.RefreshData(self.cate.getwordstocate())
+            #self.parent.m_listCate.SetSelection(index)
             self.parent.m_listCateWords.RefreshData(self.parent.cate.getcatewords(self.GetItemData(index)[0]))
             for i in range(0, self.GetItemCount(), 1):
                 self.Select(i, on=0)
             self.Select(index, on=1)
             self.parent.butsave.SetBackgroundColour((255,0,0,255))
-            self.parent.Refresh() 
+            self.parent.Refresh()
         if seq[0][-1] == 'catewords' :
             if index < self.GetItemCount() and index != -1 :
+                cible = self.GetItemData(index)[0]
                 for val in seq :
                     word, eff = val[1]
                     if word not in self.cate.cate['CATE'][self.GetItemData(index)[0]][1] :
                         self.cate.changewordcate(self.GetItemData(index)[0], word, eff)
                         self.parent.butsave.SetBackgroundColour((255,0,0,255))
-                        self.parent.Refresh()
+                self.parent.Refresh()
             else :
                 index = self.GetItemCount()
                 if self.cate.addcatefromwordcate(word, eff) :
                     self.parent.butsave.SetBackgroundColour((255,0,0,255))
                     self.parent.Refresh()
                 else :
-                    dial = wx.MessageDialog(self, "This category name is already used", style=wx.OK|wx.CENTRE).ShowModal()
+                    dial = wx.MessageDialog(self, "This category name is already used", style=wx.OK|wx.CENTRE)
+                    dial.ShowModal()
+                    dial.Destroy()
+                    return
                 #self.cate.addwordincate(self.GetItemData(index)[0], word, eff)
             self.dlist = self.cate.getcate()
             self.RefreshData(self.dlist)
             self.parent.m_listToCate.RefreshData(self.cate.getwordstocate())
             #self.parent.m_listCateWords.RefreshData(self.parent.cate.getcatewords(self.GetItemData(index)[0]))
-            self.parent.m_listCateWords.RefreshData(self.parent.cate.getcatewords(self.GetItemData(self.currentItem)[0]))
+            self.parent.m_listCate.SetSelection(index)
+            self.parent.m_listCateWords.RefreshData(self.parent.cate.getcatewords(self.GetItemData(index)[0]))
             #self.SetSelection(index)
 
 
@@ -977,16 +988,19 @@ class ListForWords(ListForCate) :
             self.parent.m_listCate.RefreshData(self.cate.getcate())
             self.parent.m_listCateWords.RefreshData(self.cate.getcatewords(categorie))
             self.parent.butsave.SetBackgroundColour((255,0,0,255))
-            self.parent.Refresh()
+            #self.parent.Refresh()
         elif seq[0][-1] == 'cate' :
             categorie = seq[0][1][0]
             self.cate.delcate(categorie)
             self.RefreshData(self.cate.getwordstocate())
             self.parent.m_listCate.RefreshData(self.cate.getcate())
-            self.parent.m_listCate.SetSelection(0)
-            self.parent.m_listCateWords.RefreshData(self.cate.getcatewords(self.parent.m_listCate.GetItemText(0)))
+            if self.parent.m_listCate.GetItemCount() != 0 :
+                self.parent.m_listCate.SetSelection(0)
+                self.parent.m_listCateWords.RefreshData(self.cate.getcatewords(self.parent.m_listCate.GetItemText(0)))
+            else :
+                self.parent.m_listCateWords.RefreshData({})
             self.parent.butsave.SetBackgroundColour((255,0,0,255))
-            self.parent.Refresh()
+            #self.parent.Refresh()
 
 
 
@@ -1131,8 +1145,8 @@ class ListForCateWords(ListForCate) :
                 self.parent.m_listCate.RefreshData(self.cate.getcate())
                 self.parent.m_listToCate.RefreshData(self.dlist)
                 self.parent.butsave.SetBackgroundColour((255,0,0,255))
-                self.parent.Refresh()
-        else : 
+                #self.parent.Refresh()
+        else :
             message = wx.MessageDialog(self, _("You have to select a category first"), _("Information"), wx.OK|wx.ICON_INFORMATION)
             message.ShowModal()
             message.Destroy()
