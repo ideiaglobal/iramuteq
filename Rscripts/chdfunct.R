@@ -315,6 +315,28 @@ make.spec.hypergeo <- function(mat) {
     out
 }
 
+make.spec.chrono.bef <- function(mat, empan = 1) {
+        library(textometry)
+        spec <- NULL
+        for (dat in (empan+1):ncol(mat)) {
+                nmat <- cbind(rowSums(mat[,(dat-empan):dat]), mat[,(dat)])
+                spec.dat  <- specificities(nmat)
+                spec <- cbind(spec,spec.dat[,2])
+                #colnames(spec)[-1] <- colnames(mat)[dat]
+        }
+        for (val in 1:empan) {
+                spec <- cbind(rep(0,nrow(mat)), spec)
+        }
+        colnames(spec) <- colnames(mat)
+        sumcol<-colSums(mat)
+    eff_relatif<-round(t(apply(mat,1,function(x) {(x/t(as.matrix(sumcol))*1000)})),2)
+    colnames(eff_relatif) <- colnames(mat)
+    out <-list()
+    out[[1]]<-spec
+    out[[3]]<-eff_relatif
+    out
+}
+
 BuildProf01<-function(x,classes) {
 	#x : donnees en 0/1
 	#classes : classes de chaque lignes de x
