@@ -16,6 +16,7 @@ import os
 # import des fichiers du projet
 #------------------------------------
 from html.parser import HTMLParser
+from html import unescape
 
 
 mois = {'janvier' : '01',
@@ -169,7 +170,7 @@ def ParseEuropress(txtdir, fileout, encodage_in, encodage_out) :
             parser.doinit(outf)
             with codecs.open(f, 'r', encodage_in) as infile :
                 content = infile.read()
-                content = HTMLParser().unescape(content)
+                content = unescape(content)
             parser.feed(content)
             tot += parser.nb
     return tot
