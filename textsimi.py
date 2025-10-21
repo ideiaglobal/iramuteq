@@ -53,7 +53,7 @@ class SimiTxt(AnalyseText):
             if prep.val == wx.ID_OK :
                 continu = True
                 self.parametres = prep.parametres
-#                self.dlg = progressbar(self.ira, 4)
+                self.dlg = progressbar(self.ira, 4)
             else :
                 return False
         else :
@@ -81,7 +81,7 @@ class SimiTxt(AnalyseText):
                 else :
                     graph_simi = [[os.path.basename(fileout), script.txtgraph]]
                 print_liste(self.pathout['liste_graph'], graph_simi)
-        else : 
+        else :
             return False
 
     def makesimiparam(self) :
@@ -135,14 +135,16 @@ class SimiTxt(AnalyseText):
 
 class SimiFromCluster(SimiTxt) :
 
-    def __init__(self, ira, corpus, actives, lfreq, lchi, numcluster, parametres = None, dlg = False) :
+    def __init__(self, ira, corpus, actives, lfreq, lchi, numcluster, parametres = None, dlg = False,  Fromstat=False, limit=None) :
         self.actives = actives
         self.numcluster = numcluster
+        self.Fromstat = Fromstat
         self.lfreq = lfreq
         self.lchi = lchi
+        self.limit = limit
         parametres['name'] = 'simi_classe_%i' % (numcluster + 1)
-        dlg.Destroy()
-        SimiTxt.__init__(self, ira, corpus, parametres, dlg=True, lemdial = False)
+        #dlg.Destroy()
+        SimiTxt.__init__(self, ira, corpus, parametres, dlg=dlg, lemdial = False)
 
     def preferences(self) :
         return self.parametres
@@ -151,14 +153,18 @@ class SimiFromCluster(SimiTxt) :
         self.parametres['type'] = 'clustersimitxt'
         self.pathout.basefiles(simipath)
         self.indices = indices_simi
-        if self.dlg  :
-            self.makesimiparam()
+        self.makesimiparam()
         if 'bystar' in self.parametres :
             del self.parametres['bystar']
-        dictcol = dict([[i, [act, self.corpus.getlemclustereff(act, self.numcluster)]] for i, act in enumerate(self.actives)])
+        if not self.Fromstat :
+            dictcol = dict([[i, [act, self.corpus.getlemclustereff(act, self.numcluster)]] for i, act in enumerate(self.actives)])
+        else :
+            dictcol = dict([[i, [act, self.corpus.lems[act].freq]] for i, act in enumerate(self.actives)])
         continu = True
         if self.dlg :
 #            self.dlg.Destroy()
+            dlg = True
+            self.dlg.Show(False)
             self.stars = []
             self.parametres['stars'] = 0
             self.parametres['sfromchi'] = 1
@@ -166,10 +172,23 @@ class SimiFromCluster(SimiTxt) :
             if prep.val == wx.ID_OK :
                 continu = True
                 self.parametres = prep.parametres
+                print(self.parametres['com'])
             else :
                 continu = False
+        else :
+            dlg = False
         if continu :
-            self.dlg = progressbar(self.parent, 3)
+            if dlg :
+                self.dlg = progressbar(self.parent, 3)
+            else :
+                if self.limit is None or self.limit > len(self.actives):
+                    self.limit = len(self.actives)
+                self.parametres['selected'] = [val for val in range(self.limit)]
+                order_actives = [[i, act, self.corpus.getlemeff(act)] for i,
+                                 act in enumerate(self.actives) if i <= self.limit]
+                #order_actives = sorted(order_actives, key=itemgetter(2), reverse = True)
+                with open(self.pathout['selected.csv'], 'w') as f :
+                    f.write('\n'.join([repr(order_actives[val][0]) for val in self.parametres['selected']]))
             self.makefiles()
             self.parametres['type'] = 'clustersimitxt'
             script = PrintSimiScript(self)
@@ -188,7 +207,10 @@ class SimiFromCluster(SimiTxt) :
                 else :
                     graph_simi = [[os.path.basename(fileout), script.txtgraph]]
                 print_liste(self.pathout['liste_graph'], graph_simi)
-            self.dlg.Destroy()
+            try :
+                self.dlg.Destroy()
+            except :
+                print('dlg is bool')
         else :
             return False
 
