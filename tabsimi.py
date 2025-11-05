@@ -101,8 +101,8 @@ class DoSimi(AnalyseMatrix):
                 else :
                     actives = self.actives
                 if isinstance(actives, dict) :
+                    self.tableau.actives = actives
                     actives = [[val, actives[val][0]] for val in actives]
-                    self.tableau.actives = dict(actives)
                 self.tableau.make_listactives()
                 actives = dict([[i, val] for i, val in enumerate(actives)])
                 self.dial = PrefSimi(self.parent, -1, self.paramsimi, self.indices, wordlist = actives)
