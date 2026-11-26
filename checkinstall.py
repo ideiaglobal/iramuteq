@@ -160,7 +160,7 @@ def RLibsAreInstalled(self) :
         return True
 
 def CheckRPackages(self):
-    listdep = ['ca', 'gee', 'ape', 'igraph','proxy', 'wordcloud', 'irlba', 'textometry', 'sna', 'network', 'intergraph', 'rgl']
+    listdep = ['ca', 'gee', 'ape', 'igraph','proxy', 'wordcloud', 'irlba', 'textometry', 'sna', 'network', 'intergraph', 'rgl', 'udpipe']  # udpipe: lematização contextual (lemmaconf.py)
     nolib = []
     i=0
     dlg = wx.ProgressDialog("Test des librairies de R", "test en cours...", maximum = len(listdep), parent=self, style=wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_CAN_ABORT)

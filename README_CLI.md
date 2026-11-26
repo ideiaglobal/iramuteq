@@ -138,7 +138,7 @@ Ao abrir um corpus de texto (*Abrir um corpus de texto* / *Ouvrir un corpus text
 
 | Analisador | Peso | Línguas | Instalação |
 |---|---|---|---|
-| **udpipe** | leve: pacote R + um modelo de 3–24 MB por língua | todas as do IRaMuTeQ (101 modelos UD 2.5, ~65 línguas) | `install.packages("udpipe")`. O modelo da língua é **descarregado automaticamente na primeira utilização** para `~/.iramuteq-udpipe` |
+| **udpipe** | leve: pacote R + um modelo de 3–24 MB por língua | todas as do IRaMuTeQ (101 modelos UD 2.5, ~65 línguas) | `install.packages("udpipe")`; o pacote entra na verificação de bibliotecas R do arranque (`checkinstall.py`). O modelo da língua é **descarregado automaticamente na primeira utilização** para `~/.iramuteq-udpipe` |
 | **FreeLing** | pesado: programa C++, cerca de 1 GB por língua instalada | gl, es, pt, en, fr, it, de, … (as que forem compiladas) | à parte (ver `iramuteq-analise/avaliacao_gl/RESULTADOS.md`) |
 | **Stanza** | o mais pesado: Python + PyTorch (1,4 GB) + modelos | ~70 línguas | à parte, num ambiente próprio, com os modelos de cada língua |
 
