@@ -132,6 +132,29 @@ Os modelos UD 2.5 do udpipe têm licença **CC BY-NC-SA 4.0** (uso não comercia
 - **Concordanciador.** Mostra as chaves, com o sufixo das formas ambíguas, por exemplo `vino_ver`.
 - **Expressões e dicionário externo.** O dicionário de expressões (`expression_XX.txt`) não é aplicado. A opção de dicionário externo nas análises deixa de fazer sentido.
 
+### Na interface gráfica (FreeLing)
+
+Ao abrir um corpus de texto (*Abrir um corpus de texto* / *Ouvrir un corpus texte*), o campo **Dicionário** do diálogo de configuração tem uma terceira opção: **FreeLing (contextual)**.
+
+- **Quando a opção está disponível:** só fica ativa se o FreeLing estiver instalado e tiver dados para a língua escolhida. Ao lado aparece a língua e a pasta (por exemplo `gl - ~/.iramuteq-tools/freeling-4.2.1`). Caso contrário aparece a razão: "não instalado" ou "língua não disponível no FreeLing".
+- **Dicionário de expressões:** com a opção escolhida, a caixa "Usar o dicionário de expressões" fica desmarcada e desativada. Ao voltar ao dicionário, o valor anterior é reposto.
+- **Corpus criado:** abre-se e analisa-se como qualquer outro. O `Corpus.cira` regista `parser = freeling`, `freeling_lang` e `freeling_path`.
+- **Pasta do FreeLing:** fica na preferência `freeling_path` do `iramuteq.cfg`. Vazia, usa `~/.iramuteq-tools/freeling-4.2.1`.
+
+Código envolvido:
+
+- `dialog.py` (`CorpusPref`): opção, ativação conforme a língua e parâmetros `parser`, `freeling_lang`, `freeling_path`.
+- `corpus.py` (`Builder`): com `parser = freeling`, constrói o corpus com `lemmatiseur.build_parsed_corpus`.
+- `freelingconf.py`: localização do FreeLing e línguas disponíveis. Fica num módulo próprio para o `dialog.py` não importar o `corpus.py`, o que criaria uma importação circular.
+- `locale/{fr_FR,pt_PT,es_ES}`: traduções dos três textos novos.
+
+Para correr a interface no Debian 13:
+
+```bash
+sudo apt install python3-wxgtk4.0 python3-xlrd
+python3 iramuteq.py
+```
+
 ### Testes (corpus sintéticos com frases gramaticais, 200 textos, 4 temas)
 
 **Espanhol (`spanish-ancora`).** O corpus tem *vino* nome no tema "bebida" (400 ocorrências) e *vino* verbo no tema "llegada" (400).

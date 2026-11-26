@@ -1599,3 +1599,15 @@ msgstr "oui"
 #, fuzzy
 #~ msgid "Wordcloud"
 #~ msgstr "Nuage de mots"
+
+#: dialog.py (FreeLing)
+msgid "FreeLing (contextual)"
+msgstr "FreeLing (contextuel)"
+
+#: dialog.py (FreeLing)
+msgid "not installed"
+msgstr "non installé"
+
+#: dialog.py (FreeLing)
+msgid "language not available in FreeLing"
+msgstr "langue non disponible dans FreeLing"

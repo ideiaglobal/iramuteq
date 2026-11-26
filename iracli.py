@@ -24,6 +24,8 @@ import types
 from configparser import RawConfigParser  # stdlib, antes de o configparser local entrar no caminho
 
 APPLI_PATH = os.path.dirname(os.path.realpath(__file__))
+if APPLI_PATH not in sys.path:   # também com `python3 -I`, que não acrescenta a pasta do script
+    sys.path.insert(0, APPLI_PATH)
 
 
 # ---------------------------------------------------------------------------
@@ -438,8 +440,7 @@ def analysis_problems(name, analyse, ira):
 # ---------------------------------------------------------------------------
 # 6. Linha de comandos
 # ---------------------------------------------------------------------------
-FREELING_LANGS = {'galician': 'gl', 'spanish': 'es', 'portuguese': 'pt', 'english': 'en', 'french': 'fr',
-                  'italian': 'it', 'german': 'de', 'dutch': 'nl', 'norwegian': 'nb'}
+from freelingconf import DEFAULT_FREELING_DIR, IRA_TO_FREELING as FREELING_LANGS  # noqa: E402
 
 
 def make_analyser(args, ap):
@@ -484,7 +485,7 @@ def build_parser():
     ap.add_argument('--udpipe-model', help='modelo udpipe: nome (ex.: spanish-ancora, galician-ctg) procurado em '
                     '~/.iramuteq-udpipe, ou caminho para um ficheiro .udpipe')
     ap.add_argument('--freeling-lang', help='língua do FreeLing (gl, es, pt…); omissão: deduzida de --lang')
-    ap.add_argument('--freeling-dir', default=os.path.expanduser('~/.iramuteq-tools/freeling-4.2.1'),
+    ap.add_argument('--freeling-dir', default=DEFAULT_FREELING_DIR,
                     help='pasta de instalação do FreeLing (omissão: ~/.iramuteq-tools/freeling-4.2.1)')
     ap.add_argument('--stanza-lang', help='língua do Stanza (gl, es, pt…); omissão: deduzida de --lang')
     ap.add_argument('--stanza-package', help='modelo do Stanza (ex.: ctg, treegal); omissão: o padrão da língua')

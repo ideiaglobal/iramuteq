@@ -2252,7 +2252,7 @@ class CorpusPref ( wx.Dialog ):
         self.m_staticText19.Wrap( -1 )
         fgSizer1.Add( self.m_staticText19, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
         bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
-        fgSizer5 = wx.FlexGridSizer( 2, 2, 0, 0 )
+        fgSizer5 = wx.FlexGridSizer( 3, 2, 0, 0 )
         fgSizer5.SetFlexibleDirection( wx.BOTH )
         fgSizer5.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         self.radio_default_dict = wx.RadioButton( self.m_panel1, wx.ID_ANY, _("Default"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -2266,6 +2266,11 @@ class CorpusPref ( wx.Dialog ):
         self.otherdictpath.SetMinSize(wx.Size(300, -1))
         fgSizer5.Add( self.otherdictpath, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         self.otherdictpath.Enable( False )
+        # lematização contextual com o FreeLing (ver freelingconf.py e lemmatiseur.py)
+        self.radio_freeling = wx.RadioButton( self.m_panel1, wx.ID_ANY, _("FreeLing (contextual)"), wx.DefaultPosition, wx.DefaultSize, 0 )
+        fgSizer5.Add( self.radio_freeling, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        self.freeling_status = wx.StaticText( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 300,-1 ), 0 )
+        fgSizer5.Add( self.freeling_status, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         bSizer2.Add( fgSizer5, 1, wx.EXPAND, 5 )
         fgSizer1.Add( bSizer2, 1, wx.EXPAND, 5 )
         self.m_staticText3 = wx.StaticText( self.m_panel1, wx.ID_ANY, _("Output folder"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -2377,6 +2382,7 @@ class CorpusPref ( wx.Dialog ):
         self.lang_choices.Bind( wx.EVT_CHOICE, self.OnChangeLangage )
         self.radio_other_dict.Bind( wx.EVT_RADIOBUTTON, self.changedictchoice )
         self.radio_default_dict.Bind( wx.EVT_RADIOBUTTON, self.changedictchoice )
+        self.radio_freeling.Bind( wx.EVT_RADIOBUTTON, self.changedictchoice )
         self.otherdictpath.Bind( wx.EVT_FILEPICKER_CHANGED, self.selectdict)
         self.setparametres(parametres)
         self.SetSizer( bSizer1 )
@@ -2418,6 +2424,7 @@ class CorpusPref ( wx.Dialog ):
         self.check_tolist.SetValue(parametres['tolist'])
         self.check_ponct.SetValue(parametres['keep_ponct'])
         self.defaultdictpath.SetValue(self.langues[0])
+        self.update_freeling()
 
     def doparametres(self) :
         parametres = {}
@@ -2439,6 +2446,11 @@ class CorpusPref ( wx.Dialog ):
         parametres['keep_ponct'] = self.check_ponct.GetValue()
         if self.radio_other_dict.GetValue() :
             parametres['dictionary'] = self.otherdictpath.GetPath()
+        if self.radio_freeling.GetValue() and self.radio_freeling.IsEnabled() :
+            parametres['parser'] = 'freeling'
+            parametres['freeling_lang'] = self.freeling_code
+            parametres['freeling_path'] = self.freeling_path
+            parametres['expressions'] = False
         for val in parametres :
             if isinstance(parametres[val], bool) :
                 if parametres[val] :
@@ -2449,9 +2461,39 @@ class CorpusPref ( wx.Dialog ):
 
     def OnChangeLangage(self, evt):
         self.defaultdictpath.SetValue(self.langues[self.lang_choices.GetSelection()])
+        self.update_freeling()
+
+    def update_freeling(self):
+        """Ativa a opção FreeLing só se estiver instalado e tiver a língua escolhida."""
+        from freelingconf import freeling_dir, freeling_installed, freeling_lang
+        self.freeling_path = freeling_dir(getattr(self.parent, 'pref', None))
+        lang = self.langues[self.lang_choices.GetSelection()]
+        self.freeling_code = freeling_lang(lang, self.freeling_path)
+        if not freeling_installed(self.freeling_path) :
+            self.freeling_status.SetLabel(_("not installed") + ' (' + self.freeling_path + ')')
+            ok = False
+        elif self.freeling_code is None :
+            self.freeling_status.SetLabel(_("language not available in FreeLing"))
+            ok = False
+        else :
+            self.freeling_status.SetLabel(self.freeling_code + ' - ' + self.freeling_path)
+            ok = True
+        self.radio_freeling.Enable( ok )
+        if not ok and self.radio_freeling.GetValue() :
+            self.radio_default_dict.SetValue( True )
+        self.changedictchoice(None)
 
     def changedictchoice(self, evt):
-        if self.radio_default_dict.GetValue() :
+        freeling = self.radio_freeling.GetValue() and self.radio_freeling.IsEnabled()
+        # o dicionário de expressões não se aplica com a lematização contextual:
+        # desmarca-se e desativa-se, e repõe-se o valor anterior ao voltar ao dicionário
+        if freeling and self.check_expressions.IsEnabled() :
+            self.expressions_before_freeling = self.check_expressions.GetValue()
+            self.check_expressions.SetValue( False )
+        elif not freeling and not self.check_expressions.IsEnabled() :
+            self.check_expressions.SetValue( getattr(self, 'expressions_before_freeling', True) )
+        self.check_expressions.Enable( not freeling )
+        if self.radio_default_dict.GetValue() or freeling :
             self.otherdictpath.Enable( False )
             self.m_sdbSizer1OK.Enable( True )
         else :

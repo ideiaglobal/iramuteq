@@ -1704,6 +1704,12 @@ class Builder :
             if dial.corpusname.GetValue() != '' :
                 parametres['corpus_name'] = dial.corpusname.GetValue()
             dial.Destroy()
+            if parametres.get('parser') == 'freeling' :
+                # lematização contextual: o dicionário do corpus é construído a partir da anotação (lemmatiseur.py)
+                self.parent.lexique = {}
+                self.parent.expressions = {}
+                self.parametres = parametres
+                return
             ReadLexique(self.parent, lang = parametres['lang'], filein = filein)
             if parametres['lang'] != 'other' and  os.path.exists(self.parent.DictPath.get(parametres['lang']+'_exp', 'french_exp')):
                 self.parent.expressions = ReadDicoAsDico(self.parent.DictPath.get(parametres['lang']+'_exp', 'french_exp'))
@@ -1716,6 +1722,14 @@ class Builder :
                 self.dlg.Destroy()
 
     def doanalyse(self) :
+        if self.parametres.get('parser') == 'freeling' :
+            from lemmatiseur import FreeLing, build_parsed_corpus
+            analyser = FreeLing(self.parametres['freeling_lang'], freeling_dir = self.parametres['freeling_path'])
+            if self.dlg is not None :
+                self.dlg.Pulse('FreeLing...')
+            corpus, ambiguous = build_parsed_corpus(self.parent.filename, self.parametres, analyser, dlg = self.dlg)
+            log.info('FreeLing : %i formes ambigues' % len(ambiguous))
+            return corpus
         return BuildFromAlceste(self.parent.filename, self.parametres, self.parent.lexique, self.parent.expressions, dlg = self.dlg).corpus
 
 class SubBuilder :
