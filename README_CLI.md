@@ -30,6 +30,8 @@ O CLI verifica os pacotes R antes de começar. Se faltar algum, indica o comando
 | `--dictionary` | — | Dicionário próprio (`forma<TAB>lema<TAB>categoria`) |
 | `--out` | pasta do corpus | Onde se cria `<corpus>_corpus_N/` |
 | `--no-lem` | — | Não lematizar |
+| `--parser` | `dicionario` | `dicionario` ou `udpipe` (ver a secção seguinte) |
+| `--udpipe-model` | — | Modelo udpipe: nome (`spanish-ancora`, `galician-treegal`…) ou caminho |
 | `--rpath` | `R` no PATH | Executável R |
 
 **`chd`**
@@ -75,6 +77,65 @@ O CLI verifica os pacotes R antes de começar. Se faltar algum, indica o comando
 
 Os restantes parâmetros vêm de `configuration/*.cfg` ou dos mesmos valores por omissão que os diálogos da interface usam.
 
+## Lematização contextual com udpipe (experimental)
+
+O dicionário do IRaMuTeQ associa cada forma a **um só** lema e categoria. Com `--parser udpipe`, o corpus é anotado por um modelo [Universal Dependencies](https://universaldependencies.org) através do pacote R [udpipe](https://cran.r-project.org/package=udpipe), e cada ocorrência recebe o lema e a categoria do seu contexto.
+
+```bash
+python3 iracli.py corpus.txt --parser udpipe --udpipe-model spanish-ancora -a chd,spec --spec-var tema
+```
+
+**Modelos.** Os modelos são procurados em `~/.iramuteq-udpipe/` pelo nome; também se pode dar o caminho de um ficheiro `.udpipe`. Para descarregar um modelo:
+
+```bash
+Rscript -e 'udpipe::udpipe_download_model("galician-treegal", model_dir="~/.iramuteq-udpipe")'
+```
+
+Os modelos UD 2.5 do udpipe têm licença **CC BY-NC-SA 4.0** (uso não comercial).
+
+### Como funciona (`udpipeparser.py`)
+
+1. **Leitura dos blocos.** Lê os blocos de texto com o mesmo agrupamento do `read_corpus`: as linhas entre marcas `****` e `-*`.
+2. **Anotação.** Anota todos os blocos **numa só chamada ao R** (`udpipe(..., parser = "none")`). Parte do texto original, com maiúsculas e pontuação.
+3. **Conversão das categorias.** Converte as categorias UD (UPOS + traços) nas que já existem no `key.cfg`, sem acrescentar categorias novas:
+   - `NOUN`→`nom`, `VERB`→`ver`, `ADP`→`pre`;
+   - `DET` com `Definite=Def`→`art_def`;
+   - `PRON` com `PronType=Dem`→`pro_dem`;
+   - `PROPN`→`nr`, como hoje acontece com as formas fora do dicionário.
+4. **Chaves.** Cria uma **chave por leitura** só quando a mesma forma tem leituras diferentes no corpus. Por exemplo, `vino_nom` (lema *vino*) e `vino_ver` (lema *venir*). As formas com uma só leitura ficam com a chave simples.
+5. **Lemas com várias categorias.** Quando um lema aparece com mais de uma categoria (*bajo* adj./prep.), recebe também um sufixo. Assim, as duas leituras não se juntam num lema cuja categoria seria a da primeira forma encontrada.
+6. **Construção do corpus.** O `BuildFromAlcesteParsed` (subclasse de `BuildFromAlceste`) só substitui o `treattxt`. A segmentação, as bases de dados e todas as análises continuam inalteradas.
+7. **Ficheiro de ambiguidades.** Escreve `ambiguidades.csv` na pasta do corpus: forma, leituras e ocorrências. O `Corpus.cira` regista `parser = udpipe` e o modelo usado.
+
+**Decisões desta primeira versão:**
+
+- **Contrações.** São divididas nas palavras sintáticas (gl. *do* → *de* + *o*), porque assim os artigos e as preposições ficam suplementares.
+- **Concordanciador.** Mostra as chaves, com o sufixo das formas ambíguas, por exemplo `vino_ver`.
+- **Expressões e dicionário externo.** O dicionário de expressões (`expression_XX.txt`) não é aplicado. A opção de dicionário externo nas análises deixa de fazer sentido.
+
+### Testes (corpus sintéticos com frases gramaticais, 200 textos, 4 temas)
+
+**Espanhol (`spanish-ancora`).** O corpus tem *vino* nome no tema "bebida" (400 ocorrências) e *vino* verbo no tema "llegada" (400).
+
+| | Dicionário | udpipe |
+|---|---|---|
+| Leituras de *vino* | 800 × `vino/nom` | **400 `vino/nom` + 400 `venir/ver`** (100 % certo) |
+| Especificidade de *vino* em bebida / llegada | +51 / **+56** | **+245** / −34 |
+| Especificidade de *venir* em llegada | — | **+248** |
+| CHD | *vino* caracteriza a classe de bebida e as duas de chegada | *vino* só na de bebida (χ² 362); *venir* nas de chegada |
+
+Outros erros do dicionário que o udpipe evita: *casa* → `casar`. Erros do udpipe: *crianza* → `crianzar/ver` 8 vezes, e o primeiro verbo de algumas frases com maiúscula (*Dámelo* → NOUN).
+
+**Galego (`galician-ctg`, `galician-treegal`).** O corpus tem *como* verbo (*comer*, 400 ocorrências) e *como* conjunção (400).
+
+| | Léxico | ctg | treegal |
+|---|---|---|---|
+| *como* | 800 × `adv` | 800 × `pro` | 619 `adv` + 181 `con`, **nunca *comer*** |
+| *sobre* prep. / nome (frases isoladas) | sempre `sobrar/ver` | ✔ ADP / NOUN | ✔ ADP / NOUN |
+| Erros de lema vistos | — | *peixe*→`peixar`, *caldo*→`calr`, *polbo*→`polbir`, *veu*→`ver` | *peixe*→VERB, *viño*→`vo`, *mañá*→`mañ/aux`, *veu*→`ver` |
+
+**Conclusão.** A integração funciona: a ambiguidade passa da anotação para todas as análises sem alterar o resto do IRaMuTeQ. A qualidade depende inteiramente do modelo. O espanhol AnCora é bom. Os modelos galegos UD 2.5 são fracos, porque os *treebanks* são pequenos e o ctg não tem traços morfológicos. Para o galego vale a pena experimentar outros analisadores com o mesmo módulo, como FreeLing, Linguakit ou Stanza. O ponto de troca é a função `annotate`.
+
 ## Resultados
 
 São as mesmas pastas que a interface cria e podem ser abertas nela (*Open an analysis*):
@@ -116,7 +177,7 @@ Pacotes R instalados para estes testes: `ape` 5.8.1, `proxy` 0.4.29, `textometry
 
 ## Como funciona
 
-Além da correção acima, que é independente do CLI, o código da aplicação **não foi alterado**. O `iracli.py`:
+Além da correção acima, que é independente do CLI, o código da aplicação **não foi alterado**. A lematização contextual está num módulo novo, `udpipeparser.py`. O `iracli.py`:
 
 1. Regista um *import hook* que responde a `import wx` (e `wx.*`) com classes substitutas sem efeitos. Faz o mesmo para `xlrd`, quando falta. Assim importam sem erro os módulos que misturam interface e cálculo.
 2. Cria um objeto `Headless` com os atributos da janela principal que as análises leem: `ConfigPath`, `DictPath`, `RscriptsPath`, `pref`, `RPath`, `TEMPDIR`, `history`, `lexique`.

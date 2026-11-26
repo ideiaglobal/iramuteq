@@ -167,7 +167,7 @@ LANGS = ['french', 'english', 'german', 'italian', 'swedish', 'portuguese', 'spa
          'greek', 'galician', 'dutch', 'norwegian', 'other']
 
 
-def build_corpus(ira, infile, lang, outdir, dictionary=None):
+def build_corpus(ira, infile, lang, outdir, dictionary=None, udpipe_model=None):
     from functions import DoConf, ReadDicoAsDico, ReadLexique
     from chemins import PathOut
     from corpus import BuildFromAlceste
@@ -179,12 +179,27 @@ def build_corpus(ira, infile, lang, outdir, dictionary=None):
     parametres['lang'] = lang
     PathOut().createdir(parametres['pathout'])
 
+    if udpipe_model:
+        from udpipeparser import build_parsed_corpus
+        rscript = os.path.join(os.path.dirname(ira.RPath), 'Rscript')
+        corpus, ambiguous = build_parsed_corpus(infile, parametres, udpipe_model, rscript)
+        corpus.conn_all()
+        summarize_ambiguities(ambiguous, corpus.parametres['pathout'])
+        return corpus
+
     ReadLexique(ira, lang=lang, filein=dictionary)
     exp_path = ira.DictPath.get(lang + '_exp')
     ira.expressions = ReadDicoAsDico(exp_path) if lang != 'other' and exp_path and os.path.exists(exp_path) else {}
     corpus = BuildFromAlceste(infile, parametres, ira.lexique, ira.expressions, dlg=None).corpus
     corpus.conn_all()  # na interface, isto acontece quando OpenAnalyse reabre o corpus
     return corpus
+
+
+def summarize_ambiguities(ambiguous, pathout, show=8):
+    print('  udpipe: %i formas com mais de uma leitura (lista completa em ambiguidades.csv)' % len(ambiguous))
+    top = sorted(ambiguous, key=lambda k: -sum(ambiguous[k].values()))[:show]
+    for form in top:
+        print('    %-12s %s' % (form, ' · '.join('%s/%s (%i)' % (l, g, n) for (l, g), n in ambiguous[form].most_common())))
 
 
 def modalities(corpus, spec):
@@ -439,6 +454,10 @@ def build_parser():
     ap.add_argument('--dictionary', help='dicionário próprio (forma<TAB>lema<TAB>categoria)')
     ap.add_argument('--out', help='pasta onde criar os resultados (omissão: junto ao corpus)')
     ap.add_argument('--no-lem', action='store_true', help='não lematizar')
+    ap.add_argument('--parser', default='dicionario', choices=['dicionario', 'udpipe'],
+                    help='lematização: dicionario (omissão, a da aplicação) ou udpipe (contextual, pacote R udpipe)')
+    ap.add_argument('--udpipe-model', help='modelo udpipe: nome (ex.: spanish-ancora, galician-ctg) procurado em '
+                    '~/.iramuteq-udpipe, ou caminho para um ficheiro .udpipe')
     ap.add_argument('--rpath', default=shutil.which('R'), help='executável R (omissão: R no PATH)')
     ap.add_argument('-v', '--verbose', action='store_true', help='mostrar o registo interno do IRaMuTeQ')
 
@@ -491,7 +510,12 @@ def main(argv=None):
         ap.error('R não encontrado; indique-o com --rpath')
     if not os.path.isfile(args.corpus):
         ap.error('corpus não encontrado: %s' % args.corpus)
-    missing = missing_r_packages(args.rpath, r_packages_for(args, analyses))
+    if args.parser == 'udpipe' and not args.udpipe_model:
+        ap.error('--parser udpipe exige --udpipe-model (ex.: spanish-ancora, galician-ctg)')
+    if args.parser == 'udpipe' and args.dictionary:
+        ap.error('--dictionary não se aplica com --parser udpipe')
+    pkgs = r_packages_for(args, analyses) + (['udpipe'] if args.parser == 'udpipe' else [])
+    missing = missing_r_packages(args.rpath, pkgs)
     if missing:
         print('Faltam pacotes R para %s: %s\nInstale-os com:\n  Rscript -e \'install.packages(c(%s))\'' % (
             ', '.join(analyses), ', '.join(missing), ', '.join('"%s"' % p for p in missing)), file=sys.stderr)
@@ -505,8 +529,9 @@ def main(argv=None):
         sys.path.insert(0, APPLI_PATH)
 
     ira = Headless(args.rpath)
-    print('== Corpus (%s)' % args.lang)
-    corpus = build_corpus(ira, args.corpus, args.lang, outdir, args.dictionary)
+    print('== Corpus (%s)' % (args.lang if args.parser == 'dicionario' else 'udpipe: ' + args.udpipe_model))
+    corpus = build_corpus(ira, args.corpus, args.lang, outdir, args.dictionary,
+                          udpipe_model=args.udpipe_model if args.parser == 'udpipe' else None)
     summarize_corpus(corpus)
     print('  pasta:', corpus.parametres['pathout'])
 
