@@ -1704,7 +1704,7 @@ class Builder :
             if dial.corpusname.GetValue() != '' :
                 parametres['corpus_name'] = dial.corpusname.GetValue()
             dial.Destroy()
-            if parametres.get('parser') == 'freeling' :
+            if parametres.get('parser') in ('freeling', 'udpipe', 'stanza') :
                 # lematização contextual: o dicionário do corpus é construído a partir da anotação (lemmatiseur.py)
                 self.parent.lexique = {}
                 self.parent.expressions = {}
@@ -1722,13 +1722,15 @@ class Builder :
                 self.dlg.Destroy()
 
     def doanalyse(self) :
-        if self.parametres.get('parser') == 'freeling' :
-            from lemmatiseur import FreeLing, build_parsed_corpus
-            analyser = FreeLing(self.parametres['freeling_lang'], freeling_dir = self.parametres['freeling_path'])
+        if self.parametres.get('parser') in ('freeling', 'udpipe', 'stanza') :
+            # lematização contextual (lemmaconf.py escolhe e cria o analisador; lemmatiseur.py anota)
+            from lemmaconf import make_analyser, LABELS
+            from lemmatiseur import build_parsed_corpus
             if self.dlg is not None :
-                self.dlg.Pulse('FreeLing...')
+                self.dlg.Pulse(LABELS[self.parametres['parser']] + '...')
+            analyser = make_analyser(self.parametres, rpath = getattr(self.parent, 'RPath', None))
             corpus, ambiguous = build_parsed_corpus(self.parent.filename, self.parametres, analyser, dlg = self.dlg)
-            log.info('FreeLing : %i formes ambigues' % len(ambiguous))
+            log.info('%s : %i formes ambigues' % (analyser.name, len(ambiguous)))
             return corpus
         return BuildFromAlceste(self.parent.filename, self.parametres, self.parent.lexique, self.parent.expressions, dlg = self.dlg).corpus
 

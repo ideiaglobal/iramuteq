@@ -163,9 +163,26 @@ x <- x[, c("doc_id", "token_id", "token", "lemma", "upos", "feats")]
 write.table(x, args[3], sep = "\t", quote = FALSE, row.names = FALSE, na = "", fileEncoding = "UTF-8")
 '''
 
-    def __init__(self, model, rpath=None, model_dir=UDPIPE_MODEL_DIR):
-        self.model_path = self.find_model(model, model_dir)
+    def __init__(self, model, rpath=None, model_dir=UDPIPE_MODEL_DIR, download=False):
         self.rscript = _find_rscript(rpath)
+        try:
+            self.model_path = self.find_model(model, model_dir)
+        except FileNotFoundError:
+            if not download or os.path.isfile(model):
+                raise
+            self.model_path = self.download_model(model, model_dir)
+
+    def download_model(self, model, model_dir=UDPIPE_MODEL_DIR):
+        """Descarrega um modelo UD 2.5 (3–20 MB) do repositório do pacote udpipe para model_dir."""
+        os.makedirs(model_dir, exist_ok=True)
+        log.info('udpipe: a descarregar o modelo %s para %s', model, model_dir)
+        code = 'm <- udpipe::udpipe_download_model(commandArgs(TRUE)[1], model_dir = commandArgs(TRUE)[2]); ' \
+               'if (isTRUE(m$download_failed[1])) quit(status = 1)'
+        proc = subprocess.run([self.rscript, '--vanilla', '-e', code, model, model_dir],
+                              capture_output=True, text=True)
+        if proc.returncode != 0:
+            raise RuntimeError('udpipe: não foi possível descarregar o modelo %s:\n%s' % (model, proc.stderr[-2000:]))
+        return self.find_model(model, model_dir)
 
     @staticmethod
     def find_model(name_or_path, model_dir=UDPIPE_MODEL_DIR):

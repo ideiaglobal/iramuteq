@@ -1611,3 +1611,19 @@ msgstr "non installé"
 #: dialog.py (FreeLing)
 msgid "language not available in FreeLing"
 msgstr "langue non disponible dans FreeLing"
+
+#: dialog.py (lematização contextual)
+msgid "Contextual"
+msgstr "Contextuel"
+
+#: dialog.py (lematização contextual)
+msgid "language not available"
+msgstr "langue non disponible"
+
+#: dialog.py (lematização contextual)
+msgid "R package udpipe not installed"
+msgstr "paquet R udpipe non installé"
+
+#: dialog.py (lematização contextual)
+msgid "model downloaded on first use"
+msgstr "modèle téléchargé à la première utilisation"

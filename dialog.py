@@ -2266,11 +2266,17 @@ class CorpusPref ( wx.Dialog ):
         self.otherdictpath.SetMinSize(wx.Size(300, -1))
         fgSizer5.Add( self.otherdictpath, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         self.otherdictpath.Enable( False )
-        # lematização contextual com o FreeLing (ver freelingconf.py e lemmatiseur.py)
-        self.radio_freeling = wx.RadioButton( self.m_panel1, wx.ID_ANY, _("FreeLing (contextual)"), wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizer5.Add( self.radio_freeling, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        self.freeling_status = wx.StaticText( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 300,-1 ), 0 )
-        fgSizer5.Add( self.freeling_status, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        # lematização contextual: udpipe, FreeLing ou Stanza (ver lemmaconf.py e lemmatiseur.py)
+        from lemmaconf import ANALYSERS, LABELS
+        self.analysers = ANALYSERS
+        self.radio_contextual = wx.RadioButton( self.m_panel1, wx.ID_ANY, _("Contextual"), wx.DefaultPosition, wx.DefaultSize, 0 )
+        fgSizer5.Add( self.radio_contextual, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        bSizerCtx = wx.BoxSizer( wx.HORIZONTAL )
+        self.analyser_choice = wx.Choice( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, [LABELS[a] for a in ANALYSERS], 0 )
+        bSizerCtx.Add( self.analyser_choice, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT, 5 )
+        self.contextual_status = wx.StaticText( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 360,-1 ), wx.ST_ELLIPSIZE_END )
+        bSizerCtx.Add( self.contextual_status, 0, wx.ALIGN_CENTER_VERTICAL, 0 )
+        fgSizer5.Add( bSizerCtx, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         bSizer2.Add( fgSizer5, 1, wx.EXPAND, 5 )
         fgSizer1.Add( bSizer2, 1, wx.EXPAND, 5 )
         self.m_staticText3 = wx.StaticText( self.m_panel1, wx.ID_ANY, _("Output folder"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -2382,7 +2388,8 @@ class CorpusPref ( wx.Dialog ):
         self.lang_choices.Bind( wx.EVT_CHOICE, self.OnChangeLangage )
         self.radio_other_dict.Bind( wx.EVT_RADIOBUTTON, self.changedictchoice )
         self.radio_default_dict.Bind( wx.EVT_RADIOBUTTON, self.changedictchoice )
-        self.radio_freeling.Bind( wx.EVT_RADIOBUTTON, self.changedictchoice )
+        self.radio_contextual.Bind( wx.EVT_RADIOBUTTON, self.changedictchoice )
+        self.analyser_choice.Bind( wx.EVT_CHOICE, self.OnChangeAnalyser )
         self.otherdictpath.Bind( wx.EVT_FILEPICKER_CHANGED, self.selectdict)
         self.setparametres(parametres)
         self.SetSizer( bSizer1 )
@@ -2424,7 +2431,7 @@ class CorpusPref ( wx.Dialog ):
         self.check_tolist.SetValue(parametres['tolist'])
         self.check_ponct.SetValue(parametres['keep_ponct'])
         self.defaultdictpath.SetValue(self.langues[0])
-        self.update_freeling()
+        self.update_contextual(choose_default = True)
 
     def doparametres(self) :
         parametres = {}
@@ -2446,10 +2453,10 @@ class CorpusPref ( wx.Dialog ):
         parametres['keep_ponct'] = self.check_ponct.GetValue()
         if self.radio_other_dict.GetValue() :
             parametres['dictionary'] = self.otherdictpath.GetPath()
-        if self.radio_freeling.GetValue() and self.radio_freeling.IsEnabled() :
-            parametres['parser'] = 'freeling'
-            parametres['freeling_lang'] = self.freeling_code
-            parametres['freeling_path'] = self.freeling_path
+        if self.contextual_selected() :
+            analyser = self.analysers[self.analyser_choice.GetSelection()]
+            parametres['parser'] = analyser
+            parametres.update(self.analyser_status[analyser][3])
             parametres['expressions'] = False
         for val in parametres :
             if isinstance(parametres[val], bool) :
@@ -2461,39 +2468,57 @@ class CorpusPref ( wx.Dialog ):
 
     def OnChangeLangage(self, evt):
         self.defaultdictpath.SetValue(self.langues[self.lang_choices.GetSelection()])
-        self.update_freeling()
+        self.update_contextual()
 
-    def update_freeling(self):
-        """Ativa a opção FreeLing só se estiver instalado e tiver a língua escolhida."""
-        from freelingconf import freeling_dir, freeling_installed, freeling_lang
-        self.freeling_path = freeling_dir(getattr(self.parent, 'pref', None))
+    def update_contextual(self, choose_default = False):
+        """Estado de cada analisador para a língua escolhida; escolhe o melhor disponível se preciso."""
+        from lemmaconf import status, PREFERENCE, DEFAULT_PREFERENCE
         lang = self.langues[self.lang_choices.GetSelection()]
-        self.freeling_code = freeling_lang(lang, self.freeling_path)
-        if not freeling_installed(self.freeling_path) :
-            self.freeling_status.SetLabel(_("not installed") + ' (' + self.freeling_path + ')')
-            ok = False
-        elif self.freeling_code is None :
-            self.freeling_status.SetLabel(_("language not available in FreeLing"))
-            ok = False
-        else :
-            self.freeling_status.SetLabel(self.freeling_code + ' - ' + self.freeling_path)
-            ok = True
-        self.radio_freeling.Enable( ok )
-        if not ok and self.radio_freeling.GetValue() :
+        pref = getattr(self.parent, 'pref', None)
+        rpath = getattr(self.parent, 'RPath', None)
+        self.analyser_status = dict((a, status(a, lang, pref, rpath)) for a in self.analysers)
+        available = [a for a in self.analysers if self.analyser_status[a][0]]
+        current = self.analysers[self.analyser_choice.GetSelection()] if self.analyser_choice.GetSelection() >= 0 else None
+        if choose_default or current not in available :
+            best = [a for a in PREFERENCE.get(lang, DEFAULT_PREFERENCE) if a in available]
+            self.analyser_choice.SetSelection(self.analysers.index(best[0] if best else self.analysers[0]))
+        # a opção só fica ativa se houver pelo menos um analisador para esta língua
+        self.radio_contextual.Enable( bool(available) )
+        if not available and self.radio_contextual.GetValue() :
             self.radio_default_dict.SetValue( True )
+        self.OnChangeAnalyser(None)
+
+    def OnChangeAnalyser(self, evt):
+        analyser = self.analysers[self.analyser_choice.GetSelection()]
+        ok, msg, arg, params = self.analyser_status[analyser]
+        if ok :   # disponível: primeiro o modelo/língua, depois a nota (ex.: "french-gsd (descarregado…)")
+            label = arg + (' (' + _(msg) + ')' if msg else '')
+        else :    # indisponível: primeiro a razão
+            label = _(msg) + (' (' + arg + ')' if arg else '')
+        self.contextual_status.SetLabel(label)
+        self.contextual_status.SetToolTip(label)
         self.changedictchoice(None)
 
+    def contextual_selected(self):
+        return self.radio_contextual.GetValue() and self.radio_contextual.IsEnabled()
+
     def changedictchoice(self, evt):
-        freeling = self.radio_freeling.GetValue() and self.radio_freeling.IsEnabled()
+        contextual = self.contextual_selected()
+        self.analyser_choice.Enable( self.radio_contextual.IsEnabled() )
         # o dicionário de expressões não se aplica com a lematização contextual:
         # desmarca-se e desativa-se, e repõe-se o valor anterior ao voltar ao dicionário
-        if freeling and self.check_expressions.IsEnabled() :
-            self.expressions_before_freeling = self.check_expressions.GetValue()
+        if contextual and self.check_expressions.IsEnabled() :
+            self.expressions_before_contextual = self.check_expressions.GetValue()
             self.check_expressions.SetValue( False )
-        elif not freeling and not self.check_expressions.IsEnabled() :
-            self.check_expressions.SetValue( getattr(self, 'expressions_before_freeling', True) )
-        self.check_expressions.Enable( not freeling )
-        if self.radio_default_dict.GetValue() or freeling :
+        elif not contextual and not self.check_expressions.IsEnabled() :
+            self.check_expressions.SetValue( getattr(self, 'expressions_before_contextual', True) )
+        self.check_expressions.Enable( not contextual )
+        if contextual :
+            # só se pode avançar se o analisador escolhido estiver disponível para esta língua
+            analyser = self.analysers[self.analyser_choice.GetSelection()]
+            self.otherdictpath.Enable( False )
+            self.m_sdbSizer1OK.Enable( self.analyser_status[analyser][0] )
+        elif self.radio_default_dict.GetValue() :
             self.otherdictpath.Enable( False )
             self.m_sdbSizer1OK.Enable( True )
         else :

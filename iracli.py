@@ -440,7 +440,7 @@ def analysis_problems(name, analyse, ira):
 # ---------------------------------------------------------------------------
 # 6. Linha de comandos
 # ---------------------------------------------------------------------------
-from freelingconf import DEFAULT_FREELING_DIR, IRA_TO_FREELING as FREELING_LANGS  # noqa: E402
+from lemmaconf import DEFAULT_FREELING_DIR, IRA_TO_ISO as FREELING_LANGS, UDPIPE_DEFAULT  # noqa: E402
 
 
 def make_analyser(args, ap):
@@ -448,7 +448,10 @@ def make_analyser(args, ap):
     from lemmatiseur import FreeLing, Stanza, Udpipe
     try:
         if args.parser == 'udpipe':
-            return Udpipe(args.udpipe_model, rpath=args.rpath)
+            model = args.udpipe_model or UDPIPE_DEFAULT.get(args.lang)
+            if not model:
+                ap.error('indique o modelo com --udpipe-model (não há modelo por omissão para %s)' % args.lang)
+            return Udpipe(model, rpath=args.rpath, download=True)   # descarrega o modelo se faltar
         if args.parser == 'freeling':
             lang = args.freeling_lang or FREELING_LANGS.get(args.lang)
             if not lang:
@@ -483,7 +486,8 @@ def build_parser():
                     help='lematização: dicionario (omissão, a da aplicação), ou contextual com udpipe '
                     '(pacote R), FreeLing ou Stanza')
     ap.add_argument('--udpipe-model', help='modelo udpipe: nome (ex.: spanish-ancora, galician-ctg) procurado em '
-                    '~/.iramuteq-udpipe, ou caminho para um ficheiro .udpipe')
+                    '~/.iramuteq-udpipe e descarregado se faltar, ou caminho para um ficheiro .udpipe; '
+                    'omissão: o modelo de --lang (ex.: french-gsd)')
     ap.add_argument('--freeling-lang', help='língua do FreeLing (gl, es, pt…); omissão: deduzida de --lang')
     ap.add_argument('--freeling-dir', default=DEFAULT_FREELING_DIR,
                     help='pasta de instalação do FreeLing (omissão: ~/.iramuteq-tools/freeling-4.2.1)')
@@ -543,8 +547,6 @@ def main(argv=None):
         ap.error('R não encontrado; indique-o com --rpath')
     if not os.path.isfile(args.corpus):
         ap.error('corpus não encontrado: %s' % args.corpus)
-    if args.parser == 'udpipe' and not args.udpipe_model:
-        ap.error('--parser udpipe exige --udpipe-model (ex.: spanish-ancora, galician-ctg)')
     if args.parser != 'dicionario' and args.dictionary:
         ap.error('--dictionary não se aplica com --parser %s' % args.parser)
     pkgs = r_packages_for(args, analyses) + (['udpipe'] if args.parser == 'udpipe' else [])

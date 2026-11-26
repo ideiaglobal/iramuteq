@@ -31,7 +31,7 @@ O CLI verifica os pacotes R antes de começar. Se faltar algum, indica o comando
 | `--out` | pasta do corpus | Onde se cria `<corpus>_corpus_N/` |
 | `--no-lem` | — | Não lematizar |
 | `--parser` | `dicionario` | `dicionario`, `udpipe`, `freeling` ou `stanza` (ver a secção seguinte) |
-| `--udpipe-model` | — | Modelo udpipe: nome (`spanish-ancora`, `galician-treegal`…) ou caminho |
+| `--udpipe-model` | o modelo de `--lang` | Modelo udpipe: nome (`spanish-ancora`, `galician-treegal`…) ou caminho. É descarregado se faltar |
 | `--freeling-lang` | deduzida de `--lang` | Língua do FreeLing (`gl`, `es`, `pt`…) |
 | `--freeling-dir` | `~/.iramuteq-tools/freeling-4.2.1` | Pasta de instalação do FreeLing |
 | `--stanza-lang` | deduzida de `--lang` | Língua do Stanza (`gl`, `es`, `pt`…) |
@@ -132,21 +132,40 @@ Os modelos UD 2.5 do udpipe têm licença **CC BY-NC-SA 4.0** (uso não comercia
 - **Concordanciador.** Mostra as chaves, com o sufixo das formas ambíguas, por exemplo `vino_ver`.
 - **Expressões e dicionário externo.** O dicionário de expressões (`expression_XX.txt`) não é aplicado. A opção de dicionário externo nas análises deixa de fazer sentido.
 
-### Na interface gráfica (FreeLing)
+### Na interface gráfica
 
-Ao abrir um corpus de texto (*Abrir um corpus de texto* / *Ouvrir un corpus texte*), o campo **Dicionário** do diálogo de configuração tem uma terceira opção: **FreeLing (contextual)**.
+Ao abrir um corpus de texto (*Abrir um corpus de texto* / *Ouvrir un corpus texte*), o campo **Dicionário** do diálogo de configuração tem uma terceira opção: **Contextual**, com a escolha do analisador.
 
-- **Quando a opção está disponível:** só fica ativa se o FreeLing estiver instalado e tiver dados para a língua escolhida. Ao lado aparece a língua e a pasta (por exemplo `gl - ~/.iramuteq-tools/freeling-4.2.1`). Caso contrário aparece a razão: "não instalado" ou "língua não disponível no FreeLing".
+| Analisador | Peso | Línguas | Instalação |
+|---|---|---|---|
+| **udpipe** | leve: pacote R + um modelo de 3–24 MB por língua | todas as do IRaMuTeQ (101 modelos UD 2.5, ~65 línguas) | `install.packages("udpipe")`. O modelo da língua é **descarregado automaticamente na primeira utilização** para `~/.iramuteq-udpipe` |
+| **FreeLing** | pesado: programa C++, cerca de 1 GB por língua instalada | gl, es, pt, en, fr, it, de, … (as que forem compiladas) | à parte (ver `iramuteq-analise/avaliacao_gl/RESULTADOS.md`) |
+| **Stanza** | o mais pesado: Python + PyTorch (1,4 GB) + modelos | ~70 línguas | à parte, num ambiente próprio, com os modelos de cada língua |
+
+Comportamento do diálogo:
+
+- **Escolha por omissão:** para cada língua, o diálogo escolhe o melhor analisador disponível. Para o galego é o FreeLing, que foi o melhor na avaliação; para as outras línguas é o udpipe.
+- **Estado do analisador:** ao lado da escolha aparece o modelo ou a língua (`french-gsd`, `gl - ~/.iramuteq-tools/freeling-4.2.1`). Se o modelo ainda não existe, aparece a nota "modelo descarregado na primeira utilização". Se o analisador escolhido não estiver disponível, aparece a razão ("não instalado", "língua não disponível", "pacote R udpipe não instalado") e o botão OK fica desativado.
+- **Opção desativada:** a opção *Contextual* fica desativada quando nenhum analisador serve para a língua (por exemplo, "outra").
 - **Dicionário de expressões:** com a opção escolhida, a caixa "Usar o dicionário de expressões" fica desmarcada e desativada. Ao voltar ao dicionário, o valor anterior é reposto.
-- **Corpus criado:** abre-se e analisa-se como qualquer outro. O `Corpus.cira` regista `parser = freeling`, `freeling_lang` e `freeling_path`.
+- **Corpus criado:** o `Corpus.cira` regista o analisador (`parser`), o modelo (`parser_model`) e os parâmetros dele (`udpipe_model`, `freeling_lang`, `stanza_lang`…).
 - **Pasta do FreeLing:** fica na preferência `freeling_path` do `iramuteq.cfg`. Vazia, usa `~/.iramuteq-tools/freeling-4.2.1`.
 
 Código envolvido:
 
-- `dialog.py` (`CorpusPref`): opção, ativação conforme a língua e parâmetros `parser`, `freeling_lang`, `freeling_path`.
-- `corpus.py` (`Builder`): com `parser = freeling`, constrói o corpus com `lemmatiseur.build_parsed_corpus`.
-- `freelingconf.py`: localização do FreeLing e línguas disponíveis. Fica num módulo próprio para o `dialog.py` não importar o `corpus.py`, o que criaria uma importação circular.
-- `locale/{fr_FR,pt_PT,es_ES}`: traduções dos três textos novos.
+- `lemmaconf.py`: lista dos analisadores, modelos udpipe por língua (`UDPIPE_DEFAULT`), preferência por língua (`PREFERENCE`), deteção do que está instalado (`status`) e criação do analisador (`make_analyser`). Não depende da interface nem do corpus, para o `dialog.py` não importar o `corpus.py`, o que criaria uma importação circular.
+- `dialog.py` (`CorpusPref`): opção *Contextual*, escolha do analisador e estado.
+- `corpus.py` (`Builder`): com `parser` = `udpipe`, `freeling` ou `stanza`, constrói o corpus com `lemmatiseur.build_parsed_corpus`.
+- `lemmatiseur.py` (`Udpipe`): descarrega o modelo quando falta (`download=True`).
+- `locale/{fr_FR,pt_PT,es_ES}`: traduções dos textos novos.
+
+No CLI, `--parser udpipe` sem `--udpipe-model` usa o modelo da língua de `--lang`, e descarrega-o se faltar.
+
+**Teste em francês** (corpus sintético, 240 textos; *été* = estação, 480 ocorrências, e *été* = particípio de *être*, 480 ocorrências). Correu pelo mesmo caminho da interface (`Builder` com `parser = udpipe`):
+
+- **Modelo:** o `french-gsd` foi descarregado automaticamente (24 MB).
+- **Categorias:** as 960 ocorrências ficaram todas com a categoria certa (480 `aux` + 480 `nom`). Em 45 dos nomes, o lema saiu `être` em vez de `été`.
+- **CHD:** 8 classes, sem erros. *été* nome caracteriza as duas classes "saison". *été* auxiliar fica suplementar, fora da CHD.
 
 Para correr a interface no Debian 13:
 
