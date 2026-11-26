@@ -198,6 +198,9 @@ def ConstructDicoPath(AppliPath):
         'galician_exp' : os.path.join(BasePath, 'expression_gl.txt'),
         'dutch' : os.path.join(BasePath, 'lexique_nl.txt'),
         'norwegian' :  os.path.join(BasePath, 'lexique_nn.txt'),
+        # dicionários que já existiam sem estar no seletor; chave = código ISO (corpuslangs.py)
+        'la' : os.path.join(BasePath, 'lexique_la.txt'),
+        'ro' : os.path.join(BasePath, 'lexique_ro.txt'),
     }
     return DictPath
 

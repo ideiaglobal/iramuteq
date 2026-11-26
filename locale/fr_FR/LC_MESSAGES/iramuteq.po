@@ -1627,3 +1627,27 @@ msgstr "paquet R udpipe non installé"
 #: dialog.py (lematização contextual)
 msgid "model downloaded on first use"
 msgstr "modèle téléchargé à la première utilisation"
+
+msgid "Show all languages"
+msgstr "Afficher toutes les langues"
+
+msgid "no dictionary"
+msgstr "pas de dictionnaire"
+
+msgid "dictionary"
+msgstr "dictionnaire"
+
+msgid "no lemmatization"
+msgstr "sans lemmatisation"
+
+msgid "Model"
+msgstr "Modèle"
+
+msgid "language not installed"
+msgstr "langue non installée"
+
+msgid "model not downloaded"
+msgstr "modèle non téléchargé"
+
+msgid "Other language"
+msgstr "Autre langue"

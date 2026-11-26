@@ -26,7 +26,7 @@ O CLI verifica os pacotes R antes de começar. Se faltar algum, indica o comando
 
 | Opção | Omissão | Descrição |
 |---|---|---|
-| `--lang` | `portuguese` | Idioma do dicionário (french, english, galician, …, other) |
+| `--lang` | `portuguese` | Língua do corpus: as 11 antigas pelo nome (french, galician…), as outras pelo código ISO (`la`, `ro`, `ca`, `ru`, `ast`…; ver `corpuslangs_data.py`), ou `other`. Também aceita o ISO das antigas (`gl` = galician). Sem dicionário do IRaMuTeQ, exige `--parser` ou `--dictionary` |
 | `--dictionary` | — | Dicionário próprio (`forma<TAB>lema<TAB>categoria`) |
 | `--out` | pasta do corpus | Onde se cria `<corpus>_corpus_N/` |
 | `--no-lem` | — | Não lematizar |
@@ -138,9 +138,9 @@ Ao abrir um corpus de texto (*Abrir um corpus de texto* / *Ouvrir un corpus text
 
 | Analisador | Peso | Línguas | Instalação |
 |---|---|---|---|
-| **udpipe** | leve: pacote R + um modelo de 3–24 MB por língua | todas as do IRaMuTeQ (101 modelos UD 2.5, ~65 línguas) | `install.packages("udpipe")`; o pacote entra na verificação de bibliotecas R do arranque (`checkinstall.py`). O modelo da língua é **descarregado automaticamente na primeira utilização** para `~/.iramuteq-udpipe` |
-| **FreeLing** | pesado: programa C++, cerca de 1 GB por língua instalada | gl, es, pt, en, fr, it, de, … (as que forem compiladas) | à parte (ver `iramuteq-analise/avaliacao_gl/RESULTADOS.md`) |
-| **Stanza** | o mais pesado: Python + PyTorch (1,4 GB) + modelos | ~70 línguas | à parte, num ambiente próprio, com os modelos de cada língua |
+| **udpipe** | leve: pacote R + um modelo de 3–24 MB por língua | 66 línguas (101 modelos UD 2.5), incluindo todas as do IRaMuTeQ | `install.packages("udpipe")`; o pacote entra na verificação de bibliotecas R do arranque (`checkinstall.py`). O modelo da língua é **descarregado automaticamente na primeira utilização** para `~/.iramuteq-udpipe` |
+| **FreeLing** | pesado: programa C++, cerca de 1 GB por língua instalada | 13 no FreeLing 4.2.1 (as, ca, cy, de, en, es, fr, gl, it, nb, pt, ru, sl); só as compiladas ficam disponíveis | à parte (ver `iramuteq-analise/avaliacao_gl/RESULTADOS.md`) |
+| **Stanza** | o mais pesado: Python + PyTorch (1,4 GB) + modelos | 100 línguas com lematizador | à parte, num ambiente próprio, com os modelos de cada língua |
 
 Comportamento do diálogo:
 
@@ -150,11 +150,31 @@ Comportamento do diálogo:
 - **Dicionário de expressões:** com a opção escolhida, a caixa "Usar o dicionário de expressões" fica desmarcada e desativada. Ao voltar ao dicionário, o valor anterior é reposto.
 - **Corpus criado:** o `Corpus.cira` regista o analisador (`parser`), o modelo (`parser_model`) e os parâmetros dele (`udpipe_model`, `freeling_lang`, `stanza_lang`…).
 - **Pasta do FreeLing:** fica na preferência `freeling_path` do `iramuteq.cfg`. Vazia, usa `~/.iramuteq-tools/freeling-4.2.1`.
+- **Modelo:** quando a língua tem mais de um modelo udpipe (espanhol: `ancora`, `gsd`) ou mais de um pacote Stanza instalado (galego: `ctg`, `treegal`), aparece uma segunda escolha com o modelo. Por omissão: o de `UDPIPE_DEFAULT` (ou o primeiro da lista) e o pacote por omissão do Stanza.
+
+#### Seletor de língua
+
+O seletor de língua já não depende só dos dicionários. Junta:
+
+1. **as línguas com dicionário do IRaMuTeQ** (13: as 11 antigas, mais latim e romeno, cujos ficheiros já existiam em `dictionnaires/` sem estarem no seletor);
+2. **as línguas que algum analisador trata nesta máquina** (com o pacote R udpipe instalado são 66 no total, porque o modelo udpipe se descarrega sozinho);
+3. **Outra língua** (sem lematização), no fim.
+
+- **Nomes:** cada língua aparece com o nome na própria língua e o código ISO (*Galego (gl)*, *Català (ca)*, *Русский (ru)*), o que dispensa traduções. As línguas com dicionário vêm primeiro.
+- **"Mostrar todas as línguas":** acrescenta as línguas que só teriam analisador se ele fosse instalado (104 no total). Um corpus ou uma preferência com uma língua que não está entre as utilizáveis liga esta opção sozinho.
+- **Linha de estado:** por baixo do seletor, mostra o que existe para a língua, por exemplo `dicionário · udpipe · FreeLing · Stanza` ou `udpipe · FreeLing (língua não instalada) · Stanza (modelo não descarregado)`.
+- **Língua sem dicionário:** a opção *Por omissão* fica desativada e escolhe-se *Contextual*. Se também não houver analisador, escolhe-se *Outro* (dicionário próprio). Ao voltar a uma língua com dicionário, se o *Outro* tinha sido escolhido automaticamente e está vazio, volta-se a *Por omissão*.
+- **Chaves internas:** as 11 línguas antigas mantêm a chave (`french`, `galician`…), para os `.cira` e as preferências antigas continuarem a funcionar; as novas usam o código ISO (`la`, `ro`, `ca`). A língua por omissão nas preferências usa a mesma lista.
+- **Romeno e latim:** o dicionário latino funciona bem (*duxit* → `duco`). O romeno é fraco: faltam palavras gramaticais (*în*, *la*, *de*, *pentru*), *și* aparece como `sieși` e há categorias (`nomnom`, `T`) que o `key.cfg` não conhece. Além disso, o filtro de caracteres por omissão (separador *Limpeza*) não inclui *ă ș ț*. Para o romeno, a lematização contextual (udpipe) é preferível. O filtro de caracteres não se aplica na lematização contextual, por isso o cirílico, o grego ou o chinês passam intactos.
+
+A tabela fixa das línguas (`corpuslangs_data.py`: chave, ISO, autónimo, modelos udpipe, código Stanza e FreeLing) é gerada por `iramuteq-analise/linguas/gerar_registo.py` a partir das listas do udpipe 0.8.12, do Stanza 1.15.1 e do FreeLing 4.2.1 (`iramuteq-analise/linguas/LINGUAS.md`). O que está instalado vê-se em tempo de execução.
 
 Código envolvido:
 
-- `lemmaconf.py`: lista dos analisadores, modelos udpipe por língua (`UDPIPE_DEFAULT`), preferência por língua (`PREFERENCE`), deteção do que está instalado (`status`) e criação do analisador (`make_analyser`). Não depende da interface nem do corpus, para o `dialog.py` não importar o `corpus.py`, o que criaria uma importação circular.
-- `dialog.py` (`CorpusPref`): opção *Contextual*, escolha do analisador e estado.
+- `lemmaconf.py`: lista dos analisadores, modelos udpipe e pacotes Stanza por língua (`models`, `UDPIPE_DEFAULT`), preferência por língua (`PREFERENCE`), deteção do que está instalado (`status`) e criação do analisador (`make_analyser`). Não depende da interface nem do corpus, para o `dialog.py` não importar o `corpus.py`, o que criaria uma importação circular.
+- `corpuslangs.py` e `corpuslangs_data.py`: registo das línguas e ordem do seletor (`choices`).
+- `dialog.py` (`CorpusPref`): seletor de língua, opção *Contextual*, escolha do analisador e do modelo, estado; `PrefDialog`: língua por omissão.
+- `chemins.py`: dicionários latino (`la`) e romeno (`ro`). `functions.ReadLexique`: língua sem dicionário dá um léxico vazio.
 - `corpus.py` (`Builder`): com `parser` = `udpipe`, `freeling` ou `stanza`, constrói o corpus com `lemmatiseur.build_parsed_corpus`.
 - `lemmatiseur.py` (`Udpipe`): descarrega o modelo quando falta (`download=True`).
 - `locale/{fr_FR,pt_PT,es_ES}`: traduções dos textos novos.

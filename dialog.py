@@ -441,7 +441,10 @@ releases at startup""")
         self.m_staticText56 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText56.Wrap( -1 )
         fgSizer1.Add( self.m_staticText56, 0, wx.ALL, 5 )
-        self.txtlangues = wx.Choice( self, wx.ID_ANY, (200, -1), choices = langues_n)
+        # língua por omissão dos corpus: todas as do registo (corpuslangs.py), as com dicionário primeiro
+        import corpuslangs
+        self.txtlangues_keys = corpuslangs.choices(getattr(parent, 'DictPath', None) or {}, lambda k : True, True)
+        self.txtlangues = wx.Choice( self, wx.ID_ANY, (200, -1), choices = [corpuslangs.label(k, _("Other language")) for k in self.txtlangues_keys])
         #self.langues.SetSelection( 0 )
         fgSizer1.Add( self.txtlangues, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
 
@@ -532,7 +535,8 @@ of R packages""")
         else : val2 = 1
         self.m_radioBox2.SetSelection(val2)
         self.langues.SetSelection(self.listlangues.index(self.parent.pref.get('iramuteq', 'guilanguage')))
-        self.txtlangues.SetSelection(langues.index(self.parent.pref.get('iramuteq','language')))
+        deflang = self.parent.pref.get('iramuteq','language')
+        self.txtlangues.SetSelection(self.txtlangues_keys.index(deflang) if deflang in self.txtlangues_keys else 0)
         #if sys.platform == 'win32' :
         #    if self.parent.pref.getboolean('iramuteq', 'R_mem') :
         #        self.m_checkBox1.SetValue(True)
@@ -578,7 +582,7 @@ of R packages""")
         else :  valcheck = 'false'
         parent.pref.set('iramuteq', 'checkupdate', valcheck)
         parent.pref.set('iramuteq', 'guilanguage', self.listlangues[self.langues.GetSelection()])
-        parent.pref.set('iramuteq', 'language', langues[self.txtlangues.GetSelection()])
+        parent.pref.set('iramuteq', 'language', self.txtlangues_keys[self.txtlangues.GetSelection()])
         #if sys.platform == 'win32' :
         #    if self.m_checkBox1.GetValue() :
         #        parent.pref.set('iramuteq', 'R_mem', 'true')
@@ -2212,7 +2216,7 @@ class CorpusPref ( wx.Dialog ):
     def __init__( self, parent, parametres ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _("Settings"), pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_DIALOG_STYLE | wx.STAY_ON_TOP )
         self.parent = parent
-        self.langues = langues
+        self.lang_keys = []
         self.encodages = [enc[0].lower() for enc in encodages]
         ucimark = ['****', '0000']
         ucemethod = [_("characters"), _("occurrences"), _("paragraphs")]
@@ -2244,10 +2248,17 @@ class CorpusPref ( wx.Dialog ):
         self.m_staticText2 = wx.StaticText( self.m_panel1, wx.ID_ANY, _("Language"), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         fgSizer1.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
-        lang_choicesChoices = langues_n
-        self.lang_choices = wx.Choice( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, lang_choicesChoices, 0 )
-        self.lang_choices.SetSelection( 0 )
-        fgSizer1.Add( self.lang_choices, 0, wx.ALL, 5 )
+        # língua: dicionários do IRaMuTeQ + línguas que algum analisador trata nesta máquina (corpuslangs.py)
+        bSizerLang = wx.BoxSizer( wx.VERTICAL )
+        bSizerLangRow = wx.BoxSizer( wx.HORIZONTAL )
+        self.lang_choices = wx.Choice( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.Size( 260,-1 ), [], 0 )
+        bSizerLangRow.Add( self.lang_choices, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT, 10 )
+        self.check_all_langs = wx.CheckBox( self.m_panel1, wx.ID_ANY, _("Show all languages"), wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizerLangRow.Add( self.check_all_langs, 0, wx.ALIGN_CENTER_VERTICAL, 0 )
+        bSizerLang.Add( bSizerLangRow, 0, 0, 0 )
+        self.lang_status = wx.StaticText( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 460,-1 ), wx.ST_ELLIPSIZE_END )
+        bSizerLang.Add( self.lang_status, 0, wx.TOP, 3 )
+        fgSizer1.Add( bSizerLang, 0, wx.ALL, 5 )
         self.m_staticText19 = wx.StaticText( self.m_panel1, wx.ID_ANY, _("Dictionary"), wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText19.Wrap( -1 )
         fgSizer1.Add( self.m_staticText19, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT|wx.ALL, 5 )
@@ -2274,7 +2285,12 @@ class CorpusPref ( wx.Dialog ):
         bSizerCtx = wx.BoxSizer( wx.HORIZONTAL )
         self.analyser_choice = wx.Choice( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, [LABELS[a] for a in ANALYSERS], 0 )
         bSizerCtx.Add( self.analyser_choice, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT, 5 )
-        self.contextual_status = wx.StaticText( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 360,-1 ), wx.ST_ELLIPSIZE_END )
+        # modelo udpipe ou pacote Stanza, quando a língua tem mais de um
+        self.model_choice = wx.Choice( self.m_panel1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, [], 0 )
+        self.model_choice.SetToolTip( _("Model") )
+        bSizerCtx.Add( self.model_choice, 0, wx.ALIGN_CENTER_VERTICAL|wx.RIGHT, 5 )
+        self.models = []
+        self.contextual_status = wx.StaticText( self.m_panel1, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 300,-1 ), wx.ST_ELLIPSIZE_END )
         bSizerCtx.Add( self.contextual_status, 0, wx.ALIGN_CENTER_VERTICAL, 0 )
         fgSizer5.Add( bSizerCtx, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         bSizer2.Add( fgSizer5, 1, wx.EXPAND, 5 )
@@ -2390,6 +2406,8 @@ class CorpusPref ( wx.Dialog ):
         self.radio_default_dict.Bind( wx.EVT_RADIOBUTTON, self.changedictchoice )
         self.radio_contextual.Bind( wx.EVT_RADIOBUTTON, self.changedictchoice )
         self.analyser_choice.Bind( wx.EVT_CHOICE, self.OnChangeAnalyser )
+        self.model_choice.Bind( wx.EVT_CHOICE, self.OnChangeModel )
+        self.check_all_langs.Bind( wx.EVT_CHECKBOX, self.OnShowAllLangs )
         self.otherdictpath.Bind( wx.EVT_FILEPICKER_CHANGED, self.selectdict)
         self.setparametres(parametres)
         self.SetSizer( bSizer1 )
@@ -2415,7 +2433,7 @@ class CorpusPref ( wx.Dialog ):
             except ValueError :
                 enc = self.encodages.index('utf-8')
         self.encodage_choices.SetSelection(enc)
-        self.lang_choices.SetSelection(self.langues.index(parametres['lang']))
+        self.fill_languages(parametres['lang'])
         self.repout_choices.SetValue(parametres['pathout'])
         self.corpusname.SetValue(parametres['corpus_name'])
         self.ucimark_choices.SetSelection(parametres['ucimark'])
@@ -2430,13 +2448,12 @@ class CorpusPref ( wx.Dialog ):
         self.check_tirets.SetValue(parametres['tiret'])
         self.check_tolist.SetValue(parametres['tolist'])
         self.check_ponct.SetValue(parametres['keep_ponct'])
-        self.defaultdictpath.SetValue(self.langues[0])
-        self.update_contextual(choose_default = True)
+        self.update_language(choose_default = True)
 
     def doparametres(self) :
         parametres = {}
         parametres['encoding'] = encodages[self.encodage_choices.GetSelection()][0]
-        parametres['lang'] = self.langues[self.lang_choices.GetSelection()]
+        parametres['lang'] = self.current_lang()
         parametres['pathout'] = self.repout_choices.GetValue()
         parametres['corpus_name'] = self.corpusname.GetValue()
         parametres['ucimark'] = self.ucimark_choices.GetSelection()
@@ -2456,7 +2473,7 @@ class CorpusPref ( wx.Dialog ):
         if self.contextual_selected() :
             analyser = self.analysers[self.analyser_choice.GetSelection()]
             parametres['parser'] = analyser
-            parametres.update(self.analyser_status[analyser][3])
+            parametres.update(self.analyser_status[analyser][3])   # inclui o modelo escolhido
             parametres['expressions'] = False
         for val in parametres :
             if isinstance(parametres[val], bool) :
@@ -2466,14 +2483,81 @@ class CorpusPref ( wx.Dialog ):
                     parametres[val] = 0
         return parametres
 
-    def OnChangeLangage(self, evt):
-        self.defaultdictpath.SetValue(self.langues[self.lang_choices.GetSelection()])
-        self.update_contextual()
+    # --- língua ---------------------------------------------------------------
+    def current_lang(self):
+        sel = self.lang_choices.GetSelection()
+        return self.lang_keys[sel] if 0 <= sel < len(self.lang_keys) else 'other'
 
+    def dictpath(self):
+        return getattr(self.parent, 'DictPath', None) or {}
+
+    def fill_languages(self, select = None):
+        """Preenche o seletor de língua; mostra todas se a língua pedida não estiver entre as utilizáveis."""
+        import corpuslangs
+        from lemmaconf import usable
+        pref = getattr(self.parent, 'pref', None)
+        rpath = getattr(self.parent, 'RPath', None)
+        select = select or self.current_lang()
+        show_all = self.check_all_langs.GetValue()
+        keys = corpuslangs.choices(self.dictpath(), lambda k: usable(k, pref, rpath), show_all)
+        if select not in keys and not show_all and corpuslangs.get(select) is not None:
+            self.check_all_langs.SetValue(True)
+            keys = corpuslangs.choices(self.dictpath(), lambda k: usable(k, pref, rpath), True)
+        self.lang_keys = keys
+        self.lang_choices.SetItems([corpuslangs.label(k, _("Other language")) for k in keys])
+        self.lang_choices.SetSelection(keys.index(select) if select in keys else keys.index('french') if 'french' in keys else 0)
+
+    def OnShowAllLangs(self, evt):
+        self.fill_languages()
+        self.update_language()
+
+    def OnChangeLangage(self, evt):
+        self.update_language()
+
+    def update_language(self, choose_default = False):
+        """Dicionário por omissão, linha de estado da língua e analisadores para a língua escolhida."""
+        import corpuslangs
+        lang = self.current_lang()
+        has_dict = lang == 'other' or corpuslangs.has_dictionary(lang, self.dictpath())
+        self.defaultdictpath.SetValue(os.path.basename(self.dictpath()[lang]) if lang != 'other' and has_dict else
+                                      ('' if lang == 'other' else _("no dictionary")))
+        self.radio_default_dict.Enable( has_dict )
+        self.update_contextual(choose_default = True)
+        # sem dicionário do IRaMuTeQ: lematização contextual se houver analisador, senão dicionário próprio
+        if not has_dict and self.radio_default_dict.GetValue() :
+            if self.radio_contextual.IsEnabled() :
+                self.radio_contextual.SetValue( True )
+            else :
+                self.radio_other_dict.SetValue( True )
+                self.auto_other_dict = True
+            self.changedictchoice(None)
+        # "Outro" foi escolhido automaticamente e a nova língua tem dicionário: volta-se ao de omissão
+        elif has_dict and getattr(self, 'auto_other_dict', False) and self.radio_other_dict.GetValue() \
+                and self.otherdictpath.GetPath() == '' :
+            self.radio_default_dict.SetValue( True )
+            self.auto_other_dict = False
+            self.changedictchoice(None)
+        self.update_lang_status(has_dict)
+
+    def update_lang_status(self, has_dict):
+        from lemmaconf import supported, LABELS
+        lang = self.current_lang()
+        if lang == 'other' :
+            parts = [_("no lemmatization")]
+        else :
+            parts = [_("dictionary")] if has_dict else []
+            for a in supported(lang) :
+                ok = self.analyser_status[a][0]
+                parts.append(LABELS[a] + ('' if ok else ' (' + _(self.analyser_status[a][1]) + ')'))
+        label = ' \u00b7 '.join(parts)
+        self.lang_status.SetLabel(label)
+        self.lang_status.SetToolTip(label)
+
+    # --- analisador contextual --------------------------------------------------
     def update_contextual(self, choose_default = False):
         """Estado de cada analisador para a língua escolhida; escolhe o melhor disponível se preciso."""
         from lemmaconf import status, PREFERENCE, DEFAULT_PREFERENCE
-        lang = self.langues[self.lang_choices.GetSelection()]
+        lang = self.current_lang()
         pref = getattr(self.parent, 'pref', None)
         rpath = getattr(self.parent, 'RPath', None)
         self.analyser_status = dict((a, status(a, lang, pref, rpath)) for a in self.analysers)
@@ -2489,7 +2573,24 @@ class CorpusPref ( wx.Dialog ):
         self.OnChangeAnalyser(None)
 
     def OnChangeAnalyser(self, evt):
+        """Preenche a escolha do modelo (udpipe) ou do pacote (Stanza) e mostra o estado."""
+        from lemmaconf import models
         analyser = self.analysers[self.analyser_choice.GetSelection()]
+        self.models, default = models(analyser, self.current_lang()) if self.analyser_status[analyser][0] else ([], None)
+        self.model_choice.SetItems([m.split('-', 1)[1] if analyser == 'udpipe' and '-' in m else m for m in self.models])
+        if self.models :
+            self.model_choice.SetSelection(self.models.index(default) if default in self.models else 0)
+        self.model_choice.Show( len(self.models) > 1 )
+        self.m_panel1.Layout()
+        self.OnChangeModel(None)
+
+    def OnChangeModel(self, evt):
+        from lemmaconf import status
+        analyser = self.analysers[self.analyser_choice.GetSelection()]
+        if self.models :
+            model = self.models[self.model_choice.GetSelection()]
+            self.analyser_status[analyser] = status(analyser, self.current_lang(), getattr(self.parent, 'pref', None),
+                                                    getattr(self.parent, 'RPath', None), model = model)
         ok, msg, arg, params = self.analyser_status[analyser]
         if ok :   # disponível: primeiro o modelo/língua, depois a nota (ex.: "french-gsd (descarregado…)")
             label = arg + (' (' + _(msg) + ')' if msg else '')
@@ -2503,6 +2604,8 @@ class CorpusPref ( wx.Dialog ):
         return self.radio_contextual.GetValue() and self.radio_contextual.IsEnabled()
 
     def changedictchoice(self, evt):
+        if evt is not None :   # escolha do utilizador
+            self.auto_other_dict = False
         contextual = self.contextual_selected()
         self.analyser_choice.Enable( self.radio_contextual.IsEnabled() )
         # o dicionário de expressões não se aplica com a lematização contextual:

@@ -165,8 +165,6 @@ class Headless:
 # ---------------------------------------------------------------------------
 # 3. Corpus
 # ---------------------------------------------------------------------------
-LANGS = ['french', 'english', 'german', 'italian', 'swedish', 'portuguese', 'spanish',
-         'greek', 'galician', 'dutch', 'norwegian', 'other']
 
 
 def build_corpus(ira, infile, lang, outdir, dictionary=None, analyser=None):
@@ -440,7 +438,18 @@ def analysis_problems(name, analyse, ira):
 # ---------------------------------------------------------------------------
 # 6. Linha de comandos
 # ---------------------------------------------------------------------------
-from lemmaconf import DEFAULT_FREELING_DIR, IRA_TO_ISO as FREELING_LANGS, UDPIPE_DEFAULT  # noqa: E402
+import corpuslangs  # noqa: E402
+from lemmaconf import DEFAULT_FREELING_DIR, freeling_lang, stanza_code, udpipe_default  # noqa: E402
+
+
+def lang_key(value):
+    """--lang: chave do IRaMuTeQ (french, galician…), código ISO (ca, ru, ast…) ou other."""
+    if value == corpuslangs.OTHER or corpuslangs.get(value):
+        return value
+    for entry in corpuslangs.LANGS:
+        if entry['iso'] == value:
+            return entry['key']
+    raise argparse.ArgumentTypeError('língua desconhecida: %s (ver corpuslangs_data.py)' % value)
 
 
 def make_analyser(args, ap):
@@ -448,17 +457,17 @@ def make_analyser(args, ap):
     from lemmatiseur import FreeLing, Stanza, Udpipe
     try:
         if args.parser == 'udpipe':
-            model = args.udpipe_model or UDPIPE_DEFAULT.get(args.lang)
+            model = args.udpipe_model or udpipe_default(args.lang)
             if not model:
                 ap.error('indique o modelo com --udpipe-model (não há modelo por omissão para %s)' % args.lang)
             return Udpipe(model, rpath=args.rpath, download=True)   # descarrega o modelo se faltar
         if args.parser == 'freeling':
-            lang = args.freeling_lang or FREELING_LANGS.get(args.lang)
+            lang = args.freeling_lang or freeling_lang(args.lang, args.freeling_dir)
             if not lang:
                 ap.error('indique a língua do FreeLing com --freeling-lang')
             return FreeLing(lang, freeling_dir=args.freeling_dir, ner=not args.freeling_no_ner)
         if args.parser == 'stanza':
-            lang = args.stanza_lang or FREELING_LANGS.get(args.lang)
+            lang = args.stanza_lang or stanza_code(args.lang)
             if not lang:
                 ap.error('indique a língua do Stanza com --stanza-lang')
             return Stanza(lang, package=args.stanza_package)
@@ -478,7 +487,9 @@ def build_parser():
     ap.add_argument('corpus', help='ficheiro de texto no formato IRaMuTeQ (**** *var_mod)')
     ap.add_argument('-a', '--analyses', default='chd',
                     help='lista separada por vírgulas: %s (omissão: chd)' % ','.join(ANALYSES))
-    ap.add_argument('--lang', default='portuguese', choices=LANGS, help='idioma do dicionário (omissão: portuguese)')
+    ap.add_argument('--lang', default='portuguese', type=lang_key, metavar='LÍNGUA',
+                    help='língua do corpus: french, galician… ou código ISO (ca, ru, ast…), ou other '
+                         '(omissão: portuguese). As línguas sem dicionário precisam de --parser')
     ap.add_argument('--dictionary', help='dicionário próprio (forma<TAB>lema<TAB>categoria)')
     ap.add_argument('--out', help='pasta onde criar os resultados (omissão: junto ao corpus)')
     ap.add_argument('--no-lem', action='store_true', help='não lematizar')
@@ -549,6 +560,11 @@ def main(argv=None):
         ap.error('corpus não encontrado: %s' % args.corpus)
     if args.parser != 'dicionario' and args.dictionary:
         ap.error('--dictionary não se aplica com --parser %s' % args.parser)
+    if args.parser == 'dicionario' and not args.dictionary and args.lang != corpuslangs.OTHER:
+        from chemins import ConstructDicoPath
+        if not corpuslangs.has_dictionary(args.lang, ConstructDicoPath(APPLI_PATH)):
+            ap.error('o IRaMuTeQ não tem dicionário para %s: use --parser udpipe (ou freeling/stanza) '
+                     'ou --dictionary' % corpuslangs.label(args.lang))
     pkgs = r_packages_for(args, analyses) + (['udpipe'] if args.parser == 'udpipe' else [])
     missing = missing_r_packages(args.rpath, pkgs)
     if missing:

@@ -688,7 +688,9 @@ def ReadDicoAsDico(dicopath):
 
 def ReadLexique(parent, lang = 'french', filein = None):
     if lang != 'other' :
-        if filein is None :
+        if filein is None and lang not in parent.DictPath :
+            parent.lexique = {}   # língua sem dicionário do IRaMuTeQ (só lematização contextual)
+        elif filein is None :
             parent.lexique = ReadDicoAsDico(parent.DictPath.get(lang, 'french'))
         else :
             parent.lexique = ReadDicoAsDico(filein)
