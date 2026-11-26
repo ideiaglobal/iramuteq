@@ -30,8 +30,13 @@ O CLI verifica os pacotes R antes de começar. Se faltar algum, indica o comando
 | `--dictionary` | — | Dicionário próprio (`forma<TAB>lema<TAB>categoria`) |
 | `--out` | pasta do corpus | Onde se cria `<corpus>_corpus_N/` |
 | `--no-lem` | — | Não lematizar |
-| `--parser` | `dicionario` | `dicionario` ou `udpipe` (ver a secção seguinte) |
+| `--parser` | `dicionario` | `dicionario`, `udpipe`, `freeling` ou `stanza` (ver a secção seguinte) |
 | `--udpipe-model` | — | Modelo udpipe: nome (`spanish-ancora`, `galician-treegal`…) ou caminho |
+| `--freeling-lang` | deduzida de `--lang` | Língua do FreeLing (`gl`, `es`, `pt`…) |
+| `--freeling-dir` | `~/.iramuteq-tools/freeling-4.2.1` | Pasta de instalação do FreeLing |
+| `--stanza-lang` | deduzida de `--lang` | Língua do Stanza (`gl`, `es`, `pt`…) |
+| `--stanza-package` | o padrão da língua | Modelo do Stanza (ex.: `treegal`, `ctg`) |
+| `--freeling-no-ner` | — | Não juntar nomes próprios compostos (`Xosé_Luís_Barreiro`) |
 | `--rpath` | `R` no PATH | Executável R |
 
 **`chd`**
@@ -77,9 +82,17 @@ O CLI verifica os pacotes R antes de começar. Se faltar algum, indica o comando
 
 Os restantes parâmetros vêm de `configuration/*.cfg` ou dos mesmos valores por omissão que os diálogos da interface usam.
 
-## Lematização contextual com udpipe (experimental)
+## Lematização contextual: udpipe, FreeLing e Stanza (experimental)
 
-O dicionário do IRaMuTeQ associa cada forma a **um só** lema e categoria. Com `--parser udpipe`, o corpus é anotado por um modelo [Universal Dependencies](https://universaldependencies.org) através do pacote R [udpipe](https://cran.r-project.org/package=udpipe), e cada ocorrência recebe o lema e a categoria do seu contexto.
+O dicionário do IRaMuTeQ associa cada forma a **um só** lema e categoria. Com `--parser udpipe`, `--parser freeling` ou `--parser stanza`, o corpus é anotado por um analisador morfológico, e cada ocorrência recebe o lema e a categoria do seu contexto:
+
+- **udpipe:** modelos [Universal Dependencies](https://universaldependencies.org) através do pacote R [udpipe](https://cran.r-project.org/package=udpipe).
+- **Stanza:** [Stanza](https://stanfordnlp.github.io/stanza/), num ambiente Python próprio (`~/.iramuteq-tools/stanza-venv`, com PyTorch). É chamado através de `stanza_annotate.py`.
+- **FreeLing:** [FreeLing](https://github.com/TALP-UPC/FreeLing) 4.2.1, programa `analyze`, com etiquetas EAGLES convertidas para UD. A instalação no Debian 13 está descrita em `iramuteq-analise/avaliacao_gl/RESULTADOS.md`.
+
+```bash
+python3 iracli.py corpus.txt --lang galician --parser freeling -a chd,spec --spec-var tema
+```
 
 ```bash
 python3 iracli.py corpus.txt --parser udpipe --udpipe-model spanish-ancora -a chd,spec --spec-var tema
@@ -93,10 +106,16 @@ Rscript -e 'udpipe::udpipe_download_model("galician-treegal", model_dir="~/.iram
 
 Os modelos UD 2.5 do udpipe têm licença **CC BY-NC-SA 4.0** (uso não comercial).
 
-### Como funciona (`udpipeparser.py`)
+### Como funciona (`lemmatiseur.py`)
 
 1. **Leitura dos blocos.** Lê os blocos de texto com o mesmo agrupamento do `read_corpus`: as linhas entre marcas `****` e `-*`.
-2. **Anotação.** Anota todos os blocos **numa só chamada ao R** (`udpipe(..., parser = "none")`). Parte do texto original, com maiúsculas e pontuação.
+2. **Anotação.** Anota todos os blocos **numa só chamada** ao analisador, a partir do texto original, com maiúsculas e pontuação:
+   - classe `Udpipe`: uma chamada ao R com `udpipe(..., parser = "none")`;
+   - classe `FreeLing`: uma chamada ao `analyze`, com uma frase-sentinela entre os blocos para os separar na saída, e sem reconhecimento de datas e quantidades.
+
+   - classe `Stanza`: uma chamada ao `stanza_annotate.py` no ambiente do Stanza, com os blocos em JSON.
+
+   Para acrescentar outro analisador basta uma classe com `annotate(blocos)` e `describe()`. As palavras que chegam com o ponto final colado (*pan.*) são divididas em palavra + separador.
 3. **Conversão das categorias.** Converte as categorias UD (UPOS + traços) nas que já existem no `key.cfg`, sem acrescentar categorias novas:
    - `NOUN`→`nom`, `VERB`→`ver`, `ADP`→`pre`;
    - `DET` com `Definite=Def`→`art_def`;
@@ -105,7 +124,7 @@ Os modelos UD 2.5 do udpipe têm licença **CC BY-NC-SA 4.0** (uso não comercia
 4. **Chaves.** Cria uma **chave por leitura** só quando a mesma forma tem leituras diferentes no corpus. Por exemplo, `vino_nom` (lema *vino*) e `vino_ver` (lema *venir*). As formas com uma só leitura ficam com a chave simples.
 5. **Lemas com várias categorias.** Quando um lema aparece com mais de uma categoria (*bajo* adj./prep.), recebe também um sufixo. Assim, as duas leituras não se juntam num lema cuja categoria seria a da primeira forma encontrada.
 6. **Construção do corpus.** O `BuildFromAlcesteParsed` (subclasse de `BuildFromAlceste`) só substitui o `treattxt`. A segmentação, as bases de dados e todas as análises continuam inalteradas.
-7. **Ficheiro de ambiguidades.** Escreve `ambiguidades.csv` na pasta do corpus: forma, leituras e ocorrências. O `Corpus.cira` regista `parser = udpipe` e o modelo usado.
+7. **Ficheiro de ambiguidades.** Escreve `ambiguidades.csv` na pasta do corpus: forma, leituras e ocorrências. O `Corpus.cira` regista o analisador (`parser`) e o modelo usado (`parser_model`).
 
 **Decisões desta primeira versão:**
 
@@ -134,7 +153,20 @@ Outros erros do dicionário que o udpipe evita: *casa* → `casar`. Erros do udp
 | *sobre* prep. / nome (frases isoladas) | sempre `sobrar/ver` | ✔ ADP / NOUN | ✔ ADP / NOUN |
 | Erros de lema vistos | — | *peixe*→`peixar`, *caldo*→`calr`, *polbo*→`polbir`, *veu*→`ver` | *peixe*→VERB, *viño*→`vo`, *mañá*→`mañ/aux`, *veu*→`ver` |
 
-**Conclusão.** A integração funciona: a ambiguidade passa da anotação para todas as análises sem alterar o resto do IRaMuTeQ. A qualidade depende inteiramente do modelo. O espanhol AnCora é bom. Os modelos galegos UD 2.5 são fracos, porque os *treebanks* são pequenos e o ctg não tem traços morfológicos. Para o galego vale a pena experimentar outros analisadores com o mesmo módulo, como FreeLing, Linguakit ou Stanza. O ponto de troca é a função `annotate`.
+**FreeLing (`--parser freeling`), nos mesmos corpus:**
+
+| | udpipe | FreeLing |
+|---|---|---|
+| es: *vino* (400 nome + 400 verbo) | **400 + 400** (100 %) | 479 `vino/nom` + 321 `venir/ver` (79 verbos lidos como nome) |
+| es: especificidade de *vino* em bebida / llegada | 245 / −34 | 178 / −6 |
+| gl: *como* (400 *comer* + 400 conjunção) | treegal: 619 `adv` + 181 `con` | 800 × `pro_rel`, **nunca *comer*** |
+
+Na comparação alargada com texto real (`iramuteq-analise/avaliacao_gl/RESULTADOS.md`), o FreeLing é o melhor analisador para galego: 73 % no conjunto de ambiguidades e cerca de 97 % na distinção ativa/suplementar no TreeGal.
+
+**Conclusão.** A integração funciona: a ambiguidade passa da anotação para todas as análises sem alterar o resto do IRaMuTeQ. A qualidade depende do analisador e da língua:
+- **Espanhol:** o melhor foi o udpipe com o modelo AnCora.
+- **Galego:** o melhor nas ambiguidades foi o FreeLing; o Stanza-treegal foi o melhor no texto corrido. Os modelos udpipe UD 2.5 são fracos.
+- **Limite comum:** nenhum resolve as leituras raras, como *como* = *comer*.
 
 ## Resultados
 
@@ -177,7 +209,7 @@ Pacotes R instalados para estes testes: `ape` 5.8.1, `proxy` 0.4.29, `textometry
 
 ## Como funciona
 
-Além da correção acima, que é independente do CLI, o código da aplicação **não foi alterado**. A lematização contextual está num módulo novo, `udpipeparser.py`. O `iracli.py`:
+Além da correção acima, que é independente do CLI, o código da aplicação **não foi alterado**. A lematização contextual está num módulo novo, `lemmatiseur.py`. O `iracli.py`:
 
 1. Regista um *import hook* que responde a `import wx` (e `wx.*`) com classes substitutas sem efeitos. Faz o mesmo para `xlrd`, quando falta. Assim importam sem erro os módulos que misturam interface e cálculo.
 2. Cria um objeto `Headless` com os atributos da janela principal que as análises leem: `ConfigPath`, `DictPath`, `RscriptsPath`, `pref`, `RPath`, `TEMPDIR`, `history`, `lexique`.

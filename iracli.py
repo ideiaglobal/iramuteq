@@ -167,7 +167,7 @@ LANGS = ['french', 'english', 'german', 'italian', 'swedish', 'portuguese', 'spa
          'greek', 'galician', 'dutch', 'norwegian', 'other']
 
 
-def build_corpus(ira, infile, lang, outdir, dictionary=None, udpipe_model=None):
+def build_corpus(ira, infile, lang, outdir, dictionary=None, analyser=None):
     from functions import DoConf, ReadDicoAsDico, ReadLexique
     from chemins import PathOut
     from corpus import BuildFromAlceste
@@ -179,12 +179,11 @@ def build_corpus(ira, infile, lang, outdir, dictionary=None, udpipe_model=None):
     parametres['lang'] = lang
     PathOut().createdir(parametres['pathout'])
 
-    if udpipe_model:
-        from udpipeparser import build_parsed_corpus
-        rscript = os.path.join(os.path.dirname(ira.RPath), 'Rscript')
-        corpus, ambiguous = build_parsed_corpus(infile, parametres, udpipe_model, rscript)
+    if analyser is not None:
+        from lemmatiseur import build_parsed_corpus
+        corpus, ambiguous = build_parsed_corpus(infile, parametres, analyser)
         corpus.conn_all()
-        summarize_ambiguities(ambiguous, corpus.parametres['pathout'])
+        summarize_ambiguities(analyser.name, ambiguous)
         return corpus
 
     ReadLexique(ira, lang=lang, filein=dictionary)
@@ -195,8 +194,8 @@ def build_corpus(ira, infile, lang, outdir, dictionary=None, udpipe_model=None):
     return corpus
 
 
-def summarize_ambiguities(ambiguous, pathout, show=8):
-    print('  udpipe: %i formas com mais de uma leitura (lista completa em ambiguidades.csv)' % len(ambiguous))
+def summarize_ambiguities(name, ambiguous, show=8):
+    print('  %s: %i formas com mais de uma leitura (lista completa em ambiguidades.csv)' % (name, len(ambiguous)))
     top = sorted(ambiguous, key=lambda k: -sum(ambiguous[k].values()))[:show]
     for form in top:
         print('    %-12s %s' % (form, ' · '.join('%s/%s (%i)' % (l, g, n) for (l, g), n in ambiguous[form].most_common())))
@@ -439,6 +438,31 @@ def analysis_problems(name, analyse, ira):
 # ---------------------------------------------------------------------------
 # 6. Linha de comandos
 # ---------------------------------------------------------------------------
+FREELING_LANGS = {'galician': 'gl', 'spanish': 'es', 'portuguese': 'pt', 'english': 'en', 'french': 'fr',
+                  'italian': 'it', 'german': 'de', 'dutch': 'nl', 'norwegian': 'nb'}
+
+
+def make_analyser(args, ap):
+    """Analisador contextual pedido em --parser (None = dicionário da aplicação)."""
+    from lemmatiseur import FreeLing, Stanza, Udpipe
+    try:
+        if args.parser == 'udpipe':
+            return Udpipe(args.udpipe_model, rpath=args.rpath)
+        if args.parser == 'freeling':
+            lang = args.freeling_lang or FREELING_LANGS.get(args.lang)
+            if not lang:
+                ap.error('indique a língua do FreeLing com --freeling-lang')
+            return FreeLing(lang, freeling_dir=args.freeling_dir, ner=not args.freeling_no_ner)
+        if args.parser == 'stanza':
+            lang = args.stanza_lang or FREELING_LANGS.get(args.lang)
+            if not lang:
+                ap.error('indique a língua do Stanza com --stanza-lang')
+            return Stanza(lang, package=args.stanza_package)
+    except FileNotFoundError as e:
+        ap.error(str(e))
+    return None
+
+
 def build_parser():
     from_simi = ['cooccurrence', 'pourcentage de cooccurrence', 'Russel', 'Jaccard', 'Kulczynski1', 'Kulczynski2',
                  'Mountford', 'Fager', 'simple matching', 'Hamman', 'Faith', 'Tanimoto', 'Dice', 'Phi', 'Stiles',
@@ -454,10 +478,18 @@ def build_parser():
     ap.add_argument('--dictionary', help='dicionário próprio (forma<TAB>lema<TAB>categoria)')
     ap.add_argument('--out', help='pasta onde criar os resultados (omissão: junto ao corpus)')
     ap.add_argument('--no-lem', action='store_true', help='não lematizar')
-    ap.add_argument('--parser', default='dicionario', choices=['dicionario', 'udpipe'],
-                    help='lematização: dicionario (omissão, a da aplicação) ou udpipe (contextual, pacote R udpipe)')
+    ap.add_argument('--parser', default='dicionario', choices=['dicionario', 'udpipe', 'freeling', 'stanza'],
+                    help='lematização: dicionario (omissão, a da aplicação), ou contextual com udpipe '
+                    '(pacote R), FreeLing ou Stanza')
     ap.add_argument('--udpipe-model', help='modelo udpipe: nome (ex.: spanish-ancora, galician-ctg) procurado em '
                     '~/.iramuteq-udpipe, ou caminho para um ficheiro .udpipe')
+    ap.add_argument('--freeling-lang', help='língua do FreeLing (gl, es, pt…); omissão: deduzida de --lang')
+    ap.add_argument('--freeling-dir', default=os.path.expanduser('~/.iramuteq-tools/freeling-4.2.1'),
+                    help='pasta de instalação do FreeLing (omissão: ~/.iramuteq-tools/freeling-4.2.1)')
+    ap.add_argument('--stanza-lang', help='língua do Stanza (gl, es, pt…); omissão: deduzida de --lang')
+    ap.add_argument('--stanza-package', help='modelo do Stanza (ex.: ctg, treegal); omissão: o padrão da língua')
+    ap.add_argument('--freeling-no-ner', action='store_true',
+                    help='não juntar nomes próprios compostos (ex.: Xosé_Luís_Barreiro)')
     ap.add_argument('--rpath', default=shutil.which('R'), help='executável R (omissão: R no PATH)')
     ap.add_argument('-v', '--verbose', action='store_true', help='mostrar o registo interno do IRaMuTeQ')
 
@@ -512,8 +544,8 @@ def main(argv=None):
         ap.error('corpus não encontrado: %s' % args.corpus)
     if args.parser == 'udpipe' and not args.udpipe_model:
         ap.error('--parser udpipe exige --udpipe-model (ex.: spanish-ancora, galician-ctg)')
-    if args.parser == 'udpipe' and args.dictionary:
-        ap.error('--dictionary não se aplica com --parser udpipe')
+    if args.parser != 'dicionario' and args.dictionary:
+        ap.error('--dictionary não se aplica com --parser %s' % args.parser)
     pkgs = r_packages_for(args, analyses) + (['udpipe'] if args.parser == 'udpipe' else [])
     missing = missing_r_packages(args.rpath, pkgs)
     if missing:
@@ -529,9 +561,9 @@ def main(argv=None):
         sys.path.insert(0, APPLI_PATH)
 
     ira = Headless(args.rpath)
-    print('== Corpus (%s)' % (args.lang if args.parser == 'dicionario' else 'udpipe: ' + args.udpipe_model))
-    corpus = build_corpus(ira, args.corpus, args.lang, outdir, args.dictionary,
-                          udpipe_model=args.udpipe_model if args.parser == 'udpipe' else None)
+    analyser = make_analyser(args, ap)
+    print('== Corpus (%s)' % (args.lang if analyser is None else analyser.describe()['parser_model']))
+    corpus = build_corpus(ira, args.corpus, args.lang, outdir, args.dictionary, analyser=analyser)
     summarize_corpus(corpus)
     print('  pasta:', corpus.parametres['pathout'])
 
