@@ -1117,6 +1117,7 @@ afctogexf <- function(fileout, toplot, classes, clnb, sizes, nodes.attr=NULL) {
     #rownames(toplot)<-afc$rownames[1:100]
     cc <- rainbow(clnb)[classes]
     cc <- t(sapply(cc, col2rgb, alpha=TRUE))
+    cc[,4] <- cc[,4]/255  # o rgexf atual (testado: 0.17.0) exige alfa entre 0 e 1
     #sizes <- apply(chistabletot[1:100,], 1, max)
     
     nodes <- data.frame(cbind(1:nrow(toplot), rownames(toplot)))
@@ -1175,6 +1176,7 @@ simi.to.gexf <- function(fileout, graph.simi, nodes.attr = NULL) {
 	edges <- as.data.frame(get.edges(g, c(1:ecount(g))))
 	col <- graph.simi$color
 	col <- t(sapply(col, col2rgb, alpha=TRUE))
+	col[,4] <- col[,4]/255  # o rgexf atual (testado: 0.17.0) exige alfa entre 0 e 1
 	write.gexf(nodes, edges, output=fileout, nodesAtt=nodesatt, nodesVizAtt=list(color=col,position=lo, size=graph.simi$label.cex), edgesVizAtt=list(size=graph.simi$we.width))
 }
 
