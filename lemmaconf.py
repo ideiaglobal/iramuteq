@@ -234,14 +234,20 @@ def default_analyser(ira_lang, pref=None, rpath=None):
     return None
 
 
-def make_analyser(parametres, rpath=None):
-    """Instancia o analisador descrito nos parâmetros do corpus (parser, freeling_lang, udpipe_model…)."""
+def make_analyser(parametres, rpath=None, progress=None):
+    """Instancia o analisador descrito nos parâmetros do corpus (parser, freeling_lang, udpipe_model…).
+
+    progress(event, detail) é chamado enquanto o analisador corre: event 'download' (detail = modelo
+    udpipe a descarregar) ou 'annotate' (detail = nome do analisador)."""
     from lemmatiseur import FreeLing, Stanza, Udpipe
     parser = parametres.get('parser')
     if parser == 'freeling':
-        return FreeLing(parametres['freeling_lang'], freeling_dir=parametres.get('freeling_path', DEFAULT_FREELING_DIR))
-    if parser == 'udpipe':
-        return Udpipe(parametres['udpipe_model'], rpath=rpath, download=True)
-    if parser == 'stanza':
-        return Stanza(parametres['stanza_lang'], package=parametres.get('stanza_package') or None)
-    raise ValueError('analisador desconhecido: %s' % parser)
+        analyser = FreeLing(parametres['freeling_lang'], freeling_dir=parametres.get('freeling_path', DEFAULT_FREELING_DIR))
+    elif parser == 'udpipe':
+        return Udpipe(parametres['udpipe_model'], rpath=rpath, download=True, progress=progress)
+    elif parser == 'stanza':
+        analyser = Stanza(parametres['stanza_lang'], package=parametres.get('stanza_package') or None)
+    else:
+        raise ValueError('analisador desconhecido: %s' % parser)
+    analyser.progress = progress
+    return analyser

@@ -30,6 +30,24 @@ from corpus import BuildFromAlceste, Uce, testetoile, testint
 
 log = logging.getLogger('iramuteq.lemmatiseur')
 
+
+def run_process(cmd, progress=None, event=None, detail=None, input=None, **kw):
+    """subprocess.run com captura de texto; enquanto o processo corre chama progress(event, detail)
+    cada 0,2 s, para a janela de progresso do IRaMuTeQ se manter viva e mostrar o que se faz."""
+    if progress is None:
+        return subprocess.run(cmd, input=input, capture_output=True, text=True, **kw)
+    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE if input is not None else None,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, **kw)
+    pending = input
+    while True:
+        progress(event, detail)
+        try:
+            out, err = proc.communicate(pending, timeout=0.2)
+            break
+        except subprocess.TimeoutExpired:
+            pending = None   # o resto da entrada continua a ser enviado por communicate
+    return subprocess.CompletedProcess(cmd, proc.returncode, out, err)
+
 TOOLS_DIR = os.path.join(os.path.expanduser('~'), '.iramuteq-tools')
 UDPIPE_MODEL_DIR = os.path.join(os.path.expanduser('~'), '.iramuteq-udpipe')
 FREELING_DIR = os.path.join(TOOLS_DIR, 'freeling-4.2.1')
@@ -163,8 +181,9 @@ x <- x[, c("doc_id", "token_id", "token", "lemma", "upos", "feats")]
 write.table(x, args[3], sep = "\t", quote = FALSE, row.names = FALSE, na = "", fileEncoding = "UTF-8")
 '''
 
-    def __init__(self, model, rpath=None, model_dir=UDPIPE_MODEL_DIR, download=False):
+    def __init__(self, model, rpath=None, model_dir=UDPIPE_MODEL_DIR, download=False, progress=None):
         self.rscript = _find_rscript(rpath)
+        self.progress = progress
         try:
             self.model_path = self.find_model(model, model_dir)
         except FileNotFoundError:
@@ -178,8 +197,8 @@ write.table(x, args[3], sep = "\t", quote = FALSE, row.names = FALSE, na = "", f
         log.info('udpipe: a descarregar o modelo %s para %s', model, model_dir)
         code = 'm <- udpipe::udpipe_download_model(commandArgs(TRUE)[1], model_dir = commandArgs(TRUE)[2]); ' \
                'if (isTRUE(m$download_failed[1])) quit(status = 1)'
-        proc = subprocess.run([self.rscript, '--vanilla', '-e', code, model, model_dir],
-                              capture_output=True, text=True)
+        proc = run_process([self.rscript, '--vanilla', '-e', code, model, model_dir],
+                           self.progress, 'download', model)
         if proc.returncode != 0:
             raise RuntimeError('udpipe: não foi possível descarregar o modelo %s:\n%s' % (model, proc.stderr[-2000:]))
         return self.find_model(model, model_dir)
@@ -209,8 +228,8 @@ write.table(x, args[3], sep = "\t", quote = FALSE, row.names = FALSE, na = "", f
                 f.write('d%07i\t%s\n' % (i, ' '.join(block).replace('\t', ' ')))
         with open(fscript, 'w', encoding='utf-8') as f:
             f.write(self.R_SCRIPT)
-        proc = subprocess.run([self.rscript, '--vanilla', fscript, self.model_path, fin, fout],
-                              capture_output=True, text=True)
+        proc = run_process([self.rscript, '--vanilla', fscript, self.model_path, fin, fout],
+                           self.progress, 'annotate', self.name)
         if proc.returncode != 0:
             raise RuntimeError('udpipe falhou:\n' + proc.stderr)
         docs = [[] for _ in blocks]
@@ -228,6 +247,7 @@ class FreeLing:
     """FreeLing 4.x (programa `analyze`). Divide contrações e clíticos; junta nomes próprios (NER)."""
     name = 'freeling'
     r_packages = []
+    progress = None   # progress(event, detail), ver run_process
     SENTINEL = 'Zzxqwj'   # frase-sentinela entre blocos, para os separar na saída
 
     def __init__(self, lang='gl', freeling_dir=FREELING_DIR, ner=True, multiwords=True):
@@ -255,8 +275,8 @@ class FreeLing:
         env = dict(os.environ, FREELINGSHARE=self.share,
                    LD_LIBRARY_PATH=os.pathsep.join(filter(None, [os.path.join(self.dir, 'lib'),
                                                                  os.environ.get('LD_LIBRARY_PATH')])))
-        proc = subprocess.run([self.analyze, '-f', self.cfg] + self.options, input=text,
-                              capture_output=True, text=True, env=env)
+        proc = run_process([self.analyze, '-f', self.cfg] + self.options, self.progress, 'annotate',
+                           self.name, input=text, env=env)
         if proc.returncode != 0:
             raise RuntimeError('FreeLing falhou:\n' + proc.stderr[-3000:])
         docs, cur, skip_dot = [], [], False
@@ -284,6 +304,7 @@ class Stanza:
     """Stanza (Stanford NLP), num ambiente Python próprio (PyTorch). Modelos UD recentes."""
     name = 'stanza'
     r_packages = []
+    progress = None   # progress(event, detail), ver run_process
     HELPER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stanza_annotate.py')
 
     def __init__(self, lang='gl', python=os.path.join(TOOLS_DIR, 'stanza-venv', 'bin', 'python'),
@@ -299,7 +320,8 @@ class Stanza:
         import json
         req = {'lang': self.lang, 'model_dir': self.model_dir, 'package': self.package,
                'texts': [' '.join(b) for b in blocks]}
-        proc = subprocess.run([self.python, '-I', self.HELPER], input=json.dumps(req), capture_output=True, text=True)
+        proc = run_process([self.python, '-I', self.HELPER], self.progress, 'annotate', self.name,
+                           input=json.dumps(req))
         if proc.returncode != 0:
             raise RuntimeError('Stanza falhou:\n' + proc.stderr[-3000:])
         docs = [[tuple(w) for w in doc] for doc in json.loads(proc.stdout)]

@@ -1651,3 +1651,9 @@ msgstr "modèle non téléchargé"
 
 msgid "Other language"
 msgstr "Autre langue"
+
+msgid "Downloading the udpipe model %s (first use, this may take a few minutes)..."
+msgstr "Téléchargement du modèle udpipe %s (première utilisation, cela peut prendre quelques minutes)..."
+
+msgid "Lemmatizing with %s..."
+msgstr "Lemmatisation avec %s..."

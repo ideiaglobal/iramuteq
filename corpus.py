@@ -1726,9 +1726,16 @@ class Builder :
             # lematização contextual (lemmaconf.py escolhe e cria o analisador; lemmatiseur.py anota)
             from lemmaconf import make_analyser, LABELS
             from lemmatiseur import build_parsed_corpus
+            progress = None
             if self.dlg is not None :
-                self.dlg.Pulse(LABELS[self.parametres['parser']] + '...')
-            analyser = make_analyser(self.parametres, rpath = getattr(self.parent, 'RPath', None))
+                self.dlg.Pulse(_("Lemmatizing with %s...") % LABELS[self.parametres['parser']])
+                def progress(event, detail) :
+                    if event == 'download' :
+                        msg = _("Downloading the udpipe model %s (first use, this may take a few minutes)...") % detail
+                    else :
+                        msg = _("Lemmatizing with %s...") % LABELS.get(detail, detail)
+                    self.dlg.Pulse(msg)
+            analyser = make_analyser(self.parametres, rpath = getattr(self.parent, 'RPath', None), progress = progress)
             corpus, ambiguous = build_parsed_corpus(self.parent.filename, self.parametres, analyser, dlg = self.dlg)
             log.info('%s : %i formes ambigues' % (analyser.name, len(ambiguous)))
             return corpus
